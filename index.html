@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private Projects</title>
+  <style>
+    :root{
+      --bg:#f5f6f8;
+      --surface:#ffffff;
+      --surface-2:#f8fafc;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --primary:#7c3aed;
+      --primary-soft:#f3e8ff;
+      --shadow:0 8px 24px rgba(15, 23, 42, 0.08);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#f8fafc 0%, #f3f4f6 100%);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:24px 16px 40px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:20px;
+    }
+
+    .brand{
+      font-size:1rem;
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+
+    .back-link{
+      text-decoration:none;
+      color:var(--muted);
+      font-size:.95rem;
+      background:var(--surface);
+      border:1px solid var(--border);
+      padding:10px 14px;
+      border-radius:999px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:28px;
+      padding:28px 24px;
+      box-shadow:var(--shadow);
+      margin-bottom:22px;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      font-size:.82rem;
+      color:var(--primary);
+      background:var(--primary-soft);
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:2rem;
+      line-height:1.1;
+      letter-spacing:-0.02em;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      max-width:760px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+      gap:18px;
+    }
+
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      min-height:220px;
+    }
+
+    .icon{
+      width:52px;
+      height:52px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.4rem;
+      background:var(--primary-soft);
+      color:var(--primary);
+      margin-bottom:16px;
+    }
+
+    h2{
+      margin:0 0 8px;
+      font-size:1.2rem;
+    }
+
+    .card p{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.6;
+      flex:1;
+    }
+
+    .meta{
+      font-size:.88rem;
+      color:var(--muted);
+      margin-bottom:16px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      background:var(--primary);
+      color:#fff;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:700;
+      transition:transform .16s ease, filter .16s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      filter:brightness(.97);
+    }
+
+    .placeholder{
+      background:var(--surface-2);
+      border-style:dashed;
+    }
+
+    .footer{
+      margin-top:28px;
+      text-align:center;
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    @media (max-width:700px){
+      .hero{
+        padding:24px 18px;
+      }
+
+      h1{
+        font-size:1.7rem;
+      }
+
+      .topbar{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">kaffeetrinker80 / Private Projects</div>
+      <a class="back-link" href="/">← Back to Home</a>
+    </div>
+
+    <section class="hero">
+      <div class="eyebrow">Private Projects</div>
+      <h1>Personal experiments, drafts and internal helper pages</h1>
+      <p>
+        This section is reserved for private ideas, early prototypes and smaller personal tools.
+        Not everything here is polished or finished — some projects may simply be experiments in progress.
+      </p>
+    </section>
+
+    <section class="grid">
+      <article class="card placeholder">
+        <div class="icon">🧪</div>
+        <h2>No public tools yet</h2>
+        <p>
+          This area is prepared for future private projects, internal helper pages or test tools
+          that may be added later.
+        </p>
+        <div class="meta">Placeholder</div>
+        <a class="btn" href="#" onclick="return false;" style="background:#94a3b8;">Coming Later</a>
+      </article>
+
+      <article class="card placeholder">
+        <div class="icon">🗂️</div>
+        <h2>Drafts & prototypes</h2>
+        <p>
+          A place for unfinished concepts, private planning pages and experiments that are not part
+          of the main public tool collection yet.
+        </p>
+        <div class="meta">Reserved section</div>
+        <a class="btn" href="#" onclick="return false;" style="background:#94a3b8;">Reserved</a>
+      </article>
+    </section>
+
+    <div class="footer">
+      Made with Love © · kaffeetrinker80
+    </div>
+  </div>
+</body>
+</html>
