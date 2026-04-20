@@ -3,199 +3,326 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private Projects</title>
+  <title>Private Projects | kaffeetrinker80</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    :root{
-      --bg:#f5f6f8;
-      --surface:#ffffff;
-      --surface-2:#f8fafc;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --primary:#7c3aed;
-      --primary-soft:#f3e8ff;
-      --shadow:0 8px 24px rgba(15, 23, 42, 0.08);
-      --radius:22px;
+    :root {
+      --bg: #12151a;
+      --bg-soft: #1a1e24;
+      --surface: rgba(30, 35, 43, 0.6);
+      --surface-soft: rgba(49, 56, 68, 0.8);
+      --text: #eef2f7;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --shadow: 0 16px 34px rgba(0,0,0,.3);
+
+      /* Base Projects Purple */
+      --primary: #c5a8ff;
+      --primary-soft: rgba(197, 168, 255, 0.15);
+
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      
+      --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    *{box-sizing:border-box}
+    * { box-sizing: border-box; }
 
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:linear-gradient(180deg,#f8fafc 0%, #f3f4f6 100%);
-      color:var(--text);
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      position: relative;
+      overflow-x: hidden;
     }
 
-    .wrap{
-      max-width:980px;
-      margin:0 auto;
-      padding:24px 16px 40px;
+    /* Ambient Background Glow */
+    body::before, body::after {
+      content: "";
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      opacity: 0.12;
+      pointer-events: none;
     }
 
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:20px;
+    body::before { background: var(--primary); top: -100px; left: -100px; }
+    body::after { background: #6ea8ff; bottom: 10%; right: -200px; }
+
+    /* Entrance Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .brand{
-      font-size:1rem;
-      font-weight:700;
-      letter-spacing:.01em;
+    .animate-in { animation: fadeInUp 0.8s var(--transition-smooth) forwards; opacity: 0; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
     }
 
-    .back-link{
-      text-decoration:none;
-      color:var(--muted);
-      font-size:.95rem;
-      background:var(--surface);
-      border:1px solid var(--border);
-      padding:10px 14px;
-      border-radius:999px;
-      box-shadow:var(--shadow);
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
     }
 
-    .hero{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:28px;
-      padding:28px 24px;
-      box-shadow:var(--shadow);
-      margin-bottom:22px;
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .eyebrow{
-      display:inline-block;
-      font-size:.82rem;
-      color:var(--primary);
-      background:var(--primary-soft);
-      padding:8px 12px;
-      border-radius:999px;
-      font-weight:700;
-      margin-bottom:14px;
+    .brand-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      background: linear-gradient(90deg, #fff, #aab4c3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    h1{
-      margin:0 0 10px;
-      font-size:2rem;
-      line-height:1.1;
-      letter-spacing:-0.02em;
+    .brand-subtitle {
+      color: var(--primary);
+      font-size: .95rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
     }
 
-    .hero p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.65;
-      max-width:760px;
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
-      gap:18px;
+    .nav a {
+      text-decoration: none;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 999px;
+      backdrop-filter: blur(12px);
+      font-size: .95rem;
+      font-weight: 400;
+      transition: all var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .card{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:20px;
-      box-shadow:var(--shadow);
-      display:flex;
-      flex-direction:column;
-      min-height:220px;
+    .nav a:hover {
+      transform: translateY(-2px);
+      background: var(--surface-soft);
+      border-color: var(--border-hover);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
-    .icon{
-      width:52px;
-      height:52px;
-      border-radius:16px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:1.4rem;
-      background:var(--primary-soft);
-      color:var(--primary);
-      margin-bottom:16px;
+    .hero {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 48px 40px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
     }
 
-    h2{
-      margin:0 0 8px;
-      font-size:1.2rem;
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 3.5rem;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff 0%, #aab4c3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .card p{
-      margin:0 0 16px;
-      color:var(--muted);
-      line-height:1.6;
-      flex:1;
+    .hero-subtitle {
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--primary);
+      margin: 0 0 20px;
+      letter-spacing: -0.01em;
     }
 
-    .meta{
-      font-size:.88rem;
-      color:var(--muted);
-      margin-bottom:16px;
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 1.15rem;
+      font-weight: 300;
     }
 
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      text-decoration:none;
-      background:var(--primary);
-      color:#fff;
-      border-radius:14px;
-      padding:12px 14px;
-      font-weight:700;
-      transition:transform .16s ease, filter .16s ease;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
     }
 
-    .btn:hover{
-      transform:translateY(-1px);
-      filter:brightness(.97);
+    /* Styling für die Platzhalter-Karten */
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 260px;
+      transition: all var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      
+      /* Slate/Gray Theme für inaktive Projekte */
+      --c-theme: #64748b; 
+      --c-soft: rgba(100, 116, 139, 0.15);
     }
 
-    .placeholder{
-      background:var(--surface-2);
-      border-style:dashed;
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--c-theme);
+      box-shadow: 0 12px 30px var(--c-soft);
     }
 
-    .footer{
-      margin-top:28px;
-      text-align:center;
-      color:var(--muted);
-      font-size:.9rem;
+    .icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: var(--c-soft);
+      color: var(--c-theme);
+      transition: transform var(--transition-smooth);
+      flex-shrink: 0;
     }
 
-    @media (max-width:700px){
-      .hero{
-        padding:24px 18px;
-      }
+    .card:hover .icon-wrap {
+      transform: scale(1.1) rotate(-4deg);
+    }
 
-      h1{
-        font-size:1.7rem;
-      }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
 
-      .topbar{
-        flex-direction:column;
-        align-items:flex-start;
-      }
+    .card p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 300;
+      font-size: 0.95rem;
+      flex-grow: 1;
+    }
+
+    .meta {
+      display: inline-block;
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--c-theme);
+      background: var(--c-soft);
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .card-actions {
+      width: 100%;
+      margin-top: auto;
+    }
+
+    /* Inaktiver Button Style */
+    .btn-card {
+      display: block;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      transition: all var(--transition-smooth);
+      position: relative;
+      color: var(--c-theme);
+      background: var(--c-soft);
+      cursor: default;
+    }
+
+    .btn-card:hover {
+      background: rgba(100, 116, 139, 0.25);
+    }
+
+    .footer {
+      margin-top: 60px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .95rem;
+      font-weight: 300;
+    }
+
+    @media (max-width: 960px){
+      .hero h1 { font-size: 2.8rem; }
+      .hero-subtitle { font-size: 1.2rem; }
+    }
+
+    @media (max-width: 640px){
+      .container { padding: 24px 16px 40px; }
+      .hero { padding: 32px 24px; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero-subtitle { font-size: 1.1rem; }
+      .grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="brand">kaffeetrinker80 / Private Projects</div>
-      <a class="back-link" href="/">← Back to Home</a>
-    </div>
+  <div class="container">
+    <header class="topbar animate-in">
+      <div class="brand">
+        <div class="brand-title">kaffeetrinker80</div>
+        <div class="brand-subtitle">Private Projects</div>
+      </div>
+      <nav class="nav">
+        <a href="https://kaffeetrinker80.github.io/">← Back to Home</a>
+      </nav>
+    </header>
 
-    <section class="hero">
-      <div class="eyebrow">Private Projects</div>
-      <h1>Personal experiments, drafts and internal helper pages</h1>
+    <section class="hero animate-in delay-1">
+      <h1>Private Projects</h1>
+      <div class="hero-subtitle">Personal experiments, drafts and internal helper pages.</div>
       <p>
         This section is reserved for private ideas, early prototypes and smaller personal tools.
         Not everything here is polished or finished — some projects may simply be experiments in progress.
@@ -203,30 +330,43 @@
     </section>
 
     <section class="grid">
-      <article class="card placeholder">
-        <div class="icon">🧪</div>
+      <article class="card animate-in delay-2">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 2v7.31l-4.5 7.69A2 2 0 0 0 7.24 20h9.52a2 2 0 0 0 1.8-2.92L14 9.31V2h-4Z"/>
+            <path d="M8.5 2h7"/>
+          </svg>
+        </div>
         <h2>No public tools yet</h2>
         <p>
           This area is prepared for future private projects, internal helper pages or test tools
           that may be added later.
         </p>
         <div class="meta">Placeholder</div>
-        <a class="btn" href="#" onclick="return false;" style="background:#94a3b8;">Coming Later</a>
+        <div class="card-actions">
+          <a class="btn-card" href="#" onclick="return false;">Coming Later</a>
+        </div>
       </article>
 
-      <article class="card placeholder">
-        <div class="icon">🗂️</div>
+      <article class="card animate-in delay-3">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+          </svg>
+        </div>
         <h2>Drafts & prototypes</h2>
         <p>
           A place for unfinished concepts, private planning pages and experiments that are not part
           of the main public tool collection yet.
         </p>
         <div class="meta">Reserved section</div>
-        <a class="btn" href="#" onclick="return false;" style="background:#94a3b8;">Reserved</a>
+        <div class="card-actions">
+          <a class="btn-card" href="#" onclick="return false;">Reserved</a>
+        </div>
       </article>
     </section>
 
-    <div class="footer">
+    <div class="footer animate-in delay-3">
       Made with Love © · kaffeetrinker80
     </div>
   </div>
