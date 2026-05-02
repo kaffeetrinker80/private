@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>Private Projects | kaffeetrinker80</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,362 +13,189 @@
     :root {
       --bg: #12151a;
       --bg-soft: #1a1e24;
-      --surface: rgba(30, 35, 43, 0.6);
-      --surface-soft: rgba(49, 56, 68, 0.8);
+      --surface: #1e232b;
       --text: #eef2f7;
       --muted: #94a3b8;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.15);
-      --shadow: 0 16px 34px rgba(0,0,0,.3);
-
-      /* Base Projects Purple */
-      --primary: #c5a8ff;
-      --primary-soft: rgba(197, 168, 255, 0.15);
-
+      --border: rgba(255, 255, 255, 0.1);
+      
+      /* Projects Purple Theme */
+      --primary: #c5a8ff; 
       --radius-xl: 28px;
       --radius-lg: 22px;
-      --radius-md: 16px;
-      
       --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
 
     body {
-      margin: 0;
-      font-family: 'Outfit', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      position: relative;
-      overflow-x: hidden;
+      margin: 0; font-family: 'Outfit', sans-serif;
+      background-color: var(--bg); color: var(--text);
+      position: relative; overflow-x: hidden; line-height: 1.5;
     }
 
-    /* Ambient Background Glow */
     body::before, body::after {
-      content: "";
-      position: absolute;
-      width: 600px;
-      height: 600px;
-      border-radius: 50%;
-      filter: blur(120px);
-      z-index: -1;
-      opacity: 0.12;
-      pointer-events: none;
+      content: ""; position: fixed; width: 400px; height: 400px;
+      border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.12; pointer-events: none;
     }
-
     body::before { background: var(--primary); top: -100px; left: -100px; }
-    body::after { background: #6ea8ff; bottom: 10%; right: -200px; }
+    body::after { background: #6ea8ff; bottom: 10%; right: -150px; }
 
-    /* Entrance Animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes shine { to { background-position: 200% center; } }
+    @keyframes starPulse {
+      0% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 8px var(--primary)); }
+      100% { transform: scale(1); opacity: 0.7; }
     }
 
-    .animate-in { animation: fadeInUp 0.8s var(--transition-smooth) forwards; opacity: 0; }
+    .animate-in { animation: fadeInUp 0.6s var(--transition-smooth) forwards; opacity: 0; }
     .delay-1 { animation-delay: 0.1s; }
     .delay-2 { animation-delay: 0.2s; }
     .delay-3 { animation-delay: 0.3s; }
 
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 32px 20px 60px;
-    }
+    .container { max-width: 1120px; margin: 0 auto; padding: 20px 20px 40px; position: relative; }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
+    /* TOPBAR */
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 9999; }
+    
+    .bookmark-btn {
+      background: var(--bg-soft); border: 1px solid var(--border); color: var(--primary);
+      width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s ease;
     }
+    .bookmark-btn:hover { transform: translateY(-2px); background: #252b33; }
+    .bookmark-btn svg { animation: starPulse 4s infinite ease-in-out; }
 
-    .brand {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .brand-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: .02em;
-      background: linear-gradient(90deg, #fff, #aab4c3);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .brand-subtitle {
-      color: var(--primary);
-      font-size: .95rem;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-    }
-
-    .nav {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .nav a {
-      text-decoration: none;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 10px 18px;
-      border-radius: 999px;
-      backdrop-filter: blur(12px);
-      font-size: .95rem;
-      font-weight: 400;
+    .nav-back {
+      text-decoration: none; color: var(--text); background: var(--bg-soft); border: 1px solid var(--border);
+      padding: 12px 20px; border-radius: 14px; font-size: .95rem; font-weight: 600;
       transition: all var(--transition-smooth);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
     }
+    .nav-back:hover { transform: translateY(-2px); background: #252b33; }
 
-    .nav a:hover {
-      transform: translateY(-2px);
-      background: var(--surface-soft);
-      border-color: var(--border-hover);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-
+    /* HERO */
     .hero {
-      background: var(--surface);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      padding: 48px 40px;
-      margin-bottom: 40px;
-      position: relative;
-      overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); padding: 50px 24px; margin-bottom: 40px; text-align: center;
     }
-
     .hero h1 {
-      margin: 0 0 8px;
-      font-size: 3.5rem;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ffffff 0%, #aab4c3 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      margin: 0; font-size: 3.2rem; line-height: 1.1; font-weight: 700;
+      background: linear-gradient(90deg, #ffffff 0%, var(--primary) 25%, #ffffff 50%, var(--primary) 75%, #ffffff 100%);
+      background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: shine 6s linear infinite;
     }
+    .hero-byline { font-size: 1.3rem; color: var(--primary); margin-top: 10px; font-weight: 400; }
+    .hero p { color: var(--muted); line-height: 1.6; font-size: 1.1rem; margin: 24px auto 0; max-width: 760px; }
 
-    .hero-subtitle {
-      font-size: 1.4rem;
-      font-weight: 400;
-      color: var(--primary);
-      margin: 0 0 20px;
-      letter-spacing: -0.01em;
-    }
+    /* GRID */
+    .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
 
-    .hero p {
-      margin: 0;
-      max-width: 760px;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 1.15rem;
-      font-weight: 300;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-    }
-
-    /* Styling für die Platzhalter-Karten */
     .card {
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius-lg);
-      padding: 28px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      min-height: 260px;
-      transition: all var(--transition-smooth);
-      position: relative;
-      overflow: hidden;
-      
-      /* Slate/Gray Theme für inaktive Projekte */
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 24px; display: flex; flex-direction: column;
+      transition: var(--transition-smooth); height: 100%;
+    }
+    
+    /* Active Card Styling */
+    .card.active-project {
+      --c-theme: var(--primary);
+      --c-soft: rgba(197, 168, 255, 0.1);
+    }
+    /* Placeholder Card Styling */
+    .card.placeholder {
       --c-theme: #64748b; 
-      --c-soft: rgba(100, 116, 139, 0.15);
+      --c-soft: rgba(100, 116, 139, 0.1);
+      border-style: dashed;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: var(--c-theme);
-      box-shadow: 0 12px 30px var(--c-soft);
+    .card:hover { transform: translateY(-5px); border-color: var(--c-theme); }
+    .card.active-project:hover { box-shadow: 0 10px 30px rgba(197, 168, 255, 0.15); }
+
+    .icon-wrap { 
+      width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; 
+      margin-bottom: 20px; background: var(--c-soft); color: var(--c-theme);
     }
 
-    .icon-wrap {
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      background: var(--c-soft);
-      color: var(--c-theme);
-      transition: transform var(--transition-smooth);
-      flex-shrink: 0;
-    }
+    .card h2 { font-size: 1.4rem; color: #fff; margin: 0 0 10px; }
+    .card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; flex-grow: 1; }
+    .meta { font-size: .75rem; font-weight: 600; color: var(--c-theme); background: var(--c-soft); padding: 5px 12px; border-radius: 999px; margin-bottom: 24px; display: inline-block; width: fit-content; }
 
-    .card:hover .icon-wrap {
-      transform: scale(1.1) rotate(-4deg);
+    .btn-card { 
+      width: 100%; text-align: center; text-decoration: none; font-weight: 600; padding: 14px; border-radius: 14px; 
+      color: var(--c-theme); background: var(--c-soft); transition: all 0.3s;
     }
+    .active-project .btn-card:hover { background: var(--c-theme); color: #1a1025; }
 
-    .card h2 {
-      margin: 0 0 12px;
-      font-size: 1.4rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      color: #fff;
-    }
+    .footer { margin-top: 60px; text-align: center; color: var(--muted); font-size: 0.85rem; padding-bottom: 20px; }
 
-    .card p {
-      margin: 0 0 20px;
-      color: var(--muted);
-      line-height: 1.6;
-      font-weight: 300;
-      font-size: 0.95rem;
-      flex-grow: 1;
-    }
-
-    .meta {
-      display: inline-block;
-      font-size: .8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--c-theme);
-      background: var(--c-soft);
-      padding: 6px 12px;
-      border-radius: 999px;
-      margin-bottom: 24px;
-      border: 1px solid rgba(255,255,255,0.03);
-    }
-
-    .card-actions {
-      width: 100%;
-      margin-top: auto;
-    }
-
-    /* Inaktiver Button Style */
-    .btn-card {
-      display: block;
-      width: 100%;
-      text-align: center;
-      text-decoration: none;
-      font-weight: 600;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid transparent;
-      transition: all var(--transition-smooth);
-      position: relative;
-      color: var(--c-theme);
-      background: var(--c-soft);
-      cursor: default;
-    }
-
-    .btn-card:hover {
-      background: rgba(100, 116, 139, 0.25);
-    }
-
-    .footer {
-      margin-top: 60px;
-      text-align: center;
-      color: var(--muted);
-      font-size: .95rem;
-      font-weight: 300;
-    }
-
-    @media (max-width: 960px){
-      .hero h1 { font-size: 2.8rem; }
-      .hero-subtitle { font-size: 1.2rem; }
-    }
-
-    @media (max-width: 640px){
-      .container { padding: 24px 16px 40px; }
-      .hero { padding: 32px 24px; }
-      .hero h1 { font-size: 2.2rem; }
-      .hero-subtitle { font-size: 1.1rem; }
-      .grid { grid-template-columns: 1fr; }
+    @media (min-width: 768px) {
+      .hero h1 { font-size: 4rem; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header class="topbar animate-in">
-      <div class="brand">
-        <div class="brand-title">kaffeetrinker80</div>
-        <div class="brand-subtitle">Private Projects</div>
-      </div>
+      <button class="bookmark-btn" onclick="addBookmark()" title="Bookmark this page">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </button>
       <nav class="nav">
-        <a href="https://kaffeetrinker80.github.io/">← Back to Home</a>
+        <a href="https://kaffeetrinker80.github.io/" class="nav-back">← Back to Home</a>
       </nav>
     </header>
 
     <section class="hero animate-in delay-1">
       <h1>Private Projects</h1>
-      <div class="hero-subtitle">Personal experiments, drafts and internal helper pages.</div>
+      <div class="hero-byline">by kaffeetrinker80</div>
       <p>
-        This section is reserved for private ideas, early prototypes and smaller personal tools.
-        Not everything here is polished or finished — some projects may simply be experiments in progress.
+        Personal experiments, drafts and internal helper pages. 
+        This section is reserved for private ideas and early prototypes.
       </p>
     </section>
 
-    <section class="grid">
-      <article class="card animate-in delay-2">
+    <section class="grid animate-in delay-2">
+      <!-- NEU: ETIKETTEN TOOL -->
+      <article class="card active-project">
         <div class="icon-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 2v7.31l-4.5 7.69A2 2 0 0 0 7.24 20h9.52a2 2 0 0 0 1.8-2.92L14 9.31V2h-4Z"/>
-            <path d="M8.5 2h7"/>
+            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l5.58-5.58c.94-.94.94-2.48 0-3.42L12 2z"/><path d="M7 7h.01"/>
           </svg>
         </div>
-        <h2>No public tools yet</h2>
-        <p>
-          This area is prepared for future private projects, internal helper pages or test tools
-          that may be added later.
-        </p>
-        <div class="meta">Placeholder</div>
+        <h2>Etiketten-Tool</h2>
+        <p>Simple and fast label generator for household and organization tasks.</p>
+        <div class="meta">Utility · Organization</div>
         <div class="card-actions">
-          <a class="btn-card" href="#" onclick="return false;">Coming Later</a>
+          <a class="btn-card" href="etiketten-tool/index.html">Open Tool</a>
         </div>
       </article>
 
-      <article class="card animate-in delay-3">
+      <!-- PLACEHOLDER 1 -->
+      <article class="card placeholder">
         <div class="icon-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+            <path d="M10 2v7.31l-4.5 7.69A2 2 0 0 0 7.24 20h9.52a2 2 0 0 0 1.8-2.92L14 9.31V2h-4Z"/><path d="M8.5 2h7"/>
           </svg>
         </div>
-        <h2>Drafts & prototypes</h2>
-        <p>
-          A place for unfinished concepts, private planning pages and experiments that are not part
-          of the main public tool collection yet.
-        </p>
-        <div class="meta">Reserved section</div>
+        <h2>Future Drafts</h2>
+        <p>This area is prepared for future private projects or internal helper pages.</p>
+        <div class="meta">Placeholder</div>
         <div class="card-actions">
           <a class="btn-card" href="#" onclick="return false;">Reserved</a>
         </div>
       </article>
     </section>
 
-    <div class="footer animate-in delay-3">
-      Made with Love © · kaffeetrinker80
-    </div>
+    <footer class="footer animate-in delay-3">
+      <p>Made with Love © · kaffeetrinker80</p>
+    </footer>
   </div>
+
+  <script>
+    function addBookmark() {
+      alert("To bookmark this page, please press:\n\nCTRL + D (Windows/Linux)\nCMD + D (Mac)");
+    }
+  </script>
 </body>
 </html>
