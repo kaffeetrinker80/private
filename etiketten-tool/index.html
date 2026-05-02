@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
- <!-- Icons + Manifest -->
+<!-- Icons + Manifest -->
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -11,20 +11,24 @@
 <link rel="manifest" href="site.webmanifest">
 
 <meta name="theme-color" content="#172f4d">
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Etiketten & Badgecard Tool</title>
+  <title>Etiketten & Badgecard Tool V1.3</title>
   <style>
     :root{
-      --bg:#f4f6f8;
+      --bg:#f4f7fb;
       --card:#ffffff;
       --ink:#172033;
       --muted:#64748b;
       --line:#d7dee8;
+      --soft:#f1f5f9;
       --accent:#1f5f8b;
-      --accent2:#0f766e;
+      --accent-dark:#14324d;
+      --green:#0f766e;
       --danger:#b91c1c;
-      --shadow:0 12px 30px rgba(15,23,42,.10);
+      --danger-bg:#fee2e2;
+      --shadow:0 12px 34px rgba(15,23,42,.12);
       --radius:18px;
     }
 
@@ -32,22 +36,24 @@
 
     body{
       margin:0;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
       color:var(--ink);
-      background:linear-gradient(135deg,#eef4fa,#f8fafc 40%,#e8f3f0);
+      background:
+        radial-gradient(circle at top left, rgba(31,95,139,.18), transparent 32%),
+        linear-gradient(135deg,#eef4fa,#f8fafc 45%,#e8f3f0);
     }
 
     header{
-      max-width:1440px;
+      max-width:1480px;
       margin:0 auto;
       padding:18px 18px 10px;
     }
 
     .hero{
-      background:linear-gradient(135deg,#14324d,#1f5f8b 55%,#0f766e);
+      background:linear-gradient(135deg,var(--accent-dark),var(--accent) 55%,var(--green));
       color:white;
       border-radius:24px;
-      padding:22px;
+      padding:20px 22px;
       box-shadow:var(--shadow);
       display:flex;
       justify-content:space-between;
@@ -56,36 +62,40 @@
     }
 
     .hero h1{
-      margin:0 0 6px;
-      font-size:clamp(1.45rem,2vw,2.2rem);
-      letter-spacing:-.03em;
+      margin:0 0 5px;
+      font-size:clamp(1.45rem,2vw,2.15rem);
+      letter-spacing:-.035em;
     }
 
-    .hero p{margin:0;color:rgba(255,255,255,.82)}
+    .hero p{
+      margin:0;
+      color:rgba(255,255,255,.84);
+      font-size:.96rem;
+    }
 
-    .badge{
+    .version-badge{
       background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.24);
+      border:1px solid rgba(255,255,255,.25);
       padding:8px 12px;
       border-radius:999px;
-      font-size:.85rem;
+      font-size:.84rem;
       white-space:nowrap;
     }
 
     main{
-      max-width:1440px;
+      max-width:1480px;
       margin:0 auto;
       padding:10px 18px 34px;
       display:grid;
-      grid-template-columns:390px 1fr;
+      grid-template-columns:430px 1fr;
       gap:18px;
       align-items:start;
     }
 
     .panel,.preview-wrap{
-      background:rgba(255,255,255,.86);
+      background:rgba(255,255,255,.88);
       backdrop-filter:blur(8px);
-      border:1px solid rgba(215,222,232,.9);
+      border:1px solid rgba(215,222,232,.95);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
     }
@@ -103,26 +113,23 @@
       padding-top:14px;
       margin-top:14px;
     }
-
-    .section:first-child{border-top:0;padding-top:0;margin-top:0}
+    .section:first-child{border-top:0;margin-top:0;padding-top:0}
 
     h2{
       font-size:1rem;
       margin:0 0 10px;
-      letter-spacing:-.01em;
+      letter-spacing:-.015em;
     }
 
     label{
       display:block;
       font-size:.78rem;
-      font-weight:700;
+      font-weight:750;
       color:#334155;
       margin:10px 0 5px;
     }
 
-    input,select,textarea,button{
-      font:inherit;
-    }
+    input,select,textarea,button{font:inherit}
 
     input,select,textarea{
       width:100%;
@@ -135,7 +142,7 @@
     }
 
     textarea{
-      min-height:92px;
+      min-height:76px;
       resize:vertical;
       line-height:1.35;
     }
@@ -148,11 +155,11 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 
-    .btn-row{
+    .btn-row,.mini-row{
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
-      margin-top:10px;
+      gap:7px;
+      margin-top:9px;
     }
 
     button{
@@ -162,15 +169,17 @@
       background:#e9eef5;
       color:#172033;
       cursor:pointer;
-      font-weight:700;
+      font-weight:750;
       transition:.15s ease;
     }
 
-    button:hover{transform:translateY(-1px);filter:brightness(.98)}
+    button:hover{transform:translateY(-1px);filter:brightness(.985)}
+    button.active{background:var(--accent);color:white}
     .primary{background:var(--accent);color:white}
-    .green{background:var(--accent2);color:white}
-    .danger{background:#fee2e2;color:var(--danger)}
-    .mini{padding:7px 9px;font-size:.84rem}
+    .green{background:var(--green);color:white}
+    .danger{background:var(--danger-bg);color:var(--danger)}
+    .mini{padding:6px 9px;font-size:.78rem;border-radius:10px;font-weight:650}
+    .ghost{background:#eef3f8;color:#334155}
 
     .toggle-row{
       display:flex;
@@ -179,62 +188,109 @@
       margin:8px 0;
       font-size:.9rem;
     }
-
     .toggle-row input{width:auto}
-
-    .format-buttons{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:8px;
-    }
-
-    .format-buttons button.active{
-      background:var(--accent);
-      color:white;
-    }
 
     .help{
       color:var(--muted);
       font-size:.82rem;
-      line-height:1.4;
+      line-height:1.42;
       margin-top:8px;
     }
+
+    .smart-box{
+      background:#f8fafc;
+      border:1px solid #dbe4ee;
+      border-radius:14px;
+      padding:10px;
+      margin:10px 0 12px;
+    }
+
+    .format-buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:7px;
+    }
+
+    .format-buttons button{
+      padding:6px 9px;
+      font-size:.78rem;
+      border-radius:10px;
+      background:#eef3f8;
+      font-weight:650;
+    }
+    .format-buttons button.active{background:var(--accent);color:white}
+
+    .items-list{
+      display:flex;
+      flex-direction:column;
+      gap:9px;
+      max-height:280px;
+      overflow:auto;
+      padding-right:3px;
+    }
+
+    .item-row{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:9px;
+    }
+
+    .item-top{
+      display:grid;
+      grid-template-columns:1fr 70px auto;
+      gap:7px;
+      align-items:center;
+    }
+
+    .item-row input,.item-row textarea{padding:7px 8px;border-radius:9px}
+    .item-row textarea{min-height:44px}
+
+    .advanced-box{display:none}
+    .advanced-box.show{display:block}
 
     .preview-wrap{
       padding:16px;
       overflow:auto;
+      min-height:70vh;
     }
 
     .preview-toolbar{
       display:flex;
       justify-content:space-between;
-      gap:10px;
       align-items:center;
+      gap:10px;
       margin-bottom:14px;
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:rgba(255,255,255,.9);
+      backdrop-filter:blur(8px);
+      padding-bottom:8px;
     }
-
     .preview-toolbar h2{margin:0}
 
     .page-stage{
       display:flex;
-      gap:24px;
-      align-items:flex-start;
       flex-wrap:wrap;
+      align-items:flex-start;
+      gap:24px;
     }
 
+    .page-holder{display:block}
     .page-title{
       font-size:.86rem;
-      font-weight:800;
+      font-weight:850;
       color:var(--muted);
       margin:0 0 8px;
     }
 
-    .page{
+    .sheet{
       width:210mm;
       min-height:297mm;
       background:white;
-      box-shadow:0 15px 40px rgba(15,23,42,.18);
+      box-shadow:0 15px 42px rgba(15,23,42,.18);
       position:relative;
       padding:var(--page-margin-top) var(--page-margin-right) var(--page-margin-bottom) var(--page-margin-left);
       display:grid;
@@ -248,101 +304,92 @@
     .label-card{
       width:var(--label-w);
       height:var(--label-h);
-      position:relative;
       overflow:hidden;
-      border:1px dashed rgba(15,23,42,.35);
+      position:relative;
+      border:1px dashed rgba(15,23,42,.36);
+      background:#fff;
+      color:#111827;
+      padding:4mm;
       display:flex;
       align-items:center;
       justify-content:center;
-      text-align:center;
-      padding:4mm;
-      white-space:pre-wrap;
-      line-height:1.18;
-      color:#111827;
-      background:white;
+      text-align:var(--text-align);
       font-family:var(--font-family);
       font-size:var(--font-size);
       font-weight:var(--font-weight);
       font-style:var(--font-style);
       text-decoration:var(--text-decoration);
+      line-height:1.16;
     }
 
     .label-card.no-border{border-color:transparent}
+
+    .label-content{width:100%;white-space:normal}
+
+    .badge-headline{
+      display:block;
+      font-size:var(--headline-size);
+      font-weight:var(--headline-weight);
+      line-height:1.04;
+      overflow-wrap:anywhere;
+    }
+
+    .badge-subline{
+      display:block;
+      margin-top:1.9mm;
+      font-size:var(--subline-size);
+      font-weight:var(--subline-weight);
+      line-height:1.16;
+      white-space:pre-line;
+      overflow-wrap:anywhere;
+    }
 
     .cutmarks .label-card::before,
     .cutmarks .label-card::after{
       content:"";
       position:absolute;
       pointer-events:none;
-      opacity:.65;
+      opacity:.7;
     }
 
     .cutmarks .label-card::before{
-      inset:1.8mm;
+      inset:1.7mm;
       border:.25mm solid rgba(15,23,42,.18);
     }
 
     .cutmarks .label-card::after{
-      left:50%; top:50%;
-      width:8mm; height:8mm;
+      left:50%;top:50%;
+      width:8mm;height:8mm;
       transform:translate(-50%,-50%);
-      border-left:.2mm solid rgba(15,23,42,.12);
-      border-top:.2mm solid rgba(15,23,42,.12);
+      border-left:.2mm solid rgba(15,23,42,.13);
+      border-top:.2mm solid rgba(15,23,42,.13);
     }
-
-    .empty-label{color:#cbd5e1}
-
-    .items-list{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      max-height:220px;
-      overflow:auto;
-      padding-right:3px;
-    }
-
-    .item-row{
-      display:grid;
-      grid-template-columns:1fr 64px auto;
-      gap:7px;
-      align-items:center;
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:7px;
-    }
-
-    .item-row input{padding:7px 8px;border-radius:9px}
-    .item-row textarea{min-height:42px;padding:7px 8px;border-radius:9px}
 
     .footer-note{
-      color:#64748b;
+      color:var(--muted);
       font-size:.76rem;
       margin-top:12px;
       text-align:center;
     }
 
-    @media (max-width:980px){
+    @media(max-width:1050px){
       main{grid-template-columns:1fr}
       .panel{position:relative;top:0;max-height:none}
-      .page{transform:scale(.55)}
-      .page-holder{height:165mm}
+      .sheet{transform:scale(.55)}
+      .page-holder{height:166mm}
     }
 
-    @page{
-      size:A4 portrait;
-      margin:0;
-    }
+    @page{size:A4 portrait;margin:0}
 
     @media print{
       body{background:white}
       header,.panel,.preview-toolbar,.page-title,.footer-note{display:none!important}
-      main{display:block;max-width:none;padding:0;margin:0}
-      .preview-wrap{border:0;box-shadow:none;padding:0;background:white;overflow:visible}
+      main{display:block;max-width:none;margin:0;padding:0}
+      .preview-wrap{border:0;box-shadow:none;padding:0;background:white;overflow:visible;min-height:0}
       .page-stage{display:block}
       .page-holder{page-break-after:always;height:auto!important}
       .page-holder:last-child{page-break-after:auto}
-      .page{
+      .sheet{
         width:210mm;
         height:297mm;
         min-height:297mm;
@@ -350,358 +397,482 @@
         transform:none!important;
         overflow:hidden;
       }
-      .hide-print{display:none!important}
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="hero">
-      <div>
-        <h1>Etiketten & Badgecard Tool</h1>
-        <p>A4-Etiketten, Viertel-/Achtel-Seiten, Kongress-Badges, Rückseiten, JSON & Druckansicht.</p>
-      </div>
-      <div class="badge">Standalone HTML · lokale Daten</div>
+<header>
+  <div class="hero">
+    <div>
+      <h1>Etiketten & Badgecard Tool</h1>
+      <p>A4-Etiketten, Kongress-Badges, Smart Paste, Rückseite, JSON & Druckansicht.</p>
     </div>
-  </header>
+    <div class="version-badge">V1.3 · Standalone HTML</div>
+  </div>
+</header>
 
-  <main>
-    <aside class="panel">
-      <div class="section">
-        <h2>1. Format wählen</h2>
-        <label>Standardformat</label>
-        <select id="presetSelect"></select>
-        <div class="help">Alle Maße sind in mm. Für normale Etikettenbögen bitte Druckdialog auf <b>100 % / tatsächliche Größe</b> stellen.</div>
+<main>
+  <aside class="panel">
+    <div class="section">
+      <h2>1. Format wählen</h2>
+      <label>Standardformat</label>
+      <select id="presetSelect"></select>
+      <div class="help">Alle Maße sind in mm. Beim Drucken bitte <b>100 % / tatsächliche Größe</b> einstellen.</div>
 
-        <div class="grid2">
-          <div>
-            <label>Spalten</label>
-            <input id="cols" type="number" min="1" max="10" step="1" />
-          </div>
-          <div>
-            <label>Zeilen</label>
-            <input id="rows" type="number" min="1" max="20" step="1" />
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div>
-            <label>Etikett Breite</label>
-            <input id="labelW" type="number" min="10" step="0.1" />
-          </div>
-          <div>
-            <label>Etikett Höhe</label>
-            <input id="labelH" type="number" min="10" step="0.1" />
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div>
-            <label>Abstand X</label>
-            <input id="gapX" type="number" min="0" step="0.1" />
-          </div>
-          <div>
-            <label>Abstand Y</label>
-            <input id="gapY" type="number" min="0" step="0.1" />
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div>
-            <label>Rand oben</label>
-            <input id="marginTop" type="number" min="0" step="0.1" />
-          </div>
-          <div>
-            <label>Rand links</label>
-            <input id="marginLeft" type="number" min="0" step="0.1" />
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div>
-            <label>Rand rechts</label>
-            <input id="marginRight" type="number" min="0" step="0.1" />
-          </div>
-          <div>
-            <label>Rand unten</label>
-            <input id="marginBottom" type="number" min="0" step="0.1" />
-          </div>
-        </div>
-
-        <div class="toggle-row"><input id="showCutmarks" type="checkbox" checked /> <span>Schneide-/Hilfslinien anzeigen</span></div>
-        <div class="toggle-row"><input id="showBorders" type="checkbox" checked /> <span>Etikettenrahmen drucken</span></div>
+      <div class="grid2">
+        <div><label>Spalten</label><input id="cols" type="number" min="1" max="10" step="1"></div>
+        <div><label>Zeilen</label><input id="rows" type="number" min="1" max="20" step="1"></div>
+      </div>
+      <div class="grid2">
+        <div><label>Etikett Breite</label><input id="labelW" type="number" min="10" step="0.1"></div>
+        <div><label>Etikett Höhe</label><input id="labelH" type="number" min="10" step="0.1"></div>
+      </div>
+      <div class="grid2">
+        <div><label>Abstand X</label><input id="gapX" type="number" min="0" step="0.1"></div>
+        <div><label>Abstand Y</label><input id="gapY" type="number" min="0" step="0.1"></div>
+      </div>
+      <div class="grid2">
+        <div><label>Rand oben</label><input id="marginTop" type="number" min="0" step="0.1"></div>
+        <div><label>Rand links</label><input id="marginLeft" type="number" min="0" step="0.1"></div>
+      </div>
+      <div class="grid2">
+        <div><label>Rand rechts</label><input id="marginRight" type="number" min="0" step="0.1"></div>
+        <div><label>Rand unten</label><input id="marginBottom" type="number" min="0" step="0.1"></div>
       </div>
 
-      <div class="section">
-        <h2>2. Text & Stil</h2>
-        <label>Bearbeitungsmodus</label>
-        <select id="editMode">
-          <option value="same">Ein Text für alle Etiketten</option>
-          <option value="list">Mehrere Texte mit Anzahl</option>
-        </select>
+      <div class="toggle-row"><input id="showCutmarks" type="checkbox"><span>Schneide-/Hilfslinien anzeigen</span></div>
+      <div class="toggle-row"><input id="showBorders" type="checkbox"><span>Etikettenrahmen drucken</span></div>
+    </div>
 
-        <div id="sameEditor">
-          <label>Text</label>
-          <textarea id="mainText">Name / Bereich
-Kongress 2026</textarea>
-          <label>Anzahl</label>
-          <input id="mainQty" type="number" min="1" step="1" value="8" />
-        </div>
+    <div class="section">
+      <h2>2. Text & Stil</h2>
+      <label>Bearbeitungsmodus</label>
+      <select id="editMode">
+        <option value="same">Ein Badge mehrfach</option>
+        <option value="list">Mehrere Badges mit Anzahl</option>
+      </select>
 
-        <div id="listEditor" style="display:none">
-          <label>Einträge</label>
-          <div class="items-list" id="itemsList"></div>
-          <div class="btn-row">
-            <button class="mini" id="addItemBtn">+ Eintrag</button>
-            <button class="mini danger" id="clearItemsBtn">Liste leeren</button>
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div>
-            <label>Schriftart</label>
-            <select id="fontFamily">
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="system-ui, sans-serif">System UI</option>
-              <option value="Verdana, sans-serif">Verdana</option>
-              <option value="Tahoma, sans-serif">Tahoma</option>
-              <option value="Georgia, serif">Georgia</option>
-              <option value="'Times New Roman', serif">Times New Roman</option>
-              <option value="'Courier New', monospace">Courier New</option>
-            </select>
-          </div>
-          <div>
-            <label>Größe</label>
-            <input id="fontSize" type="number" min="6" max="72" step="1" value="16" />
-          </div>
-        </div>
-
-        <div class="format-buttons">
-          <button id="boldBtn" type="button">Fett</button>
-          <button id="italicBtn" type="button">Kursiv</button>
-          <button id="underlineBtn" type="button">Unterstrichen</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>3. Rückseite</h2>
-        <div class="toggle-row"><input id="enableBack" type="checkbox" /> <span>Rückseite zusätzlich erstellen</span></div>
-        <label>Rückseiten-Text</label>
-        <textarea id="backText">Bitte sichtbar tragen
-Thank you for serving</textarea>
-        <div class="help">Beim Duplexdruck kann je nach Drucker die Rückseite gespiegelt/gedreht wirken. Erst mit normalem Papier testen — Drucker sind kleine Kobolde.</div>
-      </div>
-
-      <div class="section">
-        <h2>4. Daten & Druck</h2>
+      <div class="smart-box">
+        <label>Smart Paste / Schnelleingabe</label>
+        <textarea id="smartPaste" placeholder="Einfach einfügen, z.B.&#10;ATTENDANT&#10;Entrance A"></textarea>
         <div class="btn-row">
-          <button class="primary" id="printBtn">Drucken</button>
-          <button class="green" id="exportBtn">JSON exportieren</button>
-          <button id="importBtn">JSON importieren</button>
-          <input id="importFile" type="file" accept="application/json,.json" style="display:none" />
+          <button class="mini primary" id="applySmartBtn" type="button">In Badge übernehmen</button>
+          <button class="mini ghost" id="clearSmartBtn" type="button">Feld leeren</button>
         </div>
-        <div class="help">Export speichert Layout, Texte und Stil. Es werden keine Daten online gespeichert.</div>
+        <div class="help">Erste Zeile = große Überschrift. Weitere Zeilen = kleiner Text darunter. Im Listenmodus wird daraus ein neuer Eintrag.</div>
       </div>
 
-      <div class="footer-note">Made with Love © – Label Tool V 1.0</div>
-    </aside>
-
-    <section class="preview-wrap">
-      <div class="preview-toolbar">
-        <h2>Vorschau</h2>
-        <div class="help" id="countInfo"></div>
+      <div id="sameEditor">
+        <label>Überschrift</label>
+        <input id="headline" type="text">
+        <label>Text darunter</label>
+        <textarea id="subline"></textarea>
+        <label>Anzahl</label>
+        <input id="mainQty" type="number" min="1" step="1">
       </div>
-      <div class="page-stage" id="pageStage"></div>
-    </section>
-  </main>
 
-  <script>
-    const PRESETS = {
-      half: {
-        name:'A4 halbseitig – 2 Etiketten, 210 × 148,5 mm',
-        cols:1, rows:2, labelW:210, labelH:148.5, gapX:0, gapY:0,
-        marginTop:0, marginRight:0, marginBottom:0, marginLeft:0
-      },
-      quarter: {
-        name:'A4 Viertelseite – 4 Etiketten, 105 × 148,5 mm',
-        cols:2, rows:2, labelW:105, labelH:148.5, gapX:0, gapY:0,
-        marginTop:0, marginRight:0, marginBottom:0, marginLeft:0
-      },
-      eighth: {
-        name:'A4 Achtelseite – 8 Etiketten, 105 × 74,25 mm',
-        cols:2, rows:4, labelW:105, labelH:74.25, gapX:0, gapY:0,
-        marginTop:0, marginRight:0, marginBottom:0, marginLeft:0
-      },
-      sixteenth: {
-        name:'A4 Sechzehntel – 16 Etiketten, 52,5 × 74,25 mm',
-        cols:4, rows:4, labelW:52.5, labelH:74.25, gapX:0, gapY:0,
-        marginTop:0, marginRight:0, marginBottom:0, marginLeft:0
-      },
-      business: {
-        name:'Visitenkarte – 10 Karten, 85 × 55 mm',
-        cols:2, rows:5, labelW:85, labelH:55, gapX:5, gapY:0,
-        marginTop:11, marginRight:17.5, marginBottom:11, marginLeft:17.5
-      },
-      badge: {
-        name:'Kongress Badgecards – 8 Karten, 80 × 52 mm',
-        cols:2, rows:4, labelW:80, labelH:52, gapX:10, gapY:10,
-        marginTop:19.5, marginRight:20, marginBottom:19.5, marginLeft:20
-      },
-      address_24: {
-        name:'Adressetiketten ähnlich 70 × 37 mm – 24 Stück',
-        cols:3, rows:8, labelW:70, labelH:37, gapX:0, gapY:0,
-        marginTop:0.5, marginRight:0, marginBottom:0.5, marginLeft:0
-      },
-      custom: {
-        name:'Eigenes Format',
-        cols:2, rows:4, labelW:80, labelH:52, gapX:5, gapY:5,
-        marginTop:10, marginRight:10, marginBottom:10, marginLeft:10
-      }
-    };
-
-    const state = {
-      preset:'badge',
-      layout:{...PRESETS.badge},
-      editMode:'same',
-      mainText:'Name / Bereich\nKongress 2026',
-      mainQty:8,
-      items:[
-        {text:'Attendant\nEntrance A', qty:2},
-        {text:'Cleaning\nTeam 1', qty:2},
-        {text:'First Aid\nSupport', qty:1}
-      ],
-      style:{
-        fontFamily:'Arial, sans-serif',
-        fontSize:16,
-        bold:false,
-        italic:false,
-        underline:false
-      },
-      showCutmarks:true,
-      showBorders:true,
-      enableBack:false,
-      backText:'Bitte sichtbar tragen\nThank you for serving'
-    };
-
-    const $ = id => document.getElementById(id);
-
-    function initPresets(){
-      const select = $('presetSelect');
-      select.innerHTML = Object.entries(PRESETS).map(([key,p]) => `<option value="${key}">${p.name}</option>`).join('');
-      select.value = state.preset;
-    }
-
-    function mm(value){ return `${Number(value || 0)}mm`; }
-
-    function escapeHtml(str){
-      return String(str ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-    }
-
-    function readLayoutFromInputs(){
-      state.layout.cols = Number($('cols').value) || 1;
-      state.layout.rows = Number($('rows').value) || 1;
-      state.layout.labelW = Number($('labelW').value) || 10;
-      state.layout.labelH = Number($('labelH').value) || 10;
-      state.layout.gapX = Number($('gapX').value) || 0;
-      state.layout.gapY = Number($('gapY').value) || 0;
-      state.layout.marginTop = Number($('marginTop').value) || 0;
-      state.layout.marginRight = Number($('marginRight').value) || 0;
-      state.layout.marginBottom = Number($('marginBottom').value) || 0;
-      state.layout.marginLeft = Number($('marginLeft').value) || 0;
-    }
-
-    function syncInputs(){
-      const l = state.layout;
-      $('presetSelect').value = state.preset;
-      $('cols').value = l.cols;
-      $('rows').value = l.rows;
-      $('labelW').value = l.labelW;
-      $('labelH').value = l.labelH;
-      $('gapX').value = l.gapX;
-      $('gapY').value = l.gapY;
-      $('marginTop').value = l.marginTop;
-      $('marginRight').value = l.marginRight;
-      $('marginBottom').value = l.marginBottom;
-      $('marginLeft').value = l.marginLeft;
-
-      $('editMode').value = state.editMode;
-      $('sameEditor').style.display = state.editMode === 'same' ? 'block' : 'none';
-      $('listEditor').style.display = state.editMode === 'list' ? 'block' : 'none';
-      $('mainText').value = state.mainText;
-      $('mainQty').value = state.mainQty;
-      $('fontFamily').value = state.style.fontFamily;
-      $('fontSize').value = state.style.fontSize;
-      $('boldBtn').classList.toggle('active', state.style.bold);
-      $('italicBtn').classList.toggle('active', state.style.italic);
-      $('underlineBtn').classList.toggle('active', state.style.underline);
-      $('showCutmarks').checked = state.showCutmarks;
-      $('showBorders').checked = state.showBorders;
-      $('enableBack').checked = state.enableBack;
-      $('backText').value = state.backText;
-      renderItemsEditor();
-      renderPreview();
-    }
-
-    function collectEntries(front = true){
-      if(!front && state.enableBack){
-        const total = collectEntries(true).length;
-        return Array.from({length:total}, () => state.backText || '');
-      }
-
-      if(state.editMode === 'same'){
-        return Array.from({length:Math.max(1, Number(state.mainQty)||1)}, () => state.mainText || '');
-      }
-
-      const entries = [];
-      state.items.forEach(item => {
-        const qty = Math.max(0, Number(item.qty)||0);
-        for(let i=0;i<qty;i++) entries.push(item.text || '');
-      });
-      return entries.length ? entries : [''];
-    }
-
-    function renderItemsEditor(){
-      const box = $('itemsList');
-      box.innerHTML = state.items.map((item,index)=>`
-        <div class="item-row">
-          <textarea data-item-text="${index}">${escapeHtml(item.text)}</textarea>
-          <input type="number" min="0" step="1" data-item-qty="${index}" value="${item.qty}">
-          <button class="mini danger" data-remove-item="${index}">×</button>
+      <div id="listEditor" style="display:none">
+        <label>Einträge</label>
+        <div class="items-list" id="itemsList"></div>
+        <div class="btn-row">
+          <button class="mini ghost" id="addItemBtn" type="button">+ Eintrag</button>
+          <button class="mini danger" id="clearItemsBtn" type="button">Liste leeren</button>
         </div>
-      `).join('');
+      </div>
 
-      box.querySelectorAll('[data-item-text]').forEach(el => {
-        el.addEventListener('input', e => {
-          state.items[Number(e.target.dataset.itemText)].text = e.target.value;
-          renderPreview();
-        });
-      });
-      box.querySelectorAll('[data-item-qty]').forEach(el => {
-        el.addEventListener('input', e => {
-          state.items[Number(e.target.dataset.itemQty)].qty = Number(e.target.value)||0;
-          renderPreview();
-        });
-      });
-      box.querySelectorAll('[data-remove-item]').forEach(btn => {
-        btn.addEventListener('click', e => {
-          state.items.splice(Number(e.target.dataset.removeItem),1);
-          syncInputs();
-        });
+      <div class="grid2">
+        <div>
+          <label>Schriftart</label>
+          <select id="fontFamily">
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="system-ui, sans-serif">System UI</option>
+            <option value="Verdana, sans-serif">Verdana</option>
+            <option value="Tahoma, sans-serif">Tahoma</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="'Courier New', monospace">Courier New</option>
+          </select>
+        </div>
+        <div><label>Basisgröße</label><input id="fontSize" type="number" min="6" max="72" step="1"></div>
+      </div>
+
+      <div class="grid2">
+        <div><label>Überschrift Größe</label><input id="headlineSize" type="number" min="6" max="72" step="1"></div>
+        <div><label>Text Größe</label><input id="sublineSize" type="number" min="6" max="72" step="1"></div>
+      </div>
+
+      <label>Ausrichtung</label>
+      <div class="format-buttons">
+        <button id="alignLeft" type="button">Links</button>
+        <button id="alignCenter" type="button">Zentriert</button>
+        <button id="alignRight" type="button">Rechts</button>
+      </div>
+
+      <label>Format</label>
+      <div class="format-buttons">
+        <button id="boldBtn" type="button">Alles fett</button>
+        <button id="italicBtn" type="button">Kursiv</button>
+        <button id="underlineBtn" type="button">Unterstrichen</button>
+        <button id="headlineBoldBtn" type="button">Überschrift fett</button>
+      </div>
+
+      <div class="toggle-row"><input id="advancedToggle" type="checkbox"><span>Erweiterten HTML-Modus anzeigen</span></div>
+      <div id="advancedBox" class="advanced-box">
+        <label>HTML / Sonderformatierung</label>
+        <textarea id="advancedHtml" placeholder="Optional, z.B. für Sonderlayouts"></textarea>
+        <div class="help">Nur bei Bedarf. Normalerweise reichen Überschrift und Text darunter.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>3. Rückseite</h2>
+      <div class="toggle-row"><input id="enableBack" type="checkbox"><span>Rückseite zusätzlich erstellen</span></div>
+      <label>Rückseite Überschrift</label>
+      <input id="backHeadline" type="text">
+      <label>Rückseite Text</label>
+      <textarea id="backSubline"></textarea>
+      <div class="help">Beim Duplexdruck erst mit normalem Papier testen. Je nach Drucker: lange oder kurze Kante.</div>
+    </div>
+
+    <div class="section">
+      <h2>4. Daten & Druck</h2>
+      <div class="btn-row">
+        <button class="primary" id="printBtn" type="button">Drucken</button>
+        <button class="green" id="exportBtn" type="button">JSON exportieren</button>
+        <button class="ghost" id="importBtn" type="button">JSON importieren</button>
+        <button class="danger" id="resetBtn" type="button">Reset</button>
+        <input id="importFile" type="file" accept="application/json,.json" style="display:none">
+      </div>
+      <div class="help">Alles bleibt lokal im Browser. Der JSON-Export speichert Layout, Texte und Stil.</div>
+    </div>
+
+    <div class="footer-note">Made with Love © – Label Tool V 1.3</div>
+  </aside>
+
+  <section class="preview-wrap">
+    <div class="preview-toolbar">
+      <h2>Vorschau</h2>
+      <div class="help" id="countInfo">–</div>
+    </div>
+    <div class="page-stage" id="pageStage"></div>
+  </section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  const VERSION = '1.3';
+  const A4 = { w:210, h:297 };
+
+  const PRESETS = {
+    half:{ name:'A4 halbseitig – 2 Etiketten, 210 × 148,5 mm', cols:1, rows:2, labelW:210, labelH:148.5, gapX:0, gapY:0, marginTop:0, marginRight:0, marginBottom:0, marginLeft:0 },
+    quarter:{ name:'A4 Viertelseite – 4 Etiketten, 105 × 148,5 mm', cols:2, rows:2, labelW:105, labelH:148.5, gapX:0, gapY:0, marginTop:0, marginRight:0, marginBottom:0, marginLeft:0 },
+    eighth:{ name:'A4 Achtelseite – 8 Etiketten, 105 × 74,25 mm', cols:2, rows:4, labelW:105, labelH:74.25, gapX:0, gapY:0, marginTop:0, marginRight:0, marginBottom:0, marginLeft:0 },
+    sixteenth:{ name:'A4 Sechzehntel – 16 Etiketten, 52,5 × 74,25 mm', cols:4, rows:4, labelW:52.5, labelH:74.25, gapX:0, gapY:0, marginTop:0, marginRight:0, marginBottom:0, marginLeft:0 },
+    business:{ name:'Visitenkarte – 10 Karten, 85 × 55 mm', cols:2, rows:5, labelW:85, labelH:55, gapX:5, gapY:0, marginTop:11, marginRight:17.5, marginBottom:11, marginLeft:17.5 },
+    badge:{ name:'Kongress Badgecards – 8 Karten, 80 × 52 mm', cols:2, rows:4, labelW:80, labelH:52, gapX:10, gapY:10, marginTop:19.5, marginRight:20, marginBottom:19.5, marginLeft:20 },
+    address24:{ name:'Adressetiketten ähnlich 70 × 37 mm – 24 Stück', cols:3, rows:8, labelW:70, labelH:37, gapX:0, gapY:0, marginTop:.5, marginRight:0, marginBottom:.5, marginLeft:0 },
+    custom:{ name:'Eigenes Format', cols:2, rows:4, labelW:80, labelH:52, gapX:5, gapY:5, marginTop:10, marginRight:10, marginBottom:10, marginLeft:10 }
+  };
+
+  const DEFAULT_STATE = {
+    version: VERSION,
+    preset: 'badge',
+    layout: {...PRESETS.badge},
+    editMode: 'same',
+    headline: 'ATTENDANT',
+    subline: 'Entrance A',
+    mainQty: 8,
+    items: [
+      { headline:'ATTENDANT', subline:'Entrance A', qty:2, html:'' },
+      { headline:'CLEANING', subline:'Team 1', qty:2, html:'' },
+      { headline:'FIRST AID', subline:'Support', qty:1, html:'' }
+    ],
+    style: {
+      fontFamily:'Arial, sans-serif',
+      fontSize:16,
+      headlineSize:22,
+      sublineSize:13,
+      bold:false,
+      italic:false,
+      underline:false,
+      headlineBold:true,
+      textAlign:'center'
+    },
+    showCutmarks:true,
+    showBorders:true,
+    enableBack:false,
+    backHeadline:'Bitte sichtbar tragen',
+    backSubline:'Thank you for serving',
+    advanced:false,
+    advancedHtml:''
+  };
+
+  let state = structuredCloneSafe(DEFAULT_STATE);
+
+  const $ = id => document.getElementById(id);
+  const fields = {};
+
+  function structuredCloneSafe(obj){
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function mm(value){
+    return `${Number(value || 0)}mm`;
+  }
+
+  function escapeHtml(value){
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    }[char]));
+  }
+
+  function safeHtml(input){
+    const template = document.createElement('template');
+    template.innerHTML = String(input ?? '').replace(/\n/g,'<br>');
+    const allowedTags = new Set(['B','STRONG','I','EM','U','BR','SPAN','DIV','SMALL']);
+    const allowedStyles = new Set(['font-size','font-weight','font-style','text-decoration','color','line-height','letter-spacing','text-align']);
+
+    function clean(node){
+      [...node.childNodes].forEach(child => {
+        if(child.nodeType === Node.ELEMENT_NODE){
+          if(!allowedTags.has(child.tagName)){
+            child.replaceWith(document.createTextNode(child.textContent));
+            return;
+          }
+          [...child.attributes].forEach(attr => {
+            if(attr.name.toLowerCase() !== 'style') child.removeAttribute(attr.name);
+          });
+          if(child.hasAttribute('style')){
+            const cleaned = [];
+            child.getAttribute('style').split(';').forEach(rule => {
+              const parts = rule.split(':');
+              if(parts.length < 2) return;
+              const prop = parts[0].trim().toLowerCase();
+              const value = parts.slice(1).join(':').trim().replace(/[<>]/g,'');
+              if(allowedStyles.has(prop)) cleaned.push(`${prop}:${value}`);
+            });
+            if(cleaned.length) child.setAttribute('style', cleaned.join(';'));
+            else child.removeAttribute('style');
+          }
+          clean(child);
+        }
       });
     }
+    clean(template.content);
+    return template.innerHTML;
+  }
 
-    function buildPage(title, entries){
-      const perPage = state.layout.cols * state.layout.rows;
-      const pages = [];
-      for(let start=0; start<entries.length; start += perPage){
-        const chunk = entries.slice(start, start + perPage);
-        while(chunk.length < perPage) chunk.push('');
-        pages.push(chunk);
+  function splitSmartText(raw){
+    const lines = String(raw || '')
+      .replace(/\r/g,'')
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean);
+    return {
+      headline: lines[0] || '',
+      subline: lines.slice(1).join('\n')
+    };
+  }
+
+  function normalizeState(input){
+    const s = structuredCloneSafe(DEFAULT_STATE);
+    if(!input || typeof input !== 'object') return s;
+
+    Object.assign(s, input);
+    s.version = VERSION;
+    s.layout = {...DEFAULT_STATE.layout, ...(input.layout || {})};
+    s.style = {...DEFAULT_STATE.style, ...(input.style || {})};
+    s.items = Array.isArray(input.items) ? input.items.map(item => ({
+      headline: item.headline ?? '',
+      subline: item.subline ?? '',
+      qty: Number(item.qty) || 0,
+      html: item.html ?? ''
+    })) : structuredCloneSafe(DEFAULT_STATE.items);
+
+    if(!PRESETS[s.preset]) s.preset = 'custom';
+    s.mainQty = Math.max(1, Number(s.mainQty) || 1);
+    return s;
+  }
+
+  function cacheFields(){
+    [
+      'presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft',
+      'showCutmarks','showBorders','editMode','smartPaste','headline','subline','mainQty','itemsList',
+      'fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn',
+      'advancedToggle','advancedBox','advancedHtml','enableBack','backHeadline','backSubline','pageStage','countInfo','importFile'
+    ].forEach(id => fields[id] = $(id));
+  }
+
+  function initPresets(){
+    fields.presetSelect.innerHTML = Object.entries(PRESETS).map(([key,p]) => `<option value="${key}">${p.name}</option>`).join('');
+  }
+
+  function readLayoutFromInputs(){
+    const l = state.layout;
+    l.cols = Math.max(1, Number(fields.cols.value) || 1);
+    l.rows = Math.max(1, Number(fields.rows.value) || 1);
+    l.labelW = Math.max(10, Number(fields.labelW.value) || 10);
+    l.labelH = Math.max(10, Number(fields.labelH.value) || 10);
+    l.gapX = Math.max(0, Number(fields.gapX.value) || 0);
+    l.gapY = Math.max(0, Number(fields.gapY.value) || 0);
+    l.marginTop = Math.max(0, Number(fields.marginTop.value) || 0);
+    l.marginRight = Math.max(0, Number(fields.marginRight.value) || 0);
+    l.marginBottom = Math.max(0, Number(fields.marginBottom.value) || 0);
+    l.marginLeft = Math.max(0, Number(fields.marginLeft.value) || 0);
+  }
+
+  function syncForm(){
+    const l = state.layout;
+    fields.presetSelect.value = state.preset;
+    fields.cols.value = l.cols;
+    fields.rows.value = l.rows;
+    fields.labelW.value = l.labelW;
+    fields.labelH.value = l.labelH;
+    fields.gapX.value = l.gapX;
+    fields.gapY.value = l.gapY;
+    fields.marginTop.value = l.marginTop;
+    fields.marginRight.value = l.marginRight;
+    fields.marginBottom.value = l.marginBottom;
+    fields.marginLeft.value = l.marginLeft;
+
+    fields.showCutmarks.checked = !!state.showCutmarks;
+    fields.showBorders.checked = !!state.showBorders;
+
+    fields.editMode.value = state.editMode;
+    $('sameEditor').style.display = state.editMode === 'same' ? 'block' : 'none';
+    $('listEditor').style.display = state.editMode === 'list' ? 'block' : 'none';
+
+    fields.headline.value = state.headline;
+    fields.subline.value = state.subline;
+    fields.mainQty.value = state.mainQty;
+
+    fields.fontFamily.value = state.style.fontFamily;
+    fields.fontSize.value = state.style.fontSize;
+    fields.headlineSize.value = state.style.headlineSize;
+    fields.sublineSize.value = state.style.sublineSize;
+
+    fields.alignLeft.classList.toggle('active', state.style.textAlign === 'left');
+    fields.alignCenter.classList.toggle('active', state.style.textAlign === 'center');
+    fields.alignRight.classList.toggle('active', state.style.textAlign === 'right');
+    fields.boldBtn.classList.toggle('active', !!state.style.bold);
+    fields.italicBtn.classList.toggle('active', !!state.style.italic);
+    fields.underlineBtn.classList.toggle('active', !!state.style.underline);
+    fields.headlineBoldBtn.classList.toggle('active', !!state.style.headlineBold);
+
+    fields.advancedToggle.checked = !!state.advanced;
+    fields.advancedBox.classList.toggle('show', !!state.advanced);
+    fields.advancedHtml.value = state.advancedHtml || '';
+
+    fields.enableBack.checked = !!state.enableBack;
+    fields.backHeadline.value = state.backHeadline;
+    fields.backSubline.value = state.backSubline;
+
+    renderItemsEditor();
+    renderPreview();
+  }
+
+  function renderItemsEditor(){
+    fields.itemsList.innerHTML = state.items.map((item,index) => `
+      <div class="item-row">
+        <div class="item-top">
+          <input data-item-headline="${index}" placeholder="Überschrift" value="${escapeHtml(item.headline)}">
+          <input data-item-qty="${index}" type="number" min="0" step="1" value="${Number(item.qty)||0}">
+          <button class="mini danger" type="button" data-remove-item="${index}">×</button>
+        </div>
+        <label>Text darunter</label>
+        <textarea data-item-subline="${index}" placeholder="Details">${escapeHtml(item.subline)}</textarea>
+      </div>
+    `).join('');
+
+    fields.itemsList.querySelectorAll('[data-item-headline]').forEach(input => {
+      input.addEventListener('input', e => {
+        state.items[Number(e.target.dataset.itemHeadline)].headline = e.target.value;
+        renderPreview();
+      });
+    });
+
+    fields.itemsList.querySelectorAll('[data-item-subline]').forEach(input => {
+      input.addEventListener('input', e => {
+        state.items[Number(e.target.dataset.itemSubline)].subline = e.target.value;
+        renderPreview();
+      });
+    });
+
+    fields.itemsList.querySelectorAll('[data-item-qty]').forEach(input => {
+      input.addEventListener('input', e => {
+        state.items[Number(e.target.dataset.itemQty)].qty = Math.max(0, Number(e.target.value) || 0);
+        renderPreview();
+      });
+    });
+
+    fields.itemsList.querySelectorAll('[data-remove-item]').forEach(button => {
+      button.addEventListener('click', e => {
+        state.items.splice(Number(e.target.dataset.removeItem), 1);
+        syncForm();
+      });
+    });
+  }
+
+  function collectEntries(front = true){
+    if(!front && state.enableBack){
+      return collectEntries(true).map(() => ({
+        headline: state.backHeadline,
+        subline: state.backSubline,
+        html: ''
+      }));
+    }
+
+    if(state.editMode === 'same'){
+      const qty = Math.max(1, Number(state.mainQty) || 1);
+      return Array.from({length:qty}, () => ({
+        headline: state.headline,
+        subline: state.subline,
+        html: state.advanced ? state.advancedHtml : ''
+      }));
+    }
+
+    const entries = [];
+    state.items.forEach(item => {
+      const qty = Math.max(0, Number(item.qty) || 0);
+      for(let i=0; i<qty; i++){
+        entries.push({
+          headline: item.headline || '',
+          subline: item.subline || '',
+          html: item.html || ''
+        });
       }
-      return pages.map((chunk,pageIndex)=>`
+    });
+    return entries.length ? entries : [{headline:'',subline:'',html:''}];
+  }
+
+  function entryHtml(entry){
+    if(entry.html) return safeHtml(entry.html);
+    const headline = escapeHtml(entry.headline || '');
+    const subline = escapeHtml(entry.subline || '');
+    return `<span class="badge-headline">${headline}</span>${subline ? `<span class="badge-subline">${subline}</span>` : ''}`;
+  }
+
+  function buildPages(title, entries){
+    const perPage = Math.max(1, state.layout.cols * state.layout.rows);
+    const pages = [];
+    for(let start = 0; start < entries.length; start += perPage){
+      const chunk = entries.slice(start, start + perPage);
+      while(chunk.length < perPage) chunk.push({headline:'', subline:'', html:''});
+      pages.push(chunk);
+    }
+
+    return pages.map((chunk, pageIndex) => {
+      const cards = chunk.map(entry => {
+        const hasContent = !!(entry.headline || entry.subline || entry.html);
+        return `<div class="label-card ${state.showBorders ? '' : 'no-border'} ${hasContent ? '' : 'empty-label'}"><div class="label-content">${entryHtml(entry)}</div></div>`;
+      }).join('');
+
+      return `
         <div class="page-holder">
-          <div class="page-title">${title} ${pages.length > 1 ? pageIndex + 1 : ''}</div>
-          <div class="page ${state.showCutmarks ? 'cutmarks' : ''}" style="
+          <div class="page-title">${title}${pages.length > 1 ? ' ' + (pageIndex + 1) : ''}</div>
+          <div class="sheet ${state.showCutmarks ? 'cutmarks' : ''}" style="
             --cols:${state.layout.cols};
             --label-w:${mm(state.layout.labelW)};
             --label-h:${mm(state.layout.labelH)};
@@ -712,108 +883,165 @@ Thank you for serving</textarea>
             --page-margin-bottom:${mm(state.layout.marginBottom)};
             --page-margin-left:${mm(state.layout.marginLeft)};
             --font-family:${state.style.fontFamily};
-            --font-size:${state.style.fontSize}pt;
+            --font-size:${Number(state.style.fontSize)||16}pt;
             --font-weight:${state.style.bold ? '800' : '400'};
             --font-style:${state.style.italic ? 'italic' : 'normal'};
             --text-decoration:${state.style.underline ? 'underline' : 'none'};
-          ">
-            ${chunk.map(text=>`<div class="label-card ${state.showBorders ? '' : 'no-border'} ${text ? '' : 'empty-label'}">${escapeHtml(text)}</div>`).join('')}
-          </div>
+            --text-align:${state.style.textAlign || 'center'};
+            --headline-size:${Number(state.style.headlineSize)||22}pt;
+            --subline-size:${Number(state.style.sublineSize)||13}pt;
+            --headline-weight:${state.style.headlineBold ? '800' : '400'};
+            --subline-weight:${state.style.bold ? '800' : '400'};
+          ">${cards}</div>
         </div>
-      `).join('');
-    }
+      `;
+    }).join('');
+  }
 
-    function renderPreview(){
-      const stage = $('pageStage');
+  function renderPreview(){
+    try{
       const frontEntries = collectEntries(true);
-      let html = buildPage('Vorderseite', frontEntries);
-      if(state.enableBack){
-        html += buildPage('Rückseite', collectEntries(false));
+      let html = buildPages('Vorderseite', frontEntries);
+      if(state.enableBack) html += buildPages('Rückseite', collectEntries(false));
+      fields.pageStage.innerHTML = html;
+      const pages = Math.ceil(frontEntries.length / Math.max(1, state.layout.cols * state.layout.rows));
+      fields.countInfo.textContent = `${frontEntries.length} Etikett(en) · ${state.layout.cols} × ${state.layout.rows} pro Seite · ${pages} Seite(n)`;
+    }catch(error){
+      console.error(error);
+      fields.pageStage.innerHTML = `<div class="help">Vorschau konnte nicht gerendert werden: ${escapeHtml(error.message)}</div>`;
+    }
+  }
+
+  function applySmartPaste(){
+    const value = fields.smartPaste.value.trim();
+    if(!value) return;
+    const split = splitSmartText(value);
+    if(!split.headline && !split.subline) return;
+
+    if(state.editMode === 'same'){
+      state.headline = split.headline;
+      state.subline = split.subline;
+    }else{
+      state.items.push({ headline: split.headline, subline: split.subline, qty:1, html:'' });
+    }
+
+    fields.smartPaste.value = '';
+    syncForm();
+  }
+
+  function downloadJson(filename, data){
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function wireEvents(){
+    fields.presetSelect.addEventListener('change', e => {
+      state.preset = e.target.value;
+      state.layout = {...PRESETS[state.preset]};
+      syncForm();
+    });
+
+    ['cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft'].forEach(id => {
+      fields[id].addEventListener('input', () => {
+        state.preset = 'custom';
+        readLayoutFromInputs();
+        fields.presetSelect.value = 'custom';
+        renderPreview();
+      });
+    });
+
+    fields.showCutmarks.addEventListener('change', e => { state.showCutmarks = e.target.checked; renderPreview(); });
+    fields.showBorders.addEventListener('change', e => { state.showBorders = e.target.checked; renderPreview(); });
+
+    fields.editMode.addEventListener('change', e => { state.editMode = e.target.value; syncForm(); });
+    fields.headline.addEventListener('input', e => { state.headline = e.target.value; renderPreview(); });
+    fields.subline.addEventListener('input', e => { state.subline = e.target.value; renderPreview(); });
+    fields.mainQty.addEventListener('input', e => { state.mainQty = Math.max(1, Number(e.target.value) || 1); renderPreview(); });
+
+    fields.fontFamily.addEventListener('change', e => { state.style.fontFamily = e.target.value; renderPreview(); });
+    fields.fontSize.addEventListener('input', e => { state.style.fontSize = Math.max(6, Number(e.target.value) || 16); renderPreview(); });
+    fields.headlineSize.addEventListener('input', e => { state.style.headlineSize = Math.max(6, Number(e.target.value) || 22); renderPreview(); });
+    fields.sublineSize.addEventListener('input', e => { state.style.sublineSize = Math.max(6, Number(e.target.value) || 13); renderPreview(); });
+
+    fields.alignLeft.addEventListener('click', () => { state.style.textAlign = 'left'; syncForm(); });
+    fields.alignCenter.addEventListener('click', () => { state.style.textAlign = 'center'; syncForm(); });
+    fields.alignRight.addEventListener('click', () => { state.style.textAlign = 'right'; syncForm(); });
+    fields.boldBtn.addEventListener('click', () => { state.style.bold = !state.style.bold; syncForm(); });
+    fields.italicBtn.addEventListener('click', () => { state.style.italic = !state.style.italic; syncForm(); });
+    fields.underlineBtn.addEventListener('click', () => { state.style.underline = !state.style.underline; syncForm(); });
+    fields.headlineBoldBtn.addEventListener('click', () => { state.style.headlineBold = !state.style.headlineBold; syncForm(); });
+
+    fields.advancedToggle.addEventListener('change', e => { state.advanced = e.target.checked; syncForm(); });
+    fields.advancedHtml.addEventListener('input', e => { state.advancedHtml = e.target.value; renderPreview(); });
+
+    fields.enableBack.addEventListener('change', e => { state.enableBack = e.target.checked; renderPreview(); });
+    fields.backHeadline.addEventListener('input', e => { state.backHeadline = e.target.value; renderPreview(); });
+    fields.backSubline.addEventListener('input', e => { state.backSubline = e.target.value; renderPreview(); });
+
+    $('applySmartBtn').addEventListener('click', applySmartPaste);
+    fields.smartPaste.addEventListener('paste', () => setTimeout(applySmartPaste, 0));
+    $('clearSmartBtn').addEventListener('click', () => { fields.smartPaste.value = ''; });
+
+    $('addItemBtn').addEventListener('click', () => {
+      state.items.push({ headline:'Neuer Eintrag', subline:'Details', qty:1, html:'' });
+      syncForm();
+    });
+
+    $('clearItemsBtn').addEventListener('click', () => {
+      if(confirm('Liste wirklich leeren?')){
+        state.items = [];
+        syncForm();
       }
-      stage.innerHTML = html;
-      $('countInfo').textContent = `${frontEntries.length} Etikett(en) · ${state.layout.cols} × ${state.layout.rows} pro Seite`;
-    }
+    });
 
-    function downloadJson(filename, data){
-      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
+    $('printBtn').addEventListener('click', () => window.print());
 
-    function wireEvents(){
-      $('presetSelect').addEventListener('change', e => {
-        state.preset = e.target.value;
-        state.layout = {...PRESETS[state.preset]};
-        syncInputs();
-      });
+    $('exportBtn').addEventListener('click', () => {
+      state.version = VERSION;
+      const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+      downloadJson(`etiketten_tool_backup_v1-3_${stamp}.json`, state);
+    });
 
-      ['cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft'].forEach(id=>{
-        $(id).addEventListener('input', () => {
-          state.preset = 'custom';
-          readLayoutFromInputs();
-          $('presetSelect').value = 'custom';
-          renderPreview();
-        });
-      });
+    $('importBtn').addEventListener('click', () => fields.importFile.click());
+    fields.importFile.addEventListener('change', async e => {
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      try{
+        const imported = JSON.parse(await file.text());
+        state = normalizeState(imported);
+        syncForm();
+      }catch(error){
+        alert('JSON konnte nicht importiert werden: ' + error.message);
+      }finally{
+        e.target.value = '';
+      }
+    });
 
-      $('editMode').addEventListener('change', e => { state.editMode = e.target.value; syncInputs(); });
-      $('mainText').addEventListener('input', e => { state.mainText = e.target.value; renderPreview(); });
-      $('mainQty').addEventListener('input', e => { state.mainQty = Number(e.target.value)||1; renderPreview(); });
-      $('fontFamily').addEventListener('change', e => { state.style.fontFamily = e.target.value; renderPreview(); });
-      $('fontSize').addEventListener('input', e => { state.style.fontSize = Number(e.target.value)||16; renderPreview(); });
-      $('boldBtn').addEventListener('click', () => { state.style.bold = !state.style.bold; syncInputs(); });
-      $('italicBtn').addEventListener('click', () => { state.style.italic = !state.style.italic; syncInputs(); });
-      $('underlineBtn').addEventListener('click', () => { state.style.underline = !state.style.underline; syncInputs(); });
-      $('showCutmarks').addEventListener('change', e => { state.showCutmarks = e.target.checked; renderPreview(); });
-      $('showBorders').addEventListener('change', e => { state.showBorders = e.target.checked; renderPreview(); });
-      $('enableBack').addEventListener('change', e => { state.enableBack = e.target.checked; renderPreview(); });
-      $('backText').addEventListener('input', e => { state.backText = e.target.value; renderPreview(); });
+    $('resetBtn').addEventListener('click', () => {
+      if(confirm('Tool auf Beispielwerte zurücksetzen?')){
+        state = structuredCloneSafe(DEFAULT_STATE);
+        syncForm();
+      }
+    });
+  }
 
-      $('addItemBtn').addEventListener('click', () => {
-        state.items.push({text:'Neuer Eintrag', qty:1});
-        syncInputs();
-      });
-
-      $('clearItemsBtn').addEventListener('click', () => {
-        if(confirm('Liste wirklich leeren?')){
-          state.items = [];
-          syncInputs();
-        }
-      });
-
-      $('printBtn').addEventListener('click', () => window.print());
-
-      $('exportBtn').addEventListener('click', () => {
-        const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-        downloadJson(`etiketten_tool_backup_${stamp}.json`, state);
-      });
-
-      $('importBtn').addEventListener('click', () => $('importFile').click());
-      $('importFile').addEventListener('change', async e => {
-        const file = e.target.files?.[0];
-        if(!file) return;
-        try{
-          const imported = JSON.parse(await file.text());
-          Object.assign(state, imported);
-          state.layout = {...state.layout};
-          syncInputs();
-        }catch(err){
-          alert('JSON konnte nicht importiert werden: ' + err.message);
-        }finally{
-          e.target.value = '';
-        }
-      });
-    }
-
+  function boot(){
+    cacheFields();
     initPresets();
     wireEvents();
-    syncInputs();
-  </script>
+    syncForm();
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
 </body>
 </html>
