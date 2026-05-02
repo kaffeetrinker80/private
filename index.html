@@ -17,9 +17,7 @@
       --text: #eef2f7;
       --muted: #94a3b8;
       --border: rgba(255, 255, 255, 0.1);
-      
-      /* Projects Purple Theme */
-      --primary: #c5a8ff; 
+      --primary: #c5a8ff; /* Projects Purple */
       --radius-xl: 28px;
       --radius-lg: 22px;
       --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -56,7 +54,6 @@
 
     .container { max-width: 1120px; margin: 0 auto; padding: 20px 20px 40px; position: relative; }
 
-    /* TOPBAR */
     .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 9999; }
     
     .bookmark-btn {
@@ -74,7 +71,6 @@
     }
     .nav-back:hover { transform: translateY(-2px); background: #252b33; }
 
-    /* HERO */
     .hero {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius-xl); padding: 50px 24px; margin-bottom: 40px; text-align: center;
@@ -88,7 +84,6 @@
     .hero-byline { font-size: 1.3rem; color: var(--primary); margin-top: 10px; font-weight: 400; }
     .hero p { color: var(--muted); line-height: 1.6; font-size: 1.1rem; margin: 24px auto 0; max-width: 760px; }
 
-    /* GRID */
     .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
 
     .card {
@@ -97,12 +92,10 @@
       transition: var(--transition-smooth); height: 100%;
     }
     
-    /* Active Card Styling */
     .card.active-project {
       --c-theme: var(--primary);
       --c-soft: rgba(197, 168, 255, 0.1);
     }
-    /* Placeholder Card Styling */
     .card.placeholder {
       --c-theme: #64748b; 
       --c-soft: rgba(100, 116, 139, 0.1);
@@ -114,8 +107,9 @@
 
     .icon-wrap { 
       width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; 
-      margin-bottom: 20px; background: var(--c-soft); color: var(--c-theme);
+      margin-bottom: 20px; background: var(--c-soft); overflow: hidden;
     }
+    .icon-wrap img { width: 40px; height: 40px; object-fit: contain; }
 
     .card h2 { font-size: 1.4rem; color: #fff; margin: 0 0 10px; }
     .card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; flex-grow: 1; }
@@ -156,12 +150,11 @@
     </section>
 
     <section class="grid animate-in delay-2">
-      <!-- NEU: ETIKETTEN TOOL -->
+      <!-- ETIKETTEN TOOL -->
       <article class="card active-project">
         <div class="icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l5.58-5.58c.94-.94.94-2.48 0-3.42L12 2z"/><path d="M7 7h.01"/>
-          </svg>
+          <!-- Pfad angepasst auf dein Standard-Format -->
+          <img src="./etiketten-tool/android-chrome-192x192.png" alt="Icon">
         </div>
         <h2>Etiketten-Tool</h2>
         <p>Simple and fast label generator for household and organization tasks.</p>
@@ -171,12 +164,12 @@
         </div>
       </article>
 
-      <!-- PLACEHOLDER 1 -->
+      <!-- PLACEHOLDER -->
       <article class="card placeholder">
         <div class="icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 2v7.31l-4.5 7.69A2 2 0 0 0 7.24 20h9.52a2 2 0 0 0 1.8-2.92L14 9.31V2h-4Z"/><path d="M8.5 2h7"/>
-          </svg>
+          <img src="./placeholder-icon.png" alt="Icon" onerror="this.style.display='none'">
+          <!-- Fallback Symbol falls kein Bild da ist -->
+          <span style="font-size: 24px; color: var(--muted);">?</span>
         </div>
         <h2>Future Drafts</h2>
         <p>This area is prepared for future private projects or internal helper pages.</p>
