@@ -14,7 +14,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Etiketten & Badgecard Tool V1.4.2</title>
+  <title>Etiketten & Badgecard Tool V1.4.4</title>
   <style>
     :root{
       --ink:#172033;
@@ -200,6 +200,24 @@
       font-size:.82rem;
       line-height:1.42;
       margin-top:8px;
+    }
+
+    .duplex-status{
+      background:#f8fafc;
+      border:1px solid #dbe4ee;
+      border-radius:12px;
+      padding:8px 10px;
+      margin-top:8px;
+      color:#334155;
+      font-size:.82rem;
+      line-height:1.35;
+    }
+
+    .duplex-status.active{
+      border-color:rgba(15,118,110,.28);
+      background:#ecfdf5;
+      color:#115e59;
+      font-weight:650;
     }
 
     .smart-box{
@@ -406,7 +424,7 @@
       <h1>Etiketten & Badgecard Tool</h1>
       <p>A4-Etiketten, Kongress-Badges, Smart Paste, Duplex, Bild, JSON & Druckansicht.</p>
     </div>
-    <div class="version-badge">V1.4.2 · Standalone HTML</div>
+    <div class="version-badge">V1.4.4 · Standalone HTML</div>
   </div>
 </header>
 
@@ -528,12 +546,12 @@
       <div class="toggle-row"><input id="imageEnabled" type="checkbox"><span>Bild auf Etiketten anzeigen</span></div>
       <input id="imageFile" type="file" accept="image/*">
       <div class="grid2">
-        <div><label>Breite mm</label><input id="imageW" type="number" min="5" max="200" step="1"></div>
-        <div><label>Deckkraft %</label><input id="imageOpacity" type="number" min="5" max="100" step="5"></div>
+        <div><label>Bildbreite (mm)</label><input id="imageW" type="number" min="5" max="200" step="1"></div>
+        <div><label>Bild-Deckkraft (%)</label><input id="imageOpacity" type="number" min="5" max="100" step="5"></div>
       </div>
       <div class="grid2">
-        <div><label>Position X mm</label><input id="imageX" type="number" min="-100" max="200" step="1"></div>
-        <div><label>Position Y mm</label><input id="imageY" type="number" min="-100" max="200" step="1"></div>
+        <div><label>Bild-Abstand vom linken Etikettenrand (mm)</label><input id="imageX" type="number" min="-100" max="200" step="1"></div>
+        <div><label>Bild-Abstand vom oberen Etikettenrand (mm)</label><input id="imageY" type="number" min="-100" max="200" step="1"></div>
       </div>
       <div class="help">Bild wird auf jedem Label gleich platziert. Für Logos am besten PNG verwenden.</div>
     </div>
@@ -550,7 +568,12 @@
       <input id="backHeadline" type="text">
       <label>Rückseite Text</label>
       <textarea id="backSubline"></textarea>
-      <div class="help">Für normalen Duplexdruck ist die erste Option richtig. Für manuelles Wiedereinlegen eher die zweite.</div>
+      <div class="grid2">
+        <div><label>Rückseite Überschrift Größe</label><input id="backHeadlineSize" type="number" min="6" max="72" step="1"></div>
+        <div><label>Rückseite Text Größe</label><input id="backSublineSize" type="number" min="6" max="72" step="1"></div>
+      </div>
+      <div class="duplex-status" id="duplexHint">Rückseite ist aus. Aktiviere die Checkbox, um Rückseiten in die Druckvorschau einzufügen.</div>
+      <div class="help">Für normalen Duplexdruck ist die erste Option richtig. Wichtig: Die sichtbare Reihenfolge unterscheidet sich erst, sobald mehr als eine Vorderseite entsteht.</div>
     </div>
 
     <div class="section">
@@ -565,7 +588,7 @@
       <div class="help">Alles bleibt lokal im Browser. Bilder im JSON können die Datei größer machen.</div>
     </div>
 
-    <div class="footer-note">Made with Love © – Label Tool V 1.4.2</div>
+    <div class="footer-note">Made with Love © – Label Tool V 1.4.4</div>
   </aside>
 
   <section class="preview-wrap">
@@ -581,7 +604,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '1.4.2';
+  const VERSION = '1.4.4';
 
   const PRESETS = {
     half:{name:'A4 halbseitig – 2 Etiketten, 210 × 148,5 mm',cols:1,rows:2,labelW:210,labelH:148.5,gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},
@@ -618,6 +641,7 @@
     duplexMode:'interleaved',
     backHeadline:'Bitte sichtbar tragen',
     backSubline:'Thank you for serving',
+    backStyle:{headlineSize:16,sublineSize:11},
     advanced:false,
     advancedHtml:'',
     image:{enabled:false,src:'',w:24,x:4,y:4,opacity:20}
@@ -650,7 +674,7 @@
   }
 
   function cacheElements(){
-    ['presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','editMode','smartPaste','headline','subline','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','advancedToggle','advancedBox','advancedHtml','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','duplexMode','backHeadline','backSubline','pageStage','countInfo','importFile'].forEach(function(id){
+    ['presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','editMode','smartPaste','headline','subline','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','advancedToggle','advancedBox','advancedHtml','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','duplexMode','duplexHint','backHeadline','backSubline','backHeadlineSize','backSublineSize','pageStage','countInfo','importFile'].forEach(function(id){
       el[id] = byId(id);
     });
   }
@@ -662,6 +686,7 @@
     fresh.version = VERSION;
     fresh.layout = Object.assign({}, DEFAULT_STATE.layout, imported.layout || {});
     fresh.style = Object.assign({}, DEFAULT_STATE.style, imported.style || {});
+    fresh.backStyle = Object.assign({}, DEFAULT_STATE.backStyle, imported.backStyle || {});
     fresh.image = Object.assign({}, DEFAULT_STATE.image, imported.image || {});
     fresh.items = Array.isArray(imported.items) ? imported.items.map(function(item){
       return {
@@ -749,8 +774,11 @@
 
     el.enableBack.checked = !!state.enableBack;
     el.duplexMode.value = state.duplexMode;
+    updateDuplexHint();
     el.backHeadline.value = state.backHeadline;
     el.backSubline.value = state.backSubline;
+    el.backHeadlineSize.value = state.backStyle.headlineSize;
+    el.backSublineSize.value = state.backStyle.sublineSize;
 
     renderItemsEditor();
     renderPreview();
@@ -821,7 +849,7 @@
   function collectEntries(front){
     if(front === false && state.enableBack){
       return collectEntries(true).map(function(){
-        return {headline:state.backHeadline, subline:state.backSubline, html:''};
+        return {headline:state.backHeadline, subline:state.backSubline, html:'', back:true};
       });
     }
 
@@ -855,6 +883,33 @@
     return pages;
   }
 
+  function getFrontPageCount(){
+    const perPage = Math.max(1, state.layout.cols * state.layout.rows);
+    const count = collectEntries(true).length;
+    return Math.ceil(count / perPage);
+  }
+
+  function updateDuplexHint(){
+    if(!el.duplexHint) return;
+    const pages = getFrontPageCount();
+    el.duplexHint.classList.toggle('active', !!state.enableBack);
+
+    if(!state.enableBack){
+      el.duplexHint.textContent = 'Rückseite ist aus. Aktiviere die Checkbox, um Rückseiten in die Druckvorschau einzufügen.';
+      return;
+    }
+
+    if(state.duplexMode === 'interleaved'){
+      el.duplexHint.textContent = 'Rückseite ist aktiv. Druckreihenfolge: Vorderseite 1 → Rückseite 1 → Vorderseite 2 → Rückseite 2. Bei nur einer Vorderseite sieht die Auswahl natürlich fast gleich aus.';
+    }else{
+      el.duplexHint.textContent = 'Rückseite ist aktiv. Druckreihenfolge: erst alle Vorderseiten, danach alle Rückseiten. Das ist praktisch fürs manuelle Wiedereinlegen.';
+    }
+
+    if(pages <= 1){
+      el.duplexHint.textContent += ' Hinweis: Aktuell gibt es nur eine Vorderseite; der Unterschied der beiden Duplex-Optionen wird erst ab Seite 2 sichtbar.';
+    }
+  }
+
   function renderPreview(){
     try{
       el.pageStage.innerHTML = '';
@@ -881,6 +936,7 @@
       });
 
       el.countInfo.textContent = frontEntries.length + ' Etikett(en) · ' + state.layout.cols + ' × ' + state.layout.rows + ' pro Seite · ' + frontPages.length + ' Vorderseite(n)' + (state.enableBack ? ' + Rückseite' : '');
+      updateDuplexHint();
     }catch(error){
       console.error(error);
       el.pageStage.innerHTML = '<div class="help">Vorschaufehler: ' + escapeHtml(error.message) + '</div>';
@@ -932,6 +988,10 @@
     const card = document.createElement('div');
     card.className = 'label-card';
     if(!state.showBorders) card.classList.add('no-border');
+    if(entry.back){
+      card.style.setProperty('--headline-size', (Number(state.backStyle.headlineSize) || 16) + 'pt');
+      card.style.setProperty('--subline-size', (Number(state.backStyle.sublineSize) || 11) + 'pt');
+    }
 
     if(state.image.enabled && state.image.src){
       const img = document.createElement('img');
@@ -1088,10 +1148,12 @@
       reader.readAsDataURL(file);
     });
 
-    el.enableBack.addEventListener('change', function(){ state.enableBack = el.enableBack.checked; renderPreview(); });
+    el.enableBack.addEventListener('change', function(){ state.enableBack = el.enableBack.checked; syncForm(); });
     el.duplexMode.addEventListener('change', function(){ state.duplexMode = el.duplexMode.value; renderPreview(); });
     el.backHeadline.addEventListener('input', function(){ state.backHeadline = el.backHeadline.value; renderPreview(); });
     el.backSubline.addEventListener('input', function(){ state.backSubline = el.backSubline.value; renderPreview(); });
+    el.backHeadlineSize.addEventListener('input', function(){ state.backStyle.headlineSize = Math.max(6, Number(el.backHeadlineSize.value) || 16); renderPreview(); });
+    el.backSublineSize.addEventListener('input', function(){ state.backStyle.sublineSize = Math.max(6, Number(el.backSublineSize.value) || 11); renderPreview(); });
 
     byId('applySmartBtn').addEventListener('click', applySmartPaste);
     el.smartPaste.addEventListener('paste', function(){ setTimeout(applySmartPaste, 0); });
@@ -1114,7 +1176,7 @@
     byId('exportBtn').addEventListener('click', function(){
       state.version = VERSION;
       const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-      downloadJson('etiketten_tool_backup_v1-4-2_' + stamp + '.json', state);
+      downloadJson('etiketten_tool_backup_v1-4-4_' + stamp + '.json', state);
     });
 
     byId('importBtn').addEventListener('click', function(){ el.importFile.click(); });
