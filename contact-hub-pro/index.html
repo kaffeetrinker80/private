@@ -1,1 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Icons + Manifest -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" href="favicon.ico">
+
+<link rel="manifest" href="site.webmanifest">
+
+<meta name="theme-color" content="#172f4d">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ContactHub Pro V1.2.2</title>
+<meta name="theme-color" content="#172033" />
+<style>
+:root{
+  --bg:#f4f7fb;--card:#fff;--card2:#f8fafc;--text:#172033;--muted:#64748b;--line:#dbe4ef;
+  --accent:#2563eb;--accent2:#1d4ed8;--soft:#e8f0ff;--green:#15803d;--greenSoft:#dcfce7;
+  --warn:#b45309;--warnSoft:#fef3c7;--danger:#b91c1c;--dangerSoft:#fee2e2;
+  --shadow:0 10px 28px rgba(15,23,42,.075);--r:18px;--r2:12px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);background:linear-gradient(135deg,#edf4ff,#f7fafc 45%,#f4f7fb);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{
+  border:1px solid transparent;border-radius:999px;padding:7px 11px;cursor:pointer;font-weight:760;
+  background:#edf3fa;color:#243044;transition:.13s ease;white-space:nowrap;font-size:13px;line-height:1.15;
+  box-shadow:0 1px 0 rgba(15,23,42,.03);
+}
+button:hover{transform:translateY(-1px);filter:brightness(.985)}
+button:active{transform:translateY(0)}
+button.primary{background:var(--accent);color:#fff}
+button.green{background:var(--green);color:#fff}
+button.ghost{background:#f1f5f9;border-color:#e2e8f0;color:#334155}
+button.danger{background:var(--dangerSoft);color:var(--danger)}
+button.mini{padding:5px 8px;border-radius:999px;font-size:12px}
+button.icon{padding:4px 6px;min-width:28px}
+input,select,textarea{
+  width:100%;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;
+  padding:8px 9px;outline:none;transition:.14s ease;font-size:13px;
+}
+input:focus,select:focus,textarea:focus{border-color:#93b4ff;box-shadow:0 0 0 3px rgba(37,99,235,.11)}
+textarea{min-height:108px;resize:vertical;line-height:1.43}
+label{display:block;font-size:11px;font-weight:850;color:#475569;margin:0 0 4px;text-transform:uppercase;letter-spacing:.03em}
+.app{max-width:1840px;margin:0 auto;padding:16px}
+.topbar{
+  position:sticky;top:0;z-index:30;margin:-16px -16px 14px;padding:13px 16px;
+  backdrop-filter:blur(15px);background:rgba(244,247,251,.9);border-bottom:1px solid rgba(219,228,239,.9)
+}
+.header{max-width:1840px;margin:0 auto;display:grid;grid-template-columns:minmax(320px,1fr) auto;gap:14px;align-items:center}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{
+  width:44px;height:44px;border-radius:15px;display:grid;place-items:center;color:#fff;font-size:22px;font-weight:900;
+  background:radial-gradient(circle at 28% 22%,#93c5fd,#2563eb 44%,#172033 100%);box-shadow:var(--shadow);flex:0 0 auto;
+}
+h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
+.sub{margin:4px 0 0;color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:7px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.status{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);color:#475569;font-size:12px;font-weight:800}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.note{
+  margin-bottom:12px;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:10px 12px;display:flex;justify-content:space-between;gap:12px;align-items:center
+}
+.note span{font-size:12px;color:var(--muted);line-height:1.35}
+.grid{display:grid;grid-template-columns:minmax(300px,.86fr) minmax(520px,1.45fr) minmax(360px,.92fr);gap:13px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.panelHead{padding:12px 13px;border-bottom:1px solid var(--line);background:linear-gradient(#fff,#f8fafc);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.panelHead h2{font-size:16px;margin:0;letter-spacing:-.025em}.panelHead small{color:var(--muted);font-weight:800}
+.panelBody{padding:13px}.stack{display:grid;gap:9px}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.sectionTitle{margin:12px 0 7px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+.hint{font-size:12px;color:var(--muted);line-height:1.35}
+.list{display:grid;gap:7px;max-height:52vh;overflow:auto;padding-right:2px}
+.cardItem{border:1px solid var(--line);background:#fff;border-radius:14px;padding:9px;transition:.13s ease;display:grid;gap:6px}
+.cardItem:hover{border-color:#adc4fb;background:#fbfdff}.cardItem.active{border-color:#2563eb;background:#eef4ff;box-shadow:0 0 0 3px rgba(37,99,235,.07)}
+.cardTop{display:grid;grid-template-columns:auto 1fr auto auto;gap:6px;align-items:start}
+.check{width:17px;height:17px;margin:1px 0 0;accent-color:var(--accent)}
+.cardName{font-weight:920;line-height:1.15;cursor:pointer}.cardMeta{font-size:12px;color:var(--muted);line-height:1.3}.smallBtns{display:flex;gap:5px;flex-wrap:wrap}
+.chips{display:flex;gap:4px;flex-wrap:wrap}.chip{font-size:10.5px;font-weight:850;background:#eef3f8;color:#475569;border-radius:999px;padding:3px 6px;display:inline-flex;align-items:center;gap:4px}.chip.blue{background:var(--soft);color:#1e40af}.chip.green{background:var(--greenSoft);color:#166534}.chip.warn{background:var(--warnSoft);color:var(--warn)}.chip.danger{background:var(--dangerSoft);color:var(--danger)}
+.lineAction{display:grid;grid-template-columns:1fr auto auto;gap:4px;align-items:center;font-size:12px;color:#334155;background:#f8fafc;border:1px solid #e9eef6;border-radius:10px;padding:4px 5px;min-width:0}
+.lineAction span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{padding:6px 9px;border-radius:999px;font-size:12px;background:#eef3f8;color:#475569;font-weight:900;cursor:pointer}.tab.active{background:#172033;color:#fff}
+.workflow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px}
+.step{border:1px solid var(--line);background:#f8fafc;border-radius:13px;padding:8px;font-size:12px;color:#475569;line-height:1.25}
+.step b{display:block;color:#172033;margin-bottom:2px}
+.previewBox{background:#f8fbff;color:#172033;border-radius:18px;padding:14px;min-height:330px;white-space:pre-wrap;line-height:1.52;border:1px solid #d7e4f2;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.subjectBox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-weight:800;color:#334155;min-height:52px;word-break:break-word;line-height:1.35}
+.previewActions{display:flex;gap:7px;flex-wrap:wrap}.placeholderGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.placeholder{font-family:var(--mono);font-size:11px;font-weight:850;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:9px;padding:6px 7px;color:#334155;cursor:pointer;user-select:none}.placeholder:hover{background:#e8f0ff;color:#1d4ed8}
+.waBtn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border-color:rgba(255,255,255,.18);display:inline-flex;align-items:center;gap:7px}
+.waIcon{width:17px;height:17px;border-radius:50%;background:#fff;color:#16a34a;display:inline-grid;place-items:center;font-size:11px;font-weight:950;line-height:1}
+.recipientBox{display:grid;gap:6px;background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:10px;font-size:13px}
+.recipientBox b{font-size:15px}.recipientLine{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#475569;min-width:0}.recipientLine span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sendChoice{display:grid;grid-template-columns:1fr;gap:7px}
+.placeholder{display:grid;gap:2px}.placeholder code{font-family:var(--mono);font-size:11px;color:#1d4ed8}.placeholder span{font-family:var(--sans);font-size:10.5px;color:#64748b;font-weight:800;letter-spacing:0;text-transform:none}
+
+.simpleComposer{border:1px solid #dbe7f4;background:linear-gradient(180deg,#ffffff,#f8fbff);border-radius:16px;padding:11px;display:grid;gap:10px}
+.simpleComposer .subjectInput{min-height:64px;line-height:1.38;font-weight:750}
+.simpleComposer .mainText{min-height:210px;font-size:14px;line-height:1.48}
+.simpleComposer .footerText{min-height:88px}
+.toggleRow{display:flex;gap:8px;flex-wrap:wrap}
+.langToggle{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:850;color:#334155}
+.langToggle input{width:auto;margin:0;accent-color:var(--accent)}
+.smartSelectGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.templateMiniHelp{font-size:12px;color:var(--muted);line-height:1.35;background:#f8fafc;border:1px dashed #c8d7e8;border-radius:13px;padding:8px 9px}
+.contactTools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:820px){.smartSelectGrid,.contactTools{grid-template-columns:1fr}}
+
+/* v1.1.5 picker + bulk assignment helpers */
+.insertPickerGrid{display:grid;grid-template-columns:minmax(240px,.9fr) minmax(260px,1.1fr);gap:10px}
+.insertContactSelect{min-height:230px;padding:6px}
+.bulkAssignBox{border:1px solid var(--line);background:#f8fafc;border-radius:16px;padding:11px;display:grid;gap:9px}
+.bulkAssignHead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bulkAssignHead b{font-size:13px}.bulkAssignHead select{max-width:190px}
+.bulkCheckGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-height:180px;overflow:auto;padding-right:2px}
+.bulkCustomGrid{display:grid;grid-template-columns:1fr;gap:6px}
+@media(max-width:820px){.insertPickerGrid,.bulkCheckGrid{grid-template-columns:1fr}.bulkAssignHead{align-items:flex-start;flex-direction:column}.bulkAssignHead select{max-width:none}}
+
+.modalOverlay{position:fixed;inset:0;background:rgba(15,23,42,.52);z-index:90;display:none;align-items:center;justify-content:center;padding:18px}.modalOverlay.show{display:flex}
+.modal{width:min(1050px,100%);max-height:88vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 80px rgba(15,23,42,.28)}
+.modalHead{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.modalHead h3{margin:0;font-size:18px}.modalBody{padding:17px}.modalFoot{padding:13px 17px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap;background:#f8fafc}
+.importSummary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}.stat{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:9px}.stat b{display:block;font-size:20px;letter-spacing:-.03em}.stat span{font-size:12px;color:var(--muted);font-weight:800}
+.tableWrap{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;background:#fff}th,td{padding:8px 9px;border-bottom:1px solid #edf2f7;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#f8fafc;z-index:2;font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:.04em}
+.toastWrap{position:fixed;right:18px;bottom:18px;z-index:140;display:grid;gap:8px;max-width:min(420px,calc(100vw - 36px))}.toast{background:#172033;color:#fff;border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);font-size:13px;font-weight:760;animation:toastIn .22s ease both}@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fileInput,.hidden{display:none!important}.empty{border:1px dashed #cbd5e1;border-radius:16px;padding:17px;text-align:center;color:var(--muted);background:#f8fafc}.dangerText{color:var(--danger);font-weight:850}
+@media(max-width:1280px){.grid{grid-template-columns:1fr 1fr}.previewPanel{grid-column:1/-1}}
+@media(max-width:820px){.app{padding:11px}.topbar{margin:-11px -11px 11px;padding:11px}.header{grid-template-columns:1fr}.toolbar{justify-content:flex-start}.note{align-items:flex-start;flex-direction:column}.grid,.row,.row3,.workflow{grid-template-columns:1fr}.importSummary{grid-template-columns:1fr 1fr}.placeholderGrid{grid-template-columns:1fr}.list{max-height:none}h1{font-size:21px}.logo{width:40px;height:40px}.cardTop{grid-template-columns:auto 1fr auto}}
+@media print{body{background:#fff}.topbar,.note,.contactsPanel,.templatesPanel,.previewActions,.sectionTitle button{display:none!important}.app{padding:0}.grid{display:block}.panel{box-shadow:none;border:0}.panelHead{border-bottom:1px solid #bbb}.previewBox{background:#fff;color:#000;border:0;padding:0;min-height:0}.subjectBox{border:0;padding:0}.previewPanel{display:block}}
+
+:root{--wa:#25d366;--wa2:#128c47;}
+
+/* Sticky panels */
+.panel{position:sticky;top:72px;max-height:calc(100vh - 88px);}
+.panel .panelBody{overflow-y:auto;max-height:calc(100vh - 162px);}
+
+/* Grid layout */
+.grid{grid-template-columns:minmax(310px,.82fr) minmax(520px,1.18fr) minmax(410px,1.05fr);}
+.utilityNote{margin-top:-3px}
+
+/* WA button */
+.waBtnIcon{background:var(--wa);border-color:rgba(0,0,0,.08);color:#fff;display:inline-flex;align-items:center;gap:6px;font-weight:800;}
+.waBtnIcon:hover{background:var(--wa2);transform:translateY(-1px);}
+.waBtnIcon svg{flex:0 0 auto;}
+
+/* Compose hint */
+.composeHint{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #cfe1f7;background:linear-gradient(135deg,#f8fbff,#eef6ff);border-radius:16px;padding:10px 12px;color:#35506f;font-size:13px;line-height:1.35}
+.composeHint b{font-size:13px;color:#172033}
+.composeHint span{color:#64748b}
+.templateListHeader{display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+/* Recipient pick rows */
+.pickRows{display:grid;gap:5px;margin-top:4px;}
+.pickRow{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;cursor:pointer;transition:.13s;font-size:12.5px;}
+.pickRow:hover{background:#dcfce7;transform:translateX(2px);}
+.pickRow.active{outline:2px solid rgba(37,99,235,.28);border-color:#2563eb;background:#eaf2ff}
+.pickRow.email-row{background:#eff6ff;border-color:#bfdbfe;}
+.pickRow.email-row:hover{background:#dbeafe;}
+.pickRow.email-row.active{background:#dbeafe}
+.pickRow.missing{background:#fef9c3;border-color:#fde68a;cursor:default;opacity:.7;}
+.pickRow.missing:hover{transform:none;}
+.pickRow .openNow{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#64748b}
+.pickIcon{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;flex:0 0 auto;font-weight:900;font-size:12px;}
+.pickIcon.wa{background:var(--wa);color:#fff;}
+.pickIcon.em{background:#2563eb;color:#fff;}
+.pickIcon.mis{background:#e2e8f0;color:#94a3b8;}
+.pickVal{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;color:var(--text);}
+.pickLbl{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#15803d;white-space:nowrap;}
+.pickLbl.em{color:#1d4ed8;}
+.pickLbl.mis{color:#b45309;}
+
+/* Channel pill */
+.channelPill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;background:#eef3f8;color:#475569}
+.channelPill.wa{background:#dcfce7;color:#15803d}
+.channelPill.mail{background:#eff6ff;color:#1d4ed8}
+
+/* Char counter */
+.charCounter{font-size:11px;color:var(--muted);font-weight:800;}
+.charCounter.warn{color:var(--warn);}
+.charCounter.over{color:var(--danger);}
+.previewMetaRow{display:flex;justify-content:space-between;align-items:center;margin-top:5px;}
+
+/* Favourite star */
+.starBtn{background:none!important;border:none!important;box-shadow:none!important;padding:2px 4px!important;font-size:16px;line-height:1;color:#cbd5e1;min-width:unset;transition:color .13s,transform .13s;}
+.starBtn.on{color:#f59e0b!important;}
+.starBtn:hover{color:#f59e0b!important;transform:scale(1.25)!important;filter:none!important;}
+
+/* Dark mode toggle */
+.themeToggle{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;padding:6px 10px;font-size:12px;cursor:pointer;font-weight:900;color:#475569;display:inline-flex;align-items:center;gap:5px;transition:.13s;white-space:nowrap;}
+.themeToggle:hover{background:#e2e8f0;}
+
+/* Keyboard hint */
+.kbdHint{font-size:10.5px;color:var(--muted);display:inline-flex;align-items:center;gap:3px;}
+kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px;padding:1px 5px;font-family:var(--mono);font-weight:700;}
+
+/* Contact management */
+.masterTextarea{min-height:140px;font-family:var(--mono);font-size:12px}
+.rolePickGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:4px}
+.rolePick{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:7px 9px;font-size:12px;font-weight:800;color:#334155}
+.rolePick input{width:auto;margin:0}
+.contactQuickGrid{display:grid;grid-template-columns:1fr auto auto;gap:7px;align-items:end}
+.contactMiniNote{font-size:11px;color:var(--muted);line-height:1.35;margin-top:4px}
+.editorBlock{border:1px solid var(--line);background:#f8fafc;border-radius:16px;padding:11px;display:grid;gap:10px}
+.editorBlockTitle{font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin:0}
+.roleChips{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.sharePreview{white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px;min-height:150px;line-height:1.45}
+.contactToolRow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+
+/* Preview box */
+.previewBox{background:#f8fbff;color:#172033;border-color:#dbe4ef;box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+
+/* Subject & composer field sizes */
+.subjectInput{min-height:72px}
+.simpleComposer .subjectInput{min-height:72px;font-size:14px;line-height:1.45}
+.simpleComposer .mainText{min-height:240px;font-size:14px;line-height:1.5}
+.simpleComposer .footerText{min-height:110px;font-size:13px;line-height:1.45}
+
+@media(max-width:820px){
+  .rolePickGrid{grid-template-columns:1fr 1fr}
+  .contactQuickGrid{grid-template-columns:1fr}
+  .contactToolRow{display:grid;grid-template-columns:1fr 1fr}
+  .contactQuickGrid button{width:100%}
+}
+/* ═══════ DARK MODE ════════════════════════════════════════════════ */
+[data-theme=dark]{
+  --bg:#0f172a;--card:#1e293b;--card2:#1a2438;
+  --text:#e2e8f0;--muted:#94a3b8;--line:#2d3f55;
+  --accent:#3b82f6;--soft:#1e3a5f;
+  --green:#22c55e;--greenSoft:#14532d;
+  --warn:#f59e0b;--warnSoft:#422006;
+  --danger:#f87171;--dangerSoft:#450a0a;
+  --shadow:0 10px 28px rgba(0,0,0,.4);
+}
+[data-theme=dark] body{background:linear-gradient(135deg,#0d1929,#0f172a 50%,#111827);}
+[data-theme=dark] .topbar{background:rgba(15,23,42,.93);border-color:rgba(45,63,85,.9);}
+
+/* Inputs & forms */
+[data-theme=dark] input,[data-theme=dark] select,[data-theme=dark] textarea{background:#1e293b;color:#e2e8f0;border-color:#2d3f55;}
+[data-theme=dark] input:focus,[data-theme=dark] select:focus,[data-theme=dark] textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.18);}
+[data-theme=dark] label{color:#8fa8c0;}
+
+/* Buttons */
+[data-theme=dark] button{background:#1e293b;color:#cbd5e1;border-color:#2d3f55;}
+[data-theme=dark] button.primary{background:var(--accent);color:#fff;border-color:transparent;}
+[data-theme=dark] button.ghost{background:#1a2438;border-color:#2d3f55;color:#94a3b8;}
+[data-theme=dark] button.danger{background:#450a0a;color:#fca5a5;}
+[data-theme=dark] button.green{background:#15803d;color:#fff;}
+[data-theme=dark] .themeToggle{background:#1e293b;border-color:#2d3f55;color:#94a3b8;}
+[data-theme=dark] .themeToggle:hover{background:#263348;}
+
+/* Panels & layout */
+[data-theme=dark] .panelHead{background:linear-gradient(#1e293b,#1a2438);}
+[data-theme=dark] .note{background:#1e293b;}
+[data-theme=dark] .sectionTitle{color:#7a98b4;}
+[data-theme=dark] .hint{color:#8fa8c0;}
+[data-theme=dark] .status{background:#1e293b;border-color:#2d3f55;color:#94a3b8;}
+[data-theme=dark] .step{background:#1a2438;border-color:#2d3f55;color:#94a3b8;}
+[data-theme=dark] .step b{color:#c8d8ea;}
+[data-theme=dark] .stat{background:#1a2438;}
+[data-theme=dark] .empty{border-color:#2d3f55;background:#1a2438;}
+
+/* Card items */
+[data-theme=dark] .cardItem{background:#1e293b;border-color:#2d3f55;}
+[data-theme=dark] .cardItem:hover{background:#263348;border-color:#4a6080;}
+[data-theme=dark] .cardItem.active{background:#1a2e4a;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.14);}
+
+/* Tabs */
+[data-theme=dark] .tab{background:#1a2438;color:#94a3b8;}
+[data-theme=dark] .tab.active{background:#3b82f6;color:#fff;}
+
+/* Line actions */
+[data-theme=dark] .lineAction{background:#1a2438;border-color:#2d3f55;color:#94a3b8;}
+
+/* Chips */
+[data-theme=dark] .chip{background:#1a2438;color:#94a3b8;}
+[data-theme=dark] .chip.blue{background:#1e3a5f;color:#93c5fd;}
+[data-theme=dark] .chip.green{background:#14532d;color:#86efac;}
+[data-theme=dark] .chip.warn{background:#422006;color:#fcd34d;}
+[data-theme=dark] .chip.danger{background:#450a0a;color:#fca5a5;}
+
+/* Placeholders */
+[data-theme=dark] .placeholder{background:#1a2438;border-color:#2d3f55;color:#c0d4ea;}
+[data-theme=dark] .placeholder:hover{background:#1e3a5f;color:#93c5fd;}
+[data-theme=dark] .placeholder code{color:#93c5fd;}
+
+/* Recipient & compose */
+[data-theme=dark] .recipientBox{background:#1a2438;border-color:#2d3f55;}
+[data-theme=dark] .subjectBox{background:#1a2438;color:#e2e8f0;border-color:#2d3f55;}
+[data-theme=dark] .previewBox{background:#172033;color:#dbeafe;border-color:#2d3f55;}
+[data-theme=dark] .composeHint{background:#1a2438;border-color:#2d3f55;color:#94a3b8;}
+[data-theme=dark] .composeHint b{color:#cbd5e1;}
+[data-theme=dark] .composeHint span{color:#7a98b4;}
+[data-theme=dark] .simpleComposer{background:linear-gradient(180deg,#1e293b,#1a2438);border-color:#2d3f55}
+[data-theme=dark] .langToggle{background:#1a2438;border-color:#2d3f55;color:#cbd5e1;}
+[data-theme=dark] .templateMiniHelp{background:#1a2438;border-color:#2d3f55;color:#7a98b4;}
+
+/* Pick rows */
+[data-theme=dark] .pickRow{background:#1a3d2b;border-color:#1e5c3a;}
+[data-theme=dark] .pickRow:hover{background:#1e5438;}
+[data-theme=dark] .pickRow.active{background:#1a3d2b;border-color:#3b82f6;outline-color:rgba(59,130,246,.3);}
+[data-theme=dark] .pickRow.email-row{background:#1e3a5f;border-color:#2563eb;}
+[data-theme=dark] .pickRow.email-row:hover{background:#1d3461;}
+[data-theme=dark] .pickRow.email-row.active{background:#1e3a5f;border-color:#3b82f6;}
+[data-theme=dark] .pickRow.missing{background:#292524;border-color:#57534e;color:#9ca3af;}
+[data-theme=dark] .pickIcon.mis{background:#374151;color:#9ca3af;}
+
+/* Contact management */
+[data-theme=dark] .rolePick{background:#1a2438;border-color:#2d3f55;color:#cbd5e1;}
+[data-theme=dark] .editorBlock{background:#1a2438;border-color:#2d3f55;}
+[data-theme=dark] .editorBlockTitle{color:#7a98b4;}
+[data-theme=dark] .sharePreview{background:#1a2438;border-color:#2d3f55;color:#c8d8ea;}
+[data-theme=dark] .bulkAssignBox{background:#1a2438;border-color:#2d3f55;}
+
+/* Modal */
+[data-theme=dark] .modal{background:#1e293b;border-color:#2d3f55;}
+[data-theme=dark] .modalHead,[data-theme=dark] .modalFoot{background:#1a2438;border-color:#2d3f55;}
+
+/* Table */
+[data-theme=dark] table{background:#1e293b;}
+[data-theme=dark] th{background:#1a2438;color:#7a98b4;}
+[data-theme=dark] td{border-color:#2d3f55;color:#e2e8f0;}
+
+/* Toast */
+[data-theme=dark] .toast{background:#1e40af;color:#dbeafe;}
+
+/* Misc */
+[data-theme=dark] kbd{background:#1e293b;border-color:#2d3f55;color:#94a3b8;}
+/* ═══════ END DARK MODE ════════════════════════════════════════════ */
+/* ── Auto-height textareas (email/mobile in editor) ────────────── */
+textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hidden;line-height:1.5;transition:height .1s ease;}
+/* ── Search field dominant highlight ──────────────────────────── */
+#contactSearch{font-size:14px;padding:10px 14px;border-width:2px;border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,99,235,.10),var(--shadow);background:#fff;font-weight:600;}
+#contactSearch:focus{border-color:var(--accent);box-shadow:0 0 0 5px rgba(37,99,235,.18),var(--shadow);background:#f8fbff;}
+#contactSearch::placeholder{color:#93a8cc;font-weight:500;}
+[data-theme='dark'] #contactSearch{background:#1e293b;border-color:var(--accent);box-shadow:0 0 0 4px rgba(59,130,246,.18);color:#e2e8f0;}
+[data-theme='dark'] #contactSearch:focus{box-shadow:0 0 0 5px rgba(59,130,246,.28);}
+[data-theme='dark'] #contactSearch::placeholder{color:#4a6080;}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">✉</div>
+      <div>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.2.2</span></h1>
+        <p class="sub">Contacts · Teams · Messaging · Team Captain Export</p>
+      </div>
+    </div>
+    <div class="toolbar">
+      <span class="status" id="saveStatus"><span class="dot"></span> Saved locally</span>
+      <button class="ghost" id="btnStartEmpty">Start empty</button>
+      <button class="ghost" id="btnImportJson">Import JSON</button>
+      <button class="green" id="btnImportCsv">Import Outlook CSV</button>
+      <button class="themeToggle" id="btnTheme">🌙 Dark</button>
+      <button class="primary" id="btnExportJson">Export backup</button>
+      <button class="ghost" id="btnExportCsv">Export CSV</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <input class="fileInput" type="file" id="jsonInput" accept="application/json,.json" />
+  <input class="fileInput" type="file" id="csvInput" accept="text/csv,.csv" />
+
+  <div class="note utilityNote">
+    <span><strong>Workflow:</strong> choose a contact on the left, pick a message category/template in the middle, then use the ready preview on the right.</span>
+    <div class="smallBtns">
+      <button class="mini ghost" id="btnSentItems">History</button>
+      <button class="mini danger" id="btnClearLocal">Clear local data</button>
+    </div>
+  </div>
+
+  <main class="grid">
+    <section class="panel contactsPanel">
+      <div class="panelHead">
+        <div><h2>Contacts</h2><small id="contactCount">0</small></div>
+        <div class="smallBtns">
+          <button class="mini primary" id="btnMasterData">⚙️ Master data</button>
+          <button class="mini ghost" id="btnMergeSelected">Merge</button>
+          <button class="mini ghost" id="btnCaptainExport">📤 Captain Export</button>
+          <button class="primary mini" id="btnNewContact">+ Contact</button>
+        </div>
+      </div>
+      <div class="panelBody stack">
+        <div class="row">
+          <input id="contactSearch" placeholder="Search name, congregation, role, email, mobile..." />
+          <select id="contactSortBy" title="Sortierung"><option value="lastName">↕ Nachname</option><option value="firstName">↕ Vorname</option></select>
+        </div>
+        <div class="row">
+          <select id="contactRoleFilter"><option value="">All congregation roles</option></select>
+        </div>
+        <div class="row">
+          <select id="contactTagFilter"><option value="">All tags</option></select>
+          <select id="contactTeamFilter"><option value="">All Assembly / Convention teams</option></select>
+        </div>
+        <div>
+          <select id="contactBulkAction"><option value="">Bulk actions...</option><option value="bulkEdit">Bulk edit selected...</option><option value="role">Add / replace congregation role</option><option value="setTeam">🏷 Assign Assembly / Convention team</option><option value="tag">Add tag</option><option value="delete">Delete selected</option></select>
+        </div>
+        <div class="contactToolRow">
+          <button class="mini ghost" id="btnSelectVisible">Select visible</button>
+          <button class="mini ghost" id="btnClearSelection">Clear selection</button>
+          <button class="mini ghost" id="btnCopyContactList">Copy list</button>
+          <button class="mini ghost" id="btnExportSelectedCsv">Export selected CSV</button>
+          <button class="mini ghost" id="btnBulkEditSelected">Bulk edit selected</button>
+          <button class="mini danger" id="btnBulkDeleteSelected">Delete selected</button>
+        </div>
+        <div class="hint" id="selectionHint">0 selected. Use role search/filter, then select contacts for copy/export.</div>
+        <div class="list" id="contactList"></div>
+      </div>
+    </section>
+
+    <section class="panel templatesPanel">
+      <div class="panelHead">
+        <div><h2>Message templates</h2><small id="templateCount">0</small></div>
+        <button class="primary mini" id="btnNewTemplate">+ Template</button>
+      </div>
+      <div class="panelBody stack">
+        <div class="composeHint">
+          <b>Simple message</b>
+          <span>Keep this reduced: subject for email, main message, footer. Use contact placeholders only when helpful.</span>
+        </div>
+        <div class="sectionTitle"><span>Categories</span></div>
+        <div class="tabs" id="areaTabs"></div>
+        <div>
+          <input id="templateSearch" placeholder="Search title, category, subject or message..." />
+        </div>
+        <div class="list" id="templateList"></div>
+
+        <div class="sectionTitle"><span id="templateEditTitle">Message composer</span><div class="smallBtns"><button class="mini ghost" id="btnDuplicateTemplate">Duplicate</button><button class="mini danger" id="btnDeleteTemplate">Delete</button></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Event name</label><input id="draft_eventName" placeholder="z.B. Circuit Assembly 2026"></div>
+          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Date</label><input id="draft_date" placeholder="z.B. 14. Juni 2026"></div>
+        </div>
+        <div id="templateEditor" class="stack"></div>
+
+        <div class="sectionTitle"><span>Placeholders</span><span style="font-size:11px;color:var(--muted);font-weight:500">Klick → direkt in Textfeld</span></div>
+        <div id="placeholderGrid" class="placeholderGrid"></div>
+
+      </div>
+    </section>
+
+    <section class="panel previewPanel">
+      <div class="panelHead">
+        <div><h2>Ready message</h2><small id="previewMeta">Select contact + template</small></div>
+        <button class="mini ghost" id="btnPrintPreview">Print</button>
+      </div>
+      <div class="panelBody stack">
+        <div class="sectionTitle"><span id="sendToTitle">Prepare for this contact</span></div>
+        <div class="recipientBox" id="recipientBox">Select a contact on the left.</div>
+        <div class="sendChoice">
+          <div><label id="lblChannel">Channel</label><select id="deliveryChannel"><option value="whatsapp">WhatsApp</option><option value="email">Email</option></select></div>
+        </div>
+        <div class="sectionTitle"><span id="subjectTitle">Email subject</span><button class="mini ghost" id="btnCopySubject">Copy</button></div>
+        <div class="subjectBox" id="subjectPreview">—</div>
+        <div class="sectionTitle"><span id="messageTitle">Ready message</span><button class="mini ghost" id="btnCopyMessageTop">Copy</button></div>
+        <div class="previewBox" id="messagePreview">Select contact and template.</div>
+        <div class="previewMetaRow">
+          <span class="kbdHint"><kbd>Ctrl</kbd>+<kbd>↵</kbd> send</span>
+          <span class="charCounter" id="charCounter">0 characters</span>
+        </div>
+        <div class="previewActions">
+          <button class="primary" id="btnCopyMessage">Copy</button>
+          <button class="waBtnIcon" id="btnOpenWhatsApp" title="Open WhatsApp (Ctrl+Enter)"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.852L0 24l6.335-1.513A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.368l-.36-.213-3.762.898.954-3.67-.234-.374A9.818 9.818 0 012.182 12C2.182 6.575 6.575 2.182 12 2.182S21.818 6.575 21.818 12 17.425 21.818 12 21.818z"/></svg> WhatsApp</button>
+          <button class="ghost" id="btnOpenEmail">Email</button>
+          <button class="ghost" id="btnInsertContact">Insert contact</button>
+          <button class="ghost" id="btnSaveSent">Save to history</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modalOverlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modalHead"><h3 id="modalTitle">Modal</h3><button class="mini ghost" id="btnCloseModal">Close</button></div>
+    <div class="modalBody" id="modalBody"></div>
+    <div class="modalFoot" id="modalFoot"></div>
+  </div>
+</div>
+<div class="toastWrap" id="toastWrap"></div>
+
+<script>
+(() => {
+'use strict';
+const APP_VERSION='1.1.10', STORAGE_KEY='contacthub_pro_v110_data';
+const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en'};
+const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','eventName','date','organization','email','emails','mobile','mobiles'];
+const I18N={en:{merge:'Merge'}};
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const uid=p=>`${p}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
+const nowNice=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const stamp=()=>new Date().toISOString().slice(0,16).replace('T','_').replace(':','');
+const cleanNewlines=v=>String(v??'').replace(/\\n/g,'\n').replace(/\\r/g,'');
+
+function emptyData(){return{schemaVersion:1,appName:'ContactHub Pro',appVersion:APP_VERSION,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),settings:{uiLanguage:'en',autosave:true,githubCleanMode:true,masterRoles:['PTC','Assistant PTC','Elder','MS','Publisher'],masterCongregations:[]},contacts:[],templates:[],sentItems:[]}}
+function sampleData(){const d=emptyData();d.contacts=[
+  contact({firstName:'John',lastName:'Sample',congregation:'Sample Congregation',role:'PTC',languages:['en'],language:'en',tags:['PTC','Talk Planning','Sample'],emails:['john.sample@example.com'],mobiles:['01791234567'],source:'sample'}),
+  contact({firstName:'Maria',lastName:'Example',congregation:'Demo English',role:'Volunteer',languages:['en','de'],language:'en',tags:['Volunteer','Sample'],emails:['maria.example@example.com'],mobiles:['01602345678'],source:'sample'}),
+  contact({firstName:'Max',lastName:'Muster',congregation:'Beispielversammlung',role:'Tech Host',languages:['de'],language:'de',tags:['Tech','Sample'],emails:['max.muster@example.com'],mobiles:[],source:'sample'})
+];d.templates=[
+  {id:uid('t'),title:'Vortragserinnerung',area:'Theokratisch',category:'PTC',language:'de',tone:'warm',channel:'whatsapp',subject:'',body:'Hallo {{firstName}},\nnur eine kurze Erinnerung an deinen Vortrag am {{date}} in {{congregation}}.\n\nTopic: {{topic}}\n\nDanke dir schon mal!'},
+  {id:uid('t'),title:'Einsatz-Erinnerung',area:'Theokratisch',category:'Volunteers',language:'de',tone:'freundlich',channel:'whatsapp',subject:'',body:'Hallo {{firstName}},\nvielen Dank nochmal, dass du bei {{eventName}} unterstützt.\n\nDeine Assignment:\n{{assignment}}\n\nFalls sich etwas ändert, gib mir bitte kurz Bescheid.'},
+  {id:uid('t'),title:'Kurze Nachfrage',area:'Theokratisch',category:'Reminder',language:'de',tone:'kurz',channel:'whatsapp',subject:'',body:'Hallo {{firstName}},\nkurze Nachfrage wegen {{topic}} am {{date}}.\n\nPasst das für dich so?'},
+  {id:uid('t'),title:'Terminbestätigung',area:'Arbeit',category:'Termine',language:'de',tone:'professionell',channel:'email',subject:'Terminbestätigung {{date}}',body:'Hallo {{firstName}},\nhiermit bestätige ich den Termin am {{date}} in {{location}}.\n\nViele Grüße'},
+  {id:uid('t'),title:'Talk reminder',area:'Theocratic',category:'PTC',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\njust a quick reminder regarding your talk on {{date}} in {{congregation}}.\n\nThe topic is: {{topic}}\n\nThanks again!'},
+  {id:uid('t'),title:'Volunteer assignment reminder',area:'Theocratic',category:'Volunteers',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\nthank you again for being willing to support {{eventName}}.\n\nYour assignment is:\n{{assignment}}\n\nPlease let me know if anything changes.'},
+  {id:uid('t'),title:'Appointment confirmation',area:'Work',category:'Appointments',language:'en',tone:'professional',channel:'email',subject:'Appointment confirmation {{date}}',body:'Hi {{firstName}},\nthis is to confirm our appointment on {{date}} at {{location}}.\n\nBest regards'}
+];return d}
+function contact(o){const c=normalizeContactShape({id:uid('c'),displayName:buildName(o.firstName,o.lastName,o.displayName),...o});c.emails=(o.emails||[]).map((v,i)=>({label:i?'other':'primary',value:normalizeEmail(v)})).filter(e=>isEmail(e.value));c.mobiles=(o.mobiles||[]).map((v,i)=>{const n=normalizeMobile(v,{allowUnclear:true});return{label:i?'other':'mobile',value:n.value,raw:n.raw,countryGuess:n.countryGuess,warning:n.warning||''}}).filter(m=>m.value);return c}
+function normalizeContactShape(c){const roles=Array.isArray(c.roles)?c.roles:splitTags(c.role);const role=(roles.length?roles.join(', '):(c.role||''));const teams=Array.isArray(c.teams)?c.teams:splitTags(c.team);const team=(teams.length?teams.join(', '):(c.team||''));return{id:c.id||uid('c'),firstName:c.firstName||'',lastName:c.lastName||'',displayName:c.displayName||buildName(c.firstName,c.lastName,''),congregation:c.congregation||'',role,roles,organization:c.organization||'',notes:c.notes||'',languages:Array.isArray(c.languages)?c.languages:(c.language?[c.language]:['en']),language:c.language||(Array.isArray(c.languages)&&c.languages[0])||'en',tags:Array.isArray(c.tags)?c.tags:splitTags(c.tags),team,teams,active:typeof c.active==='boolean'?c.active:true,source:c.source||'local',importedAt:c.importedAt||new Date().toISOString(),favorite:c.favorite||false,emails:Array.isArray(c.emails)?c.emails:[],mobiles:Array.isArray(c.mobiles)?c.mobiles:[]}}
+function normalizeTemplateShape(t){return{id:t.id||uid('t'),title:t.title||'Untitled template',area:t.area||'Other',category:t.category||'',language:t.language||'en',tone:t.tone||'',channel:t.channel||'general',subject:t.subject||'',body:cleanNewlines(t.body||''),footer:cleanNewlines(t.footer||''),recipientStyle:t.recipientStyle||'first',greeting:t.greeting||''}}
+function migrate(data){const base=emptyData(),m={...base,...data};m.contacts=Array.isArray(data.contacts)?data.contacts.map(normalizeContactShape):[];ensureUniqueContactIds(m.contacts);m.templates=Array.isArray(data.templates)?data.templates.map(normalizeTemplateShape):[];m.sentItems=Array.isArray(data.sentItems)?data.sentItems:[];m.settings={...base.settings,...(data.settings||{})};m.appVersion=APP_VERSION;m.appName='ContactHub Pro';return m}
+function ensureUniqueContactIds(contacts){
+  const seen=new Set();
+  (contacts||[]).forEach(c=>{
+    if(!c.id||seen.has(c.id)){c.id=uid('c');}
+    seen.add(c.id);
+  });
+}
+
+function init(){const saved=localStorage.getItem(STORAGE_KEY);try{state.data=saved?migrate(JSON.parse(saved)):emptyData();ensureUniqueContactIds(state.data.contacts)}catch{state.data=emptyData();toast('Autosave konnte nicht gelesen werden.')}
+state.uiLang='en';state.data.settings.uiLanguage='en';selectFirst();bind();applyLang();renderAll();saveStatus('Saved locally','ok')}
+function selectFirst(){if(!state.selectedContactId&&state.data.contacts[0])state.selectedContactId=state.data.contacts[0].id;if(!state.selectedTemplateId&&state.data.templates[0])state.selectedTemplateId=state.data.templates[0].id}
+function saveSoon(){saveStatus('Saving...','warn');clearTimeout(state.autosaveTimer);state.autosaveTimer=setTimeout(saveNow,350)}
+function saveNow(){ensureUniqueContactIds(state.data.contacts);state.data.updatedAt=new Date().toISOString();state.data.settings.uiLanguage='en';localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));saveStatus(`Saved locally · ${nowNice()}`,'ok')}
+function saveStatus(t,mode){$('#saveStatus').innerHTML=`<span class="dot" style="background:${mode==='warn'?'#f59e0b':mode==='danger'?'#ef4444':'#15803d'}"></span> ${esc(t)}`}
+function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=msg;$('#toastWrap').appendChild(d);setTimeout(()=>d.remove(),3200)}
+function applyLang(){state.uiLang='en';document.querySelectorAll('[data-i18n]').forEach(el=>{el.removeAttribute('data-i18n')});renderTemplates();renderPlaceholders();renderCounts();renderPreview()}
+
+function renderAll(){renderCounts();renderFilters();renderAreaTabs();renderContacts();renderTemplates();renderTemplateEditor();renderPreview();renderPlaceholders()}
+function renderCounts(){$('#contactCount').textContent=`${state.data.contacts.length} contacts`;$('#templateCount').textContent=`${state.data.templates.length} templates`}
+function renderFilters(){
+  const oldTag=$('#contactTagFilter')?.value||'',oldRole=$('#contactRoleFilter')?.value||'',oldTeam=$('#contactTeamFilter')?.value||'';
+  const tags=[...new Set(state.data.contacts.flatMap(c=>c.tags||[]))].sort((a,b)=>a.localeCompare(b));
+  const roles=allRoles();
+  const teams=allTeams();
+  if($('#contactTagFilter')){$('#contactTagFilter').innerHTML='<option value="">All tags</option>'+tags.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');$('#contactTagFilter').value=tags.includes(oldTag)?oldTag:'';}
+  if($('#contactRoleFilter')){$('#contactRoleFilter').innerHTML='<option value="">All congregation roles</option>'+roles.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');$('#contactRoleFilter').value=roles.includes(oldRole)?oldRole:'';}
+  if($('#contactTeamFilter')){$('#contactTeamFilter').innerHTML='<option value="">All Assembly / Convention teams</option>'+teams.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');$('#contactTeamFilter').value=teams.includes(oldTeam)?oldTeam:'';}
+  updateSelectionHint();
+}
+function contactRoles(c){return c.roles&&c.roles.length?c.roles:splitTags(c.role)}
+function contactTeams(c){return c.teams&&c.teams.length?c.teams:splitTags(c.team)}
+function filteredContacts(){const q=$('#contactSearch').value.trim().toLowerCase(),tag=$('#contactTagFilter').value,role=$('#contactRoleFilter')?.value||'',team=$('#contactTeamFilter')?.value||'';return state.data.contacts.filter(c=>{const roles=contactRoles(c);const teams=contactTeams(c);const name=contactName(c);const hay=[c.firstName,c.lastName,name,c.displayName,c.congregation,c.role,roles.join(' '),c.organization,(c.tags||[]).join(' '),c.team||'',teams.join(' '),...(c.emails||[]).map(e=>e.value),...(c.mobiles||[]).map(m=>m.value)].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!tag||(c.tags||[]).includes(tag))&&(!role||roles.includes(role))&&(!team||teams.includes(team))}).sort((a,b)=>((b.favorite?1:0)-(a.favorite?1:0))||(state.sortBy==='firstName'?(a.firstName||contactName(a)).localeCompare(b.firstName||contactName(b)):(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b))))}
+function renderContacts(){const list=filteredContacts(),el=$('#contactList');if(!list.length){el.innerHTML='<div class="empty">No contacts found.<br><br><button class="primary mini" onclick="ContactHubPro.openContactEditor()">Create contact</button></div>';return}
+el.innerHTML=list.map(c=>`<div class="cardItem ${c.id===state.selectedContactId?'active':''}" data-id="${c.id}">
+  <div class="cardTop">
+    <input class="check" type="checkbox" data-check="${c.id}" ${state.selectedContactIds.has(c.id)?'checked':''}>
+    <div>
+      <div class="cardName" data-select="${c.id}">${esc(contactDisplayName(c))}</div>
+      <div class="cardMeta">${esc([c.congregation,c.organization].filter(Boolean).join(' · ')||'No congregation/company')}</div><div class="roleChips">${((c.roles&&c.roles.length?c.roles:splitTags(c.role))).slice(0,4).map(r=>`<span class="chip green">${esc(r)}</span>`).join('')}${contactTeams(c).slice(0,4).map(t=>`<span class="chip blue">${esc(t)}</span>`).join('')}</div>
+    </div>
+    <div class="smallBtns" style="justify-content:flex-end;align-items:center;gap:2px">
+      <button class="mini icon ghost" title="Edit" data-edit="${c.id}">✎</button>
+      <button class="mini icon danger" title="Delete" data-del="${c.id}">×</button>
+      <button class="mini icon ghost" title="Als vCard speichern" data-vcf="${c.id}">&#x1F4C7;</button>
+      <button class="starBtn ${c.favorite?'on':''}" data-star="${c.id}" title="${c.favorite?'Remove favorite':'Set favorite'}">${c.favorite?'★':'☆'}</button>
+    </div>
+  </div>
+  <div class="stack" style="gap:4px">
+    ${(c.emails||[]).slice(0,3).map(e=>`<div class="lineAction"><span>${esc(e.value)}</span><button class="mini icon" data-copy="${esc(e.value)}">⧉</button><button class="mini icon" data-email="${esc(e.value)}">@</button></div>`).join('')}
+    ${(c.mobiles||[]).slice(0,3).map(m=>`<div class="lineAction"><span>${esc(m.value)}</span><button class="mini icon" data-copy="${esc(m.value)}">⧉</button><button class="mini icon" data-wa="${esc(m.value)}" title="WhatsApp: ${esc(m.value)}" style="background:#dcfce7;color:#15803d;display:inline-flex;align-items:center;padding:3px 5px;"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z\"/><path d=\"M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.852L0 24l6.335-1.513A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.368l-.36-.213-3.762.898.954-3.67-.234-.374A9.818 9.818 0 012.182 12C2.182 6.575 6.575 2.182 12 2.182S21.818 6.575 21.818 12 17.425 21.818 12 21.818z\"/></svg></button></div>`).join('')}
+  </div>
+  <div class="chips">${(c.tags||[]).slice(0,5).map(t=>`<span class="chip blue">${esc(t)}</span>`).join('')}${c.source?`<span class="chip">${esc(c.source)}</span>`:''}</div>
+</div>`).join('');
+el.querySelectorAll('[data-select]').forEach(x=>x.onclick=()=>{state.selectedContactId=x.dataset.select;state.selectedTarget=null;renderContacts();renderPreview()});
+el.querySelectorAll('[data-check]').forEach(x=>{const upd=()=>{x.checked?state.selectedContactIds.add(x.dataset.check):state.selectedContactIds.delete(x.dataset.check);updateSelectionHint();};x.onclick=e=>e.stopPropagation();x.onchange=upd;x.oninput=upd;});
+el.querySelectorAll('[data-edit]').forEach(x=>x.onclick=e=>{e.stopPropagation();openContactEditor(x.dataset.edit)});
+el.querySelectorAll('[data-del]').forEach(x=>x.onclick=e=>{e.stopPropagation();quickDeleteContact(x.dataset.del)});
+el.querySelectorAll('[data-copy]').forEach(x=>x.onclick=e=>{e.stopPropagation();copyText(x.dataset.copy)});
+el.querySelectorAll('[data-email]').forEach(x=>x.onclick=e=>{e.stopPropagation();location.href=`mailto:${x.dataset.email}`});
+el.querySelectorAll('[data-wa]').forEach(x=>x.onclick=e=>{e.stopPropagation();openWhatsApp(x.dataset.wa,'')});
+el.querySelectorAll('[data-star]').forEach(x=>x.onclick=e=>{e.stopPropagation();const c=state.data.contacts.find(c=>c.id===x.dataset.star);if(c){c.favorite=!c.favorite;saveSoon();renderContacts();toast(c.favorite?'⭐ Favorite set.':'Favorite removed.');}});
+el.querySelectorAll('[data-vcf]').forEach(x=>x.onclick=function(e){e.stopPropagation();exportSingleVcf(x.dataset.vcf);});
+updateSelectionHint();
+}
+function syncSelectionFromDom(){
+  // Keep the Set in sync with the visible checkbox list. This makes bulk actions
+  // reliable even when the user checks several contacts and immediately opens a menu/button.
+  document.querySelectorAll('#contactList input[data-check]').forEach(x=>{
+    if(x.checked)state.selectedContactIds.add(x.dataset.check);
+    else state.selectedContactIds.delete(x.dataset.check);
+  });
+}
+function selectedContactIds(){
+  syncSelectionFromDom();
+  ensureUniqueContactIds(state.data.contacts);
+  const existing=new Set(state.data.contacts.map(c=>c.id));
+  state.selectedContactIds=new Set([...state.selectedContactIds].filter(id=>existing.has(id)));
+  return [...state.selectedContactIds];
+}
+function selectedContacts(){const ids=selectedContactIds();return state.data.contacts.filter(c=>ids.includes(c.id));}
+function updateSelectionHint(){const ids=selectedContactIds();const el=$('#selectionHint');if(el)el.textContent=`${ids.length} selected. Use role search/filter, then select contacts for copy/export.`;}
+function quickDeleteContact(id){const c=state.data.contacts.find(x=>x.id===id);if(!c)return;if(confirm(`Delete contact: ${contactName(c)}?`)){state.data.contacts=state.data.contacts.filter(x=>x.id!==id);state.selectedContactIds.delete(id);if(state.selectedContactId===id)state.selectedContactId=state.data.contacts[0]?.id||null;saveSoon();renderAll();toast('Contact deleted.')}}
+function mergeSelectedContacts(){const ids=selectedContactIds();if(ids.length<2)return toast('Bitte mindestens 2 Contacts auswählen.');const contacts=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean);const primary=contacts.find(c=>c.id===state.selectedContactId)||contacts[0];showModal('Merge contacts',`<p class="hint">Diese Contacts werden in <strong>${esc(contactName(primary))}</strong> Missing data, emails, mobile numbers, and tags will be added.</p><ul>${contacts.map(c=>`<li>${esc(contactName(c))}</li>`).join('')}</ul>`,`<button class="ghost" id="mergeCancel">Cancel</button><button class="primary" id="mergeNow">Merge</button>`);$('#mergeCancel').onclick=closeModal;$('#mergeNow').onclick=()=>{contacts.filter(c=>c.id!==primary.id).forEach(c=>mergeInto(primary,c));state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id)||c.id===primary.id);state.selectedContactIds.clear();state.selectedContactId=primary.id;closeModal();saveSoon();renderAll();toast('Contacts merged.')}} 
+function mergeInto(target,src){target.emails=uniqueBy([...(target.emails||[]),...(src.emails||[])],e=>e.value);target.mobiles=uniqueBy([...(target.mobiles||[]),...(src.mobiles||[])],m=>digitsOnly(m.value));['firstName','lastName','displayName','congregation','role','organization','language'].forEach(k=>{if(!target[k]&&src[k])target[k]=src[k]});target.languages=[...new Set([...(target.languages||[target.language]).filter(Boolean),...(src.languages||[src.language]).filter(Boolean)])];target.tags=[...new Set([...(target.tags||[]),...(src.tags||[])])];target.teams=[...new Set([...contactTeams(target),...contactTeams(src)])];target.team=target.teams.join(', ');if(src.notes)target.notes=[target.notes,src.notes].filter(Boolean).join('\n---\n')}
+
+function renderAreaTabs(){const cats=['All',...new Set(state.data.templates.map(t=>t.category||'Other'))].sort((a,b)=>a==='All'?-1:b==='All'?1:a.localeCompare(b));if(!cats.includes(state.activeArea))state.activeArea='All';$('#areaTabs').innerHTML=cats.map(a=>`<div class="tab ${a===state.activeArea?'active':''}" data-area="${esc(a)}">${esc(a)}</div>`).join('');$$('#areaTabs .tab').forEach(t=>t.onclick=()=>{state.activeArea=t.dataset.area;renderTemplates()})}
+function filteredTemplates(){const q=$('#templateSearch').value.trim().toLowerCase();return state.data.templates.filter(t=>{const hay=[t.title,t.category,t.subject,t.body,t.footer].join(' ').toLowerCase();return(!q||hay.includes(q))&&(state.activeArea==='All'||(t.category||'Other')===state.activeArea)}).sort((a,b)=>((a.category||'')+a.title).localeCompare((b.category||'')+b.title))}
+function renderTemplates(){const list=filteredTemplates(),el=$('#templateList');if(!list.length){el.innerHTML='<div class="empty">No templates found.<br><br><button class="primary mini" onclick="ContactHubPro.openTemplateEditor()">Create template</button></div>';return}
+el.innerHTML=list.map(t=>`<div class="cardItem ${t.id===state.selectedTemplateId?'active':''}" data-template="${t.id}" style="cursor:pointer">
+  <div class="cardTop" style="grid-template-columns:1fr auto">
+    <div><div class="cardName">${esc(t.title)}</div><div class="cardMeta">${esc(t.category||'General')}</div></div>
+    <span class="chip blue">message</span>
+  </div>
+</div>`).join('');el.querySelectorAll('[data-template]').forEach(c=>c.onclick=()=>{state.selectedTemplateId=c.dataset.template;const tt=getTemplate();if(tt&&tt.channel&&tt.channel!=='general')$('#deliveryChannel').value=tt.channel;renderTemplates();renderTemplateEditor();renderPreview()})}
+function getTemplate(){return state.data.templates.find(t=>t.id===state.selectedTemplateId)||null}
+function getContact(){return state.data.contacts.find(c=>c.id===state.selectedContactId)||null}
+function renderTemplateEditor(){const t=getTemplate(),el=$('#templateEditor');if(!t){el.innerHTML='<div class="empty">Select or create a message.</div>';return}
+const body=cleanNewlines(t.body||''), footer=cleanNewlines(t.footer||''), subject=cleanNewlines(t.subject||''); t.body=body; t.footer=footer; t.subject=subject;
+el.innerHTML=`<div class="simpleComposer">
+  <div class="row"><div><label>Message name</label><input id="tmpl_title" value="${esc(t.title)}" placeholder="e.g. Reminder, contact info, PTC message"></div><div><label>Category</label><input id="tmpl_category" value="${esc(t.category)}" placeholder="PTC, Attendants, Work, Family..."></div></div>
+  <div><label>Email subject</label><textarea id="tmpl_subject" class="subjectInput" placeholder="Only used for email. Placeholders like {{firstName}} work here.">${esc(subject)}</textarea></div>
+  <div><label>Main message</label><textarea id="tmpl_body" class="mainText" placeholder="Write the message here. You can insert contact details with the button on the right.">${esc(body)}</textarea></div>
+  <div><label>Footer / signature</label><textarea id="tmpl_footer" class="footerText" placeholder="Your name, address, phone, email...">${esc(footer)}</textarea></div>
+  
+</div>`;
+['title','category','subject','body','footer'].forEach(k=>{const el2=$('#tmpl_'+k);if(!el2)return;el2.oninput=()=>{t[k]=cleanNewlines(el2.value);saveSoon();if(k==='category')renderAreaTabs();renderTemplates();renderPreview()};if(['subject','body','footer'].includes(k)){el2.addEventListener('focus',()=>{window._lastTemplateFocus=el2;});}});
+}
+
+function renderPreview(){
+const c=getContact(),t=getTemplate();
+const charEl=document.getElementById('charCounter');
+if(!c||!t){
+  $('#previewMeta').textContent='Select contact + template';
+  $('#recipientBox').innerHTML='<span style="color:var(--muted);font-size:13px;">Select a contact on the left.</span>';
+  $('#subjectPreview').textContent='—';
+  $('#messagePreview').textContent='Select contact and template.';
+  if(charEl){charEl.textContent='0 characters';charEl.className='charCounter';}
+  return;
+}
+const data=renderData(c,t),sub=renderText(cleanNewlines(t.subject),data);
+const parts=[renderText(cleanNewlines(t.body),data),renderText(cleanNewlines(t.footer),data)].filter(x=>String(x||'').trim());
+const body=parts.join('\n\n');
+const channel=($('#deliveryChannel')&&$('#deliveryChannel').value)||t.channel||'whatsapp';
+
+ensureDefaultTarget(c,channel);
+$('#previewMeta').textContent=`${contactName(c)} · ${t.title}`;
+$('#subjectPreview').textContent=sub||'—';
+$('#messagePreview').textContent=body||'Template is empty.';
+if(charEl){
+  const len=body.length;
+  charEl.textContent=`${len} characters`;
+  charEl.className='charCounter'+(len>1600?' over':len>800?' warn':'');
+}
+const mobiles=c.mobiles||[],emails=c.emails||[];
+let rows=`<div style="font-weight:900;font-size:14px;margin-bottom:5px;">${esc(contactName(c))}</div>`;
+rows+=`<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${esc([c.congregation,c.role].filter(Boolean).join(' · ')||'—')}</div>`;
+rows+='<div class="pickRows">';
+if(mobiles.length){
+  mobiles.forEach((m,i)=>{
+    const active=state.selectedTarget&&state.selectedTarget.channel==='whatsapp'&&state.selectedTarget.value===m.value;
+    rows+=`<button type="button" class="pickRow ${active?'active':''}" data-target-channel="whatsapp" data-target-value="${esc(m.value)}" title="Use this WhatsApp number">
+      <span class="pickIcon wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.852L0 24l6.335-1.513A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.368l-.36-.213-3.762.898.954-3.67-.234-.374A9.818 9.818 0 012.182 12C2.182 6.575 6.575 2.182 12 2.182S21.818 6.575 21.818 12 17.425 21.818 12 21.818z"/></svg></span>
+      <span class="pickVal">${esc(m.value)}</span><span class="openNow">Use</span>
+    </button>`;
+  });
+} else rows+=`<div class="pickRow missing"><span class="pickIcon mis">—</span><span class="pickVal">No mobile number</span><span class="pickLbl mis">WA</span></div>`;
+if(emails.length){
+  emails.forEach((e,i)=>{
+    const active=state.selectedTarget&&state.selectedTarget.channel==='email'&&state.selectedTarget.value===e.value;
+    rows+=`<button type="button" class="pickRow email-row ${active?'active':''}" data-target-channel="email" data-target-value="${esc(e.value)}" title="Use this email address">
+      <span class="pickIcon em">@</span><span class="pickVal">${esc(e.value)}</span><span class="openNow">Use</span>
+    </button>`;
+  });
+} else rows+=`<div class="pickRow missing email-row"><span class="pickIcon mis">@</span><span class="pickVal">No email address</span><span class="pickLbl mis">Mail</span></div>`;
+rows+='</div>';
+$('#recipientBox').innerHTML=rows;
+$$('[data-target-channel]').forEach(btn=>btn.onclick=()=>{state.selectedTarget={channel:btn.dataset.targetChannel,value:btn.dataset.targetValue};$('#deliveryChannel').value=state.selectedTarget.channel;renderPreview();});
+}
+function ensureDefaultTarget(c,channel){
+  const list=channel==='email'?(c.emails||[]).map(e=>e.value):(c.mobiles||[]).map(m=>m.value);
+  if(!state.selectedTarget||state.selectedTarget.channel!==channel||!list.includes(state.selectedTarget.value)){
+    state.selectedTarget=list[0]?{channel,value:list[0]}:null;
+  }
+}
+function getSelectedTarget(channel){const c=getContact();if(!c)return'';ensureDefaultTarget(c,channel);return state.selectedTarget&&state.selectedTarget.channel===channel?state.selectedTarget.value:''}
+function recipientName(c,t){return c.firstName||firstWord(contactName(c))||contactName(c)||''}
+function renderData(c,t=null){const em=(c.emails||[]).map(e=>e.value),mo=(c.mobiles||[]).map(m=>m.value);const rn=recipientName(c,t);const ct=contactTeams(c);return{firstName:c.firstName||firstWord(contactName(c)),lastName:c.lastName||'',displayName:contactName(c),recipientName:rn,greeting:rn,congregation:c.congregation||'',role:c.role||'',team:ct[0]||'',teams:ct.join(', '),organization:c.organization||'',email:em[0]||'',emails:em.join(', '),mobile:mo[0]||'',mobiles:mo.join(', '),phone:mo[0]||'',...state.draftDetails}}
+function renderText(text,data){return cleanNewlines(text).replace(/\{\{\s*([\w]+)\s*\}\}/g,(_,k)=>data[k]??'')}
+function renderPlaceholders(){const labels={firstName:'First name',lastName:'Last name',congregation:'Congregation',role:'Role(s)',team:'Team (1st)',teams:'All teams',eventName:'Event name',date:'Datum',organization:'Company',email:'first email',emails:'all emails',mobile:'first mobile',mobiles:'all mobiles'};const el=$('#placeholderGrid');if(!el)return;el.innerHTML=PLACEHOLDERS.map(p=>`<div class="placeholder" data-ph="{{${p}}}"><code>{{${p}}}</code><span>${esc(labels[p]||p)}</span></div>`).join('');$$('[data-ph]').forEach(x=>x.onclick=()=>{const ph=x.dataset.ph;const ta=window._lastTemplateFocus;if(ta&&document.body.contains(ta)){const s=ta.selectionStart,e=ta.selectionEnd;ta.value=ta.value.slice(0,s)+ph+ta.value.slice(e);ta.selectionStart=ta.selectionEnd=s+ph.length;ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));}else{copyText(ph);toast('\ud83d\udccb '+ph+' kopiert (kein Textfeld aktiv)');}})}
+function uniqueValuesFrom(field){return [...new Set(state.data.contacts.map(c=>c[field]).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+function masterList(key,defaults=[]){
+  const raw=state.data.settings&&state.data.settings[key];
+  const saved=Array.isArray(raw)?raw:null;
+  if(saved!==null)return[...new Set(saved.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  return[...new Set(defaults.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function allRoles(){return masterList('masterRoles',['PTC','Assistant PTC','Elder','MS','Publisher'])}
+function allCongregations(){return masterList('masterCongregations',[...state.data.contacts.map(c=>c.congregation).filter(Boolean)])}
+function allTeams(){return masterList('masterTeams',['Attendant','Tech Host','Coordinator','Volunteer','Team Captain','Department Overseer','Assistant','Auditorium','Cafeteria','Lobby','Baptism','Stage','Parking'])}
+function cleanupContactAssignments(validRoles,validTeams,validTags){
+  const roleSet=new Set(validRoles), teamSet=new Set(validTeams);let roleChanges=0,teamChanges=0,tagChanges=0;
+  const doTags=Array.isArray(validTags)&&validTags.length;
+  const tagSet=doTags?new Set(validTags):null;
+  state.data.contacts.forEach(c=>{
+    const beforeRoles=contactRoles(c);
+    const afterRoles=beforeRoles.filter(r=>roleSet.has(r));
+    if(afterRoles.length!==beforeRoles.length){roleChanges++;c.roles=afterRoles;c.role=afterRoles.join(', ');}
+    const beforeTeams=contactTeams(c);
+    const afterTeams=beforeTeams.filter(t=>teamSet.has(t));
+    if(afterTeams.length!==beforeTeams.length){teamChanges++;c.teams=afterTeams;c.team=afterTeams.join(', ');}
+    if(doTags){
+      const beforeTags=c.tags||[];
+      const afterTags=beforeTags.filter(t=>tagSet.has(t));
+      if(afterTags.length!==beforeTags.length){tagChanges++;c.tags=afterTags;}
+    }
+  });
+  return{roleChanges,teamChanges,tagChanges};
+}
+
+function openMasterData(){
+  const roles=allRoles().join('\n'),congs=allCongregations().join('\n'),tms=allTeams().join('\n');
+  const savedTags=Array.isArray(state.data.settings&&state.data.settings.masterTags)?state.data.settings.masterTags:allTags();
+  const tags=savedTags.join('\n');
+  showModal('Master data',`<div class="stack">
+    <p class="hint">Zentrale Verwaltung aller Stammdaten. \u00c4nderungen an Rollen und Teams werden direkt auf alle Kontakte angewendet.</p>
+    <div class="row" style="grid-template-columns:1fr 1fr">
+      <div><label>Assembly / Convention team assignments (one per line)</label><textarea class="masterTextarea" id="md_teams">${esc(tms)}</textarea></div>
+      <div><label>Congregation roles</label><textarea class="masterTextarea" id="md_roles">${esc(roles)}</textarea></div>
+    </div>
+    <div class="row" style="grid-template-columns:1fr 1fr">
+      <div><label>Congregations</label><textarea class="masterTextarea" id="md_congs">${esc(congs)}</textarea></div>
+      <div><label>Tags (one per line)</label><textarea class="masterTextarea" id="md_tags">${esc(tags)}</textarea><div class="hint" style="margin-top:4px">Tags sind informativ \u2013 das Entfernen hier l\u00f6scht sie nicht von Kontakten.</div></div>
+    </div>
+    <div style="border-top:1px solid var(--line);padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:12px;color:var(--muted);font-weight:700">Reset:</span>
+      <button class="ghost mini" id="mdResetTeams">\ud83d\udd04 Clear all Assembly / Convention team assignments</button>
+    </div>
+  </div>`,`<button class="ghost" id="mdCancel">Cancel</button><button class="primary" id="mdSave">Save</button>`);
+  $('#mdCancel').onclick=closeModal;
+  $('#mdResetTeams').onclick=()=>{if(!confirm('Remove Assembly / Convention team assignments from ALL contacts? This cannot be undone.'))return;
+    state.data.contacts.forEach(c=>{c.team='';c.teams=[]});saveSoon();renderAll();closeModal();
+    toast('All Assembly / Convention team assignments cleared.');};
+  $('#mdSave').onclick=()=>{
+    state.data.settings=state.data.settings||{};
+    const nextTeams=[...new Set($('#md_teams').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
+    const nextRoles=[...new Set($('#md_roles').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
+    const nextTags=[...new Set($('#md_tags').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
+    state.data.settings.masterTeams=nextTeams;
+    state.data.settings.masterRoles=nextRoles;
+    state.data.settings.masterCongregations=[...new Set($('#md_congs').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
+    state.data.settings.masterTags=nextTags;
+    const cleaned=cleanupContactAssignments(nextRoles,nextTeams,nextTags);
+    closeModal();saveSoon();renderAll();
+    const extra=[];
+    if(cleaned.roleChanges)extra.push(`${cleaned.roleChanges} contact role assignment(s) reset`);
+    if(cleaned.teamChanges)extra.push(`${cleaned.teamChanges} team assignment(s) reset`);
+    if(cleaned.tagChanges)extra.push(`${cleaned.tagChanges} contact tag(s) removed`);
+    toast(extra.length?`Master data saved · ${extra.join(' · ')}`:'Master data saved.');
+  };
+}
+
+function companyToCongSelected(){
+  const ids=selectedContactIds();
+  const scope=ids.length?'selected':'visible';
+  showModal('Company / Congregation tools',`<div class="stack">
+    <p class="hint">Applies to ${scope} contacts. Useful after Outlook import, where congregation is often stored in Company.</p>
+    <div class="row"><div><label>Direction</label><select id="ccDirection"><option value="companyToCong">Company → Congregation, then clear Company</option><option value="companyToCongKeep">Company → Congregation, keep Company</option><option value="congToCompany">Congregation → Company, then clear Congregation</option><option value="congToCompanyKeep">Congregation → Company, keep Congregation</option></select></div><div><label>Only update empty target?</label><select id="ccEmptyOnly"><option value="yes">Yes, safer</option><option value="no">No, overwrite target</option></select></div></div>
+  </div>`,`<button class="ghost" id="ccCancel">Cancel</button><button class="primary" id="ccApply">Apply</button>`);
+  $('#ccCancel').onclick=closeModal;
+  $('#ccApply').onclick=()=>{const direction=$('#ccDirection').value, emptyOnly=$('#ccEmptyOnly').value==='yes';let targets=(ids.length?ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean):filteredContacts()), count=0;targets.forEach(c=>{if(direction.startsWith('company')){if(!c.organization)return;if(!emptyOnly||!c.congregation){c.congregation=c.organization;count++;}if(direction==='companyToCong')c.organization='';}else{if(!c.congregation)return;if(!emptyOnly||!c.organization){c.organization=c.congregation;count++;}if(direction==='congToCompany')c.congregation='';}});closeModal();saveSoon();renderAll();toast(`Updated ${count} contact(s).`);};
+}
+
+function contactCardText(c,format='full'){
+  const name=contactName(c);
+  const roles=(c.roles&&c.roles.length?c.roles:splitTags(c.role)).join(', ');
+  const contactLines=[];
+  if((c.mobiles||[]).length)contactLines.push(`Mobile: ${(c.mobiles||[]).map(m=>m.value).join(', ')}`);
+  if((c.emails||[]).length)contactLines.push(`Email: ${(c.emails||[]).map(e=>e.value).join(', ')}`);
+  if(format==='name')return name;
+  if(format==='contact')return contactLines.length?contactLines.join('\n'):'No email/mobile stored.';
+  const lines=[];
+  lines.push(name);
+  if(format!=='contactOnly'){
+    if(roles&&format!=='short')lines.push(`Role(s): ${roles}`);
+    if(c.congregation)lines.push(`Congregation: ${c.congregation}`);
+  }
+  if(format!=='short')lines.push(...contactLines);
+  if(format==='full'&&c.notes)lines.push(`Notes: ${c.notes}`);
+  return lines.filter(Boolean).join('\n');
+}
+function openInsertContactModal(){
+  const t=getTemplate();
+  if(!t)return toast('Select or create a message first.');
+  const opts=state.data.contacts.slice().sort((a,b)=>(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b)));
+  if(!opts.length)return toast('No contacts available.');
+  showModal('Insert contact into message',`<div class="stack">
+    <p class="hint">Search a contact, choose what should be inserted, and add it directly to the main message. Useful when writing to person A and attaching contact XY.</p>
+    <div class="insertPickerGrid">
+      <div class="stack">
+        <div><label>Search contact</label><input id="insSearch" placeholder="Search name, congregation, role, email, mobile..."></div>
+        <div><label>Contact to insert</label><select id="insContactId" class="insertContactSelect" size="10"></select></div>
+      </div>
+      <div class="stack">
+        <div><label>Insert format</label><select id="insFormat">
+          <option value="name">Name only</option>
+          <option value="contact">Contact only — email/mobile</option>
+          <option value="short">Name + congregation only</option>
+          <option value="normal" selected>Name + role + congregation + contact</option>
+          <option value="full">Full contact incl. notes</option>
+        </select></div>
+        <div><label>Preview</label><div class="sharePreview" id="insPreview"></div></div>
+      </div>
+    </div>
+  </div>`,`<button class="ghost" id="insCancel">Cancel</button><button class="primary" id="insAdd">Insert into main message</button><button class="ghost" id="insCopy">Copy only</button>`);
+  function match(c,q){
+    if(!q)return true;
+    q=q.toLowerCase();
+    const hay=[contactName(c),c.congregation,c.organization,c.role,(c.tags||[]).join(' '),...(c.emails||[]).map(e=>e.value),...(c.mobiles||[]).map(m=>m.value)].join(' ').toLowerCase();
+    return hay.includes(q);
+  }
+  function fillSelect(){
+    const q=$('#insSearch').value.trim();
+    const current=$('#insContactId').value;
+    const list=opts.filter(c=>match(c,q));
+    $('#insContactId').innerHTML=list.map(c=>`<option value="${esc(c.id)}">${esc(c.lastName&&c.firstName?c.lastName+', '+c.firstName:contactName(c))}${c.congregation?', '+esc(c.congregation):''}${contactRoles(c).length?' — '+esc(contactRoles(c).join(', ')):''}</option>`).join('');
+    if(list.some(c=>c.id===current))$('#insContactId').value=current;
+    else if(list[0])$('#insContactId').value=list[0].id;
+    update();
+  }
+  const update=()=>{const c=state.data.contacts.find(x=>x.id===$('#insContactId').value);$('#insPreview').textContent=c?contactCardText(c,$('#insFormat').value):'No contact found.';};
+  $('#insSearch').oninput=fillSelect;$('#insContactId').onchange=update;$('#insFormat').onchange=update;fillSelect();
+  $('#insCancel').onclick=closeModal;
+  $('#insCopy').onclick=()=>copyText($('#insPreview').textContent);
+  $('#insAdd').onclick=()=>{const text=$('#insPreview').textContent.trim();if(!text||text==='No contact found.')return toast('No contact selected.');t.body=cleanNewlines((t.body||'').replace(/\s+$/,''))+'\n\n'+text+'\n';closeModal();saveSoon();renderTemplateEditor();renderPreview();toast('Contact inserted into message.');};
+}
+
+
+
+
+function openContactEditor(id=null){
+  const existing=id?state.data.contacts.find(c=>c.id===id):null;
+  const c=existing?structuredClone(existing):normalizeContactShape({id:uid('c'),source:'local'});
+  const roles=allRoles(), congs=allCongregations(), teams=allTeams();
+  const selectedRoles=new Set(c.roles&&c.roles.length?c.roles:splitTags(c.role));
+  const customRoles=[...selectedRoles].filter(r=>!roles.includes(r)).join(', ');
+  showModal(existing?'Edit contact':'New contact',`
+<div class="stack">
+  <div class="editorBlock">
+    <p class="editorBlockTitle">Contact information</p>
+    <div class="row"><div><label>First name</label><input id="c_firstName" value="${esc(c.firstName)}"></div><div><label>Last name</label><input id="c_lastName" value="${esc(c.lastName)}"></div></div>
+    <div><label>Emails, one per line</label><textarea id="c_emails" class="autoRows">${esc((c.emails||[]).map(e=>e.value).join('\n'))}</textarea></div>
+    <div><label>Mobile numbers, one per line</label><textarea id="c_mobiles" class="autoRows">${esc((c.mobiles||[]).map(m=>m.value).join('\n'))}</textarea><div class="hint">0179... becomes +49 179...</div></div>
+    <div><label>Company / Outlook organization</label><input id="c_organization" value="${esc(c.organization)}"><div class="contactMiniNote">Useful after Outlook import. If Company actually contains the congregation, use the button below to move it.</div></div>
+  </div>
+
+  <div class="editorBlock">
+    <p class="editorBlockTitle">Congregation roles</p>
+    <div class="contactQuickGrid"><div><label>Congregation</label><input id="c_congregation" list="congregationOptionsModal" value="${esc(c.congregation)}" placeholder="type or pick"></div><button class="mini ghost" id="useCompanyAsCong" type="button">Company → Congregation</button><button class="mini ghost" id="useCongAsCompany" type="button">Congregation → Company</button></div>
+    <div><label>Congregation roles</label><div class="rolePickGrid">${roles.map(r=>`<label class="rolePick"><input type="checkbox" data-role-pick="${esc(r)}" ${selectedRoles.has(r)?'checked':''}> ${esc(r)}</label>`).join('')}</div></div>
+    <div><label>Additional congregation roles</label><input id="c_customRoles" value="${esc(customRoles)}" placeholder="comma-separated, e.g. PTC, Elder, MS, Publisher"></div>
+  </div>
+
+  <div class="editorBlock">
+    <p class="editorBlockTitle">Assembly / Convention assignments</p>
+    <div><label>Teams, captains, departments</label><div class="rolePickGrid">${teams.map(t=>`<label class="rolePick"><input type="checkbox" data-team-pick="${esc(t)}" ${contactTeams(c).includes(t)?'checked':''}> ${esc(t)}</label>`).join('')}</div><div class="contactMiniNote">Multiple assignments can be selected. Create or edit available options under Master data.</div></div>
+  </div>
+
+  <div class="editorBlock">
+    <p class="editorBlockTitle">Tags & notes</p>
+    <div><label>Tags, comma-separated</label><input id="c_tags" list="tagOptionsModal" value="${esc((c.tags||[]).join(', '))}"></div>
+    <div><label>Notes</label><textarea id="c_notes">${esc(c.notes)}</textarea></div>
+  </div>
+</div>
+<datalist id="congregationOptionsModal">${congs.map(x=>`<option value="${esc(x)}">`).join('')}</datalist><datalist id="tagOptionsModal">${(Array.isArray(state.data.settings&&state.data.settings.masterTags)?state.data.settings.masterTags:allTags()).map(t=>`<option value="${esc(t)}">`).join('')}</datalist>`,
+`${existing?'<button class="danger" id="modalDeleteContact">Delete</button>':''}<button class="ghost" id="modalCancel">Cancel</button><button class="primary" id="modalSaveContact">Save</button>`);
+  $('#modalCancel').onclick=closeModal;
+  // Auto-resize email/mobile textareas
+  ['c_emails','c_mobiles'].forEach(function(id){
+    var ta=document.getElementById(id);if(!ta)return;
+    function resize(){ta.style.height='0';ta.style.height=(ta.scrollHeight+2)+'px';}
+    resize();
+    ta.addEventListener('input',resize);
+    ta.addEventListener('change',resize);
+  });
+  if(existing)$('#modalDeleteContact').onclick=()=>quickDeleteContact(existing.id);
+  $('#useCompanyAsCong').onclick=()=>{const org=$('#c_organization').value.trim();if(!org)return toast('Company is empty.');$('#c_congregation').value=org;$('#c_organization').value='';};
+  $('#useCongAsCompany').onclick=()=>{const cong=$('#c_congregation').value.trim();if(!cong)return toast('Congregation is empty.');$('#c_organization').value=cong;$('#c_congregation').value='';};
+  $('#modalSaveContact').onclick=()=>{
+    const emails=$('#c_emails').value.split(/\n|;/).map(normalizeEmail).filter(isEmail).map((value,i)=>({label:i?'other':'primary',value}));
+    const mobiles=$('#c_mobiles').value.split(/\n|;/).map(v=>normalizeMobile(v,{allowUnclear:true})).filter(n=>n.value).map((n,i)=>({label:i?'other':'mobile',value:n.value,raw:n.raw,countryGuess:n.countryGuess,warning:n.warning||''}));
+    const picked=$$('[data-role-pick]').filter(x=>x.checked).map(x=>x.dataset.rolePick);
+    const custom=splitTags($('#c_customRoles').value);
+    const roles=[...new Set([...picked,...custom].map(x=>x.trim()).filter(Boolean))];
+    const pickedTeams=$$('[data-team-pick]').filter(x=>x.checked).map(x=>x.dataset.teamPick);
+    const teamsSelected=[...new Set([...pickedTeams].map(x=>x.trim()).filter(Boolean))];
+    const saved=normalizeContactShape({...c,firstName:$('#c_firstName').value.trim(),lastName:$('#c_lastName').value.trim(),displayName:buildName($('#c_firstName').value,$('#c_lastName').value,c.displayName||''),congregation:$('#c_congregation').value.trim(),organization:$('#c_organization').value.trim(),roles,role:roles.join(', '),emails,mobiles,tags:splitTags($('#c_tags').value),notes:$('#c_notes').value.trim(),teams:teamsSelected,team:teamsSelected.join(', '),source:c.source||'local'});
+    state.data.settings.masterRoles=[...new Set([...(state.data.settings.masterRoles||[]),...roles])];
+    state.data.settings.masterTeams=[...new Set([...(state.data.settings.masterTeams||[]),...teamsSelected])];
+    if(saved.congregation)state.data.settings.masterCongregations=[...new Set([...(state.data.settings.masterCongregations||[]),saved.congregation])];
+    if(existing){Object.assign(existing,saved);state.selectedContactId=existing.id}else{state.data.contacts.push(saved);state.selectedContactId=saved.id}
+    closeModal();saveSoon();renderAll();toast('Contact saved.');
+  };
+}
+
+function openTemplateEditor(){
+  const t=normalizeTemplateShape({
+    id:uid('t'),
+    title:'New message template',
+    area:'General',
+    category:'General',
+    language:'en',
+    tone:'',
+    channel:($('#deliveryChannel')?.value)||'whatsapp',
+    subject:'',
+    body:'Hi {{firstName}},\n\n',
+    footer:''
+  });
+  state.data.templates.push(t);
+  state.selectedTemplateId=t.id;
+  state.activeArea='All';
+  saveSoon();
+  renderAreaTabs();
+  renderTemplates();
+  renderTemplateEditor();
+  renderPreview();
+  toast('Template created.');
+  setTimeout(()=>$('#tmpl_title')?.focus(),0);
+}
+function duplicateTemplate(){
+  const src=getTemplate();
+  if(!src)return toast('Select a template first.');
+  const copy=normalizeTemplateShape({...structuredClone(src),id:uid('t'),title:`${src.title||'Template'} copy`});
+  state.data.templates.push(copy);
+  state.selectedTemplateId=copy.id;
+  state.activeArea='All';
+  saveSoon();
+  renderAreaTabs();
+  renderTemplates();
+  renderTemplateEditor();
+  renderPreview();
+  toast('Template duplicated.');
+}
+function deleteTemplate(){
+  const t=getTemplate();
+  if(!t)return toast('Select a template first.');
+  if(!confirm(`Delete template: ${t.title}?`))return;
+  state.data.templates=state.data.templates.filter(x=>x.id!==t.id);
+  state.selectedTemplateId=state.data.templates[0]?.id||null;
+  saveSoon();
+  renderAreaTabs();
+  renderTemplates();
+  renderTemplateEditor();
+  renderPreview();
+  toast('Template deleted.');
+}
+
+function showSentItems(){const items=[...(state.data.sentItems||[])].reverse();showModal('History',items.length?`<div class="tableWrap"><table><thead><tr><th>Date</th><th>Contact</th><th>Channel</th><th>Message</th><th></th></tr></thead><tbody>${items.map((it,i)=>`<tr><td>${esc(new Date(it.createdAt).toLocaleString())}</td><td>${esc(it.contactName)}</td><td>${esc(it.channel)}</td><td style="white-space:pre-wrap">${esc(it.body.slice(0,500))}${it.body.length>500?'…':''}</td><td><button class="mini ghost" data-sent-copy="${esc(it.body)}">Copy</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No saved messages yet.</div>',`<button class="danger" id="clearSent">Clear history</button><button class="ghost" id="closeSent">Close</button>`);$('#closeSent').onclick=closeModal;$('#clearSent').onclick=()=>{if(confirm('Clear history?')){state.data.sentItems=[];closeModal();saveSoon();toast('History cleared.')}};$$('[data-sent-copy]').forEach(b=>b.onclick=()=>copyText(b.dataset.sentCopy))}
+function saveSent(){const c=getContact(),t=getTemplate();if(!c||!t)return toast('Select contact and template.');const item={id:uid('s'),createdAt:new Date().toISOString(),contactId:c.id,contactName:contactName(c),templateId:t.id,templateTitle:t.title,channel:($('#deliveryChannel')?.value||t.channel),subject:$('#subjectPreview').textContent==='—'?'':$('#subjectPreview').textContent,body:$('#messagePreview').textContent};state.data.sentItems=state.data.sentItems||[];state.data.sentItems.push(item);saveSoon();toast('Saved to history.')}
+function showModal(title,body,foot=''){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modalFoot').innerHTML=foot;$('#modalOverlay').classList.add('show')}
+function closeModal(){$('#modalOverlay').classList.remove('show')}
+
+function bind(){
+$('#btnCloseModal').onclick=closeModal;$('#modalOverlay').onclick=e=>{if(e.target.id==='modalOverlay')closeModal()};
+$('#btnNewContact').onclick=()=>openContactEditor();$('#btnMasterData').onclick=openMasterData;$('#btnMergeSelected').onclick=mergeSelectedContacts;$('#btnNewTemplate').onclick=openTemplateEditor;$('#btnDuplicateTemplate').onclick=duplicateTemplate;$('#btnDeleteTemplate').onclick=deleteTemplate;$('#btnSelectVisible').onclick=selectVisibleContacts;$('#btnClearSelection').onclick=clearContactSelection;
+if($('#btnCaptainExport'))$('#btnCaptainExport').onclick=openCaptainExport;$('#btnCopyContactList').onclick=openContactListModal;$('#btnExportSelectedCsv').onclick=exportSelectedContactsCsv;if($('#btnBulkEditSelected'))$('#btnBulkEditSelected').onclick=openBulkEditModal;if($('#btnBulkDeleteSelected'))$('#btnBulkDeleteSelected').onclick=bulkDelete;
+var sortEl=document.getElementById('contactSortBy');if(sortEl){sortEl.value=state.sortBy||'lastName';sortEl.addEventListener('change',function(){state.sortBy=sortEl.value;renderContacts();});}
+['contactSearch','contactTagFilter','contactRoleFilter','contactTeamFilter'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',()=>{renderContacts();updateSelectionHint();});el.addEventListener('change',()=>{renderContacts();updateSelectionHint();});}});['templateSearch'].forEach(id=>$('#'+id).addEventListener('input',renderTemplates));
+$('#contactBulkAction').onchange=e=>{const v=e.target.value;e.target.value='';if(v==='bulkEdit')openBulkEditModal();if(v==='delete')bulkDelete();if(v==='tag')bulkTag();if(v==='role')bulkSetRoles();if(v==='setTeam')bulkSetTeam();};
+$('#deliveryChannel').onchange=()=>{state.selectedTarget=null;renderPreview()};
+['draft_eventName','draft_date'].forEach(function(id){var el=document.getElementById(id);if(!el)return;var key=id.replace('draft_','');el.addEventListener('input',function(){state.draftDetails[key]=el.value;renderPreview();});});
+$('#btnCopyMessage').onclick=()=>copyText($('#messagePreview').textContent);$('#btnCopyMessageTop').onclick=()=>copyText($('#messagePreview').textContent);$('#btnCopySubject').onclick=()=>copyText($('#subjectPreview').textContent==='—'?'':$('#subjectPreview').textContent);const phBtn=$('#btnCopyPlaceholderList');if(phBtn)phBtn.onclick=()=>copyText(PLACEHOLDERS.map(p=>`{{${p}}}`).join('\n'));$('#btnPrintPreview').onclick=()=>print();
+$('#btnOpenWhatsApp').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').value='whatsapp';renderPreview();const m=getSelectedTarget('whatsapp');if(!m)return toast('No mobile number selected.');openWhatsApp(m,$('#messagePreview').textContent);saveSent()};
+$('#btnOpenEmail').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').value='email';renderPreview();const e=getSelectedTarget('email');if(!e)return toast('No email address selected.');location.href=`mailto:${encodeURIComponent(e)}?subject=${encodeURIComponent($('#subjectPreview').textContent==='—'?'':$('#subjectPreview').textContent)}&body=${encodeURIComponent($('#messagePreview').textContent)}`;saveSent()};
+$('#btnInsertContact').onclick=openInsertContactModal;$('#btnSaveSent').onclick=saveSent;$('#btnSentItems').onclick=showSentItems;
+$('#btnStartEmpty').onclick=()=>{if(confirm('Start empty? Current local data will be replaced.')){state.data=emptyData();state.selectedContactId=null;state.selectedTemplateId=null;state.selectedContactIds.clear();saveNow();renderAll();toast('Started empty.')}};
+$('#btnClearLocal').onclick=()=>{if(confirm('Clear local data in this browser?')){localStorage.removeItem(STORAGE_KEY);state.data=emptyData();state.selectedContactId=null;state.selectedTemplateId=null;state.selectedContactIds.clear();renderAll();saveStatus('Local data cleared','danger');toast('Local data cleared.')}};
+$('#btnImportJson').onclick=()=>$('#jsonInput').click();$('#jsonInput').onchange=importJsonFile;$('#btnExportJson').onclick=exportJson;$('#btnImportCsv').onclick=()=>$('#csvInput').click();$('#csvInput').onchange=importCsvFile;$('#btnExportCsv').onclick=exportOutlookCsv;
+}
+function bulkDelete(){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const names=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean).slice(0,12).map(c=>'• '+contactName(c)).join('\n');const more=ids.length>12?`\n… and ${ids.length-12} more`:'';if(confirm(`Delete ${ids.length} selected contact(s)?\n\n${names}${more}\n\nThis cannot be undone.`)){state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id));state.selectedContactIds.clear();state.selectedContactId=state.data.contacts[0]?.id||null;saveSoon();renderAll();toast(`${ids.length} contact(s) deleted.`)}}
+function bulkTag(){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const tag=prompt('Add tag:');if(!tag)return;state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>c.tags=[...new Set([...(c.tags||[]),tag.trim()])]);saveSoon();renderAll();toast('Tag added.')}
+function allTags(){const mt=state.data.settings&&state.data.settings.masterTags;if(Array.isArray(mt)&&mt.length)return[...new Set(mt.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));return[...new Set(state.data.contacts.flatMap(c=>c.tags||[]).filter(Boolean))].sort((a,b)=>a.localeCompare(b));}
+function bulkSetRoles(){
+  const idsAtOpen=selectedContactIds();
+  if(!idsAtOpen.length)return toast('No contacts selected.');
+  const roles=allRoles();
+  showModal('Assign congregation roles',`<div class="stack"><p class="hint">Choose one or more congregation roles for the selected contacts.</p><div class="rolePickGrid">${roles.map(r=>`<label class="rolePick"><input type="checkbox" data-bulk-role="${esc(r)}"> ${esc(r)}</label>`).join('')}</div><div><label>Additional congregation roles</label><input id="bulkCustomRoles" placeholder="comma-separated"></div><div><label>Mode</label><select id="bulkRoleMode"><option value="add">Add to existing roles</option><option value="replace">Replace existing roles</option><option value="clear">Clear roles</option></select></div></div>`,`<button class="ghost" id="bulkRoleCancel">Cancel</button><button class="primary" id="bulkRoleApply">Apply</button>`);
+  $('#bulkRoleCancel').onclick=closeModal;
+  $('#bulkRoleApply').onclick=()=>{
+    const ids=selectedContactIds();
+    if(!ids.length)return toast('No contacts selected.');
+    const mode=$('#bulkRoleMode').value;
+    const chosen=[...new Set([...$$('[data-bulk-role]').filter(x=>x.checked).map(x=>x.dataset.bulkRole),...splitTags($('#bulkCustomRoles').value)].map(x=>x.trim()).filter(Boolean))];
+    state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>{
+      if(mode==='clear'){c.roles=[];c.role='';return;}
+      const next=mode==='replace'?chosen:[...new Set([...contactRoles(c),...chosen])];
+      c.roles=next;c.role=next.join(', ');
+    });
+    state.data.settings.masterRoles=[...new Set([...(state.data.settings.masterRoles||[]),...chosen])];
+    closeModal();saveSoon();renderAll();toast(`Congregation roles updated for ${ids.length} contact(s).`);
+  };
+}
+function autoSelectBulkMode(modeSelector){
+  const sel=$(modeSelector);
+  if(sel && sel.value==='none') sel.value='add';
+}
+function wireBulkEditAutoModes(){
+  $$('[data-be-role]').forEach(x=>x.addEventListener('change',()=>autoSelectBulkMode('#bulkEditRoleMode')));
+  $$('[data-be-team]').forEach(x=>x.addEventListener('change',()=>autoSelectBulkMode('#bulkEditTeamMode')));
+  $$('[data-be-tag]').forEach(x=>x.addEventListener('change',()=>autoSelectBulkMode('#bulkEditTagMode')));
+  const cr=$('#bulkEditCustomRoles'), ct=$('#bulkEditCustomTeams'), cg=$('#bulkEditCustomTags');
+  if(cr)cr.addEventListener('input',()=>autoSelectBulkMode('#bulkEditRoleMode'));
+  if(ct)ct.addEventListener('input',()=>autoSelectBulkMode('#bulkEditTeamMode'));
+  if(cg)cg.addEventListener('input',()=>autoSelectBulkMode('#bulkEditTagMode'));
+}
+function openBulkEditModal(){
+  const idsAtOpen=selectedContactIds();
+  if(!idsAtOpen.length)return toast('No contacts selected.');
+  const roles=allRoles(), teams=allTeams(), tags=allTags();
+  showModal('Bulk edit selected contacts',`<div class="stack">
+    <p class="hint"><strong>${idsAtOpen.length} selected contact(s).</strong> Add, replace, or clear the values that normally sit inside each contact. Leave a section on “No change” if you do not want to touch it.</p>
+    <div class="bulkAssignBox">
+      <div class="bulkAssignHead"><b>Congregation roles</b><select id="bulkEditRoleMode"><option value="none">No change</option><option value="add">Add selected</option><option value="replace">Replace with selected</option><option value="clear">Clear all roles</option></select></div>
+      <div class="bulkCheckGrid">${roles.map(r=>`<label class="rolePick"><input type="checkbox" data-be-role="${esc(r)}"> ${esc(r)}</label>`).join('')}</div>
+      <div class="bulkCustomGrid"><input id="bulkEditCustomRoles" placeholder="Additional congregation roles, comma-separated"></div>
+    </div>
+    <div class="bulkAssignBox">
+      <div class="bulkAssignHead"><b>Assembly / Convention team assignments</b><select id="bulkEditTeamMode"><option value="none">No change</option><option value="add">Add selected</option><option value="replace">Replace with selected</option><option value="clear">Clear all teams</option></select></div>
+      <div class="bulkCheckGrid">${teams.map(t=>`<label class="rolePick"><input type="checkbox" data-be-team="${esc(t)}"> ${esc(t)}</label>`).join('')}</div>
+      <div class="bulkCustomGrid"><input id="bulkEditCustomTeams" placeholder="Additional teams, comma-separated"></div>
+    </div>
+    <div class="bulkAssignBox">
+      <div class="bulkAssignHead"><b>Tags</b><select id="bulkEditTagMode"><option value="none">No change</option><option value="add">Add selected</option><option value="replace">Replace with selected</option><option value="clear">Clear all tags</option></select></div>
+      <div class="bulkCheckGrid">${tags.map(t=>`<label class="rolePick"><input type="checkbox" data-be-tag="${esc(t)}"> ${esc(t)}</label>`).join('')}</div>
+      <div class="bulkCustomGrid"><input id="bulkEditCustomTags" placeholder="Additional tags, comma-separated"></div>
+    </div>
+  </div>`,`<button class="ghost" id="bulkEditCancel">Cancel</button><button class="primary" id="bulkEditApply">Apply to selected</button>`);
+  $('#bulkEditCancel').onclick=closeModal;
+  wireBulkEditAutoModes();
+  $('#bulkEditApply').onclick=()=>{
+    const ids=selectedContactIds();
+    if(!ids.length)return toast('No contacts selected.');
+    let roleMode=$('#bulkEditRoleMode').value, teamMode=$('#bulkEditTeamMode').value, tagMode=$('#bulkEditTagMode').value;
+    const chosenRoles=[...new Set([...$$('[data-be-role]').filter(x=>x.checked).map(x=>x.dataset.beRole),...splitTags($('#bulkEditCustomRoles').value)].map(x=>x.trim()).filter(Boolean))];
+    const chosenTeams=[...new Set([...$$('[data-be-team]').filter(x=>x.checked).map(x=>x.dataset.beTeam),...splitTags($('#bulkEditCustomTeams').value)].map(x=>x.trim()).filter(Boolean))];
+    const chosenTags=[...new Set([...$$('[data-be-tag]').filter(x=>x.checked).map(x=>x.dataset.beTag),...splitTags($('#bulkEditCustomTags').value)].map(x=>x.trim()).filter(Boolean))];
+    // User-friendly default: checking values is enough. If the mode is still “No change”, treat checked/custom entries as “Add selected”.
+    if(roleMode==='none'&&chosenRoles.length)roleMode='add';
+    if(teamMode==='none'&&chosenTeams.length)teamMode='add';
+    if(tagMode==='none'&&chosenTags.length)tagMode='add';
+    state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>{
+      if(roleMode==='clear'){c.roles=[];c.role='';}
+      else if(roleMode==='replace'){c.roles=chosenRoles;c.role=chosenRoles.join(', ');}
+      else if(roleMode==='add'&&chosenRoles.length){const next=[...new Set([...contactRoles(c),...chosenRoles])];c.roles=next;c.role=next.join(', ');}
+      if(teamMode==='clear'){c.teams=[];c.team='';}
+      else if(teamMode==='replace'){c.teams=chosenTeams;c.team=chosenTeams.join(', ');}
+      else if(teamMode==='add'&&chosenTeams.length){const next=[...new Set([...contactTeams(c),...chosenTeams])];c.teams=next;c.team=next.join(', ');}
+      if(tagMode==='clear')c.tags=[];
+      else if(tagMode==='replace')c.tags=chosenTags;
+      else if(tagMode==='add'&&chosenTags.length)c.tags=[...new Set([...(c.tags||[]),...chosenTags])];
+    });
+    state.data.settings.masterRoles=[...new Set([...(state.data.settings.masterRoles||[]),...chosenRoles])];
+    state.data.settings.masterTeams=[...new Set([...(state.data.settings.masterTeams||[]),...chosenTeams])];
+    closeModal();saveSoon();renderAll();toast(`Bulk edit applied to ${ids.length} contact(s).`);
+  };
+}
+function bulkSetActive(val){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>c.active=val);saveSoon();renderAll();toast(val?`✅ ${ids.length} set active.`:`⬜ ${ids.length} set inactive.`)}
+function bulkSetTeam(){const idsAtOpen=selectedContactIds();if(!idsAtOpen.length)return toast('No contacts selected.');const teams=allTeams();showModal('Assign Assembly / Convention teams',`<div class="stack"><p class="hint">Choose one or more teams for the selected contacts.</p><div class="rolePickGrid">${teams.map(t=>`<label class="rolePick"><input type="checkbox" data-bulk-team="${esc(t)}"> ${esc(t)}</label>`).join('')}</div><div><label>Additional teams</label><input id="bulkCustomTeams" placeholder="comma-separated"></div><div><label>Mode</label><select id="bulkTeamMode"><option value="add">Add to existing team assignments</option><option value="replace">Replace existing team assignments</option><option value="clear">Clear team assignments</option></select></div></div>`,`<button class="ghost" id="bulkTeamCancel">Cancel</button><button class="primary" id="bulkTeamApply">Apply</button>`);$('#bulkTeamCancel').onclick=closeModal;$('#bulkTeamApply').onclick=()=>{const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const mode=$('#bulkTeamMode').value;const chosen=[...new Set([...$$('[data-bulk-team]').filter(x=>x.checked).map(x=>x.dataset.bulkTeam),...splitTags($('#bulkCustomTeams').value)].map(x=>x.trim()).filter(Boolean))];state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>{if(mode==='clear'){c.teams=[];c.team='';return;}const next=mode==='replace'?chosen:[...new Set([...contactTeams(c),...chosen])];c.teams=next;c.team=next.join(', ');});state.data.settings.masterTeams=[...new Set([...(state.data.settings.masterTeams||[]),...chosen])];closeModal();saveSoon();renderAll();toast(`Assembly / Convention teams updated for ${ids.length} contact(s).`);};}
+async function copyText(t){try{await navigator.clipboard.writeText(t||'');toast('Copied.')}catch{toast('Copy failed.')}}
+if(document.getElementById('btnTheme')){
+  document.getElementById('btnTheme').onclick=function(){
+    var html=document.documentElement;
+    var isDark=html.getAttribute('data-theme')==='dark';
+    html.setAttribute('data-theme',isDark?'light':'dark');
+    document.getElementById('btnTheme').textContent=isDark?'🌙 Dark':'☀️ Light';
+  };
+}
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+    e.preventDefault();
+    var sel=document.getElementById('deliveryChannel');
+    var ch=sel?sel.value:'whatsapp';
+    if(ch==='email'){var b=document.getElementById('btnOpenEmail');if(b)b.click();}
+    else{var b=document.getElementById('btnOpenWhatsApp');if(b)b.click();}
+  }
+});
+function openWhatsApp(phone,msg){const p=String(phone||'').replace(/[^+\d]/g,'').replace(/^\+/,'');if(!p)return toast('Invalid number.');open(`https://wa.me/${p}${msg?`?text=${encodeURIComponent(msg)}`:''}`,'_blank','noopener')}
+
+function openCaptainExport(){
+  const allTeamsList=allTeams();
+  const allTagsList=[...new Set(state.data.contacts.flatMap(c=>c.tags||[]))].sort();
+  showModal('📤 Captain Export',`<div class="stack">
+  <p class="hint">Choose which contacts to share with a team captain. The JSON export can be imported directly into this tool — the captain can then message the contacts straight away.</p>
+  <div class="row">
+    <div><label>Filter by Assembly / Convention team</label>
+      <select id="ce_team"><option value="">All Assembly / Convention teams</option>
+        ${allTeamsList.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}
+      </select></div>
+    <div><label>Filter by Tag</label>
+      <select id="ce_tag"><option value="">All tags</option>
+        ${allTagsList.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}
+      </select></div>
+  </div>
+  <div class="row">
+    <div><label>Status</label>
+      <select id="ce_active">
+        <option value="">Active &amp; inactive</option>
+        <option value="active" selected>✅ Active only</option>
+        <option value="inactive">⬜ Inactive only</option>
+      </select></div>
+    <div><label>Include templates</label>
+      <select id="ce_templates">
+        <option value="yes">Yes — include all templates</option>
+        <option value="no">No — contacts only</option>
+      </select></div>
+  </div>
+  <div id="ce_preview" style="font-size:13px;font-weight:700;color:var(--accent);padding:10px 12px;background:var(--soft);border-radius:12px;border:1px solid #c7d7ff">→ Select filters above</div>
+  </div>`,
+  `<button class="ghost" id="ceCancel">Cancel</button><button class="ghost" id="ceCsv">⬇ Export CSV</button><button class="primary" id="ceJson">⬇ Export JSON for Captain</button>`);
+  function ceFiltered(){
+    const t=$('#ce_team').value,tg=$('#ce_tag').value,af=$('#ce_active').value;
+    return state.data.contacts.filter(c=>
+      (!t||contactTeams(c).includes(t))&&(!tg||(c.tags||[]).includes(tg))&&
+      (af===''||(af==='active'?c.active!==false:c.active===false)));
+  }
+  function updatePreview(){
+    const n=ceFiltered().length;
+    $('#ce_preview').textContent=`${n} contact(s) will be exported.`;
+  }
+  ['ce_team','ce_tag','ce_active'].forEach(id=>$('#'+id).addEventListener('change',updatePreview));
+  updatePreview();
+  $('#ceCancel').onclick=closeModal;
+  $('#ceJson').onclick=()=>{
+    const list=ceFiltered();
+    if(!list.length)return toast('No contacts match the selected filter.');
+    const inclTpl=$('#ce_templates').value==='yes';
+    const payload={
+      schemaVersion:1,appName:'ContactHub Pro',appVersion:APP_VERSION,
+      exportedAt:new Date().toISOString(),captainExport:true,
+      contacts:list,
+      templates:inclTpl?state.data.templates:[],
+      sentItems:[],
+      settings:{...state.data.settings}
+    };
+    downloadFile(`captain_export_${stamp()}.json`,JSON.stringify(payload,null,2),'application/json;charset=utf-8');
+    toast(`✅ Exported ${list.length} contact(s) as JSON.`);
+    closeModal();
+  };
+  $('#ceCsv').onclick=()=>{
+    const list=ceFiltered();
+    if(!list.length)return toast('No contacts match the selected filter.');
+    const headers=['First Name','Last Name','Congregation','Team','Roles','Email','Mobile','Tags','Notes'];
+    const rows=list.map(c=>({
+      'First Name':c.firstName||'','Last Name':c.lastName||'',
+      'Congregation':c.congregation||'','Team':contactTeams(c).join('; '),
+      'Roles':contactRoles(c).join('; '),
+      'Email':(c.emails||[]).map(e=>e.value).join('; '),
+      'Mobile':(c.mobiles||[]).map(m=>m.value).join('; '),
+      'Tags':(c.tags||[]).join('; '),'Notes':c.notes||''
+    }));
+    downloadFile(`captain_export_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');
+    toast(`✅ Exported ${list.length} contact(s) as CSV.`);
+    closeModal();
+  };
+}
+
+function exportJson(){downloadFile(`contacthub_pro_backup_${stamp()}.json`,JSON.stringify({...state.data,appName:'ContactHub Pro',exportedAt:new Date().toISOString(),appVersion:APP_VERSION},null,2),'application/json;charset=utf-8');toast('Backup exported.')}
+function importJsonFile(e){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const incoming=migrate(JSON.parse(r.result));showModal('Import JSON',`<p class="hint">${esc(f.name)}</p><div class="importSummary"><div class="stat"><b>${incoming.contacts.length}</b><span>Contacts</span></div><div class="stat"><b>${incoming.templates.length}</b><span>Templates</span></div><div class="stat"><b>${incoming.sentItems.length}</b><span>Sent</span></div></div>`,`<button class="ghost" id="jsonCancel">Cancel</button><button class="primary" id="jsonMerge">Merge</button><button class="danger" id="jsonRestore">Full restore</button>`);$('#jsonCancel').onclick=closeModal;$('#jsonMerge').onclick=()=>{mergeImportedData(incoming,'merge');closeModal();saveSoon();renderAll();toast('JSON merged.')};$('#jsonRestore').onclick=()=>{if(confirm('Replace everything?')){state.data=incoming;selectFirst();closeModal();saveSoon();renderAll();toast('Restore done.')}}}catch(err){console.error(err);toast('JSON could not be read.')}e.target.value=''};r.readAsText(f,'utf-8')}
+function mergeImportedData(incoming,mode='merge'){incoming.contacts.forEach(c=>mergeOrAdd(c,mode));incoming.templates.forEach(t=>{if(!state.data.templates.find(x=>x.id===t.id||(x.title===t.title&&x.area===t.area&&x.language===t.language)))state.data.templates.push(t)});state.data.sentItems=[...(state.data.sentItems||[]),...(incoming.sentItems||[])];selectFirst()}
+function mergeOrAdd(c,mode){const match=findMatch(c);if(match){if(mode==='skip')return 'skipped';mergeInto(match,c);return 'merged'}state.data.contacts.push({...c,id:c.id||uid('c')});return 'new'}
+function findMatch(c){const emails=new Set((c.emails||[]).map(e=>e.value)),mobiles=new Set((c.mobiles||[]).map(m=>digitsOnly(m.value)));return state.data.contacts.find(x=>(x.emails||[]).some(e=>emails.has(e.value))||(x.mobiles||[]).some(m=>mobiles.has(digitsOnly(m.value))))}
+
+function selectedOrVisibleContacts(){const contacts=selectedContacts();return contacts.length?contacts:filteredContacts()}
+function selectVisibleContacts(){filteredContacts().forEach(c=>state.selectedContactIds.add(c.id));renderContacts();toast(`${filteredContacts().length} visible contact(s) selected.`)}
+function clearContactSelection(){state.selectedContactIds.clear();renderContacts();toast('Selection cleared.')}
+function formatContactLine(c,fmt){const roles=contactRoles(c).join(', ');const nameLF=[c.lastName,c.firstName].filter(Boolean).join(' ').trim()||c.displayName;const nameFL=buildName(c.firstName,c.lastName,c.displayName);if(fmt==='lastFirstCong')return [nameLF,c.congregation].filter(Boolean).join(', ');if(fmt==='congLastFirst')return [c.congregation,nameLF].filter(Boolean).join(', ');if(fmt==='firstLastCongRole')return [nameFL,c.congregation,roles].filter(Boolean).join(', ');if(fmt==='roleLastFirstCong')return [roles,nameLF,c.congregation].filter(Boolean).join(', ');if(fmt==='contact')return contactCardText(c,'normal');return [nameFL,c.congregation,roles].filter(Boolean).join(', ')}
+function sortedContactsForList(list,sort){return list.slice().sort((a,b)=>{if(sort==='congLast')return (a.congregation||'').localeCompare(b.congregation||'')||(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b));if(sort==='roleLast')return contactRoles(a).join(', ').localeCompare(contactRoles(b).join(', '))||(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b));return (a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b));})}
+function openContactListModal(){const base=selectedOrVisibleContacts();if(!base.length)return toast('No contacts to copy.');showModal('Copy contact list',`<div class="stack">
+  <p class="hint">Copies selected contacts. If nothing is selected, it uses the currently visible filtered contacts.</p>
+  <div class="row"><div><label>Line format</label><select id="listFmt"><option value="lastFirstCong">Last name First name, Congregation</option><option value="congLastFirst">Congregation, Last name First name</option><option value="firstLastCongRole">First Last, Congregation, Role</option><option value="roleLastFirstCong">Role · Last name First name, Congregation</option><option value="contact">Contact card format</option></select></div><div><label>Sort order</label><select id="listSort"><option value="last">Last name</option><option value="congLast">Congregation, then last name</option><option value="roleLast">Role, then last name</option></select></div></div>
+  <div><label>Preview</label><textarea id="listPreview" class="mainText" readonly></textarea></div>
+</div>`,`<button class="ghost" id="listClose">Close</button><button class="primary" id="listCopy">Copy list</button>`);
+const update=()=>{$('#listPreview').value=sortedContactsForList(base,$('#listSort').value).map(c=>formatContactLine(c,$('#listFmt').value)).join('\n');};$('#listFmt').onchange=update;$('#listSort').onchange=update;update();$('#listClose').onclick=closeModal;$('#listCopy').onclick=()=>copyText($('#listPreview').value)}
+function exportSelectedContactsCsv(){const list=selectedOrVisibleContacts();if(!list.length)return toast('No contacts to export.');const headers=['First Name','Last Name','Congregation','Team','Company','Roles','Email','Mobile','Tags','Notes'];const rows=list.map(c=>({'First Name':c.firstName||'','Last Name':c.lastName||'','Congregation':c.congregation||'','Team':contactTeams(c).join('; '),'Company':c.organization||'','Roles':contactRoles(c).join('; '),'Email':(c.emails||[]).map(e=>e.value).join('; '),'Mobile':(c.mobiles||[]).map(m=>m.value).join('; '),'Tags':(c.tags||[]).join('; '),'Notes':c.notes||''}));downloadFile(`contacthub_contacts_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');toast(`Exported ${list.length} contact(s).`)}
+
+function importCsvFile(e){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const rows=parseCsv(r.result),preview=buildCsvPreview(rows);showCsvPreview(f.name,preview)}catch(err){console.error(err);toast('CSV could not be read.')}e.target.value=''};r.readAsText(f,'utf-8')}
+function showCsvPreview(file,preview){const rows=preview.contacts.slice(0,200).map(it=>`<tr><td><span class="chip ${it.status==='new'?'green':it.status==='existing'?'warn':'danger'}">${esc(it.status)}</span></td><td>${esc(contactName(it.contact))}</td><td>${esc((it.contact.emails||[]).map(e=>e.value).join(', '))}</td><td>${esc((it.contact.mobiles||[]).map(m=>m.value).join(', '))}</td><td>${esc(it.warnings.join('; '))}</td></tr>`).join('');showModal('Outlook CSV Import',`
+<p class="hint">Datei: <strong>${esc(file)}</strong>. Bei existing contacts kannst du beim Import mergen oder überspringen.</p>
+<div class="importSummary"><div class="stat"><b>${preview.totalRows}</b><span>Rows</span></div><div class="stat"><b>${preview.contacts.length}</b><span>Contacts</span></div><div class="stat"><b>${preview.existing}</b><span>existing</span></div><div class="stat"><b>${preview.withMobile}</b><span>Mobile</span></div><div class="stat"><b>${preview.review}</b><span>Review</span></div></div>
+<div class="row" style="margin-bottom:10px"><div><label>If contact already exists</label><select id="csvExistingMode"><option value="merge">Merge / add missing data</option><option value="skip">Skip</option></select></div><div><label>Import</label><select id="csvImportFilter"><option value="all">All contacts</option><option value="clean">Only without warnings</option></select></div></div><div class="row" style="margin-bottom:10px"><div><label>Outlook Company</label><select id="csvCompanyMode"><option value="toCongClear">Use as congregation, clear Company</option><option value="toCongKeep">Use as congregation, keep Company</option><option value="keep">Keep as Company only</option></select></div><div><label>Outlook Categories</label><select id="csvCategoryMode"><option value="rolesAndTags">Use as roles + import tags</option><option value="tagsOnly">Use as import tags only</option><option value="ignore">Ignore categories</option></select></div></div>
+<div class="tableWrap"><table><thead><tr><th>Status</th><th>Name</th><th>E-Mails</th><th>Mobil</th><th>Notes</th></tr></thead><tbody>${rows||'<tr><td colspan="5">Nothing importable.</td></tr>'}</tbody></table></div>`,
+`<button class="ghost" id="csvCancel">Cancel</button><button class="primary" id="csvImport">Import</button>`);$('#csvCancel').onclick=closeModal;$('#csvImport').onclick=()=>{let added=0,merged=0,skipped=0;const mode=$('#csvExistingMode').value,filter=$('#csvImportFilter').value;preview.contacts.filter(it=>filter==='all'||!it.warnings.length).forEach(it=>{const contact=structuredClone(it.contact);const cm=$('#csvCompanyMode')?.value||'toCongClear';if(contact.organization&&(cm==='toCongClear'||cm==='toCongKeep')&&!contact.congregation){contact.congregation=contact.organization;if(cm==='toCongClear')contact.organization='';}if(cm==='keep'){}const catMode=$('#csvCategoryMode')?.value||'rolesAndTags';if(catMode==='ignore'){contact.tags=(contact.tags||[]).filter(t=>!String(t).startsWith('Outlook:'));}if(catMode==='rolesAndTags'){const cats=(contact.tags||[]).filter(t=>String(t).startsWith('Outlook:')).map(t=>t.replace(/^Outlook:\s*/,''));contact.roles=[...new Set([...(contact.roles||[]),...cats])];contact.role=contact.roles.join(', ');}const r=mergeOrAdd(contact,mode);if(r==='new')added++;if(r==='merged')merged++;if(r==='skipped')skipped++});closeModal();saveSoon();renderAll();toast(`CSV: ${added} neu, ${merged} merged, ${skipped} übersprungen.`)}}
+function buildCsvPreview(rows){const items=[];rows.forEach(row=>{const c=fromOutlook(row);if(!c)return;const warnings=[];(c.mobiles||[]).forEach(m=>{if(m.warning)warnings.push(`${m.raw}: ${m.warning}`)});if(!contactName(c)||contactName(c)==='(Ohne Name)')warnings.push('name missing');if(!(c.emails||[]).length&&!(c.mobiles||[]).length)warnings.push('no email/mobile');const existing=!!findMatch(c);items.push({contact:c,warnings,status:warnings.length?'review':existing?'existing':'new'})});return{totalRows:rows.length,contacts:items,existing:items.filter(i=>i.status==='existing').length,withMobile:items.filter(i=>i.contact.mobiles?.length).length,review:items.filter(i=>i.warnings.length).length}}
+function fromOutlook(row){const get=(...names)=>{for(const n of names){const k=Object.keys(row).find(x=>norm(x)===norm(n));if(k&&String(row[k]||'').trim())return String(row[k]).trim()}return''};const firstName=get('First Name','Given Name','First name'),lastName=get('Last Name','Surname','Last name'),displayName=get('Display Name','Name','Full Name','Display name')||buildName(firstName,lastName,'');const org=get('Company','Organization','Firma','Organization'),notes=get('Notes','Notes'),categories=get('Categories','Kategorie','Outlook Categories');const emails=uniqueBy([get('E-mail Address','Email Address','E-Mail-Adresse'),get('E-mail 2 Address','Email 2 Address','E-Mail 2-Adresse'),get('E-mail 3 Address','Email 3 Address','E-Mail 3-Adresse')].flatMap(v=>String(v||'').split(/[;,]/)).map(normalizeEmail).filter(isEmail),x=>x).map((value,i)=>({label:i?'other':'primary',value}));
+const mobileVals=[get('Mobile Phone','Mobile Phone 2','Mobiltelefon','Mobil','Handy','Telefon mobil','Other Mobile')].flatMap(v=>String(v||'').split(/[;\n]/)).filter(Boolean);const phoneVals=[get('Primary Phone','Other Phone','Business Phone','Home Phone','Telefon','Weitere Telefonnummer')].flatMap(v=>String(v||'').split(/[;\n]/)).filter(Boolean);let normals=mobileVals.map(v=>normalizeMobile(v,{allowUnclear:true}));phoneVals.forEach(v=>{const n=normalizeMobile(v,{allowUnclear:false});if(n.value&&isLikelyMobile(n.value))normals.push(n)});const mobiles=uniqueBy(normals.filter(n=>n.value).map((n,i)=>({label:i?'other':'mobile',value:n.value,raw:n.raw,countryGuess:n.countryGuess,warning:n.warning||''})),x=>digitsOnly(x.value));if(!displayName&&!emails.length&&!mobiles.length)return null;return normalizeContactShape({id:uid('c'),firstName,lastName,displayName,organization:org,notes,tags:['Imported','Outlook',...splitTags(categories).map(x=>'Outlook: '+x)],source:'outlook_csv',emails,mobiles,importedAt:new Date().toISOString()})}
+function exportOutlookCsv(){const headers=['First Name','Last Name','Display Name','Company','E-mail Address','E-mail 2 Address','E-mail 3 Address','Mobile Phone','Notes','Categories'];const rows=state.data.contacts.map(c=>({'First Name':c.firstName||'','Last Name':c.lastName||'','Display Name':c.displayName||'','Company':c.organization||c.congregation||'','E-mail Address':c.emails?.[0]?.value||'','E-mail 2 Address':c.emails?.[1]?.value||'','E-mail 3 Address':c.emails?.[2]?.value||'','Mobile Phone':(c.mobiles||[]).map(m=>m.value).join('; '),'Notes':[contactRoles(c).length?`Roles: ${contactRoles(c).join(', ')}`:'',c.congregation?`Congregation: ${c.congregation}`:'',c.notes||''].filter(Boolean).join('\n'),'Categories':(c.tags||[]).join('; ')}));downloadFile(`contacthub_pro_outlook_contacts_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');toast('CSV exported.')}
+
+function parseCsv(text){text=String(text||'').replace(/^\uFEFF/,'');const delimiter=detectDelimiter(text),rows=[];let row=[],field='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'){if(q&&nx==='"'){field+='"';i++}else q=!q}else if(ch===delimiter&&!q){row.push(field);field=''}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&nx==='\n')i++;row.push(field);field='';if(row.some(v=>String(v).trim()!==''))rows.push(row);row=[]}else field+=ch}row.push(field);if(row.some(v=>String(v).trim()!==''))rows.push(row);if(!rows.length)return[];const headers=rows.shift().map(h=>String(h||'').trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]??''])))}
+function detectDelimiter(text){const l=String(text).split(/\r?\n/)[0]||'',c=(l.match(/,/g)||[]).length,s=(l.match(/;/g)||[]).length,t=(l.match(/\t/g)||[]).length;if(t>c&&t>s)return'\t';return s>c?';':','}
+function toCsv(headers,rows){const q=v=>{const s=String(v??'');return(/[",\n\r;]/.test(s))?`"${s.replace(/"/g,'""')}"`:s};return[headers.join(','),...rows.map(r=>headers.map(h=>q(r[h])).join(','))].join('\r\n')}
+function downloadFile(name,content,type){const blob=new Blob([content],{type}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
+function exportSingleVcf(id){var c=state.data.contacts.find(function(x){return x.id===id;});if(!c)return;var L=['BEGIN:VCARD','VERSION:3.0'];L.push('N:'+(c.lastName||'')+';'+(c.firstName||'')+';;;');L.push('FN:'+contactName(c));if(c.organization||c.congregation)L.push('ORG:'+(c.organization||c.congregation||''));(c.emails||[]).forEach(function(e,i){L.push('EMAIL;TYPE='+(i===0?'PREF,':'')+'INTERNET:'+(e.value||''));});(c.mobiles||[]).forEach(function(m,i){L.push('TEL;TYPE='+(i===0?'PREF,':'')+'CELL:'+(m.value||''));});if(c.notes)L.push('NOTE:'+c.notes.split('\n').join('\\n'));L.push('END:VCARD');downloadFile(contactName(c).replace(/\s+/g,'_')+'.vcf',L.join('\r\n'),'text/vcard;charset=utf-8');toast('\u{1F4C7} vCard gespeichert.');}
+function normalizeEmail(v){return String(v||'').trim().toLowerCase().replace(/^mailto:/,'').replace(/\s+/g,'')}
+function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||''))}
+function normalizeMobile(input,opts={}){const raw=String(input||'').trim();if(!raw)return{value:'',raw,countryGuess:'',warning:''};let s=raw.replace(/\(0\)/g,'').replace(/[\s().\-\/]/g,'').replace(/^00/,'+'),warning='',countryGuess='';if(/^(\+49)/.test(s)){countryGuess='DE';s=s.replace(/^\+490/,'+49');return{value:formatPhone(s),raw,countryGuess,warning}}if(/^01\d+/.test(s)){countryGuess='DE';return{value:formatPhone('+49'+s.slice(1)),raw,countryGuess,warning}}if(/^\+\d{7,}$/.test(s)){countryGuess=s.startsWith('+43')?'AT':s.startsWith('+41')?'CH':s.startsWith('+44')?'UK':'INT';return{value:formatPhone(s),raw,countryGuess,warning}}if(/^\d{7,}$/.test(s)&&opts.allowUnclear)return{value:s,raw,countryGuess:'UNCLEAR',warning:'keine Länderkennung - bitte prüfen'};return{value:'',raw,countryGuess:'',warning:'unklar/no mobile'}}
+function formatPhone(s){s=String(s).replace(/[^+\d]/g,'');if(s.startsWith('+49')){const r=s.slice(3);return r.length>3?`+49 ${r.slice(0,3)} ${r.slice(3)}`:`+49 ${r}`}const m=s.match(/^\+(\d{1,3})(\d+)$/);return m?`+${m[1]} ${m[2].replace(/(.{3})(?=.)/g,'$1 ')}`.trim():s}
+function isLikelyMobile(v){const d=digitsOnly(v);return/^(4915|4916|4917)/.test(d)||/^01[567]/.test(d)}
+function digitsOnly(s){return String(s||'').replace(/\D/g,'')}
+function norm(s){return String(s||'').toLowerCase().replace(/[\s_\-.]/g,'').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')}
+function contactName(c){return buildName(c?.firstName,c?.lastName,c?.displayName)||'(Ohne Name)'}
+function contactDisplayName(c){if(state&&state.sortBy==='lastName'&&c.lastName&&c.firstName)return c.lastName+', '+c.firstName;return contactName(c);}
+function buildName(f,l,fb){return[f,l].filter(Boolean).join(' ').trim()||fb||''}
+function firstWord(s){return String(s||'').trim().split(/\s+/)[0]||''}
+function splitTags(v){return Array.isArray(v)?v:String(v||'').split(/[,;]/).map(x=>x.trim()).filter(Boolean)}
+function uniqueBy(arr,fn){const seen=new Set();return arr.filter(x=>{const k=fn(x);if(!k||seen.has(k))return false;seen.add(k);return true})}
+window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openInsertContactModal,openCaptainExport,openBulkEditModal};
+init();
+})();
+</script>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.2.2 · Contact hub + message composer</footer>
+</body>
+</html>
