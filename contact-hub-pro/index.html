@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.3.9</title>
+<title>ContactHub Pro V1.4.0</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -380,7 +380,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.3.9</span></h1>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.4.0</span></h1>
         <p class="sub">Contacts · Congregations · Teams · Messaging · Team Captain Export</p>
       </div>
     </div>
@@ -521,7 +521,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.3.9', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.4.0', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en',activeView:'contacts',selectedCongId:null};
 const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','eventName','date','organization','email','emails','mobile','mobiles'];
 // Template contexts — the "who am I writing to / for what occasion" dimension
@@ -846,7 +846,7 @@ function renderAll(){renderCounts();renderFilters();renderAreaTabs();renderConta
 function renderCounts(){const nc=state.data.contacts.length;$('#contactCount').textContent=`${nc} contact${nc!==1?'s':''}`;$('#templateCount').textContent=`${state.data.templates.length} templates`}
 function renderFilters(){
   const oldTag=$('#contactTagFilter')?.value||'',oldRole=$('#contactRoleFilter')?.value||'',oldTeam=$('#contactTeamFilter')?.value||'',oldCong=$('#contactCongFilter')?.value||'';
-  const tags=[...new Set(state.data.contacts.flatMap(c=>c.tags||[]))].sort((a,b)=>a.localeCompare(b));
+  const tags=allTags();
   const roles=allRoles();
   const teams=allTeams();
   const congs=allCongregations();
@@ -1541,7 +1541,7 @@ function openWhatsApp(phone,msg){const p=String(phone||'').replace(/[^+\d]/g,'')
 
 function openCaptainExport(){
   const allTeamsList=allTeams();
-  const allTagsList=[...new Set(state.data.contacts.flatMap(c=>c.tags||[]))].sort();
+  const allTagsList=allTags();
   showModal('📤 Captain Export',`<div class="stack">
   <p class="hint">Choose which contacts to share with a team captain. The JSON export can be imported directly into this tool — the captain can then message the contacts straight away.</p>
   <div class="row">
@@ -1647,7 +1647,7 @@ function buildCsvPreview(rows){const items=[];rows.forEach(row=>{const c=fromOut
 function fromOutlook(row){const get=(...names)=>{for(const n of names){const k=Object.keys(row).find(x=>norm(x)===norm(n));if(k&&String(row[k]||'').trim())return String(row[k]).trim()}return''};const firstName=get('First Name','Given Name','First name'),lastName=get('Last Name','Surname','Last name'),displayName=get('Display Name','Name','Full Name','Display name')||buildName(firstName,lastName,'');const org=get('Company','Organization','Firma','Organization'),notes=get('Notes','Notes'),categories=get('Categories','Kategorie','Outlook Categories');const emails=uniqueBy([get('E-mail Address','Email Address','E-Mail-Adresse'),get('E-mail 2 Address','Email 2 Address','E-Mail 2-Adresse'),get('E-mail 3 Address','Email 3 Address','E-Mail 3-Adresse')].flatMap(v=>String(v||'').split(/[;,]/)).map(normalizeEmail).filter(isEmail),x=>x).map((value,i)=>({label:i?'other':'primary',value}));
 const mobileVals=[get('Mobile Phone','Mobile Phone 2','Mobiltelefon','Mobil','Handy','Telefon mobil','Other Mobile')].flatMap(v=>String(v||'').split(/[;\n]/)).filter(Boolean);const phoneVals=[get('Primary Phone','Other Phone','Business Phone','Home Phone','Telefon','Weitere Telefonnummer')].flatMap(v=>String(v||'').split(/[;\n]/)).filter(Boolean);let normals=mobileVals.map(v=>normalizeMobile(v,{allowUnclear:true}));phoneVals.forEach(v=>{const n=normalizeMobile(v,{allowUnclear:false});if(n.value&&isLikelyMobile(n.value))normals.push(n)});const mobiles=uniqueBy(normals.filter(n=>n.value).map((n,i)=>({label:i?'other':'mobile',value:n.value,raw:n.raw,countryGuess:n.countryGuess,warning:n.warning||''})),x=>digitsOnly(x.value));if(!displayName&&!emails.length&&!mobiles.length)return null;return normalizeContactShape({id:uid('c'),firstName,lastName,displayName,organization:org,notes,tags:['Imported','Outlook',...splitTags(categories).map(x=>'Outlook: '+x)],source:'outlook_csv',emails,mobiles,importedAt:new Date().toISOString()})}
 function openSmartExport(){
-  const allTagsList=[...new Set(state.data.contacts.flatMap(c=>c.tags||[]))].sort((a,b)=>a.localeCompare(b));
+  const allTagsList=allTags();
   const allCongList=allCongregations();
   showModal('📤 Smart Export',`<div class="stack">
     <p class="hint">Choose what to export. You can export congregations as a list, contacts filtered by tag or congregation, or a full JSON backup.</p>
@@ -1777,6 +1777,6 @@ window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openIn
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.3.9 · Contact hub + message composer</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.4.0 · Contact hub + message composer</footer>
 </body>
 </html>
