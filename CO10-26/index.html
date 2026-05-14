@@ -11,6 +11,7 @@
 <link rel="manifest" href="site.webmanifest">
 
 <meta name="theme-color" content="#172f4d">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CO-10-26-E · Eternal Happiness 2026</title>
@@ -60,6 +61,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#11
 .import-notice strong{font-size:13px}
 .import-notice .nb{padding:5px 10px}
 .import-notice.hidden{display:none}
+.restore-status{margin:8px 16px 0;padding:8px 12px;background:#E1F5EE;border:1px solid #5DCAA5;border-radius:9px;color:#085041;font-size:12px;line-height:1.4;display:none;align-items:center;gap:7px;flex-wrap:wrap}
+.restore-status.show{display:flex}
+.restore-status strong{font-size:12px}
 .empty-state{padding:14px;margin:8px;border:1px dashed #ccc;border-radius:10px;background:#fafaf7;color:#777;font-size:12px;line-height:1.5;text-align:center}
 
 /* STATS */
@@ -280,7 +284,7 @@ body{font-size:calc(14px * var(--ui-scale))}
       <p>CO-10-26-E · Assignment &amp; Chairman Outline</p>
     </div>
     <div class="nav-actions">
-      <button class="nb" onclick="if(confirm('Reset assignments and local notes?')){asgn={};wt=[];info={};save();render()}">↺ <span>Reset</span></button>
+      <button class="nb" onclick="if(confirm('Reset assignments and local notes?')){asgn={};wt=[];info={};restoreStatus='';save();render()}">↺ <span>Reset</span></button>
       <button class="nb b" onclick="doExport()" title="Export JSON backup">↓ <span>JSON</span></button>
       <button class="nb" onclick="document.getElementById('importFile').click()" title="Import JSON backup">↑ <span>Import</span></button>
       <input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="doImport(this.files&&this.files[0]);this.value=''">
@@ -301,13 +305,14 @@ body{font-size:calc(14px * var(--ui-scale))}
       <button class="stab" id="df_Sat" onclick="fDay('Sat')">Sat</button>
       <button class="stab" id="df_Sun" onclick="fDay('Sun')">Sun</button>
     </div>
-    <button class="nb info-jump" onclick="setView('info')" title="FM frequency, announcements, baptism, attendance and chairman notes">📝 Local Info / Freitext</button>
+    <button class="nb info-jump" onclick="setView('info')" title="FM frequency, announcements, baptism, attendance and chairman notes">📝 Local Info / Free Text</button>
   </div>
   <div class="import-notice" id="importNotice">
     <strong>Please import data first.</strong>
     <span>This public template contains no speaker names or personal assignments. Import your private JSON backup to continue working.</span>
     <button class="nb b" onclick="document.getElementById('importFile').click()">↑ Import JSON</button>
   </div>
+  <div class="restore-status" id="restoreStatus"></div>
   <div class="stat-bar">
     <div class="stat"><div class="stat-n" id="sA">0</div><div class="stat-l">Assigned</div></div>
     <div class="stat"><div class="stat-n" id="sT">0</div><div class="stat-l">Total slots</div></div>
@@ -316,7 +321,7 @@ body{font-size:calc(14px * var(--ui-scale))}
   <div class="vtabs">
     <button class="vtab on" id="vt1" onclick="setView('assign')">✓ Assignments</button>
     <button class="vtab" id="vt2" onclick="setView('outline')">📄 Chairman Outline</button>
-    <button class="vtab info-tab" id="vt3" onclick="setView('info')">📝 Local Info / Freitext</button>
+    <button class="vtab info-tab" id="vt3" onclick="setView('info')">📝 Local Info / Free Text</button>
   </div>
   <div class="vtab-bar"></div>
   <div class="scroll" id="scrollArea">
@@ -535,7 +540,7 @@ const DAYS=[
  ]}
 ];
 
-let asgn={}, wt=[], info={}, scale=1, curF=null, sbDay='all', curView='assign', editIndex=null;
+let asgn={}, wt=[], info={}, scale=1, curF=null, sbDay='all', curView='assign', editIndex=null, restoreStatus='';
 const DEFAULT_SP=JSON.parse(JSON.stringify(SP));
 const INFO_FIELDS=[
   ['fmFrequency','FM frequency','e.g. 87.8 MHz'],
@@ -555,10 +560,11 @@ const INFO_FIELDS=[
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
 function ini(n){n=(n||'?').trim()||'?';const p=n.split(/\s+/);return((p[0][0]||'?')+(p[p.length-1][0]||'')).toUpperCase()}
 function key(di,si,ri){return di+'_'+si+'_'+ri}
-function save(){try{localStorage.setItem('co10_public_v1',JSON.stringify({asgn,wt,info,scale,SP}))}catch(e){}}
-function load(){try{const d=localStorage.getItem('co10_public_v1');if(d){const p=JSON.parse(d);asgn=p.asgn||{};wt=p.wt||[];info=p.info||{};scale=p.scale||1;if(Array.isArray(p.SP))SP=p.SP;}}catch(e){}}
+function save(){try{localStorage.setItem('co10_public_v1',JSON.stringify({asgn,wt,info,scale,SP,restoreStatus}))}catch(e){}}
+function load(){try{const d=localStorage.getItem('co10_public_v1');if(d){const p=JSON.parse(d);asgn=p.asgn||{};wt=p.wt||[];info=p.info||{};scale=p.scale||1;restoreStatus=p.restoreStatus||'';if(Array.isArray(p.SP))SP=p.SP;}}catch(e){}}
 function hasPrivateData(){return SP.length>0||Object.keys(asgn||{}).length>0||(wt&&wt.length>0)||Object.values(info||{}).some(function(v){return String(v||'').trim();});}
 function updateImportNotice(){var el=document.getElementById('importNotice');if(el)el.classList.toggle('hidden',hasPrivateData());}
+function updateRestoreStatus(){var el=document.getElementById('restoreStatus');if(!el)return;if(restoreStatus){el.classList.add('show');el.innerHTML='✅ <strong>Backup restored:</strong> '+esc(restoreStatus);}else{el.classList.remove('show');el.innerHTML='';}}
 function applyScale(){document.documentElement.style.setProperty('--ui-scale',scale.toFixed(2));var el=document.getElementById('scaleLbl');if(el)el.textContent=Math.round(scale*100)+'%'}
 function adjScale(step){scale=Math.max(0.85,Math.min(1.35,+(scale+step).toFixed(2)));applyScale();save()}
 function resetScale(){scale=1;applyScale();save()}
@@ -630,7 +636,7 @@ function setView(v){
   document.getElementById('v-info').style.display=v==='info'?'block':'none';
 }
 
-function render(){rAssign();rOutline();rInfo();stats();applyScale()}
+function render(){rAssign();rOutline();rInfo();stats();applyScale();updateImportNotice();updateRestoreStatus()}
 
 function btnHTML(v){
   if(!v)return'<span class="asgn-icon">+</span><span>Assign\u2026</span>';
@@ -835,7 +841,7 @@ function resetOneSpeaker(){
 function resetSpeakerList(){if(confirm('Clear the current speaker list? Assignments stay unchanged.')){SP=JSON.parse(JSON.stringify(DEFAULT_SP));save();rSb();render();}}
 
 function rInfo(){
-  var html='<div class="info-panel"><div class="info-title">Local info & free text</div><div class="info-sub">These fields are saved locally in your browser and inserted into the chairman outline where possible. Use the announcement fields for short local reminders.</div><div class="info-grid">';
+  var html='<div class="info-panel"><div class="info-title">Local info & free text</div><div class="info-sub">These fields are saved locally in your browser and inserted into the chairman outline where possible. Use the free-text announcement fields for short local reminders.</div><div class="info-grid">';
   INFO_FIELDS.forEach(function(f){
     var id=f[0],label=f[1],ph=f[2]||'';var full=/announcement|generalNotes/.test(id);
     html+='<div class="info-field '+(full?'full':'')+'"><label for="info_'+id+'">'+esc(label)+'</label>';
@@ -876,7 +882,8 @@ function doExport(){
     wt:wt,
     info:info,
     scale:scale,
-    SP:SP
+    SP:SP,
+    restoreStatus:restoreStatus
   };
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   var a=document.createElement('a');
@@ -899,8 +906,9 @@ function doImport(file){
       info=p.info||{};
       scale=typeof p.scale==='number'?p.scale:scale;
       if(Array.isArray(p.SP)&&p.SP.length)SP=p.SP;
+      var exported=p.exportedAt?new Date(p.exportedAt).toLocaleString():'';
+      restoreStatus=(file.name||'JSON backup')+(exported?' · exported '+exported:'')+' · restored '+new Date().toLocaleString();
       save();applyScale();rSb();render();setView(curView||'assign');
-      alert('Import completed.');
     }catch(e){alert('Could not import JSON: '+e.message);}
   };
   reader.readAsText(file);
@@ -911,4 +919,3 @@ load();applyScale();fDay(sbDay||'all');setView('assign');
 </script>
 </body>
 </html>
-
