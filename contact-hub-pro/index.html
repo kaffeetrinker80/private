@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.2.8</title>
+<title>ContactHub Pro V1.3.7</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -330,7 +330,39 @@ kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px
 /* Misc */
 [data-theme=dark] kbd{background:#1e293b;border-color:#2d3f55;color:#94a3b8;}
 /* ═══════ END DARK MODE ════════════════════════════════════════════ */
-/* ── Auto-height textareas (email/mobile in editor) ────────────── */
+/* ── Context cards (template navigation) ──────────────────────── */
+.contextCards{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.ctxCard{border:1px solid var(--line);background:#f8fafc;border-radius:12px;padding:7px 5px;text-align:center;cursor:pointer;transition:.13s ease;display:grid;gap:2px;}
+.ctxCard:hover{border-color:#adc4fb;background:#f0f5ff;}
+.ctxCard.active{border-color:#2563eb;background:#eef4ff;box-shadow:0 0 0 2px rgba(37,99,235,.12);}
+.ctxCard.active .ctxIcon{filter:none;}
+.ctxIcon{font-size:18px;line-height:1;}
+.ctxLabel{font-size:9px;font-weight:900;color:#475569;text-transform:uppercase;letter-spacing:.04em;line-height:1.2;}
+.ctxCount{font-size:10px;color:#94a3b8;font-weight:700;}
+.ctxCard.active .ctxLabel{color:#1d4ed8;}
+.ctxCard.active .ctxCount{color:#3b82f6;}
+[data-theme=dark] .ctxCard{background:#1a2438;border-color:#2d3f55;}
+[data-theme=dark] .ctxCard:hover{background:#1e3050;}
+[data-theme=dark] .ctxCard.active{background:#1e3a5f;border-color:#3b82f6;}
+[data-theme=dark] .ctxLabel{color:#7a98b4;}
+/* Template list: group label */
+.tmplGroupLabel{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;padding:4px 2px 2px;margin-top:4px;}
+@media(max-width:820px){.contextCards{grid-template-columns:repeat(3,1fr)}}
+
+.viewToggle{display:flex;gap:5px;margin-bottom:8px;}
+.viewToggle .vtab{padding:5px 10px;border-radius:999px;font-size:12px;background:#eef3f8;color:#475569;font-weight:900;cursor:pointer;border:1px solid transparent;}
+.viewToggle .vtab.active{background:#172033;color:#fff;}
+.congCard{border:1px solid var(--line);background:#fff;border-radius:14px;padding:9px;transition:.13s ease;display:grid;gap:5px;cursor:pointer;}
+.congCard:hover{border-color:#adc4fb;background:#fbfdff;}
+.congCard.active{border-color:#2563eb;background:#eef4ff;box-shadow:0 0 0 3px rgba(37,99,235,.07);}
+.congName{font-weight:920;line-height:1.15;}
+.congMeta{font-size:12px;color:var(--muted);line-height:1.3;}
+.jwEmailBadge{display:inline-flex;align-items:center;gap:4px;background:#e0f2fe;color:#0369a1;border-radius:999px;font-size:11px;font-weight:850;padding:2px 7px;}
+[data-theme=dark] .congCard{background:#1e2a3a;border-color:#2d3f55;}
+[data-theme=dark] .congCard:hover{border-color:#3b5d8f;background:#1e3550;}
+[data-theme=dark] .congCard.active{background:#1e3a5f;}
+[data-theme=dark] .jwEmailBadge{background:#0c3047;color:#7dd3fc;}
+
 textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hidden;line-height:1.5;transition:height .1s ease;}
 /* ── Search field dominant highlight ──────────────────────────── */
 #contactSearch{font-size:14px;padding:10px 14px;border-width:2px;border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,99,235,.10),var(--shadow);background:#fff;font-weight:600;}
@@ -348,8 +380,8 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.2.8</span></h1>
-        <p class="sub">Contacts · Teams · Messaging · Team Captain Export</p>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.3.7</span></h1>
+        <p class="sub">Contacts · Congregations · Teams · Messaging · Team Captain Export</p>
       </div>
     </div>
     <div class="toolbar">
@@ -359,7 +391,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
       <button class="green" id="btnImportCsv">Import Outlook CSV</button>
       <button class="themeToggle" id="btnTheme">🌙 Dark</button>
       <button class="primary" id="btnExportJson">Export backup</button>
-      <button class="ghost" id="btnExportCsv">Export CSV</button>
+      <button class="ghost" id="btnExportCsv">📤 Export</button>
     </div>
   </div>
 </div>
@@ -382,6 +414,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
         <div><h2>Contacts</h2><small id="contactCount">0</small></div>
         <div class="smallBtns">
           <button class="mini primary" id="btnMasterData">⚙️ Master data</button>
+          <button class="mini ghost" id="btnCongregations">🏛 Congregations</button>
           <button class="mini ghost" id="btnMergeSelected">Merge</button>
           <button class="mini ghost" id="btnCaptainExport">📤 Captain Export</button>
           <button class="primary mini" id="btnNewContact">+ Contact</button>
@@ -389,7 +422,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
       </div>
       <div class="panelBody stack">
         <div class="row">
-          <input id="contactSearch" placeholder="Search name, congregation, role, email, mobile..." />
+          <input id="contactSearch" placeholder="Search name, congregation, role, tag, email, mobile..." />
           <select id="contactSortBy" title="Sortierung"><option value="lastName">↕ Last name</option><option value="firstName">↕ First name</option></select>
         </div>
         <div class="row">
@@ -398,6 +431,10 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
         <div class="row">
           <select id="contactTagFilter"><option value="">All tags</option></select>
           <select id="contactTeamFilter"><option value="">All Assembly / Convention teams</option></select>
+        </div>
+        <div class="row">
+          <select id="contactFavFilter"><option value="">⭐ All contacts</option><option value="fav">⭐ Favorites only</option><option value="nofav">☆ Non-favorites only</option></select>
+          <select id="contactCongFilter"><option value="">All congregations</option></select>
         </div>
         <div>
           <select id="contactBulkAction"><option value="">Bulk actions...</option><option value="bulkEdit">Bulk edit selected...</option><option value="role">Add / replace congregation role</option><option value="setTeam">🏷 Assign Assembly / Convention team</option><option value="tag">Add tag</option><option value="delete">Delete selected</option></select>
@@ -421,21 +458,17 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
         <button class="primary mini" id="btnNewTemplate">+ Template</button>
       </div>
       <div class="panelBody stack">
-        <div class="composeHint">
-          <b>Simple message</b>
-          <span>Keep this reduced: subject for email, main message, footer. Use contact placeholders only when helpful.</span>
-        </div>
-        <div class="sectionTitle"><span>Categories</span></div>
-        <div class="tabs" id="areaTabs"></div>
         <div>
-          <input id="templateSearch" placeholder="Search title, category, subject or message..." />
+          <input id="templateSearch" placeholder="Search templates..." />
         </div>
+        <div id="contextCards" class="contextCards"></div>
+        <div id="ctxDescStrip" class="hint" style="display:none;background:#f0f5ff;border:1px solid #c7d8f8;border-radius:10px;padding:6px 9px;font-size:11px;font-weight:700;color:#1e40af"></div>
         <div class="list" id="templateList"></div>
 
         <div class="sectionTitle"><span id="templateEditTitle">Message composer</span><div class="smallBtns"><button class="mini ghost" id="btnDuplicateTemplate">Duplicate</button><button class="mini danger" id="btnDeleteTemplate">Delete</button></div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
-          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Event name</label><input id="draft_eventName" placeholder="z.B. Circuit Assembly 2026"></div>
-          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Date</label><input id="draft_date" placeholder="z.B. 14. Juni 2026"></div>
+          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Event name</label><input id="draft_eventName" placeholder="e.g. Circuit Assembly 2026"></div>
+          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Date</label><input id="draft_date" placeholder="e.g. 14 June 2026"></div>
         </div>
         <div id="templateEditor" class="stack"></div>
 
@@ -488,9 +521,17 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.1.10', STORAGE_KEY='contacthub_pro_v110_data';
-const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en'};
+const APP_VERSION='1.3.7', STORAGE_KEY='contacthub_pro_v110_data';
+const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en',activeView:'contacts',selectedCongId:null};
 const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','eventName','date','organization','email','emails','mobile','mobiles'];
+// Template contexts — the "who am I writing to / for what occasion" dimension
+const CONTEXTS=[
+  {id:'assembly', label:'Assembly / Convention', icon:'🏟', desc:'Volunteer assignments, team messages, captain greetings, reminders', defaultChannel:'whatsapp'},
+  {id:'congregation', label:'Congregation', icon:'🏛', desc:'Info requests, announcements, invitations to a congregation', defaultChannel:'email'},
+  {id:'ptc', label:'PTC / Talk', icon:'🎤', desc:'Talk confirmations, reminders, topic changes, follow-ups', defaultChannel:'whatsapp'},
+  {id:'personal', label:'Personal', icon:'👤', desc:'Quick notes, thank-you messages, general contact', defaultChannel:'whatsapp'},
+  {id:'work', label:'Work / Other', icon:'💼', desc:'Appointments, external contacts, secular matters', defaultChannel:'email'},
+];
 const I18N={en:{merge:'Merge'}};
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -499,24 +540,291 @@ const nowNice=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-dig
 const stamp=()=>new Date().toISOString().slice(0,16).replace('T','_').replace(':','');
 const cleanNewlines=v=>String(v??'').replace(/\\n/g,'\n').replace(/\\r/g,'');
 
-function emptyData(){return{schemaVersion:1,appName:'ContactHub Pro',appVersion:APP_VERSION,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),settings:{uiLanguage:'en',autosave:true,githubCleanMode:true,masterRoles:['PTC','Assistant PTC','Elder','MS','Publisher'],masterCongregations:[]},contacts:[],templates:[],sentItems:[]}}
+function emptyData(){return{schemaVersion:1,appName:'ContactHub Pro',appVersion:APP_VERSION,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),settings:{uiLanguage:'en',autosave:true,githubCleanMode:true,masterRoles:['PTC','Assistant PTC','Elder','MS','Publisher'],masterCongregations:[]},contacts:[],congregations:[],templates:[],sentItems:[]}}
 function sampleData(){const d=emptyData();d.contacts=[
   contact({firstName:'John',lastName:'Sample',congregation:'Sample Congregation',role:'PTC',languages:['en'],language:'en',tags:['PTC','Talk Planning','Sample'],emails:['john.sample@example.com'],mobiles:['01791234567'],source:'sample'}),
   contact({firstName:'Maria',lastName:'Example',congregation:'Demo English',role:'Volunteer',languages:['en','de'],language:'en',tags:['Volunteer','Sample'],emails:['maria.example@example.com'],mobiles:['01602345678'],source:'sample'}),
   contact({firstName:'Max',lastName:'Muster',congregation:'Beispielversammlung',role:'Tech Host',languages:['de'],language:'de',tags:['Tech','Sample'],emails:['max.muster@example.com'],mobiles:[],source:'sample'})
 ];d.templates=[
-  {id:uid('t'),title:'Vortragserinnerung',area:'Theokratisch',category:'PTC',language:'de',tone:'warm',channel:'whatsapp',subject:'',body:'Hallo {{firstName}},\nnur eine kurze Erinnerung an deinen Vortrag am {{date}} in {{congregation}}.\n\nTopic: {{topic}}\n\nDanke dir schon mal!'},
-  {id:uid('t'),title:'Einsatz-Erinnerung',area:'Theokratisch',category:'Volunteers',language:'de',tone:'freundlich',channel:'whatsapp',subject:'',body:'Hallo {{firstName}},\nvielen Dank nochmal, dass du bei {{eventName}} unterstützt.\n\nDeine Assignment:\n{{assignment}}\n\nFalls sich etwas ändert, gib mir bitte kurz Bescheid.'},
-  {id:uid('t'),title:'Kurze Nachfrage',area:'Theokratisch',category:'Reminder',language:'de',tone:'kurz',channel:'whatsapp',subject:'',body:'Hallo {{firstName}},\nkurze Nachfrage wegen {{topic}} am {{date}}.\n\nPasst das für dich so?'},
-  {id:uid('t'),title:'Terminbestätigung',area:'Arbeit',category:'Termine',language:'de',tone:'professionell',channel:'email',subject:'Terminbestätigung {{date}}',body:'Hallo {{firstName}},\nhiermit bestätige ich den Termin am {{date}} in {{location}}.\n\nViele Grüße'},
-  {id:uid('t'),title:'Talk reminder',area:'Theocratic',category:'PTC',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\njust a quick reminder regarding your talk on {{date}} in {{congregation}}.\n\nThe topic is: {{topic}}\n\nThanks again!'},
-  {id:uid('t'),title:'Volunteer assignment reminder',area:'Theocratic',category:'Volunteers',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\nthank you again for being willing to support {{eventName}}.\n\nYour assignment is:\n{{assignment}}\n\nPlease let me know if anything changes.'},
-  {id:uid('t'),title:'Appointment confirmation',area:'Work',category:'Appointments',language:'en',tone:'professional',channel:'email',subject:'Appointment confirmation {{date}}',body:'Hi {{firstName}},\nthis is to confirm our appointment on {{date}} at {{location}}.\n\nBest regards'}
+  {id:uid('t'),title:'Talk reminder',context:'ptc',category:'Reminder',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\njust a quick reminder regarding your talk on {{date}} in {{congregation}}.\n\nThe topic is: {{topic}}\n\nThanks again!'},
+  {id:uid('t'),title:'Talk confirmation',context:'ptc',category:'Confirmation',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\nI\'d like to confirm your talk on {{date}} in {{congregation}}.\n\nTopic: {{topic}}\n\nPlease let me know if anything changes. Thanks!'},
+  {id:uid('t'),title:'Volunteer assignment',context:'assembly',category:'Assignment',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\nthank you for supporting {{eventName}}.\n\nYour assignment:\n{{assignment}}\n\nDate: {{date}}\n\nPlease let me know if anything changes.'},
+  {id:uid('t'),title:'Team captain greeting',context:'assembly',category:'Team',language:'en',tone:'warm',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\nyou\'ve been assigned as team captain for {{team}} at {{eventName}}.\n\nI\'ll be in touch with further details. Thank you for serving!'},
+  {id:uid('t'),title:'Assembly reminder',context:'assembly',category:'Reminder',language:'en',tone:'friendly',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\njust a reminder about your assignment at {{eventName}} on {{date}}.\n\nLooking forward to seeing you there!'},
+  {id:uid('t'),title:'Info request to congregation',context:'congregation',category:'Enquiry',language:'en',tone:'formal',channel:'email',subject:'Enquiry — {{eventName}}',body:'Dear brothers and sisters,\n\nWe are writing regarding {{eventName}} on {{date}}.\n\n{{topic}}\n\nPlease reply at your earliest convenience.\n\nWith warm regards'},
+  {id:uid('t'),title:'Info to congregation',context:'congregation',category:'Announcement',language:'en',tone:'formal',channel:'email',subject:'{{eventName}} — Information',body:'Dear brothers and sisters,\n\nWe would like to share the following information regarding {{eventName}}:\n\n{{topic}}\n\nThank you for your cooperation.'},
+  {id:uid('t'),title:'Quick note',context:'personal',category:'General',language:'en',tone:'casual',channel:'whatsapp',subject:'',body:'Hi {{firstName}},\n\n'},
+  {id:uid('t'),title:'Appointment confirmation',context:'work',category:'Appointment',language:'en',tone:'professional',channel:'email',subject:'Appointment confirmation — {{date}}',body:'Hi {{firstName}},\nthis confirms our appointment on {{date}} at {{location}}.\n\nBest regards'},
 ];return d}
 function contact(o){const c=normalizeContactShape({id:uid('c'),displayName:buildName(o.firstName,o.lastName,o.displayName),...o});c.emails=(o.emails||[]).map((v,i)=>({label:i?'other':'primary',value:normalizeEmail(v)})).filter(e=>isEmail(e.value));c.mobiles=(o.mobiles||[]).map((v,i)=>{const n=normalizeMobile(v,{allowUnclear:true});return{label:i?'other':'mobile',value:n.value,raw:n.raw,countryGuess:n.countryGuess,warning:n.warning||''}}).filter(m=>m.value);return c}
 function normalizeContactShape(c){const roles=Array.isArray(c.roles)?c.roles:splitTags(c.role);const role=(roles.length?roles.join(', '):(c.role||''));const teams=Array.isArray(c.teams)?c.teams:splitTags(c.team);const team=(teams.length?teams.join(', '):(c.team||''));return{id:c.id||uid('c'),firstName:c.firstName||'',lastName:c.lastName||'',displayName:c.displayName||buildName(c.firstName,c.lastName,''),congregation:c.congregation||'',role,roles,organization:c.organization||'',notes:c.notes||'',languages:Array.isArray(c.languages)?c.languages:(c.language?[c.language]:['en']),language:c.language||(Array.isArray(c.languages)&&c.languages[0])||'en',tags:Array.isArray(c.tags)?c.tags:splitTags(c.tags),team,teams,active:typeof c.active==='boolean'?c.active:true,source:c.source||'local',importedAt:c.importedAt||new Date().toISOString(),favorite:c.favorite||false,emails:Array.isArray(c.emails)?c.emails:[],mobiles:Array.isArray(c.mobiles)?c.mobiles:[]}}
-function normalizeTemplateShape(t){return{id:t.id||uid('t'),title:t.title||'Untitled template',area:t.area||'Other',category:t.category||'',language:t.language||'en',tone:t.tone||'',channel:t.channel||'general',subject:t.subject||'',body:cleanNewlines(t.body||''),footer:cleanNewlines(t.footer||''),recipientStyle:t.recipientStyle||'first',greeting:t.greeting||''}}
-function migrate(data){const base=emptyData(),m={...base,...data};m.contacts=Array.isArray(data.contacts)?data.contacts.map(normalizeContactShape):[];ensureUniqueContactIds(m.contacts);m.templates=Array.isArray(data.templates)?data.templates.map(normalizeTemplateShape):[];m.sentItems=Array.isArray(data.sentItems)?data.sentItems:[];m.settings={...base.settings,...(data.settings||{})};m.appVersion=APP_VERSION;m.appName='ContactHub Pro';return m}
+function normalizeTemplateShape(t){return{id:t.id||uid('t'),title:t.title||'Untitled template',context:t.context||'personal',category:t.category||'',language:t.language||'en',tone:t.tone||'',channel:t.channel||'general',subject:t.subject||'',body:cleanNewlines(t.body||''),footer:cleanNewlines(t.footer||''),recipientStyle:t.recipientStyle||'first',greeting:t.greeting||''}}
+function normalizeCongShape(c){return{id:c.id||uid('cg'),name:c.name||'',city:c.city||'',jwEmail:c.jwEmail||'',zoomId:c.zoomId||'',zoomLink:c.zoomLink||'',zoomPass:c.zoomPass||'',notes:c.notes||''}}
+function allCongregationEntities(){return(state.data.congregations||[]).sort((a,b)=>(a.name||'').localeCompare(b.name||''))}
+function filteredCongregations(){const q=($('#congSearch')?.value||'').trim().toLowerCase();return allCongregationEntities().filter(c=>{const hay=[c.name,c.city,c.jwEmail,c.zoomId,c.notes].join(' ').toLowerCase();return !q||hay.includes(q)})}
+
+function deleteCong(id){const c=(state.data.congregations||[]).find(x=>x.id===id);if(!c)return;if(!confirm(`Delete congregation: ${c.name}?`))return;state.data.congregations=state.data.congregations.filter(x=>x.id!==id);state.data.settings.masterCongregations=(state.data.settings.masterCongregations||[]).filter(n=>n.toLowerCase()!==c.name.toLowerCase());if(state.selectedCongId===id)state.selectedCongId=null;saveSoon();syncCongregationDropdowns();toast('Congregation deleted.')}
+function openCongEditor(id=null){
+  const existing=id?(state.data.congregations||[]).find(c=>c.id===id):null;
+  const c=existing?structuredClone(existing):normalizeCongShape({id:uid('cg')});
+  showModal(existing?'Edit congregation':'New congregation',`
+<div class="stack">
+  <div class="editorBlock">
+    <p class="editorBlockTitle">Congregation details</p>
+    <div class="row"><div><label>Congregation name</label><input id="cg_name" value="${esc(c.name)}" placeholder="e.g. Munich English"></div><div><label>City / Location</label><input id="cg_city" value="${esc(c.city)}" placeholder="e.g. Munich"></div></div>
+    <div><label>JW congregation email (jwpub.org)</label><input id="cg_jwEmail" value="${esc(c.jwEmail)}" placeholder="e.g. CONG23210397@jwpub.org" style="font-family:var(--mono);"><div class="hint" style="margin-top:4px">Format: CONG + 8-digit number + @jwpub.org. Only visible here, not on individual publisher contacts.</div></div>
+  </div>
+  <div class="editorBlock">
+    <p class="editorBlockTitle">Zoom meeting</p>
+    <div class="row"><div><label>Meeting ID</label><input id="cg_zoomId" value="${esc(c.zoomId)}" placeholder="e.g. 123 456 7890" style="font-family:var(--mono)"></div><div><label>Passcode</label><input id="cg_zoomPass" value="${esc(c.zoomPass)}" placeholder="e.g. abc123" style="font-family:var(--mono)"></div></div>
+    <div><label>Join link</label><input id="cg_zoomLink" value="${esc(c.zoomLink)}" placeholder="https://zoom.us/j/..."></div>
+  </div>
+  <div class="editorBlock">
+    <p class="editorBlockTitle">Notes</p>
+    <div><textarea id="cg_notes">${esc(c.notes)}</textarea></div>
+  </div>
+</div>`,
+`${existing?'<button class="danger" id="cgDeleteBtn">Delete</button>':''}<button class="ghost" id="cgCancel">Cancel</button><button class="primary" id="cgSave">Save</button>`);
+  $('#cgCancel').onclick=closeModal;
+  if(existing&&$('#cgDeleteBtn'))$('#cgDeleteBtn').onclick=()=>deleteCong(existing.id);
+  $('#cgSave').onclick=()=>{
+    const saved=normalizeCongShape({...c,name:$('#cg_name').value.trim(),city:$('#cg_city').value.trim(),jwEmail:$('#cg_jwEmail').value.trim(),zoomId:$('#cg_zoomId').value.trim(),zoomLink:$('#cg_zoomLink').value.trim(),zoomPass:$('#cg_zoomPass').value.trim(),notes:$('#cg_notes').value.trim()});
+    if(!saved.name)return toast('Please enter a congregation name.');
+    state.data.congregations=state.data.congregations||[];
+    const oldName=existing?existing.name:'';
+    if(existing){
+      // Rename: update contacts that had the old name, update masterCongregations
+      if(oldName&&oldName!==saved.name){
+        let renamed=0;
+        state.data.contacts.forEach(c=>{if(c.congregation===oldName){c.congregation=saved.name;renamed++;}});
+        state.data.settings.masterCongregations=(state.data.settings.masterCongregations||[]).map(n=>n===oldName?saved.name:n);
+        if(renamed)toast(`Congregation renamed · ${renamed} publisher${renamed!==1?'s':''} updated.`);
+      }
+      Object.assign(existing,saved);
+    }else{
+      state.data.congregations.push(saved);state.selectedCongId=saved.id;
+    }
+    // Keep masterCongregations in sync
+    if(saved.name)state.data.settings.masterCongregations=[...new Set([...(state.data.settings.masterCongregations||[]),saved.name])].sort((a,b)=>a.localeCompare(b));
+    closeModal();saveSoon();renderAll();toast(existing&&oldName!==saved.name?`"${saved.name}" saved.`:'Congregation saved.');
+  };
+}
+function syncCongregationDropdowns(){
+  // Rebuild the master congregation list from congregation entities
+  const names=(state.data.congregations||[]).map(c=>c.name).filter(Boolean);
+  // Merge with existing (contacts may have congregations not in the entity list)
+  const fromContacts=(state.data.settings.masterCongregations||[]);
+  state.data.settings.masterCongregations=[...new Set([...names,...fromContacts])].sort((a,b)=>a.localeCompare(b));
+}
+function openCongregationsModal(){
+  const renderCongList=()=>{
+    const q=($('#congSearchModal')?.value||'').trim().toLowerCase();
+    const list=(state.data.congregations||[]).filter(c=>{
+      const hay=[c.name,c.city,c.jwEmail,c.notes].join(' ').toLowerCase();
+      return !q||hay.includes(q);
+    }).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    const el=$('#congListModal');
+    if(!el)return;
+    if(!list.length){el.innerHTML='<div class="empty">No congregations yet.</div>';return;}
+    // Count publishers per congregation
+    const countMap={};
+    state.data.contacts.forEach(c=>{if(c.congregation)countMap[c.congregation]=(countMap[c.congregation]||0)+1;});
+    el.innerHTML=list.map(c=>{
+      const pCount=countMap[c.name]||0;
+      return `<div class="congCard ${c.id===state.selectedCongId?'active':''}" style="margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div class="congName">🏛 ${esc(c.name||'(No name)')}</div>
+        <span class="chip ${pCount>0?'green':''}" title="${pCount} publisher${pCount!==1?'s':''} assigned">${pCount} publisher${pCount!==1?'s':''}</span>
+      </div>
+      ${c.city?`<div class="congMeta">📍 ${esc(c.city)}</div>`:''}
+      ${c.jwEmail
+        ?`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span class="jwEmailBadge" title="JW congregation email (jwpub.org)">✉ ${esc(c.jwEmail)}</span>
+            <span style="font-size:10px;color:#94a3b8" title="Windows Outlook may not open jwpub.org addresses via mailto. Copy the address and paste manually, or use the Edge-installed app.">⚠ copy preferred</span>
+          </div>`
+        :'<div class="congMeta" style="color:#94a3b8;font-size:11px">No JW email yet</div>'}
+      ${c.zoomId||c.zoomLink
+        ?`<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:2px">
+            <span style="font-size:11px;font-weight:800;color:#0e7490">📹 Zoom</span>
+            ${c.zoomId?`<span class="chip" style="font-family:var(--mono);background:#ecfeff;color:#0e7490">ID: ${esc(c.zoomId)}</span>`:''}
+            ${c.zoomPass?`<span class="chip" style="font-family:var(--mono);background:#f0fdfa;color:#0f766e">🔑 ${esc(c.zoomPass)}</span>`:''}
+          </div>`:''}
+      ${c.notes?`<div class="congMeta">${esc(c.notes.slice(0,80))}${c.notes.length>80?'…':''}</div>`:''}
+      <div class="smallBtns" style="margin-top:4px">
+        <button class="mini primary" data-congmsg="${c.id}">✉ Message</button>
+        ${c.zoomLink?`<button class="mini ghost" data-zoomopen="${esc(c.zoomLink)}" title="Open Zoom meeting link">📹 Join</button>`:''}
+        ${c.zoomId?`<button class="mini ghost" data-zoomidcopy="${esc(c.zoomId)}${c.zoomPass?' · Pass: '+esc(c.zoomPass):''}" title="Copy Zoom ID${c.zoomPass?' + passcode':''}">⧉ Zoom</button>`:''}
+        ${c.jwEmail?`<button class="mini ghost" data-congcopy="${esc(c.jwEmail)}" title="Copy JW email to clipboard">⧉ Email</button>`:''}
+        ${c.jwEmail?`<button class="mini ghost" data-congemailopen="${esc(c.jwEmail)}" title="Open in mail client">@ Open</button>`:''}
+        <button class="mini ghost" data-congnamecopy="${esc(c.name)}" title="Copy congregation name">⧉ Name</button>
+        <button class="mini ghost" data-congedit="${c.id}">✎ Edit</button>
+        <button class="mini danger" data-congdel="${c.id}">×</button>
+      </div>
+    </div>`;
+    }).join('');
+    el.querySelectorAll('[data-congedit]').forEach(x=>x.onclick=()=>{closeModal();openCongEditor(x.dataset.congedit)});
+    el.querySelectorAll('[data-congdel]').forEach(x=>x.onclick=()=>{deleteCong(x.dataset.congdel);renderCongList();});
+    el.querySelectorAll('[data-congemailopen]').forEach(x=>x.onclick=()=>location.href=`mailto:${x.dataset.congemailopen}`);
+    el.querySelectorAll('[data-congcopy]').forEach(x=>x.onclick=()=>copyText(x.dataset.congcopy));
+    el.querySelectorAll('[data-congnamecopy]').forEach(x=>x.onclick=()=>copyText(x.dataset.congnamecopy));
+    el.querySelectorAll('[data-zoomopen]').forEach(x=>x.onclick=()=>window.open(x.dataset.zoomopen,'_blank','noopener'));
+    el.querySelectorAll('[data-zoomidcopy]').forEach(x=>x.onclick=()=>copyText(x.dataset.zoomidcopy));
+    el.querySelectorAll('[data-congmsg]').forEach(x=>x.onclick=()=>{closeModal();selectCongAsRecipient(x.dataset.congmsg);});
+  };
+  showModal('🏛 Congregations',`<div class="stack">
+    <div class="row" style="grid-template-columns:1fr auto auto">
+      <input id="congSearchModal" placeholder="Search name, city, email...">
+      <button class="mini ghost" id="congCleanupBtn">🧹 Cleanup</button>
+      <button class="primary mini" id="congAddBtn">+ New</button>
+    </div>
+    <div class="hint" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:7px 10px;font-size:11px">
+      <b>JW email note:</b> Windows Outlook may reject <code>@jwpub.org</code> addresses via mailto. Use <b>⧉ Copy email</b> and paste manually, or install the webapp via Edge (Edge → … → Apps → Install this site as an app) — then <b>@ Open</b> works too.
+    </div>
+    <div id="congListModal" style="max-height:50vh;overflow:auto;display:grid;gap:6px"></div>
+  </div>`,`<button class="ghost" id="congModalClose">Close</button>`);
+  $('#congModalClose').onclick=closeModal;
+  $('#congSearchModal').addEventListener('input',renderCongList);
+  $('#congAddBtn').onclick=()=>{closeModal();openCongEditor();};
+  $('#congCleanupBtn').onclick=()=>{closeModal();openCongCleanup();};
+  renderCongList();
+}
+
+function openCongCleanup(){
+  // Find congregation entries that look like companies/roles, not real congregations
+  const congs=state.data.congregations||[];
+  // Heuristic: no JW email AND name looks like a role/company (no city-like pattern, short, etc.)
+  // Show ALL entries so user can decide — with a flag if suspicious
+  const looksLikeRole=name=>{
+    if(!name)return false;
+    // No spaces (single word), or contains role keywords
+    const roleWords=['gmbh','ag','ltd','inc','kg','e.v.','verein','firma','company','corp','koordinator','overseer','assistant','dept','department','büro','office','team','gruppe','group','sekretär','secretary'];
+    const n=name.toLowerCase();
+    return roleWords.some(w=>n.includes(w));
+  };
+  if(!congs.length)return toast('No congregations to clean up.');
+  showModal('🧹 Congregation Cleanup',`<div class="stack">
+    <p class="hint">Review each entry: keep real congregations, remove or move companies/roles. <span style="color:#b45309;font-weight:800">⚠ Suspicious</span> = possible wrong entry.</p>
+    <div class="hint" style="background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:8px 10px;margin-bottom:2px">
+      <b>Cong → Company (bulk):</b> Pick a congregation entry that is actually a company — this moves it to the Company field of <em>every contact</em> that has it as their congregation, then removes the congregation entry.
+      <div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <select id="bulkCongToCompanyPick" style="max-width:260px"><option value="">Select congregation entry…</option>${congs.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}${c.jwEmail?' ✉':''}</option>`).join('')}</select>
+        <button class="mini ghost" id="bulkCongToCompanyBtn">→ Move to Company field</button>
+      </div>
+    </div>
+    <div class="tableWrap"><table>
+      <thead><tr><th>Name</th><th>JW Email</th><th>City</th><th>Notes</th><th>Action</th></tr></thead>
+      <tbody>${congs.map(c=>`<tr data-cid="${c.id}">
+        <td><b>${esc(c.name)}</b>${looksLikeRole(c.name)?` <span style="color:#b45309;font-size:10px;font-weight:800">⚠ suspicious</span>`:!c.jwEmail?` <span style="color:#94a3b8;font-size:10px">no JW email</span>`:''}</td>
+        <td style="font-family:var(--mono);font-size:11px">${esc(c.jwEmail||'—')}</td>
+        <td>${esc(c.city||'—')}</td>
+        <td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.notes||'—')}</td>
+        <td>
+          <div class="smallBtns">
+            <button class="mini ghost" data-cleanup-edit="${c.id}" title="Edit">✎</button>
+            <button class="mini ghost" data-cleanup-tonote="${c.id}" title="Move to a contact">→ Contact</button>
+            <button class="mini danger" data-cleanup-del="${c.id}" title="Delete">×</button>
+          </div>
+        </td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`,`<button class="ghost" id="cleanupClose">Close</button>`);
+  $('#cleanupClose').onclick=closeModal;
+  $('#bulkCongToCompanyBtn').onclick=()=>{
+    const id=$('#bulkCongToCompanyPick').value;
+    if(!id)return toast('Please select a congregation entry first.');
+    const cong=congs.find(c=>c.id===id);if(!cong)return;
+    const affected=state.data.contacts.filter(c=>c.congregation===cong.name);
+    if(!affected.length){toast(`No contacts with congregation "${cong.name}" found.`);return;}
+    if(!confirm(`Move "${cong.name}" to Company field for ${affected.length} contact(s) and remove it as a congregation?\n\nThis cannot be undone.`))return;
+    affected.forEach(c=>{c.organization=cong.name;c.congregation='';});
+    state.data.congregations=state.data.congregations.filter(x=>x.id!==id);
+    state.data.settings.masterCongregations=(state.data.settings.masterCongregations||[]).filter(n=>n.toLowerCase()!==cong.name.toLowerCase());
+    closeModal();saveSoon();renderAll();toast(`✓ "${cong.name}" moved to Company on ${affected.length} contact(s).`);
+  };
+  $$('[data-cleanup-edit]').forEach(x=>x.onclick=()=>{closeModal();openCongEditor(x.dataset.cleanupEdit);});
+  $$('[data-cleanup-del]').forEach(x=>x.onclick=()=>{
+    const row=x.closest('tr');const id=x.dataset.cleanupDel;
+    const c=congs.find(c=>c.id===id);if(!c)return;
+    if(!confirm(`Delete congregation: "${c.name}"?`))return;
+    state.data.congregations=state.data.congregations.filter(x=>x.id!==id);
+    state.data.settings.masterCongregations=(state.data.settings.masterCongregations||[]).filter(n=>n.toLowerCase()!==c.name.toLowerCase());
+    saveSoon();row.remove();toast(`"${c.name}" deleted.`);
+  });
+  $$('[data-cleanup-tonote]').forEach(x=>x.onclick=()=>{
+    const id=x.dataset.cleanupTonote;
+    const c=congs.find(c=>c.id===id);if(!c)return;
+    closeModal();openMoveToContactModal(c);
+  });
+}
+
+function openMoveToContactModal(cong){
+  const contacts=state.data.contacts.slice().sort((a,b)=>(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b)));
+  if(!contacts.length)return toast('No contacts available.');
+  showModal(`→ Move "${esc(cong.name)}" to contact`,`<div class="stack">
+    <p class="hint">Choose a contact. The congregation name will be added there as a note, tag, role, or company. The congregation entry will then be removed.</p>
+    <div><label>Search contact</label><input id="moveSearch" placeholder="Type name..."></div>
+    <div><label>Select contact</label><select id="movePick" size="8" style="font-size:13px">${contacts.map(c=>`<option value="${c.id}">${esc(contactName(c))}${c.congregation?' · '+esc(c.congregation):''}</option>`).join('')}</select></div>
+    <div class="row"><div><label>Save as</label><select id="moveAs">
+      <option value="note">Note</option>
+      <option value="tag">Tag</option>
+      <option value="role">Congregation role</option>
+      <option value="org">Company / Organisation</option>
+    </select></div></div>
+    <div class="hint" id="movePreview"></div>
+  </div>`,`<button class="ghost" id="moveCancelBtn">Cancel</button><button class="primary" id="moveApplyBtn">Apply &amp; remove congregation entry</button>`);
+  $('#moveCancelBtn').onclick=closeModal;
+  const updatePreview=()=>{
+    const as=$('#moveAs')?.value;
+    const labels={note:`Note: "${cong.name}"`,tag:`Tag: "${cong.name}"`,role:`Congregation role: "${cong.name}"`,org:`Company: "${cong.name}"`};
+    if($('#movePreview'))$('#movePreview').textContent=labels[as]||'';
+  };
+  $('#moveAs').addEventListener('change',updatePreview);
+  $('#moveSearch').addEventListener('input',()=>{
+    const q=$('#moveSearch').value.toLowerCase();
+    $$('#movePick option').forEach(o=>{o.style.display=!q||o.textContent.toLowerCase().includes(q)?'':'none';});
+  });
+  updatePreview();
+  $('#moveApplyBtn').onclick=()=>{
+    const cid=$('#movePick').value;
+    const contact=state.data.contacts.find(c=>c.id===cid);
+    if(!contact)return toast('Please select a contact.');
+    const as=$('#moveAs').value;
+    const val=cong.name;
+    if(as==='note'){contact.notes=[contact.notes,val].filter(Boolean).join('\n');}
+    else if(as==='tag'){contact.tags=[...new Set([...(contact.tags||[]),val])];}
+    else if(as==='role'){const roles=[...new Set([...contactRoles(contact),val])];contact.roles=roles;contact.role=roles.join(', ');}
+    else if(as==='org'){contact.organization=val;}
+    state.data.congregations=state.data.congregations.filter(c=>c.id!==cong.id);
+    state.data.settings.masterCongregations=(state.data.settings.masterCongregations||[]).filter(n=>n.toLowerCase()!==cong.name.toLowerCase());
+    closeModal();saveSoon();renderAll();
+    const label={note:'Note',tag:'Tag',role:'Role',org:'Company'}[as];
+    toast(`✓ "${val}" saved as ${label} on ${contactName(contact)}.`);
+  };
+}
+
+function selectCongAsRecipient(id){
+  const cong=(state.data.congregations||[]).find(c=>c.id===id);
+  if(!cong)return;
+  if(!cong.jwEmail)return toast('No JW email for this congregation yet. Please edit it first.');
+  state.selectedContactId=null;
+  state.selectedCongId=id;
+  state.selectedTarget={channel:'email',value:cong.jwEmail,isCong:true,congId:id};
+  $('#deliveryChannel').value='email';
+  renderAll();
+  toast(`📨 ${cong.name} selected as recipient — choose a template to compose.`);
+}
+function migrate(data){const base=emptyData(),m={...base,...data};m.contacts=Array.isArray(data.contacts)?data.contacts.map(normalizeContactShape):[];ensureUniqueContactIds(m.contacts);m.settings={...base.settings,...(data.settings||{})};
+  // Migrate congregation entities
+  let congs=Array.isArray(data.congregations)?data.congregations.map(normalizeCongShape):[];
+  const existingNames=new Set(congs.map(c=>c.name.toLowerCase()));
+  const masterNames=(m.settings.masterCongregations||[]);
+  masterNames.forEach(name=>{if(name&&!existingNames.has(name.toLowerCase())){congs.push(normalizeCongShape({id:uid('cg'),name}));existingNames.add(name.toLowerCase());}});
+  m.congregations=congs;
+  // Migrate templates — map old area/category to context if no context set
+  const areaToContext={theocratic:'ptc',theokratisch:'ptc',theocratic:'ptc',ptc:'ptc',work:'work',arbeit:'work',personal:'personal',family:'personal',congregation:'congregation',versammlung:'congregation',assembly:'assembly',volunteers:'assembly',convention:'assembly'};
+  m.templates=Array.isArray(data.templates)?data.templates.map(t=>{const normalized=normalizeTemplateShape(t);if(!t.context){const key=((t.area||t.category||'')).toLowerCase().trim();const mapped=Object.entries(areaToContext).find(([k])=>key.includes(k));normalized.context=mapped?mapped[1]:'personal';}return normalized;}):[];
+  m.sentItems=Array.isArray(data.sentItems)?data.sentItems:[];m.appVersion=APP_VERSION;m.appName='ContactHub Pro';return m}
 function ensureUniqueContactIds(contacts){
   const seen=new Set();
   (contacts||[]).forEach(c=>{
@@ -525,7 +833,7 @@ function ensureUniqueContactIds(contacts){
   });
 }
 
-function init(){const saved=localStorage.getItem(STORAGE_KEY);try{state.data=saved?migrate(JSON.parse(saved)):emptyData();ensureUniqueContactIds(state.data.contacts)}catch{state.data=emptyData();toast('Autosave konnte nicht gelesen werden.')}
+function init(){const saved=localStorage.getItem(STORAGE_KEY);try{state.data=saved?migrate(JSON.parse(saved)):emptyData();ensureUniqueContactIds(state.data.contacts)}catch{state.data=emptyData();toast('Could not read autosave data.')}
 state.uiLang='en';state.data.settings.uiLanguage='en';selectFirst();bind();applyLang();renderAll();saveStatus('Saved locally','ok')}
 function selectFirst(){if(!state.selectedContactId&&state.data.contacts[0])state.selectedContactId=state.data.contacts[0].id;if(!state.selectedTemplateId&&state.data.templates[0])state.selectedTemplateId=state.data.templates[0].id}
 function saveSoon(){saveStatus('Saving...','warn');clearTimeout(state.autosaveTimer);state.autosaveTimer=setTimeout(saveNow,350)}
@@ -535,32 +843,34 @@ function toast(msg){const d=document.createElement('div');d.className='toast';d.
 function applyLang(){state.uiLang='en';document.querySelectorAll('[data-i18n]').forEach(el=>{el.removeAttribute('data-i18n')});renderTemplates();renderPlaceholders();renderCounts();renderPreview()}
 
 function renderAll(){renderCounts();renderFilters();renderAreaTabs();renderContacts();renderTemplates();renderTemplateEditor();renderPreview();renderPlaceholders()}
-function renderCounts(){$('#contactCount').textContent=`${state.data.contacts.length} contacts`;$('#templateCount').textContent=`${state.data.templates.length} templates`}
+function renderCounts(){const nc=state.data.contacts.length;$('#contactCount').textContent=`${nc} contact${nc!==1?'s':''}`;$('#templateCount').textContent=`${state.data.templates.length} templates`}
 function renderFilters(){
-  const oldTag=$('#contactTagFilter')?.value||'',oldRole=$('#contactRoleFilter')?.value||'',oldTeam=$('#contactTeamFilter')?.value||'';
+  const oldTag=$('#contactTagFilter')?.value||'',oldRole=$('#contactRoleFilter')?.value||'',oldTeam=$('#contactTeamFilter')?.value||'',oldCong=$('#contactCongFilter')?.value||'';
   const tags=[...new Set(state.data.contacts.flatMap(c=>c.tags||[]))].sort((a,b)=>a.localeCompare(b));
   const roles=allRoles();
   const teams=allTeams();
+  const congs=allCongregations();
   if($('#contactTagFilter')){$('#contactTagFilter').innerHTML='<option value="">All tags</option>'+tags.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');$('#contactTagFilter').value=tags.includes(oldTag)?oldTag:'';}
   if($('#contactRoleFilter')){$('#contactRoleFilter').innerHTML='<option value="">All congregation roles</option>'+roles.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');$('#contactRoleFilter').value=roles.includes(oldRole)?oldRole:'';}
   if($('#contactTeamFilter')){$('#contactTeamFilter').innerHTML='<option value="">All Assembly / Convention teams</option>'+teams.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');$('#contactTeamFilter').value=teams.includes(oldTeam)?oldTeam:'';}
+  if($('#contactCongFilter')){$('#contactCongFilter').innerHTML='<option value="">All congregations</option>'+congs.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');$('#contactCongFilter').value=congs.includes(oldCong)?oldCong:'';}
   updateSelectionHint();
 }
 function contactRoles(c){return c.roles&&c.roles.length?c.roles:splitTags(c.role)}
 function contactTeams(c){return c.teams&&c.teams.length?c.teams:splitTags(c.team)}
-function filteredContacts(){const q=$('#contactSearch').value.trim().toLowerCase(),tag=$('#contactTagFilter').value,role=$('#contactRoleFilter')?.value||'',team=$('#contactTeamFilter')?.value||'';return state.data.contacts.filter(c=>{const roles=contactRoles(c);const teams=contactTeams(c);const name=contactName(c);const hay=[c.firstName,c.lastName,name,c.displayName,c.congregation,c.role,roles.join(' '),c.organization,(c.tags||[]).join(' '),c.team||'',teams.join(' '),...(c.emails||[]).map(e=>e.value),...(c.mobiles||[]).map(m=>m.value)].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!tag||(c.tags||[]).includes(tag))&&(!role||roles.includes(role))&&(!team||teams.includes(team))}).sort((a,b)=>((b.favorite?1:0)-(a.favorite?1:0))||(state.sortBy==='firstName'?(a.firstName||contactName(a)).localeCompare(b.firstName||contactName(b)):(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b))))}
+function filteredContacts(){const q=$('#contactSearch').value.trim().toLowerCase(),tag=$('#contactTagFilter').value,role=$('#contactRoleFilter')?.value||'',team=$('#contactTeamFilter')?.value||'',fav=$('#contactFavFilter')?.value||'',cong=$('#contactCongFilter')?.value||'';return state.data.contacts.filter(c=>{const roles=contactRoles(c);const teams=contactTeams(c);const name=contactName(c);const hay=[c.firstName,c.lastName,name,c.displayName,c.congregation,c.role,roles.join(' '),c.organization,(c.tags||[]).join(' '),c.team||'',teams.join(' '),...(c.emails||[]).map(e=>e.value),...(c.mobiles||[]).map(m=>m.value)].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!tag||(c.tags||[]).includes(tag))&&(!role||roles.includes(role))&&(!team||teams.includes(team))&&(!cong||c.congregation===cong)&&(fav===''||(fav==='fav'&&c.favorite)||(fav==='nofav'&&!c.favorite))}).sort((a,b)=>((b.favorite?1:0)-(a.favorite?1:0))||(state.sortBy==='firstName'?(a.firstName||contactName(a)).localeCompare(b.firstName||contactName(b)):(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b))))}
 function renderContacts(){const list=filteredContacts(),el=$('#contactList');if(!list.length){el.innerHTML='<div class="empty">No contacts found.<br><br><button class="primary mini" onclick="ContactHubPro.openContactEditor()">Create contact</button></div>';return}
 el.innerHTML=list.map(c=>`<div class="cardItem ${c.id===state.selectedContactId?'active':''}" data-id="${c.id}">
   <div class="cardTop">
     <input class="check" type="checkbox" data-check="${c.id}" ${state.selectedContactIds.has(c.id)?'checked':''}>
     <div>
       <div class="cardName" data-select="${c.id}">${esc(contactDisplayName(c))}</div>
-      <div class="cardMeta">${esc([c.congregation,c.organization].filter(Boolean).join(' · ')||'No congregation/company')}</div><div class="roleChips">${((c.roles&&c.roles.length?c.roles:splitTags(c.role))).slice(0,4).map(r=>`<span class="chip green">${esc(r)}</span>`).join('')}${contactTeams(c).slice(0,4).map(t=>`<span class="chip blue">${esc(t)}</span>`).join('')}</div>
+      <div class="cardMeta">${esc(c.congregation||'')}${c.organization?`${c.congregation?' · ':''}<em style="font-style:normal;color:#94a3b8">${esc(c.organization)}</em>`:''}</div><div class="roleChips">${((c.roles&&c.roles.length?c.roles:splitTags(c.role))).slice(0,4).map(r=>`<span class="chip green">${esc(r)}</span>`).join('')}${contactTeams(c).slice(0,4).map(t=>`<span class="chip blue">${esc(t)}</span>`).join('')}</div>
     </div>
     <div class="smallBtns" style="justify-content:flex-end;align-items:center;gap:2px">
       <button class="mini icon ghost" title="Edit" data-edit="${c.id}">✎</button>
       <button class="mini icon danger" title="Delete" data-del="${c.id}">×</button>
-      <button class="mini icon ghost" title="Als vCard speichern" data-vcf="${c.id}">&#x1F4C7;</button>
+      <button class="mini icon ghost" title="Save as vCard" data-vcf="${c.id}">&#x1F4C7;</button>
       <button class="starBtn ${c.favorite?'on':''}" data-star="${c.id}" title="${c.favorite?'Remove favorite':'Set favorite'}">${c.favorite?'★':'☆'}</button>
     </div>
   </div>
@@ -599,38 +909,140 @@ function selectedContactIds(){
 function selectedContacts(){const ids=selectedContactIds();return state.data.contacts.filter(c=>ids.includes(c.id));}
 function updateSelectionHint(){const ids=selectedContactIds();const el=$('#selectionHint');if(el)el.textContent=`${ids.length} selected. Use role search/filter, then select contacts for copy/export.`;}
 function quickDeleteContact(id){const c=state.data.contacts.find(x=>x.id===id);if(!c)return;if(confirm(`Delete contact: ${contactName(c)}?`)){state.data.contacts=state.data.contacts.filter(x=>x.id!==id);state.selectedContactIds.delete(id);if(state.selectedContactId===id)state.selectedContactId=state.data.contacts[0]?.id||null;saveSoon();renderAll();toast('Contact deleted.')}}
-function mergeSelectedContacts(){const ids=selectedContactIds();if(ids.length<2)return toast('Bitte mindestens 2 Contacts auswählen.');const contacts=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean);const primary=contacts.find(c=>c.id===state.selectedContactId)||contacts[0];showModal('Merge contacts',`<p class="hint">Diese Contacts werden in <strong>${esc(contactName(primary))}</strong> Missing data, emails, mobile numbers, and tags will be added.</p><ul>${contacts.map(c=>`<li>${esc(contactName(c))}</li>`).join('')}</ul>`,`<button class="ghost" id="mergeCancel">Cancel</button><button class="primary" id="mergeNow">Merge</button>`);$('#mergeCancel').onclick=closeModal;$('#mergeNow').onclick=()=>{contacts.filter(c=>c.id!==primary.id).forEach(c=>mergeInto(primary,c));state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id)||c.id===primary.id);state.selectedContactIds.clear();state.selectedContactId=primary.id;closeModal();saveSoon();renderAll();toast('Contacts merged.')}} 
+function mergeSelectedContacts(){const ids=selectedContactIds();if(ids.length<2)return toast('Please select at least 2 contacts.');const contacts=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean);const primary=contacts.find(c=>c.id===state.selectedContactId)||contacts[0];showModal('Merge contacts',`<p class="hint">Diese Contacts werden in <strong>${esc(contactName(primary))}</strong> Missing data, emails, mobile numbers, and tags will be added.</p><ul>${contacts.map(c=>`<li>${esc(contactName(c))}</li>`).join('')}</ul>`,`<button class="ghost" id="mergeCancel">Cancel</button><button class="primary" id="mergeNow">Merge</button>`);$('#mergeCancel').onclick=closeModal;$('#mergeNow').onclick=()=>{contacts.filter(c=>c.id!==primary.id).forEach(c=>mergeInto(primary,c));state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id)||c.id===primary.id);state.selectedContactIds.clear();state.selectedContactId=primary.id;closeModal();saveSoon();renderAll();toast('Contacts merged.')}} 
 function mergeInto(target,src){target.emails=uniqueBy([...(target.emails||[]),...(src.emails||[])],e=>e.value);target.mobiles=uniqueBy([...(target.mobiles||[]),...(src.mobiles||[])],m=>digitsOnly(m.value));['firstName','lastName','displayName','congregation','role','organization','language'].forEach(k=>{if(!target[k]&&src[k])target[k]=src[k]});target.languages=[...new Set([...(target.languages||[target.language]).filter(Boolean),...(src.languages||[src.language]).filter(Boolean)])];target.tags=[...new Set([...(target.tags||[]),...(src.tags||[])])];target.teams=[...new Set([...contactTeams(target),...contactTeams(src)])];target.team=target.teams.join(', ');if(src.notes)target.notes=[target.notes,src.notes].filter(Boolean).join('\n---\n')}
 
-function renderAreaTabs(){const cats=['All',...new Set(state.data.templates.map(t=>t.category||'Other'))].sort((a,b)=>a==='All'?-1:b==='All'?1:a.localeCompare(b));if(!cats.includes(state.activeArea))state.activeArea='All';$('#areaTabs').innerHTML=cats.map(a=>`<div class="tab ${a===state.activeArea?'active':''}" data-area="${esc(a)}">${esc(a)}</div>`).join('');$$('#areaTabs .tab').forEach(t=>t.onclick=()=>{state.activeArea=t.dataset.area;renderTemplates()})}
-function filteredTemplates(){const q=$('#templateSearch').value.trim().toLowerCase();return state.data.templates.filter(t=>{const hay=[t.title,t.category,t.subject,t.body,t.footer].join(' ').toLowerCase();return(!q||hay.includes(q))&&(state.activeArea==='All'||(t.category||'Other')===state.activeArea)}).sort((a,b)=>((a.category||'')+a.title).localeCompare((b.category||'')+b.title))}
-function renderTemplates(){const list=filteredTemplates(),el=$('#templateList');if(!list.length){el.innerHTML='<div class="empty">No templates found.<br><br><button class="primary mini" onclick="ContactHubPro.openTemplateEditor()">Create template</button></div>';return}
-el.innerHTML=list.map(t=>`<div class="cardItem ${t.id===state.selectedTemplateId?'active':''}" data-template="${t.id}" style="cursor:pointer">
-  <div class="cardTop" style="grid-template-columns:1fr auto">
-    <div><div class="cardName">${esc(t.title)}</div><div class="cardMeta">${esc(t.category||'General')}</div></div>
-    <span class="chip blue">message</span>
+function renderAreaTabs(){renderContextCards()}// compat alias
+function renderContextCards(){
+  const el=$('#contextCards');if(!el)return;
+  const counts={};state.data.templates.forEach(t=>{const ctx=t.context||'personal';counts[ctx]=(counts[ctx]||0)+1;});
+  const allCount=state.data.templates.length;
+  const items=[{id:'All',label:'All',icon:'📋',desc:'Show all templates'}, ...CONTEXTS];
+  el.innerHTML=items.map(c=>{
+    const n=c.id==='All'?allCount:(counts[c.id]||0);
+    const isActive=state.activeArea===c.id;
+    return `<div class="ctxCard ${isActive?'active':''}" data-ctx="${c.id}" title="${c.desc||''}">
+      <div class="ctxIcon">${c.icon}</div>
+      <div class="ctxLabel">${c.label.split('/')[0].trim()}</div>
+      <div class="ctxCount">${n}</div>
+    </div>`;
+  }).join('');
+  // Description strip below cards
+  const activeCtx=items.find(c=>c.id===state.activeArea);
+  const strip=$('#ctxDescStrip');
+  if(strip&&activeCtx&&activeCtx.desc){
+    strip.textContent=activeCtx.icon+' '+activeCtx.desc;
+    strip.style.display='';
+  } else if(strip){strip.style.display='none';}
+  $$('.ctxCard').forEach(x=>x.onclick=()=>{state.activeArea=x.dataset.ctx;renderContextCards();renderTemplates();});
+}
+function filteredTemplates(){
+  const q=$('#templateSearch').value.trim().toLowerCase();
+  return state.data.templates.filter(t=>{
+    const hay=[t.title,t.context,t.category,t.subject,t.body,t.footer].join(' ').toLowerCase();
+    const matchQ=!q||hay.includes(q);
+    const matchCtx=state.activeArea==='All'||(t.context||'personal')===state.activeArea;
+    return matchQ&&matchCtx;
+  }).sort((a,b)=>{
+    // Sort by category within context, then title
+    const aKey=(a.category||'zzz')+a.title;
+    const bKey=(b.category||'zzz')+b.title;
+    return aKey.localeCompare(bKey);
+  });
+}
+function renderTemplates(){
+  const list=filteredTemplates(),el=$('#templateList');
+  if(!list.length){el.innerHTML='<div class="empty">No templates found.<br><br><button class="primary mini" onclick="ContactHubPro.openTemplateEditor()">Create template</button></div>';return}
+  // Group by category within the current context view
+  const groups={};
+  list.forEach(t=>{const cat=t.category||'General';if(!groups[cat])groups[cat]=[];groups[cat].push(t);});
+  const showGroups=Object.keys(groups).length>1;
+  let html='';
+  Object.entries(groups).forEach(([cat,templates])=>{
+    if(showGroups)html+=`<div class="tmplGroupLabel">${esc(cat)}</div>`;
+    templates.forEach(t=>{
+      const ctx=CONTEXTS.find(c=>c.id===(t.context||'personal'));
+      const channelBadge=t.channel==='email'?'<span class="chip" style="background:#dbeafe;color:#1e40af">✉ email</span>':'<span class="chip" style="background:#dcfce7;color:#166534">💬 WA</span>';
+      const snippet=(t.body||'').replace(/\{\{[^}]+\}\}/g,'…').replace(/\s+/g,' ').trim().slice(0,55);
+      html+=`<div class="cardItem ${t.id===state.selectedTemplateId?'active':''}" data-template="${t.id}" style="cursor:pointer">
+  <div class="cardTop" style="grid-template-columns:1fr auto;gap:4px">
+    <div>
+      <div class="cardName">${esc(t.title)}</div>
+      ${snippet?`<div class="cardMeta" style="margin-top:1px">${esc(snippet)}…</div>`:''}
+    </div>
+    ${channelBadge}
   </div>
-</div>`).join('');el.querySelectorAll('[data-template]').forEach(c=>c.onclick=()=>{state.selectedTemplateId=c.dataset.template;const tt=getTemplate();if(tt&&tt.channel&&tt.channel!=='general')$('#deliveryChannel').value=tt.channel;renderTemplates();renderTemplateEditor();renderPreview()})}
+</div>`;
+    });
+  });
+  el.innerHTML=html;
+  $$('[data-template]').forEach(c=>c.onclick=()=>{
+    state.selectedTemplateId=c.dataset.template;
+    const tt=getTemplate();
+    if(tt&&tt.channel&&tt.channel!=='general')$('#deliveryChannel').value=tt.channel;
+    renderContextCards();renderTemplates();renderTemplateEditor();renderPreview();
+  });
+}
 function getTemplate(){return state.data.templates.find(t=>t.id===state.selectedTemplateId)||null}
 function getContact(){return state.data.contacts.find(c=>c.id===state.selectedContactId)||null}
 function renderTemplateEditor(){const t=getTemplate(),el=$('#templateEditor');if(!t){el.innerHTML='<div class="empty">Select or create a message.</div>';return}
 const body=cleanNewlines(t.body||''), footer=cleanNewlines(t.footer||''), subject=cleanNewlines(t.subject||''); t.body=body; t.footer=footer; t.subject=subject;
+const ctxOptions=CONTEXTS.map(c=>`<option value="${c.id}" ${(t.context||'personal')===c.id?'selected':''}>${c.icon} ${c.label}</option>`).join('');
 el.innerHTML=`<div class="simpleComposer">
-  <div class="row"><div><label>Message name</label><input id="tmpl_title" value="${esc(t.title)}" placeholder="e.g. Reminder, contact info, PTC message"></div><div><label>Category</label><input id="tmpl_category" value="${esc(t.category)}" placeholder="PTC, Attendants, Work, Family..."></div></div>
-  <div><label>Email subject</label><textarea id="tmpl_subject" class="subjectInput" placeholder="Only used for email. Placeholders like {{firstName}} work here.">${esc(subject)}</textarea></div>
-  <div><label>Main message</label><textarea id="tmpl_body" class="mainText" placeholder="Write the message here. You can insert contact details with the button on the right.">${esc(body)}</textarea></div>
-  <div><label>Footer / signature</label><textarea id="tmpl_footer" class="footerText" placeholder="Your name, address, phone, email...">${esc(footer)}</textarea></div>
-  
+  <div class="row">
+    <div><label>Template name</label><input id="tmpl_title" value="${esc(t.title)}" placeholder="e.g. Talk reminder, Team greeting..."></div>
+    <div><label>Context</label><select id="tmpl_context">${ctxOptions}</select></div>
+  </div>
+  <div class="row">
+    <div><label>Sub-category <span style="font-weight:400;text-transform:none;font-size:10px">(optional label)</span></label><input id="tmpl_category" value="${esc(t.category)}" placeholder="e.g. Reminder, Confirmation, Team..."></div>
+    <div><label>Channel</label><select id="tmpl_channel"><option value="whatsapp" ${t.channel==='whatsapp'?'selected':''}>💬 WhatsApp</option><option value="email" ${t.channel==='email'?'selected':''}>✉ Email</option><option value="general" ${t.channel==='general'?'selected':''}>Any</option></select></div>
+  </div>
+  <div><label>Email subject <span style="font-weight:400;text-transform:none;font-size:10px">(email only)</span></label><textarea id="tmpl_subject" class="subjectInput" placeholder="Placeholders like {{firstName}} work here.">${esc(subject)}</textarea></div>
+  <div><label>Message</label><textarea id="tmpl_body" class="mainText" placeholder="Write the message. Click a placeholder below to insert contact data.">${esc(body)}</textarea></div>
+  <div><label>Footer / signature</label><textarea id="tmpl_footer" class="footerText" placeholder="Your name, phone, address...">${esc(footer)}</textarea></div>
 </div>`;
-['title','category','subject','body','footer'].forEach(k=>{const el2=$('#tmpl_'+k);if(!el2)return;el2.oninput=()=>{t[k]=cleanNewlines(el2.value);saveSoon();if(k==='category')renderAreaTabs();renderTemplates();renderPreview()};if(['subject','body','footer'].includes(k)){el2.addEventListener('focus',()=>{window._lastTemplateFocus=el2;});}});
+// Wire context → auto-set channel default if not yet customised
+$('#tmpl_context').onchange=()=>{
+  const ctx=CONTEXTS.find(c=>c.id===$('#tmpl_context').value);
+  t.context=$('#tmpl_context').value;
+  // Only suggest channel if currently on general or user hasn't changed it from the context default
+  if(ctx&&(t.channel==='general'))$('#tmpl_channel').value=ctx.defaultChannel;
+  t.channel=$('#tmpl_channel').value;
+  saveSoon();renderContextCards();renderTemplates();
+};
+$('#tmpl_channel').onchange=()=>{t.channel=$('#tmpl_channel').value;saveSoon();renderContextCards();renderTemplates();renderPreview();$('#deliveryChannel').value=t.channel!=='general'?t.channel:$('#deliveryChannel').value;};
+['title','category','subject','body','footer'].forEach(k=>{const el2=$('#tmpl_'+k);if(!el2)return;el2.oninput=()=>{t[k]=cleanNewlines(el2.value);saveSoon();if(k==='category')renderContextCards();renderTemplates();renderPreview()};if(['subject','body','footer'].includes(k)){el2.addEventListener('focus',()=>{window._lastTemplateFocus=el2;});}});
 }
 
 function renderPreview(){
-const c=getContact(),t=getTemplate();
+const t=getTemplate();
 const charEl=document.getElementById('charCounter');
+// Check if a congregation is the active recipient
+const activeCong=state.selectedTarget?.isCong?(state.data.congregations||[]).find(cg=>cg.id===state.selectedTarget.congId):null;
+const c=activeCong?null:getContact();
+if(activeCong&&t){
+  // Congregation recipient mode
+  const data={firstName:activeCong.name,lastName:'',displayName:activeCong.name,recipientName:activeCong.name,greeting:activeCong.name,congregation:activeCong.name,role:'',team:'',teams:'',organization:'',email:activeCong.jwEmail||'',emails:activeCong.jwEmail||'',mobile:'',mobiles:'',...state.draftDetails};
+  const sub=renderText(cleanNewlines(t.subject),data);
+  const parts=[renderText(cleanNewlines(t.body),data),renderText(cleanNewlines(t.footer),data)].filter(x=>String(x||'').trim());
+  const body=parts.join('\n\n');
+  $('#previewMeta').textContent=`🏛 ${activeCong.name} · ${t.title}`;
+  $('#subjectPreview').textContent=sub||'—';
+  $('#messagePreview').textContent=body||'Template is empty.';
+  if(charEl){const len=body.length;charEl.textContent=`${len} characters`;charEl.className='charCounter'+(len>1600?' over':len>800?' warn':'');}
+  let rows=`<div style="font-weight:900;font-size:14px;margin-bottom:5px;">🏛 ${esc(activeCong.name)}</div>`;
+  rows+=`<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Congregation · Email only</div>`;
+  rows+='<div class="pickRows">';
+  rows+=`<div class="pickRow missing"><span class="pickIcon mis">—</span><span class="pickVal">No WhatsApp (congregation)</span></div>`;
+  if(activeCong.jwEmail){rows+=`<div class="pickRow email-row active"><span class="pickIcon em">@</span><span class="pickVal">${esc(activeCong.jwEmail)}</span><span class="openNow jwEmailBadge" style="font-size:10px">JW</span></div><button class="mini ghost" style="margin-top:4px;font-size:11px" onclick="copyText('${activeCong.jwEmail.replace(/'/g,"\\'")}')">⧉ Copy JW email (recommended for Windows Outlook)</button>`;}
+  else{rows+=`<div class="pickRow missing email-row"><span class="pickIcon mis">@</span><span class="pickVal">No JW email — edit congregation</span></div>`;}
+  rows+=`</div><button class="mini ghost" style="margin-top:6px" onclick="state.selectedTarget=null;state.selectedCongId=null;renderPreview()">× Clear congregation recipient</button>`;
+  $('#recipientBox').innerHTML=rows;
+  return;
+}
 if(!c||!t){
   $('#previewMeta').textContent='Select contact + template';
-  $('#recipientBox').innerHTML='<span style="color:var(--muted);font-size:13px;">Select a contact on the left.</span>';
+  $('#recipientBox').innerHTML='<span style="color:var(--muted);font-size:13px;">Select a contact on the left, or use ✉ Message on a congregation.</span>';
   $('#subjectPreview').textContent='—';
   $('#messagePreview').textContent='Select contact and template.';
   if(charEl){charEl.textContent='0 characters';charEl.className='charCounter';}
@@ -681,7 +1093,11 @@ function ensureDefaultTarget(c,channel){
     state.selectedTarget=list[0]?{channel,value:list[0]}:null;
   }
 }
-function getSelectedTarget(channel){const c=getContact();if(!c)return'';ensureDefaultTarget(c,channel);return state.selectedTarget&&state.selectedTarget.channel===channel?state.selectedTarget.value:''}
+function getSelectedTarget(channel){
+  // Congregation mode
+  if(state.selectedTarget?.isCong&&channel==='email')return state.selectedTarget.value||'';
+  const c=getContact();if(!c)return'';ensureDefaultTarget(c,channel);return state.selectedTarget&&state.selectedTarget.channel===channel?state.selectedTarget.value:''
+}
 function recipientName(c,t){return c.firstName||firstWord(contactName(c))||contactName(c)||''}
 function renderData(c,t=null){const em=(c.emails||[]).map(e=>e.value),mo=(c.mobiles||[]).map(m=>m.value);const rn=recipientName(c,t);const ct=contactTeams(c);return{firstName:c.firstName||firstWord(contactName(c)),lastName:c.lastName||'',displayName:contactName(c),recipientName:rn,greeting:rn,congregation:c.congregation||'',role:c.role||'',team:ct[0]||'',teams:ct.join(', '),organization:c.organization||'',email:em[0]||'',emails:em.join(', '),mobile:mo[0]||'',mobiles:mo.join(', '),phone:mo[0]||'',...state.draftDetails}}
 function renderText(text,data){return cleanNewlines(text).replace(/\{\{\s*([\w]+)\s*\}\}/g,(_,k)=>data[k]??'')}
@@ -694,7 +1110,12 @@ function masterList(key,defaults=[]){
   return[...new Set(defaults.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 }
 function allRoles(){return masterList('masterRoles',['PTC','Assistant PTC','Elder','MS','Publisher'])}
-function allCongregations(){return masterList('masterCongregations',[...state.data.contacts.map(c=>c.congregation).filter(Boolean)])}
+function allCongregations(){
+  // Pull names from congregation entities first, then fall back to masterCongregations and contact congregation fields
+  const fromEntities=(state.data.congregations||[]).map(c=>c.name).filter(Boolean);
+  const fromMaster=masterList('masterCongregations',[...state.data.contacts.map(c=>c.congregation).filter(Boolean)]);
+  return[...new Set([...fromEntities,...fromMaster])].sort((a,b)=>a.localeCompare(b));
+}
 function allTeams(){return masterList('masterTeams',['Attendant','Tech Host','Coordinator','Volunteer','Team Captain','Department Overseer','Assistant','Auditorium','Cafeteria','Lobby','Baptism','Stage','Parking'])}
 function cleanupContactAssignments(validRoles,validTeams,validTags){
   const roleSet=new Set(validRoles), teamSet=new Set(validTeams);let roleChanges=0,teamChanges=0,tagChanges=0;
@@ -717,22 +1138,23 @@ function cleanupContactAssignments(validRoles,validTeams,validTags){
 }
 
 function openMasterData(){
-  const roles=allRoles().join('\n'),congs=allCongregations().join('\n'),tms=allTeams().join('\n');
+  const roles=allRoles().join('\n'),tms=allTeams().join('\n');
   const savedTags=Array.isArray(state.data.settings&&state.data.settings.masterTags)?state.data.settings.masterTags:allTags();
   const tags=savedTags.join('\n');
+  const congNames=allCongregations().join('\n');
   showModal('Master data',`<div class="stack">
-    <p class="hint">Zentrale Verwaltung aller Stammdaten. \u00c4nderungen an Rollen und Teams werden direkt auf alle Kontakte angewendet.</p>
+    <p class="hint">Central master data. Role and team changes apply to all contacts immediately. Add congregations here — then add email / city in the 🏛 tab.</p>
     <div class="row" style="grid-template-columns:1fr 1fr">
       <div><label>Assembly / Convention team assignments (one per line)</label><textarea class="masterTextarea" id="md_teams">${esc(tms)}</textarea></div>
       <div><label>Congregation roles</label><textarea class="masterTextarea" id="md_roles">${esc(roles)}</textarea></div>
     </div>
     <div class="row" style="grid-template-columns:1fr 1fr">
-      <div><label>Congregations</label><textarea class="masterTextarea" id="md_congs">${esc(congs)}</textarea></div>
-      <div><label>Tags (one per line)</label><textarea class="masterTextarea" id="md_tags">${esc(tags)}</textarea><div class="hint" style="margin-top:4px">Tags sind informativ \u2013 das Entfernen hier l\u00f6scht sie nicht von Kontakten.</div></div>
+      <div><label>Congregations (one per line)</label><textarea class="masterTextarea" id="md_congs">${esc(congNames)}</textarea><div class="hint" style="margin-top:4px">New names → auto-created in 🏛 tab. <b>Removing a name deletes the congregation and clears it from all publishers.</b></div></div>
+      <div><label>Tags (one per line)</label><textarea class="masterTextarea" id="md_tags">${esc(tags)}</textarea><div class="hint" style="margin-top:4px">Tags are informational — removing here does not delete them from contacts.</div></div>
     </div>
     <div style="border-top:1px solid var(--line);padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <span style="font-size:12px;color:var(--muted);font-weight:700">Reset:</span>
-      <button class="ghost mini" id="mdResetTeams">\ud83d\udd04 Clear all Assembly / Convention team assignments</button>
+      <button class="ghost mini" id="mdResetTeams">🔄 Clear all Assembly / Convention team assignments</button>
     </div>
   </div>`,`<button class="ghost" id="mdCancel">Cancel</button><button class="primary" id="mdSave">Save</button>`);
   $('#mdCancel').onclick=closeModal;
@@ -744,16 +1166,31 @@ function openMasterData(){
     const nextTeams=[...new Set($('#md_teams').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
     const nextRoles=[...new Set($('#md_roles').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
     const nextTags=[...new Set($('#md_tags').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
+    const nextCongs=[...new Set($('#md_congs').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
+    const prevCongs=state.data.settings.masterCongregations||[];
     state.data.settings.masterTeams=nextTeams;
     state.data.settings.masterRoles=nextRoles;
-    state.data.settings.masterCongregations=[...new Set($('#md_congs').value.split(/\n|;/).map(x=>x.trim()).filter(Boolean))];
+    state.data.settings.masterCongregations=nextCongs;
     state.data.settings.masterTags=nextTags;
+    // Auto-create stub entities for new names
+    state.data.congregations=state.data.congregations||[];
+    const existingByName=new Map(state.data.congregations.map(c=>[c.name.toLowerCase(),c]));
+    nextCongs.forEach(name=>{if(!existingByName.has(name.toLowerCase())){const e=normalizeCongShape({id:uid('cg'),name});state.data.congregations.push(e);existingByName.set(name.toLowerCase(),e);}});
+    // Removed names: delete entity and clear congregation from contacts
+    const nameSet=new Set(nextCongs.map(n=>n.toLowerCase()));
+    const removedNames=prevCongs.filter(n=>!nameSet.has(n.toLowerCase()));
+    let clearedContacts=0;
+    removedNames.forEach(name=>{
+      state.data.contacts.forEach(c=>{if(c.congregation===name){c.congregation='';clearedContacts++;}});
+    });
+    state.data.congregations=state.data.congregations.filter(c=>nameSet.has((c.name||'').toLowerCase()));
     const cleaned=cleanupContactAssignments(nextRoles,nextTeams,nextTags);
     closeModal();saveSoon();renderAll();
     const extra=[];
-    if(cleaned.roleChanges)extra.push(`${cleaned.roleChanges} contact role assignment(s) reset`);
+    if(clearedContacts)extra.push(`${clearedContacts} publisher${clearedContacts!==1?'s':''} unassigned`);
+    if(cleaned.roleChanges)extra.push(`${cleaned.roleChanges} role assignment(s) reset`);
     if(cleaned.teamChanges)extra.push(`${cleaned.teamChanges} team assignment(s) reset`);
-    if(cleaned.tagChanges)extra.push(`${cleaned.tagChanges} contact tag(s) removed`);
+    if(cleaned.tagChanges)extra.push(`${cleaned.tagChanges} tag(s) removed`);
     toast(extra.length?`Master data saved · ${extra.join(' · ')}`:'Master data saved.');
   };
 }
@@ -839,7 +1276,7 @@ function openInsertContactModal(){
 function openContactEditor(id=null){
   const existing=id?state.data.contacts.find(c=>c.id===id):null;
   const c=existing?structuredClone(existing):normalizeContactShape({id:uid('c'),source:'local'});
-  const roles=allRoles(), congs=allCongregations(), teams=allTeams();
+  const roles=allRoles(), congs=allCongregations(), teams=allTeams(), tags=allTags();
   const selectedRoles=new Set(c.roles&&c.roles.length?c.roles:splitTags(c.role));
   const customRoles=[...selectedRoles].filter(r=>!roles.includes(r)).join(', ');
   showModal(existing?'Edit contact':'New contact',`
@@ -849,12 +1286,12 @@ function openContactEditor(id=null){
     <div class="row"><div><label>First name</label><input id="c_firstName" value="${esc(c.firstName)}"></div><div><label>Last name</label><input id="c_lastName" value="${esc(c.lastName)}"></div></div>
     <div><label>Emails, one per line</label><textarea id="c_emails" class="autoRows">${esc((c.emails||[]).map(e=>e.value).join('\n'))}</textarea></div>
     <div><label>Mobile numbers, one per line</label><textarea id="c_mobiles" class="autoRows">${esc((c.mobiles||[]).map(m=>m.value).join('\n'))}</textarea><div class="hint">0179... becomes +49 179...</div></div>
-    <div><label>Company / Outlook organization</label><input id="c_organization" value="${esc(c.organization)}"><div class="contactMiniNote">Useful after Outlook import. If Company actually contains the congregation, use the button below to move it.</div></div>
+    <div><label>Company (per-person only)</label><input id="c_organization" value="${esc(c.organization)}"><div class="contactMiniNote">Optional: employer or secular organization. Congregation → use the Congregation field above. If Outlook imported the congregation as Company, use the button below.</div></div>
   </div>
 
   <div class="editorBlock">
     <p class="editorBlockTitle">Congregation roles</p>
-    <div class="contactQuickGrid"><div><label>Congregation</label><input id="c_congregation" list="congregationOptionsModal" value="${esc(c.congregation)}" placeholder="type or pick"></div><button class="mini ghost" id="useCompanyAsCong" type="button">Company → Congregation</button><button class="mini ghost" id="useCongAsCompany" type="button">Congregation → Company</button></div>
+    <div class="contactQuickGrid"><div><label>Congregation</label><select id="c_congregation"><option value="">— none —</option>${congs.map(x=>`<option value="${esc(x)}" ${c.congregation===x?'selected':''}>${esc(x)}</option>`).join('')}${c.congregation&&!congs.includes(c.congregation)?`<option value="${esc(c.congregation)}" selected>${esc(c.congregation)}</option>`:''}</select></div><button class="mini ghost" id="useCompanyAsCong" type="button" title="Move Company field value into Congregation">Company → Cong</button><button class="mini ghost" id="useCongAsCompany" type="button" title="Move Congregation value into Company field">Cong → Company</button></div>
     <div><label>Congregation roles</label><div class="rolePickGrid">${roles.map(r=>`<label class="rolePick"><input type="checkbox" data-role-pick="${esc(r)}" ${selectedRoles.has(r)?'checked':''}> ${esc(r)}</label>`).join('')}</div></div>
     <div><label>Additional congregation roles</label><input id="c_customRoles" value="${esc(customRoles)}" placeholder="comma-separated, e.g. PTC, Elder, MS, Publisher"></div>
   </div>
@@ -866,11 +1303,12 @@ function openContactEditor(id=null){
 
   <div class="editorBlock">
     <p class="editorBlockTitle">Tags & notes</p>
-    <div><label>Tags, comma-separated</label><input id="c_tags" list="tagOptionsModal" value="${esc((c.tags||[]).join(', '))}"></div>
+    <div><label>Tags</label><div class="rolePickGrid" id="tagPickGrid">${tags.map(tag=>`<label class="rolePick"><input type="checkbox" data-tag-pick="${esc(tag)}" ${(c.tags||[]).includes(tag)?'checked':''}> ${esc(tag)}</label>`).join('')}${!(tags.length)?'<span class="hint">No tags yet — type one below to create.</span>':''}</div></div>
+    <div><label>New tags <span style="font-weight:400;text-transform:none;font-size:10px">(comma-separated)</span></label><input id="c_tags_new" placeholder="e.g. JW, Attendant, Volunteer"></div>
     <div><label>Notes</label><textarea id="c_notes">${esc(c.notes)}</textarea></div>
   </div>
 </div>
-<datalist id="congregationOptionsModal">${congs.map(x=>`<option value="${esc(x)}">`).join('')}</datalist><datalist id="tagOptionsModal">${(Array.isArray(state.data.settings&&state.data.settings.masterTags)?state.data.settings.masterTags:allTags()).map(t=>`<option value="${esc(t)}">`).join('')}</datalist>`,
+<datalist id="congregationOptionsModal">${congs.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`,
 `${existing?'<button class="danger" id="modalDeleteContact">Delete</button>':''}<button class="ghost" id="modalCancel">Cancel</button><button class="primary" id="modalSaveContact">Save</button>`);
   $('#modalCancel').onclick=closeModal;
   // Auto-resize email/mobile textareas
@@ -882,8 +1320,8 @@ function openContactEditor(id=null){
     ta.addEventListener('change',resize);
   });
   if(existing)$('#modalDeleteContact').onclick=()=>quickDeleteContact(existing.id);
-  $('#useCompanyAsCong').onclick=()=>{const org=$('#c_organization').value.trim();if(!org)return toast('Company is empty.');$('#c_congregation').value=org;$('#c_organization').value='';};
-  $('#useCongAsCompany').onclick=()=>{const cong=$('#c_congregation').value.trim();if(!cong)return toast('Congregation is empty.');$('#c_organization').value=cong;$('#c_congregation').value='';};
+  $('#useCompanyAsCong').onclick=()=>{const org=$('#c_organization').value.trim();if(!org)return toast('Company field is empty.');$('#c_congregation').value=org;$('#c_organization').value='';};
+  $('#useCongAsCompany').onclick=()=>{const cong=$('#c_congregation').value.trim();if(!cong)return toast('No congregation selected.');$('#c_organization').value=cong;$('#c_congregation').value='';};
   $('#modalSaveContact').onclick=()=>{
     const emails=$('#c_emails').value.split(/\n|;/).map(normalizeEmail).filter(isEmail).map((value,i)=>({label:i?'other':'primary',value}));
     const mobiles=$('#c_mobiles').value.split(/\n|;/).map(v=>normalizeMobile(v,{allowUnclear:true})).filter(n=>n.value).map((n,i)=>({label:i?'other':'mobile',value:n.value,raw:n.raw,countryGuess:n.countryGuess,warning:n.warning||''}));
@@ -892,24 +1330,31 @@ function openContactEditor(id=null){
     const roles=[...new Set([...picked,...custom].map(x=>x.trim()).filter(Boolean))];
     const pickedTeams=$$('[data-team-pick]').filter(x=>x.checked).map(x=>x.dataset.teamPick);
     const teamsSelected=[...new Set([...pickedTeams].map(x=>x.trim()).filter(Boolean))];
-    const saved=normalizeContactShape({...c,firstName:$('#c_firstName').value.trim(),lastName:$('#c_lastName').value.trim(),displayName:buildName($('#c_firstName').value,$('#c_lastName').value,c.displayName||''),congregation:$('#c_congregation').value.trim(),organization:$('#c_organization').value.trim(),roles,role:roles.join(', '),emails,mobiles,tags:splitTags($('#c_tags').value),notes:$('#c_notes').value.trim(),teams:teamsSelected,team:teamsSelected.join(', '),source:c.source||'local'});
+    const congVal=$('#c_congregation').value.trim();
+    const pickedTags=$$('[data-tag-pick]').filter(x=>x.checked).map(x=>x.dataset.tagPick);
+    const newTags=splitTags($('#c_tags_new').value);
+    const allChosenTags=[...new Set([...pickedTags,...newTags].map(x=>x.trim()).filter(Boolean))];
+    const saved=normalizeContactShape({...c,firstName:$('#c_firstName').value.trim(),lastName:$('#c_lastName').value.trim(),displayName:buildName($('#c_firstName').value,$('#c_lastName').value,c.displayName||''),congregation:congVal,organization:$('#c_organization').value.trim(),roles,role:roles.join(', '),emails,mobiles,tags:allChosenTags,notes:$('#c_notes').value.trim(),teams:teamsSelected,team:teamsSelected.join(', '),source:c.source||'local'});
     state.data.settings.masterRoles=[...new Set([...(state.data.settings.masterRoles||[]),...roles])];
     state.data.settings.masterTeams=[...new Set([...(state.data.settings.masterTeams||[]),...teamsSelected])];
     if(saved.congregation)state.data.settings.masterCongregations=[...new Set([...(state.data.settings.masterCongregations||[]),saved.congregation])];
+    if(newTags.length)state.data.settings.masterTags=[...new Set([...(state.data.settings.masterTags||allTags()),...newTags])].sort((a,b)=>a.localeCompare(b));
     if(existing){Object.assign(existing,saved);state.selectedContactId=existing.id}else{state.data.contacts.push(saved);state.selectedContactId=saved.id}
     closeModal();saveSoon();renderAll();toast('Contact saved.');
   };
 }
 
 function openTemplateEditor(){
+  // Pre-select context from current filter, fall back to personal
+  const activeCtx=CONTEXTS.find(c=>c.id===state.activeArea)||CONTEXTS.find(c=>c.id==='personal');
   const t=normalizeTemplateShape({
     id:uid('t'),
-    title:'New message template',
-    area:'General',
-    category:'General',
+    title:'New template',
+    context:activeCtx.id,
+    category:'',
     language:'en',
     tone:'',
-    channel:($('#deliveryChannel')?.value)||'whatsapp',
+    channel:activeCtx.defaultChannel,
     subject:'',
     body:'Hi {{firstName}},\n\n',
     footer:''
@@ -962,8 +1407,11 @@ function bind(){
 $('#btnCloseModal').onclick=closeModal;$('#modalOverlay').onclick=e=>{if(e.target.id==='modalOverlay')closeModal()};
 $('#btnNewContact').onclick=()=>openContactEditor();$('#btnMasterData').onclick=openMasterData;$('#btnMergeSelected').onclick=mergeSelectedContacts;$('#btnNewTemplate').onclick=openTemplateEditor;$('#btnDuplicateTemplate').onclick=duplicateTemplate;$('#btnDeleteTemplate').onclick=deleteTemplate;$('#btnSelectVisible').onclick=selectVisibleContacts;$('#btnClearSelection').onclick=clearContactSelection;
 if($('#btnCaptainExport'))$('#btnCaptainExport').onclick=openCaptainExport;$('#btnCopyContactList').onclick=openContactListModal;$('#btnExportSelectedCsv').onclick=exportSelectedContactsCsv;if($('#btnBulkEditSelected'))$('#btnBulkEditSelected').onclick=openBulkEditModal;if($('#btnBulkDeleteSelected'))$('#btnBulkDeleteSelected').onclick=bulkDelete;
+if($('#btnNewCong'))$('#btnNewCong').onclick=()=>openCongEditor();
+if($('#btnCongregations'))$('#btnCongregations').onclick=openCongregationsModal;
+if($('#congSearch'))$('#congSearch').addEventListener('input',()=>{});
 var sortEl=document.getElementById('contactSortBy');if(sortEl){sortEl.value=state.sortBy||'lastName';sortEl.addEventListener('change',function(){state.sortBy=sortEl.value;renderContacts();});}
-['contactSearch','contactTagFilter','contactRoleFilter','contactTeamFilter'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',()=>{renderContacts();updateSelectionHint();});el.addEventListener('change',()=>{renderContacts();updateSelectionHint();});}});['templateSearch'].forEach(id=>$('#'+id).addEventListener('input',renderTemplates));
+['contactSearch','contactTagFilter','contactRoleFilter','contactTeamFilter','contactFavFilter','contactCongFilter'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',()=>{renderContacts();updateSelectionHint();});el.addEventListener('change',()=>{renderContacts();updateSelectionHint();});}});['templateSearch'].forEach(id=>$('#'+id).addEventListener('input',renderTemplates));
 $('#contactBulkAction').onchange=e=>{const v=e.target.value;e.target.value='';if(v==='bulkEdit')openBulkEditModal();if(v==='delete')bulkDelete();if(v==='tag')bulkTag();if(v==='role')bulkSetRoles();if(v==='setTeam')bulkSetTeam();};
 $('#deliveryChannel').onchange=()=>{state.selectedTarget=null;renderPreview()};
 ['draft_eventName','draft_date'].forEach(function(id){var el=document.getElementById(id);if(!el)return;var key=id.replace('draft_','');el.addEventListener('input',function(){state.draftDetails[key]=el.value;renderPreview();});});
@@ -973,7 +1421,7 @@ $('#btnOpenEmail').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').v
 $('#btnInsertContact').onclick=openInsertContactModal;$('#btnSaveSent').onclick=saveSent;$('#btnSentItems').onclick=showSentItems;
 $('#btnStartEmpty').onclick=()=>{if(confirm('Start empty? Current local data will be replaced.')){state.data=emptyData();state.selectedContactId=null;state.selectedTemplateId=null;state.selectedContactIds.clear();saveNow();renderAll();toast('Started empty.')}};
 $('#btnClearLocal').onclick=()=>{if(confirm('Clear local data in this browser?')){localStorage.removeItem(STORAGE_KEY);state.data=emptyData();state.selectedContactId=null;state.selectedTemplateId=null;state.selectedContactIds.clear();renderAll();saveStatus('Local data cleared','danger');toast('Local data cleared.')}};
-$('#btnImportJson').onclick=()=>$('#jsonInput').click();$('#jsonInput').onchange=importJsonFile;$('#btnExportJson').onclick=exportJson;$('#btnImportCsv').onclick=()=>$('#csvInput').click();$('#csvInput').onchange=importCsvFile;$('#btnExportCsv').onclick=exportOutlookCsv;
+$('#btnImportJson').onclick=()=>$('#jsonInput').click();$('#jsonInput').onchange=importJsonFile;$('#btnExportJson').onclick=exportJson;$('#btnImportCsv').onclick=()=>$('#csvInput').click();$('#csvInput').onchange=importCsvFile;$('#btnExportCsv').onclick=openSmartExport;
 }
 function bulkDelete(){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const names=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean).slice(0,12).map(c=>'• '+contactName(c)).join('\n');const more=ids.length>12?`\n… and ${ids.length-12} more`:'';if(confirm(`Delete ${ids.length} selected contact(s)?\n\n${names}${more}\n\nThis cannot be undone.`)){state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id));state.selectedContactIds.clear();state.selectedContactId=state.data.contacts[0]?.id||null;saveSoon();renderAll();toast(`${ids.length} contact(s) deleted.`)}}
 function bulkTag(){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const tag=prompt('Add tag:');if(!tag)return;state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>c.tags=[...new Set([...(c.tags||[]),tag.trim()])]);saveSoon();renderAll();toast('Tag added.')}
@@ -1014,9 +1462,13 @@ function wireBulkEditAutoModes(){
 function openBulkEditModal(){
   const idsAtOpen=selectedContactIds();
   if(!idsAtOpen.length)return toast('No contacts selected.');
-  const roles=allRoles(), teams=allTeams(), tags=allTags();
+  const roles=allRoles(), teams=allTeams(), tags=allTags(), congs=allCongregations();
   showModal('Bulk edit selected contacts',`<div class="stack">
-    <p class="hint"><strong>${idsAtOpen.length} selected contact(s).</strong> Add, replace, or clear the values that normally sit inside each contact. Leave a section on “No change” if you do not want to touch it.</p>
+    <p class="hint"><strong>${idsAtOpen.length} selected contact(s).</strong> Add, replace, or clear values. Leave a section on "No change" to skip it.</p>
+    <div class="bulkAssignBox">
+      <div class="bulkAssignHead"><b>Congregation</b><select id="bulkEditCongMode"><option value="none">No change</option><option value="set">Set to selected</option><option value="clear">Clear congregation</option></select></div>
+      <div style="margin-top:6px"><select id="bulkEditCongVal"><option value="">— none —</option>${congs.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('')}</select></div>
+    </div>
     <div class="bulkAssignBox">
       <div class="bulkAssignHead"><b>Congregation roles</b><select id="bulkEditRoleMode"><option value="none">No change</option><option value="add">Add selected</option><option value="replace">Replace with selected</option><option value="clear">Clear all roles</option></select></div>
       <div class="bulkCheckGrid">${roles.map(r=>`<label class="rolePick"><input type="checkbox" data-be-role="${esc(r)}"> ${esc(r)}</label>`).join('')}</div>
@@ -1034,19 +1486,22 @@ function openBulkEditModal(){
     </div>
   </div>`,`<button class="ghost" id="bulkEditCancel">Cancel</button><button class="primary" id="bulkEditApply">Apply to selected</button>`);
   $('#bulkEditCancel').onclick=closeModal;
+  $('#bulkEditCongVal').addEventListener('change',()=>{if($('#bulkEditCongMode').value==='none')$('#bulkEditCongMode').value='set';});
   wireBulkEditAutoModes();
   $('#bulkEditApply').onclick=()=>{
     const ids=selectedContactIds();
     if(!ids.length)return toast('No contacts selected.');
     let roleMode=$('#bulkEditRoleMode').value, teamMode=$('#bulkEditTeamMode').value, tagMode=$('#bulkEditTagMode').value;
+    const congMode=$('#bulkEditCongMode').value, congVal=$('#bulkEditCongVal').value.trim();
     const chosenRoles=[...new Set([...$$('[data-be-role]').filter(x=>x.checked).map(x=>x.dataset.beRole),...splitTags($('#bulkEditCustomRoles').value)].map(x=>x.trim()).filter(Boolean))];
     const chosenTeams=[...new Set([...$$('[data-be-team]').filter(x=>x.checked).map(x=>x.dataset.beTeam),...splitTags($('#bulkEditCustomTeams').value)].map(x=>x.trim()).filter(Boolean))];
     const chosenTags=[...new Set([...$$('[data-be-tag]').filter(x=>x.checked).map(x=>x.dataset.beTag),...splitTags($('#bulkEditCustomTags').value)].map(x=>x.trim()).filter(Boolean))];
-    // User-friendly default: checking values is enough. If the mode is still “No change”, treat checked/custom entries as “Add selected”.
     if(roleMode==='none'&&chosenRoles.length)roleMode='add';
     if(teamMode==='none'&&chosenTeams.length)teamMode='add';
     if(tagMode==='none'&&chosenTags.length)tagMode='add';
     state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>{
+      if(congMode==='set'&&congVal)c.congregation=congVal;
+      else if(congMode==='clear')c.congregation='';
       if(roleMode==='clear'){c.roles=[];c.role='';}
       else if(roleMode==='replace'){c.roles=chosenRoles;c.role=chosenRoles.join(', ');}
       else if(roleMode==='add'&&chosenRoles.length){const next=[...new Set([...contactRoles(c),...chosenRoles])];c.roles=next;c.role=next.join(', ');}
@@ -1183,37 +1638,145 @@ function exportSelectedContactsCsv(){const list=selectedOrVisibleContacts();if(!
 
 function importCsvFile(e){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const rows=parseCsv(r.result),preview=buildCsvPreview(rows);showCsvPreview(f.name,preview)}catch(err){console.error(err);toast('CSV could not be read.')}e.target.value=''};r.readAsText(f,'utf-8')}
 function showCsvPreview(file,preview){const rows=preview.contacts.slice(0,200).map(it=>`<tr><td><span class="chip ${it.status==='new'?'green':it.status==='existing'?'warn':'danger'}">${esc(it.status)}</span></td><td>${esc(contactName(it.contact))}</td><td>${esc((it.contact.emails||[]).map(e=>e.value).join(', '))}</td><td>${esc((it.contact.mobiles||[]).map(m=>m.value).join(', '))}</td><td>${esc(it.warnings.join('; '))}</td></tr>`).join('');showModal('Outlook CSV Import',`
-<p class="hint">Datei: <strong>${esc(file)}</strong>. Bei existing contacts kannst du beim Import mergen oder überspringen.</p>
+<p class="hint">File: <strong>${esc(file)}</strong>. For existing contacts you can merge or skip on import.</p>
 <div class="importSummary"><div class="stat"><b>${preview.totalRows}</b><span>Rows</span></div><div class="stat"><b>${preview.contacts.length}</b><span>Contacts</span></div><div class="stat"><b>${preview.existing}</b><span>existing</span></div><div class="stat"><b>${preview.withMobile}</b><span>Mobile</span></div><div class="stat"><b>${preview.review}</b><span>Review</span></div></div>
 <div class="row" style="margin-bottom:10px"><div><label>If contact already exists</label><select id="csvExistingMode"><option value="merge">Merge / add missing data</option><option value="skip">Skip</option></select></div><div><label>Import</label><select id="csvImportFilter"><option value="all">All contacts</option><option value="clean">Only without warnings</option></select></div></div><div class="row" style="margin-bottom:10px"><div><label>Outlook Company</label><select id="csvCompanyMode"><option value="toCongClear">Use as congregation, clear Company</option><option value="toCongKeep">Use as congregation, keep Company</option><option value="keep">Keep as Company only</option></select></div><div><label>Outlook Categories</label><select id="csvCategoryMode"><option value="rolesAndTags">Use as roles + import tags</option><option value="tagsOnly">Use as import tags only</option><option value="ignore">Ignore categories</option></select></div></div>
-<div class="tableWrap"><table><thead><tr><th>Status</th><th>Name</th><th>E-Mails</th><th>Mobil</th><th>Notes</th></tr></thead><tbody>${rows||'<tr><td colspan="5">Nothing importable.</td></tr>'}</tbody></table></div>`,
-`<button class="ghost" id="csvCancel">Cancel</button><button class="primary" id="csvImport">Import</button>`);$('#csvCancel').onclick=closeModal;$('#csvImport').onclick=()=>{let added=0,merged=0,skipped=0;const mode=$('#csvExistingMode').value,filter=$('#csvImportFilter').value;preview.contacts.filter(it=>filter==='all'||!it.warnings.length).forEach(it=>{const contact=structuredClone(it.contact);const cm=$('#csvCompanyMode')?.value||'toCongClear';if(contact.organization&&(cm==='toCongClear'||cm==='toCongKeep')&&!contact.congregation){contact.congregation=contact.organization;if(cm==='toCongClear')contact.organization='';}if(cm==='keep'){}const catMode=$('#csvCategoryMode')?.value||'rolesAndTags';if(catMode==='ignore'){contact.tags=(contact.tags||[]).filter(t=>!String(t).startsWith('Outlook:'));}if(catMode==='rolesAndTags'){const cats=(contact.tags||[]).filter(t=>String(t).startsWith('Outlook:')).map(t=>t.replace(/^Outlook:\s*/,''));contact.roles=[...new Set([...(contact.roles||[]),...cats])];contact.role=contact.roles.join(', ');}const r=mergeOrAdd(contact,mode);if(r==='new')added++;if(r==='merged')merged++;if(r==='skipped')skipped++});closeModal();saveSoon();renderAll();toast(`CSV: ${added} neu, ${merged} merged, ${skipped} übersprungen.`)}}
-function buildCsvPreview(rows){const items=[];rows.forEach(row=>{const c=fromOutlook(row);if(!c)return;const warnings=[];(c.mobiles||[]).forEach(m=>{if(m.warning)warnings.push(`${m.raw}: ${m.warning}`)});if(!contactName(c)||contactName(c)==='(Ohne Name)')warnings.push('name missing');if(!(c.emails||[]).length&&!(c.mobiles||[]).length)warnings.push('no email/mobile');const existing=!!findMatch(c);items.push({contact:c,warnings,status:warnings.length?'review':existing?'existing':'new'})});return{totalRows:rows.length,contacts:items,existing:items.filter(i=>i.status==='existing').length,withMobile:items.filter(i=>i.contact.mobiles?.length).length,review:items.filter(i=>i.warnings.length).length}}
+<div class="tableWrap"><table><thead><tr><th>Status</th><th>Name</th><th>E-Mails</th><th>Mobile</th><th>Notes</th></tr></thead><tbody>${rows||'<tr><td colspan="5">Nothing importable.</td></tr>'}</tbody></table></div>`,
+`<button class="ghost" id="csvCancel">Cancel</button><button class="primary" id="csvImport">Import</button>`);$('#csvCancel').onclick=closeModal;$('#csvImport').onclick=()=>{let added=0,merged=0,skipped=0;const mode=$('#csvExistingMode').value,filter=$('#csvImportFilter').value;preview.contacts.filter(it=>filter==='all'||!it.warnings.length).forEach(it=>{const contact=structuredClone(it.contact);const cm=$('#csvCompanyMode')?.value||'toCongClear';if(contact.organization&&(cm==='toCongClear'||cm==='toCongKeep')&&!contact.congregation){contact.congregation=contact.organization;if(cm==='toCongClear')contact.organization='';}if(cm==='keep'){}const catMode=$('#csvCategoryMode')?.value||'rolesAndTags';if(catMode==='ignore'){contact.tags=(contact.tags||[]).filter(t=>!String(t).startsWith('Outlook:'));}if(catMode==='rolesAndTags'){const cats=(contact.tags||[]).filter(t=>String(t).startsWith('Outlook:')).map(t=>t.replace(/^Outlook:\s*/,''));contact.roles=[...new Set([...(contact.roles||[]),...cats])];contact.role=contact.roles.join(', ');}const r=mergeOrAdd(contact,mode);if(r==='new')added++;if(r==='merged')merged++;if(r==='skipped')skipped++});closeModal();saveSoon();renderAll();toast(`CSV import: ${added} added, ${merged} merged, ${skipped} skipped.`)}}
+function buildCsvPreview(rows){const items=[];rows.forEach(row=>{const c=fromOutlook(row);if(!c)return;const warnings=[];(c.mobiles||[]).forEach(m=>{if(m.warning)warnings.push(`${m.raw}: ${m.warning}`)});if(!contactName(c)||contactName(c)==='(No name)')warnings.push('name missing');if(!(c.emails||[]).length&&!(c.mobiles||[]).length)warnings.push('no email/mobile');const existing=!!findMatch(c);items.push({contact:c,warnings,status:warnings.length?'review':existing?'existing':'new'})});return{totalRows:rows.length,contacts:items,existing:items.filter(i=>i.status==='existing').length,withMobile:items.filter(i=>i.contact.mobiles?.length).length,review:items.filter(i=>i.warnings.length).length}}
 function fromOutlook(row){const get=(...names)=>{for(const n of names){const k=Object.keys(row).find(x=>norm(x)===norm(n));if(k&&String(row[k]||'').trim())return String(row[k]).trim()}return''};const firstName=get('First Name','Given Name','First name'),lastName=get('Last Name','Surname','Last name'),displayName=get('Display Name','Name','Full Name','Display name')||buildName(firstName,lastName,'');const org=get('Company','Organization','Firma','Organization'),notes=get('Notes','Notes'),categories=get('Categories','Kategorie','Outlook Categories');const emails=uniqueBy([get('E-mail Address','Email Address','E-Mail-Adresse'),get('E-mail 2 Address','Email 2 Address','E-Mail 2-Adresse'),get('E-mail 3 Address','Email 3 Address','E-Mail 3-Adresse')].flatMap(v=>String(v||'').split(/[;,]/)).map(normalizeEmail).filter(isEmail),x=>x).map((value,i)=>({label:i?'other':'primary',value}));
 const mobileVals=[get('Mobile Phone','Mobile Phone 2','Mobiltelefon','Mobil','Handy','Telefon mobil','Other Mobile')].flatMap(v=>String(v||'').split(/[;\n]/)).filter(Boolean);const phoneVals=[get('Primary Phone','Other Phone','Business Phone','Home Phone','Telefon','Weitere Telefonnummer')].flatMap(v=>String(v||'').split(/[;\n]/)).filter(Boolean);let normals=mobileVals.map(v=>normalizeMobile(v,{allowUnclear:true}));phoneVals.forEach(v=>{const n=normalizeMobile(v,{allowUnclear:false});if(n.value&&isLikelyMobile(n.value))normals.push(n)});const mobiles=uniqueBy(normals.filter(n=>n.value).map((n,i)=>({label:i?'other':'mobile',value:n.value,raw:n.raw,countryGuess:n.countryGuess,warning:n.warning||''})),x=>digitsOnly(x.value));if(!displayName&&!emails.length&&!mobiles.length)return null;return normalizeContactShape({id:uid('c'),firstName,lastName,displayName,organization:org,notes,tags:['Imported','Outlook',...splitTags(categories).map(x=>'Outlook: '+x)],source:'outlook_csv',emails,mobiles,importedAt:new Date().toISOString()})}
-function exportOutlookCsv(){const headers=['First Name','Last Name','Congregation','E-mail Address','JW E-mail','Mobile Phone','Notes','Categories'];const rows=state.data.contacts.map(c=>{const allEmails=(c.emails||[]).map(e=>e.value);const jwEmail=allEmails.find(e=>/jwpub|jw\.org/i.test(e))||'';const regEmail=allEmails.find(e=>!/jwpub|jw\.org/i.test(e))||'';return{'First Name':c.firstName||'','Last Name':c.lastName||'','Congregation':c.congregation||'','E-mail Address':regEmail,'JW E-mail':jwEmail,'Mobile Phone':(c.mobiles||[])[0]?.value||'','Notes':[contactRoles(c).length?`Roles: ${contactRoles(c).join(', ')}`:'',c.notes||''].filter(Boolean).join('\n'),'Categories':(c.tags||[]).join('; ')};});downloadFile(`contacthub_pro_contacts_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');toast('CSV exported.');}
+function openSmartExport(){
+  const allTagsList=[...new Set(state.data.contacts.flatMap(c=>c.tags||[]))].sort((a,b)=>a.localeCompare(b));
+  const allCongList=allCongregations();
+  showModal('📤 Smart Export',`<div class="stack">
+    <p class="hint">Choose what to export. You can export congregations as a list, contacts filtered by tag or congregation, or a full JSON backup.</p>
+
+    <div class="row" style="grid-template-columns:1fr 1fr">
+      <div><label>Export type</label><select id="exp_type">
+        <option value="contacts_all">All contacts (CSV)</option>
+        <option value="contacts_tag">Contacts by tag (CSV)</option>
+        <option value="contacts_cong">Contacts by congregation (CSV)</option>
+        <option value="cong_list">Congregation list only (CSV)</option>
+        <option value="cong_with_publishers">Congregation + all their publishers (CSV)</option>
+        <option value="selected">Selected contacts (CSV)</option>
+        <option value="json">Full backup (JSON)</option>
+      </select></div>
+      <div id="exp_filterWrap" style="display:none"><label id="exp_filterLabel">Filter</label>
+        <select id="exp_filter"></select>
+      </div>
+    </div>
+
+    <div id="exp_preview" class="hint" style="background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:8px 10px;min-height:36px"></div>
+  </div>`,`<button class="ghost" id="expCancel">Cancel</button><button class="primary" id="expGo">Download</button>`);
+
+  const typeEl=$('#exp_type'), filterWrap=$('#exp_filterWrap'), filterEl=$('#exp_filter'), filterLabel=$('#exp_filterLabel'), preview=$('#exp_preview');
+
+  const updateType=()=>{
+    const t=typeEl.value;
+    const needFilter=['contacts_tag','contacts_cong','cong_with_publishers'].includes(t);
+    filterWrap.style.display=needFilter?'':'none';
+    if(t==='contacts_tag'){
+      filterLabel.textContent='Tag';
+      filterEl.innerHTML=allTagsList.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    } else if(t==='contacts_cong'||t==='cong_with_publishers'){
+      filterLabel.textContent='Congregation';
+      filterEl.innerHTML=allCongList.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    }
+    updatePreview();
+  };
+  const updatePreview=()=>{
+    const t=typeEl.value, f=filterEl.value;
+    let count=0, desc='';
+    if(t==='contacts_all'){count=state.data.contacts.length;desc=`All ${count} contacts`;}
+    else if(t==='contacts_tag'){count=state.data.contacts.filter(c=>(c.tags||[]).includes(f)).length;desc=`${count} contacts with tag "${f}"`;}
+    else if(t==='contacts_cong'){count=state.data.contacts.filter(c=>c.congregation===f).length;desc=`${count} contacts in congregation "${f}"`;}
+    else if(t==='cong_list'){count=(state.data.congregations||[]).length;desc=`${count} congregation entries (name, city, JW email, notes)`;}
+    else if(t==='cong_with_publishers'){const congs=state.data.contacts.filter(c=>c.congregation===f);count=congs.length;desc=`1 congregation + ${count} publisher contact${count!==1?'s':''} from "${f}"`;}
+    else if(t==='selected'){const ids=selectedContactIds();count=ids.length;desc=`${count} selected contact${count!==1?'s':''}`;}
+    else if(t==='json'){count=state.data.contacts.length;desc=`Full backup (${count} contacts, ${(state.data.congregations||[]).length} congregations, ${state.data.templates.length} templates)`;}
+    preview.textContent=desc||'—';
+  };
+  typeEl.addEventListener('change',updateType);
+  filterEl.addEventListener('change',updatePreview);
+  updateType();
+
+  $('#expCancel').onclick=closeModal;
+  $('#expGo').onclick=()=>{
+    const t=typeEl.value, f=filterEl.value;
+    const headers=['First Name','Last Name','Congregation','Role(s)','Teams','Email','JW Email','Mobile','Tags','Company','Notes'];
+    const toRow=c=>{
+      const allEmails=(c.emails||[]).map(e=>e.value);
+      const jwEmail=allEmails.find(e=>/jwpub|jw\.org/i.test(e))||'';
+      const regEmail=allEmails.find(e=>!/jwpub|jw\.org/i.test(e))||'';
+      return{'First Name':c.firstName||'','Last Name':c.lastName||'','Congregation':c.congregation||'','Role(s)':contactRoles(c).join('; '),'Teams':contactTeams(c).join('; '),'Email':regEmail,'JW Email':jwEmail,'Mobile':(c.mobiles||[])[0]?.value||'','Tags':(c.tags||[]).join('; '),'Company':c.organization||'','Notes':c.notes||''};
+    };
+    if(t==='json'){closeModal();exportJson();return;}
+    if(t==='contacts_all'){
+      const rows=state.data.contacts.map(toRow);
+      downloadFile(`contacts_all_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');
+      closeModal();toast(`Exported ${rows.length} contacts.`);return;
+    }
+    if(t==='contacts_tag'){
+      const rows=state.data.contacts.filter(c=>(c.tags||[]).includes(f)).map(toRow);
+      if(!rows.length)return toast(`No contacts with tag "${f}".`);
+      downloadFile(`contacts_tag_${f.replace(/\W+/g,'_')}_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');
+      closeModal();toast(`Exported ${rows.length} contacts.`);return;
+    }
+    if(t==='contacts_cong'){
+      const rows=state.data.contacts.filter(c=>c.congregation===f).map(toRow);
+      if(!rows.length)return toast(`No contacts in congregation "${f}".`);
+      downloadFile(`contacts_${f.replace(/\W+/g,'_')}_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');
+      closeModal();toast(`Exported ${rows.length} contacts.`);return;
+    }
+    if(t==='cong_list'){
+      const ch=['Name','City','JW Email','Zoom ID','Zoom Link','Zoom Passcode','Notes'];
+      const rows=(state.data.congregations||[]).sort((a,b)=>a.name.localeCompare(b.name)).map(c=>({'Name':c.name,'City':c.city,'JW Email':c.jwEmail,'Zoom ID':c.zoomId,'Zoom Link':c.zoomLink,'Zoom Passcode':c.zoomPass,'Notes':c.notes}));
+      if(!rows.length)return toast('No congregations to export.');
+      downloadFile(`congregations_${stamp()}.csv`,'\uFEFF'+toCsv(ch,rows),'text/csv;charset=utf-8');
+      closeModal();toast(`Exported ${rows.length} congregations.`);return;
+    }
+    if(t==='cong_with_publishers'){
+      const cong=(state.data.congregations||[]).find(c=>c.name===f);
+      const publishers=state.data.contacts.filter(c=>c.congregation===f);
+      // Two sections: cong header, then publishers
+      const ch=['Name','City','JW Email','Notes','—'];
+      const congRow=[{'Name':cong?.name||f,'City':cong?.city||'','JW Email':cong?.jwEmail||'','Notes':cong?.notes||'','—':''}];
+      const pubRows=publishers.map(toRow);
+      const combined='\uFEFF'+toCsv(['Name','City','JW Email','Notes','—'],congRow)+'\r\n\r\n'+'\uFEFF'+toCsv(headers,pubRows);
+      downloadFile(`congregation_${f.replace(/\W+/g,'_')}_${stamp()}.csv`,combined,'text/csv;charset=utf-8');
+      closeModal();toast(`Exported congregation + ${publishers.length} publishers.`);return;
+    }
+    if(t==='selected'){
+      const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');
+      const rows=state.data.contacts.filter(c=>ids.includes(c.id)).map(toRow);
+      downloadFile(`contacts_selected_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');
+      closeModal();toast(`Exported ${rows.length} selected contacts.`);return;
+    }
+  };
+}
 function parseCsv(text){text=String(text||'').replace(/^\uFEFF/,'');const delimiter=detectDelimiter(text),rows=[];let row=[],field='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'){if(q&&nx==='"'){field+='"';i++}else q=!q}else if(ch===delimiter&&!q){row.push(field);field=''}else if((ch==='\n'||ch==='\r')&&!q){if(ch==='\r'&&nx==='\n')i++;row.push(field);field='';if(row.some(v=>String(v).trim()!==''))rows.push(row);row=[]}else field+=ch}row.push(field);if(row.some(v=>String(v).trim()!==''))rows.push(row);if(!rows.length)return[];const headers=rows.shift().map(h=>String(h||'').trim());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]??''])))}
 function detectDelimiter(text){const l=String(text).split(/\r?\n/)[0]||'',c=(l.match(/,/g)||[]).length,s=(l.match(/;/g)||[]).length,t=(l.match(/\t/g)||[]).length;if(t>c&&t>s)return'\t';return s>c?';':','}
 function toCsv(headers,rows){const q=v=>{const s=String(v??'');return(/[",\n\r;]/.test(s))?`"${s.replace(/"/g,'""')}"`:s};return[headers.join(','),...rows.map(r=>headers.map(h=>q(r[h])).join(','))].join('\r\n')}
 function downloadFile(name,content,type){const blob=new Blob([content],{type}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}
-function exportSingleVcf(id){var c=state.data.contacts.find(function(x){return x.id===id;});if(!c)return;var L=['BEGIN:VCARD','VERSION:3.0'];L.push('N:'+(c.lastName||'')+';'+(c.firstName||'')+';;;');L.push('FN:'+contactName(c));if(c.organization||c.congregation)L.push('ORG:'+(c.organization||c.congregation||''));(c.emails||[]).forEach(function(e,i){L.push('EMAIL;TYPE='+(i===0?'PREF,':'')+'INTERNET:'+(e.value||''));});(c.mobiles||[]).forEach(function(m,i){L.push('TEL;TYPE='+(i===0?'PREF,':'')+'CELL:'+(m.value||''));});if(c.notes)L.push('NOTE:'+c.notes.split('\n').join('\\n'));L.push('END:VCARD');downloadFile(contactName(c).replace(/\s+/g,'_')+'.vcf',L.join('\r\n'),'text/vcard;charset=utf-8');toast('\u{1F4C7} vCard gespeichert.');}
+function exportSingleVcf(id){var c=state.data.contacts.find(function(x){return x.id===id;});if(!c)return;var L=['BEGIN:VCARD','VERSION:3.0'];L.push('N:'+(c.lastName||'')+';'+(c.firstName||'')+';;;');L.push('FN:'+contactName(c));if(c.organization||c.congregation)L.push('ORG:'+(c.organization||c.congregation||''));(c.emails||[]).forEach(function(e,i){L.push('EMAIL;TYPE='+(i===0?'PREF,':'')+'INTERNET:'+(e.value||''));});(c.mobiles||[]).forEach(function(m,i){L.push('TEL;TYPE='+(i===0?'PREF,':'')+'CELL:'+(m.value||''));});if(c.notes)L.push('NOTE:'+c.notes.split('\n').join('\\n'));L.push('END:VCARD');downloadFile(contactName(c).replace(/\s+/g,'_')+'.vcf',L.join('\r\n'),'text/vcard;charset=utf-8');toast('\u{1F4C7} vCard saved.');}
 function normalizeEmail(v){return String(v||'').trim().toLowerCase().replace(/^mailto:/,'').replace(/\s+/g,'')}
 function isEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||''))}
-function normalizeMobile(input,opts={}){const raw=String(input||'').trim();if(!raw)return{value:'',raw,countryGuess:'',warning:''};let s=raw.replace(/\(0\)/g,'').replace(/[\s().\-\/]/g,'').replace(/^00/,'+'),warning='',countryGuess='';if(/^(\+49)/.test(s)){countryGuess='DE';s=s.replace(/^\+490/,'+49');return{value:formatPhone(s),raw,countryGuess,warning}}if(/^01\d+/.test(s)){countryGuess='DE';return{value:formatPhone('+49'+s.slice(1)),raw,countryGuess,warning}}if(/^\+\d{7,}$/.test(s)){countryGuess=s.startsWith('+43')?'AT':s.startsWith('+41')?'CH':s.startsWith('+44')?'UK':'INT';return{value:formatPhone(s),raw,countryGuess,warning}}if(/^\d{7,}$/.test(s)&&opts.allowUnclear)return{value:s,raw,countryGuess:'UNCLEAR',warning:'keine Länderkennung - bitte prüfen'};return{value:'',raw,countryGuess:'',warning:'unklar/no mobile'}}
+function normalizeMobile(input,opts={}){const raw=String(input||'').trim();if(!raw)return{value:'',raw,countryGuess:'',warning:''};let s=raw.replace(/\(0\)/g,'').replace(/[\s().\-\/]/g,'').replace(/^00/,'+'),warning='',countryGuess='';if(/^(\+49)/.test(s)){countryGuess='DE';s=s.replace(/^\+490/,'+49');return{value:formatPhone(s),raw,countryGuess,warning}}if(/^01\d+/.test(s)){countryGuess='DE';return{value:formatPhone('+49'+s.slice(1)),raw,countryGuess,warning}}if(/^\+\d{7,}$/.test(s)){countryGuess=s.startsWith('+43')?'AT':s.startsWith('+41')?'CH':s.startsWith('+44')?'UK':'INT';return{value:formatPhone(s),raw,countryGuess,warning}}if(/^\d{7,}$/.test(s)&&opts.allowUnclear)return{value:s,raw,countryGuess:'UNCLEAR',warning:'no country code — please check'};return{value:'',raw,countryGuess:'',warning:'unclear / not a mobile number'}}
 function formatPhone(s){s=String(s).replace(/[^+\d]/g,'');if(s.startsWith('+49')){const r=s.slice(3);return r.length>3?`+49 ${r.slice(0,3)} ${r.slice(3)}`:`+49 ${r}`}const m=s.match(/^\+(\d{1,3})(\d+)$/);return m?`+${m[1]} ${m[2].replace(/(.{3})(?=.)/g,'$1 ')}`.trim():s}
 function isLikelyMobile(v){const d=digitsOnly(v);return/^(4915|4916|4917)/.test(d)||/^01[567]/.test(d)}
 function digitsOnly(s){return String(s||'').replace(/\D/g,'')}
 function norm(s){return String(s||'').toLowerCase().replace(/[\s_\-.]/g,'').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')}
-function contactName(c){return buildName(c?.firstName,c?.lastName,c?.displayName)||'(Ohne Name)'}
+function contactName(c){return buildName(c?.firstName,c?.lastName,c?.displayName)||'(No name)'}
 function contactDisplayName(c){if(state&&state.sortBy==='lastName'&&c.lastName&&c.firstName)return c.lastName+', '+c.firstName;return contactName(c);}
 function buildName(f,l,fb){return[f,l].filter(Boolean).join(' ').trim()||fb||''}
 function firstWord(s){return String(s||'').trim().split(/\s+/)[0]||''}
 function splitTags(v){return Array.isArray(v)?v:String(v||'').split(/[,;]/).map(x=>x.trim()).filter(Boolean)}
 function uniqueBy(arr,fn){const seen=new Set();return arr.filter(x=>{const k=fn(x);if(!k||seen.has(k))return false;seen.add(k);return true})}
-window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openInsertContactModal,openCaptainExport,openBulkEditModal};
+window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openInsertContactModal,openCaptainExport,openBulkEditModal,openCongEditor,openSmartExport};
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.2.8 · Contact hub + message composer</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.3.7 · Contact hub + message composer</footer>
 </body>
 </html>
