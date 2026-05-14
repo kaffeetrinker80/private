@@ -1,1 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <!-- Icons + Manifest -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" href="favicon.ico">
+
+<link rel="manifest" href="site.webmanifest">
+
+<meta name="theme-color" content="#172f4d">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CO-10-26-E · Eternal Happiness 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#111;font-size:14px}
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sb{width:230px;flex-shrink:0;background:#fff;border-right:1px solid #e5e5e0;display:flex;flex-direction:column;transition:transform .25s}
+.sb-head{padding:14px 14px 10px;border-bottom:1px solid #e5e5e0}
+.sb-logo{font-size:10px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.sb-filter-note{font-size:11px;color:#0C447C;background:#E6F1FB;border:1px solid #85B7EB;border-radius:7px;padding:5px 8px}
+.sb-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.stab{padding:5px 0;font-size:12px;border:1px solid #ddd;border-radius:6px;background:transparent;cursor:pointer;color:#666;text-align:center;font-family:inherit}
+.stab.on{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.sb-search{padding:8px 10px;border-bottom:1px solid #e5e5e0}
+.sb-search input{width:100%;font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;background:#f9f9f7;color:#111;font-family:inherit;outline:none}
+.sb-search input:focus{border-color:#85B7EB}
+.sb-list{flex:1;overflow-y:auto;padding:6px}
+.spk{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:default}
+.spk:hover{background:#f4f4f0}
+.av{width:30px;height:30px;border-radius:50%;background:#E6F1FB;color:#0C447C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.spk-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spk-cong{font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* NAV */
+.nav{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid #e5e5e0;flex-shrink:0}
+.nav-title{flex:1;min-width:0}
+.nav-title h1{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-title p{font-size:11px;color:#888;margin-top:1px}
+.nav-actions{display:flex;gap:5px;flex-shrink:0}
+.nb{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;font-size:12px;border:1px solid #ddd;border-radius:7px;background:#fff;cursor:pointer;color:#333;font-family:inherit;font-weight:500}
+.nb:hover{background:#f4f4f0}
+.nb.g{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.nb.g:hover{background:#c8eedd}
+.nb.b{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.nb.b:hover{background:#cfe3f7}
+.ham{display:none;padding:6px 8px;border:1px solid #ddd;border-radius:7px;background:#fff;cursor:pointer;font-size:18px;line-height:1}
+
+
+/* PUBLIC IMPORT NOTICE */
+.import-notice{margin:10px 16px 0;padding:11px 14px;background:#fff8e8;border:1px solid #f0d79b;border-radius:10px;color:#5d4200;font-size:12px;line-height:1.45;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.import-notice strong{font-size:13px}
+.import-notice .nb{padding:5px 10px}
+.import-notice.hidden{display:none}
+.empty-state{padding:14px;margin:8px;border:1px dashed #ccc;border-radius:10px;background:#fafaf7;color:#777;font-size:12px;line-height:1.5;text-align:center}
+
+/* STATS */
+.stat-bar{display:flex;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid #e5e5e0;flex-shrink:0}
+.stat{background:#f4f4f0;border-radius:8px;padding:8px 14px;text-align:center;flex:1}
+.stat-n{font-size:22px;font-weight:600;color:#111}
+.stat-l{font-size:10px;color:#888;margin-top:1px}
+
+/* VIEW TABS */
+.vtabs{display:flex;padding:12px 16px 0;flex-shrink:0;gap:0}
+.vtab{padding:7px 18px;font-size:12px;font-weight:500;border:1px solid #ddd;background:#f4f4f0;cursor:pointer;color:#666;font-family:inherit}
+.vtab:first-child{border-radius:7px 0 0 0;border-right:none}
+.vtab:last-child{border-radius:0 7px 0 0}
+.vtab.on{background:#fff;color:#111;border-bottom-color:#fff;z-index:1;position:relative}
+.vtab-bar{height:1px;background:#ddd;margin:0 16px;flex-shrink:0}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;padding:16px}
+
+/* ---- ASSIGN VIEW ---- */
+.day-block{margin-bottom:28px}
+.day-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.day-hdr-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#666;white-space:nowrap}
+.day-hdr-line{flex:1;height:1px;background:#e0e0da}
+
+.srow{display:flex;background:#fff;border:1px solid #e5e5e0;border-radius:10px;margin-bottom:6px;overflow:hidden}
+.srow-time{width:54px;flex-shrink:0;padding:12px 0 12px 12px;border-right:1px solid #f0f0ec;display:flex;flex-direction:column;justify-content:flex-start}
+.srow-time span{font-size:12px;font-weight:600;color:#999;font-variant-numeric:tabular-nums}
+.srow-body{flex:1;padding:10px 12px;min-width:0}
+.srow-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+.srow-title{font-size:13px;font-weight:600;line-height:1.4;flex:1;min-width:0}
+.srow-note{font-size:11px;color:#999;font-style:italic;margin-bottom:7px;line-height:1.5}
+.slots{display:flex;flex-direction:column;gap:5px}
+.slot-row{display:flex;align-items:center;gap:8px}
+.slot-lbl{font-size:11px;color:#999;width:70px;flex-shrink:0}
+.asgn-btn{display:inline-flex;align-items:flex-start;gap:6px;padding:5px 10px;border-radius:7px;border:1.5px dashed #ccc;background:transparent;font-size:12px;color:#999;cursor:pointer;font-family:inherit;text-align:left;transition:background .15s}
+.asgn-btn:hover{background:#f4f4f0;border-color:#aaa}
+.asgn-btn.set{border-style:solid;border-color:#5DCAA5;background:#E1F5EE;color:#085041}
+.asgn-icon{font-size:14px;margin-top:1px;flex-shrink:0}
+.asgn-n{font-size:12px;font-weight:600;line-height:1.3}
+.asgn-c{font-size:10px;opacity:.75;line-height:1.2}
+.clr-btn{border:none;background:transparent;cursor:pointer;color:#bbb;padding:3px 4px;border-radius:5px;font-size:13px;display:flex;align-items:center}
+.clr-btn:hover{color:#c0392b;background:#FCEBEB}
+
+/* BADGE */
+.badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;flex-shrink:0;white-space:nowrap;margin-top:2px}
+.bv{background:#FAEEDA;color:#633806}
+.bt{background:#EAF3DE;color:#27500A}
+.bp{background:#E6F1FB;color:#0C447C}
+.bc{background:#f0f0ec;color:#666;border:1px solid #ddd}
+
+/* WT chips */
+.wt-parts{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-start}
+.chip{display:inline-flex;align-items:flex-start;gap:4px;padding:4px 8px;border-radius:7px;background:#E1F5EE;border:1px solid #5DCAA5;color:#085041}
+.chip-n{font-size:12px;font-weight:600;line-height:1.3}
+.chip-c{font-size:10px;opacity:.7;line-height:1.2}
+.chip-x{border:none;background:transparent;cursor:pointer;color:#1D9E75;padding:0;font-size:11px;display:flex;margin-top:1px}
+.add-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;border:1.5px dashed #ccc;background:transparent;font-size:12px;color:#999;cursor:pointer;font-family:inherit}
+.add-chip:hover{background:#f4f4f0}
+.wt-panel{border:1px solid #d7eadf;background:#f6fcf9;border-radius:9px;padding:9px 10px;margin-top:8px}
+.wt-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+.wt-panel-title{font-size:11px;font-weight:700;color:#085041;text-transform:uppercase;letter-spacing:.05em}
+.wt-panel-sub{font-size:10px;color:#5b8c7b;margin-top:1px}
+.wt-empty{font-size:11px;color:#888;font-style:italic;padding:4px 0}
+
+
+/* ---- OUTLINE VIEW ---- */
+.outline-day{margin-bottom:36px}
+.outline-day-hdr{font-size:13px;font-weight:700;padding:9px 14px;background:#E6F1FB;color:#0C447C;border-radius:8px;margin-bottom:12px;border:1px solid #85B7EB}
+.oblock{background:#fff;border:1px solid #e5e5e0;border-radius:10px;margin-bottom:8px;overflow:hidden}
+.ob-head{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#f9f9f7;border-bottom:1px solid #eee}
+.ob-time{font-size:12px;font-weight:700;color:#999;font-variant-numeric:tabular-nums;width:42px;flex-shrink:0;padding-top:1px}
+.ob-title{font-size:13px;font-weight:600;flex:1;line-height:1.4}
+.ob-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;min-width:120px;max-width:200px}
+.ob-spk-name{font-size:12px;font-weight:600;color:#085041;text-align:right}
+.ob-spk-cong{font-size:10px;color:#1D9E75;text-align:right}
+.ob-unassigned{font-size:11px;color:#c0392b}
+.ob-body{padding:14px 16px;font-size:13px;line-height:1.8;color:#444}
+.ob-body p{margin-bottom:10px}
+.ob-body p:last-child{margin-bottom:0}
+.fill{color:#0C447C;font-weight:700;background:#E6F1FB;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.ob-note-block{font-style:italic;color:#888;font-size:11px;padding:7px 14px;background:#f9f9f7;border-top:1px solid #eee;line-height:1.5}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:500;align-items:flex-start;justify-content:center;padding-top:60px}
+.ov.open{display:flex}
+.modal{background:#fff;border:1px solid #ccc;border-radius:12px;width:340px;max-height:500px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12)}
+.mh{padding:12px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mh h3{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mh-close{border:none;background:transparent;cursor:pointer;color:#888;font-size:18px;padding:2px 6px;border-radius:5px}
+.mh-close:hover{background:#f0f0f0}
+.ms{padding:8px 10px;border-bottom:1px solid #eee}
+.ms input{width:100%;font-size:13px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;background:#f9f9f7;font-family:inherit;outline:none}
+.ms input:focus{border-color:#85B7EB}
+.ml{flex:1;overflow-y:auto;padding:6px}
+.mi{padding:7px 9px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:9px}
+.mi:hover{background:#f4f4f0}
+.mi-av{width:30px;height:30px;border-radius:50%;background:#E6F1FB;color:#0C447C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.mi-n{font-size:13px;font-weight:500}
+.mi-c{font-size:11px;color:#888}
+.mi-manual{border:1px solid #eee;margin-bottom:4px}
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#aaa;padding:6px 9px 3px}
+
+
+/* USER CONTROLS */
+.info-panel{background:#fff;border:1px solid #e5e5e0;border-radius:12px;padding:14px;margin-bottom:16px}
+.info-title{font-size:13px;font-weight:700;margin-bottom:4px;color:#111}
+.info-sub{font-size:11px;color:#888;margin-bottom:12px;line-height:1.45}
+.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.info-field{display:flex;flex-direction:column;gap:4px}
+.info-field.full{grid-column:1/-1}
+.info-field label{font-size:11px;font-weight:600;color:#666}
+.info-field input,.info-field textarea{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:8px;background:#f9f9f7;color:#111;padding:8px 10px;outline:none;resize:vertical}
+.info-field textarea{min-height:80px;line-height:1.45}
+.info-field input:focus,.info-field textarea:focus{border-color:#85B7EB;background:#fff}
+.info-hint{font-size:10px;color:#999;line-height:1.35}
+.speaker-edit-btn{border:none;background:#f4f4f0;color:#666;border-radius:6px;padding:5px 7px;cursor:pointer;font-size:12px;margin-left:auto;flex-shrink:0}
+.speaker-edit-btn:hover{background:#E6F1FB;color:#0C447C}
+.spk{position:relative;cursor:pointer}
+.spk:after{content:'✎';margin-left:auto;color:#bbb;font-size:11px;opacity:.8}
+.spk:hover:after{color:#0C447C}
+.day-filter{display:inline-flex;align-items:center;gap:3px;padding:4px 6px;border:1px solid #e8e8e2;border-radius:9px;background:#f9f9f7}
+.day-filter .stab{min-width:42px;background:#fff}
+.day-filter .stab.on{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.wt-tools{display:inline-flex;align-items:center;gap:2px;margin-left:4px}
+.wt-tools button{border:none;background:rgba(255,255,255,.65);color:#1D9E75;border-radius:4px;padding:1px 4px;cursor:pointer;font-size:10px}
+.wt-tools button:hover{background:#fff}
+.edit-modal-body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.edit-field{display:flex;flex-direction:column;gap:4px}
+.edit-field label{font-size:11px;font-weight:700;color:#666}
+.edit-field input,.edit-field select{font-family:inherit;font-size:13px;border:1px solid #ddd;border-radius:8px;background:#f9f9f7;color:#111;padding:8px 10px;outline:none}
+.edit-field input:focus,.edit-field select:focus{border-color:#85B7EB;background:#fff}
+.day-checks{display:flex;gap:6px;flex-wrap:wrap}
+.day-checks label{display:inline-flex;align-items:center;gap:5px;border:1px solid #ddd;background:#f9f9f7;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:600;color:#555;cursor:pointer}
+.day-checks input{width:auto;margin:0}
+.spk-days{font-size:10px;color:#0C447C;margin-top:2px}
+.edit-actions{display:flex;gap:8px;justify-content:flex-end;padding-top:4px}
+.edit-actions .danger{color:#9b1c1c;border-color:#f1b5b5;background:#fff5f5}
+.info-inline{margin-top:8px;padding:7px 9px;background:#fff8e8;border:1px solid #f0d79b;border-radius:7px;font-size:11px;color:#6b4a00;line-height:1.45}
+.scale-pill{min-width:58px;justify-content:center}
+.tool-strip{display:flex;align-items:center;gap:8px;padding:8px 16px;background:#fff;border-bottom:1px solid #e5e5e0;flex-shrink:0;flex-wrap:wrap}
+.tool-group{display:inline-flex;align-items:center;gap:5px;padding:4px 6px;border:1px solid #e8e8e2;border-radius:9px;background:#f9f9f7}
+.tool-label{font-size:11px;color:#777;font-weight:600;margin-right:2px}
+.tool-strip .nb{background:#fff}
+.info-jump{background:#fff8e8!important;border-color:#f0d79b!important;color:#6b4a00!important}
+.vtab.info-tab{background:#fff8e8;color:#6b4a00;border-color:#f0d79b}.vtab.info-tab.on{background:#fff;color:#111;border-bottom-color:#fff}
+
+:root{--ui-scale:1}
+body{font-size:calc(14px * var(--ui-scale))}
+.nav-title h1{font-size:calc(14px * var(--ui-scale))}
+.nav-title p,.spk-cong,.srow-note,.slot-lbl,.ob-unassigned,.ob-note-block,.info-field label,.info-sub{font-size:calc(11px * var(--ui-scale))}
+.stab,.spk-name,.srow-time span,.asgn-btn,.asgn-n,.ob-time,.ob-spk-name,.vtab,.nb{font-size:calc(12px * var(--ui-scale))}
+.srow-title,.ob-title,.ob-body,.mi-n,.ms input,.info-field input,.info-field textarea{font-size:calc(13px * var(--ui-scale))}
+.stat-n{font-size:calc(22px * var(--ui-scale))}
+.asgn-c,.chip-c,.badge,.stat-l,.sec-lbl{font-size:calc(10px * var(--ui-scale))}
+
+/* MOBILE */
+@media(max-width:640px){
+  .sb{position:fixed;top:0;left:0;height:100%;z-index:300;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,.15)}
+  .sb.open{transform:translateX(0)}
+  .ham{display:block}
+  .nav{padding:8px 10px}
+  .nav-title p{display:none}
+  .tool-strip{padding:7px 10px;gap:6px}
+  .tool-label{display:none}
+  .stat-bar{gap:5px;padding:8px 10px}
+  .stat{padding:6px 8px}
+  .stat-n{font-size:18px}
+  .scroll{padding:10px}
+  .srow-time{width:46px}
+  .nb span{display:none}
+  .nb{padding:6px 8px}
+}
+
+/* PRINT */
+@media print{
+  .sb,.nav-actions,.ham,.tool-strip,.vtabs,.vtab-bar,.stat-bar,.clr-btn,.add-chip,.asgn-btn:not(.set),.ov{display:none!important}
+  .shell,.main{display:block;height:auto;overflow:visible}
+  .scroll{overflow:visible;padding:0}
+  body{background:#fff;font-size:11px}
+  #v-assign,#v-outline,#v-info{display:none!important}
+  body[data-print-view="assign"] #v-assign{display:block!important}
+  body[data-print-view="outline"] #v-outline{display:block!important}
+  body[data-print-view="info"] #v-info{display:block!important}
+  .outline-day{page-break-after:always}
+  .outline-day:last-child{page-break-after:avoid}
+  .oblock,.srow{break-inside:avoid}
+  .day-block{page-break-after:always}
+  .day-block:last-child{page-break-after:avoid}
+  .asgn-btn.set{border:none;background:none;padding:0}
+  .badge{display:none}
+  .outline-day-hdr,.fill,.info-inline,.wt-panel{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .nav{border-bottom:1px solid #ccc}
+  .nav-title h1{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<div class="shell" id="shell">
+
+<!-- SIDEBAR -->
+<div class="sb" id="sb">
+  <div class="sb-head">
+    <div class="sb-logo">Speakers · RC 2026 Munich</div>
+    <div class="sb-filter-note" id="sbFilterNote">Showing all speakers</div>
+  </div>
+  <div class="sb-search"><input id="sbQ" type="text" placeholder="Search speakers…" oninput="rSb()"></div>
+  <div class="sb-list" id="sbList"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="nav">
+    <button class="ham" id="hamBtn" onclick="toggleSb()">☰</button>
+    <div class="nav-title">
+      <h1>"Eternal Happiness" Regional Convention 2026</h1>
+      <p>CO-10-26-E · Assignment &amp; Chairman Outline</p>
+    </div>
+    <div class="nav-actions">
+      <button class="nb" onclick="if(confirm('Reset assignments and local notes?')){asgn={};wt=[];info={};save();render()}">↺ <span>Reset</span></button>
+      <button class="nb b" onclick="doExport()" title="Export JSON backup">↓ <span>JSON</span></button>
+      <button class="nb" onclick="document.getElementById('importFile').click()" title="Import JSON backup">↑ <span>Import</span></button>
+      <input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="doImport(this.files&&this.files[0]);this.value=''">
+      <button class="nb g" onclick="window.print()">⎙ <span>Print</span></button>
+    </div>
+  </div>
+  <div class="tool-strip">
+    <div class="tool-group" title="Adjust screen text size">
+      <span class="tool-label">Text size</span>
+      <button class="nb" onclick="adjScale(-0.05)" title="Smaller text">🔍−</button>
+      <button class="nb scale-pill" id="scaleLbl" onclick="resetScale()" title="Reset text size">100%</button>
+      <button class="nb" onclick="adjScale(0.05)" title="Larger text">🔍+</button>
+    </div>
+    <div class="day-filter" title="Filter speakers and program by day">
+      <span class="tool-label">Day</span>
+      <button class="stab on" id="df_all" onclick="fDay('all')">All</button>
+      <button class="stab" id="df_Fri" onclick="fDay('Fri')">Fri</button>
+      <button class="stab" id="df_Sat" onclick="fDay('Sat')">Sat</button>
+      <button class="stab" id="df_Sun" onclick="fDay('Sun')">Sun</button>
+    </div>
+    <button class="nb info-jump" onclick="setView('info')" title="FM frequency, announcements, baptism, attendance and chairman notes">📝 Local Info / Freitext</button>
+  </div>
+  <div class="import-notice" id="importNotice">
+    <strong>Please import data first.</strong>
+    <span>This public template contains no speaker names or personal assignments. Import your private JSON backup to continue working.</span>
+    <button class="nb b" onclick="document.getElementById('importFile').click()">↑ Import JSON</button>
+  </div>
+  <div class="stat-bar">
+    <div class="stat"><div class="stat-n" id="sA">0</div><div class="stat-l">Assigned</div></div>
+    <div class="stat"><div class="stat-n" id="sT">0</div><div class="stat-l">Total slots</div></div>
+    <div class="stat"><div class="stat-n" id="sP">0%</div><div class="stat-l">Complete</div></div>
+  </div>
+  <div class="vtabs">
+    <button class="vtab on" id="vt1" onclick="setView('assign')">✓ Assignments</button>
+    <button class="vtab" id="vt2" onclick="setView('outline')">📄 Chairman Outline</button>
+    <button class="vtab info-tab" id="vt3" onclick="setView('info')">📝 Local Info / Freitext</button>
+  </div>
+  <div class="vtab-bar"></div>
+  <div class="scroll" id="scrollArea">
+    <div id="v-assign"></div>
+    <div id="v-outline" style="display:none"></div>
+    <div id="v-info" style="display:none"></div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="ov" id="ov" onclick="if(event.target===this)cModal()">
+  <div class="modal">
+    <div class="mh">
+      <h3 id="mT">Select speaker</h3>
+      <button class="mh-close" onclick="cModal()">✕</button>
+    </div>
+    <div class="ms"><input id="mQ" type="text" placeholder="Search speakers…" oninput="rModal()"></div>
+    <div class="ml" id="mL"></div>
+  </div>
+</div>
+
+<!-- SPEAKER EDIT MODAL -->
+<div class="ov" id="spEditOv" onclick="if(event.target===this)cSpEdit()">
+  <div class="modal">
+    <div class="mh">
+      <h3>Edit speaker</h3>
+      <button class="mh-close" onclick="cSpEdit()">✕</button>
+    </div>
+    <div class="edit-modal-body">
+      <div class="edit-field"><label for="spEditName">Name</label><input id="spEditName" type="text"></div>
+      <div class="edit-field"><label for="spEditCong">Congregation</label><input id="spEditCong" type="text"></div>
+      <div class="edit-field"><label>Days / groups</label><div class="day-checks"><label><input id="spDayFri" type="checkbox" value="Fri"> Fri</label><label><input id="spDaySat" type="checkbox" value="Sat"> Sat</label><label><input id="spDaySun" type="checkbox" value="Sun"> Sun</label></div></div>
+      <div class="edit-actions">
+        <button class="nb danger" onclick="resetOneSpeaker()" title="Restore this speaker from the original list if possible">Reset</button>
+        <button class="nb" onclick="cSpEdit()">Cancel</button>
+        <button class="nb g" onclick="saveSpEdit()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let SP=[];
+
+
+// script items: {p:"text"} or {note:"italic note"}
+// placeholders in p: §SPEAKER§ §NEXT§ §PRAYER_OPEN§ §PRAYER_CLOSE§ §CONDUCTOR§
+const DAYS=[
+ {label:"Friday",sessions:[
+  {t:"09:20",ti:"Session chairman — Friday morning",type:"chair",slots:[{r:"Chairman"}],
+   sc:[{note:"[Step to the lectern, and in a loud, clear, and deliberate voice, say:]"},
+       {p:"Good morning, brothers and sisters! In five minutes, the first session of our regional convention will begin with a music-video presentation. Please come and find your place in the seating area. The countdown clock indicates when the video will begin."},
+       {note:"[After announcement exit stage. 9:15 five-minute countdown begins. Return to lectern shortly before it finishes.]"},
+       {p:"Please take your seats and enjoy the following music video. It highlights how our ministry and our personal Bible study help people find joy despite trials. Please enjoy the video!"},
+       {note:"[Be seated on the platform and pay close attention to the music-video presentation.]"}]},
+  {t:"09:35",ti:"Opening prayer",type:"prayer",slots:[{r:"Brother"}]},
+  {t:"09:40",ti:"Chairman's Address: Abundant Happiness Forever — Is It Realistic?",type:"talk",slots:[{r:"Speaker"}],
+   sc:[{note:"[When the music-video finishes, step to the lectern:]"},
+       {p:"Welcome to the opening session of this \u201cEternal Happiness\u201d Convention of Jehovah\u2019s Witnesses! Today\u2019s Scripture theme is from Jesus\u2019 words recorded at Matthew\u00a05:3: \u201cHappy are those conscious of their spiritual need.\u201d Today\u2019s program will help us to satisfy that need!"},
+       {p:"[If FM broadcast: Please note that the entire program is being broadcast in [language] on FM frequency ______.] If you have a cellular telephone or another electronic device with you, please adjust it to a setting that will not disturb others. Any recordings of this program should be for your personal use or for the benefit of those unable to attend a convention this year. Recordings should not be made available for general circulation or distribution."},
+       {p:"Now, we invite you to stand as we sing together song number\u00a0160, entitled \u201cGood News!\u201d After the song, Brother §PRAYER_OPEN§ will offer the opening prayer. Again, that\u2019s song number\u00a0160."},
+       {note:"[During the song the brother assigned to say the opening prayer will join you on stage. After the song he will go directly to the lectern and offer the prayer. After the prayer, step to the lectern and say:]"},
+       {p:"Please be seated. How do we know that Jehovah is keenly interested in our happiness? How will this convention help us to find eternal happiness? Please pay careful attention to our convention chairman, Brother §SPEAKER§, as he presents the talk \u201cAbundant Happiness Forever\u2014Is It Realistic?\u201d"}]},
+  {t:"10:10",ti:"Feature Bible Drama: The Good News According to Jesus — Episode 4 · \"This Is Why I Have Come\"",type:"video"},
+  {t:"11:05",ti:"Song 17 · Announcements",type:"video",
+   sc:[{p:"We now invite all who are able to do so to stand and sing song number\u00a017, entitled \u201cI Want To.\u201d After the song, you may wish to remain standing for some announcements. Again, that\u2019s song number\u00a017."},
+       {p:"[After song:] Anyone needing directions to a convention department may ask an attendant or check at the Information and Volunteer Department. [Indicate location.] Seating areas for the elderly and the infirm are clearly marked. [Indicate locations.] Others should not sit in these sections unless they are caring for those seated there. Please be careful when walking near these seating sections so as to respect the safety of our brothers and sisters."},
+       {p:"If a medical emergency arises at the convention site, please contact a nearby attendant, who will immediately notify First Aid. Our first-aid personnel can render assistance, and they will call emergency services as needed."},
+       {p:"Tomorrow morning, baptism candidates should be seated in [indicate location] for the baptism talk, which begins at 11:40. You may be seated."}]},
+  {t:"11:15",ti:"Symposium (1/3): Messianic Prophecy Fulfilled! — \"He Himself Took Our Sicknesses\"",type:"talk",slots:[{r:"Speaker"}],note:"First speaker introduces the next",
+   sc:[{p:"That was an excerpt from the video Making Yourself Available for Bethel Service. If you are interested in serving at Bethel or on theocratic construction projects on a part-time or full-time basis, please watch the entire video on jw.org. Baptized Christians who are 18 years of age or older and who want to volunteer should apply. Speak to your congregation secretary for more information."},
+       {p:"Jesus\u2019 miraculous healings and masterful teaching fulfilled Bible prophecies. In the following three-part symposium, note the lessons we can learn from what Jesus did and how he taught. Each speaker will introduce the one to follow. Brother §SPEAKER§ will begin with the talk \u201cMessianic Prophecy Fulfilled!\u2014\u2018He Himself Took Our Sicknesses.\u2019\u201d"},
+       {note:"[Since each speaker will introduce the next, there is no need to announce each succeeding brother's name and congregation.]"}]},
+  {t:"11:34",ti:"Symposium (2/3): Messianic Prophecy Fulfilled! — \"He Will Not Quarrel\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"11:52",ti:"Symposium (3/3): Messianic Prophecy Fulfilled! — \"Without an Illustration He Would Not Speak\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"12:10",ti:"Song 14 · Midday intermission",type:"video",
+   sc:[{p:"Thank you, brothers, for those encouraging talks! The attendance for the opening session of this \u201cEternal Happiness\u201d Convention was ________. [JW Stream figures if applicable.]"},
+       {p:"We invite you to stand now and join in singing song number\u00a014, which expresses our support for Jehovah\u2019s Kingdom. The song is entitled \u201cPraising Earth\u2019s New King.\u201d Again, that\u2019s song number\u00a014."},
+       {p:"[After song:] As indicated on the program, a music-video presentation will begin at 1:35\u00a0p.m. Please be back in your seats by then to enjoy the video. Until then, we invite you to enjoy the midday intermission."}]},
+  {t:"13:35",ti:"Session chairman — Friday afternoon",type:"chair",slots:[{r:"Chairman"}],
+   sc:[{note:"[Step to the lectern:]"},
+       {p:"Good afternoon, brothers and sisters! In five minutes, our afternoon session will begin with a music-video presentation. Please come and take your seats so that others around you can also enjoy the presentation. The countdown clock indicates when the video will begin."},
+       {note:"[Exit stage. 1:30 five-minute countdown begins.]"},
+       {p:"[When countdown finishes:] This afternoon\u2019s music-video reminds us to take delight in the beauty of creation and in our preaching work. It also helps us put names to the happy faces of Jesus\u2019 close friends\u2014the 12 apostles. Please enjoy the video!"},
+       {note:"[Be seated. When music-video finishes, step to lectern:]"},
+       {p:"The opening song for this afternoon\u2019s session highlights how God\u2019s Kingdom will bring us eternal happiness. Let\u2019s stand and sing together song number\u00a023, entitled \u201cJehovah Begins His Rule.\u201d Again, that\u2019s song number\u00a023."},
+       {p:"[After song:] Please be seated. How did Jesus\u2019 teachings about the Sabbath increase the happiness of first-century Christians, and how should these teachings affect us today? Please give your attention to Brother §NEXT§ as he answers those questions in the talk \u201cWhat Did Jesus Teach Regarding the Sabbath?\u201d"}]},
+  {t:"13:50",ti:"What Did Jesus Teach Regarding the Sabbath?",type:"talk",slots:[{r:"Speaker"}],
+   sc:[{p:"Thank you, Brother §SPEAKER§, for that faith-strengthening talk. The drama we watched this morning featured many humble men and women who ministered to Jesus. In the following symposium, we will consider two groups of such people. Take note of the practical ways we can imitate these men and women of faith. The first speaker will introduce the one to follow. Brother §NEXT§ will begin with the talk \u201cImitate Those Who Ministered to Jesus!\u2014The Apostles.\u201d"},
+       {note:"[Since the first speaker will introduce the next, there is no need to announce the succeeding brother's name and congregation.]"}]},
+  {t:"14:10",ti:"Symposium (1/2): Imitate Those Who Ministered to Jesus! — The Apostles",type:"talk",slots:[{r:"Speaker"}],note:"First speaker introduces the next"},
+  {t:"14:30",ti:"Symposium (2/2): Imitate Those Who Ministered to Jesus! — Many Women",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:50",ti:"Song 76 · Donation announcement",type:"video",
+   sc:[{p:"Thank you, brothers, for emphasizing the practical lessons we can learn from those who ministered to Jesus. We now invite all to stand and sing song number\u00a076, entitled \u201cHow Does It Make You Feel?\u201d After the song, there will be some announcements. Again, that\u2019s song number\u00a076."},
+       {p:"[After song:] Jehovah gives us the privilege of honoring him with our valuable things. Those who wish to give financial support to the Kingdom work can donate using any of the contribution boxes. [If possible, please donate online at donate.jw.org.] You may be seated."},
+       {p:"We have now come to the final talk of today\u2019s program. Jesus can help us to gain a clean standing with God. He can also give us a sure hope for everlasting life. What must we do to benefit from these provisions? Please give your full attention to Brother §NEXT§ as he presents the answer in the talk \u201cHappy Are Those Who Wash Their Robes.\u201d"}]},
+  {t:"15:00",ti:"\"Happy Are Those Who Wash Their Robes\"",type:"talk",slots:[{r:"Speaker"}],
+   sc:[{p:"Thank you, Brother §SPEAKER§, for that encouraging talk. How grateful we are to know what we must do to enjoy true happiness forever! What can we look forward to on tomorrow\u2019s program? We will watch Episode\u00a05 of The Good News According to Jesus and consider many lessons from the greatest discourse ever given\u2014the Sermon on the Mount. Tomorrow\u2019s Scripture theme is from Acts\u00a020:35: \u201cThere is more happiness in giving than there is in receiving.\u201d As a reminder, the program will begin at 9:20\u00a0a.m. Please remember to bring your lunch with you so that you can remain on the premises and enjoy association with your brothers and sisters."},
+       {p:"The attendance for this afternoon\u2019s session was __________. [JW Stream figures if applicable.] Our closing song expresses many of the reasons we have to be joyful. Song number\u00a0155 is entitled \u201cOur Joy Eternally.\u201d After the song, Brother §PRAYER_CLOSE§ will express our thanks to Jehovah. We invite all to stand and sing song number\u00a0155."}]},
+  {t:"15:35",ti:"Closing prayer",type:"prayer",slots:[{r:"Brother"}]},
+ ]},
+ {label:"Saturday",sessions:[
+  {t:"09:20",ti:"Session chairman — Saturday morning",type:"chair",slots:[{r:"Chairman"}],
+   sc:[{note:"[Step to the lectern:]"},
+       {p:"Good morning, brothers and sisters! In five minutes, the morning session will begin with a music video. This presentation is part of the convention program. We invite you to come and find your place in the seating area. The countdown clock indicates when the video will begin."},
+       {note:"[Exit stage. 9:15 five-minute countdown begins.]"},
+       {p:"[When countdown finishes:] We now invite you to watch the music video, which shows how our ministry, Jehovah\u2019s creation, and association with fellow worshippers bring real happiness. Please enjoy!"},
+       {note:"[When music-video finishes, step to lectern:]"},
+       {p:"Welcome to the second day of this \u201cEternal Happiness\u201d Convention! [FM and device reminders if applicable.] The Scripture theme for today\u2019s program is Acts\u00a020:35: \u201cThere is more happiness in giving than there is in receiving.\u201d The entire program today will center on Jesus\u2019 famous Sermon on the Mount. To begin, we invite all to stand and join in singing song number\u00a0111, entitled \u201cOur Reasons for Joy.\u201d After the song, Brother §PRAYER_OPEN§ will offer the opening prayer. Again, that\u2019s song number\u00a0111."},
+       {note:"[After prayer, step to lectern:]"},
+       {p:"Please be seated. Why has the Sermon on the Mount become world famous? Why do we need to pay attention to what Jesus taught now more than ever? Please enjoy the following talk presented by a member of the Governing Body. The theme is from Matthew\u00a05:2: \u201cHe opened his mouth and began teaching them.\u201d"},
+       {note:"[Session chairman exits. Video crew begins video (10:00).]"}]},
+  {t:"09:35",ti:"Opening prayer",type:"prayer",slots:[{r:"Brother"}]},
+  {t:"09:40",ti:"Video: \"He Opened His Mouth and Began Teaching Them\" (Governing Body)",type:"video"},
+  {t:"09:50",ti:"Feature Bible Drama: The Good News According to Jesus — Episode 5 · \"Astounded at His Way of Teaching\"",type:"video"},
+  {t:"10:25",ti:"Song 89 · Announcements",type:"video",
+   sc:[{p:"We are definitely looking forward to watching Episode\u00a06 tomorrow! Please stand now, if you are able to do so, and let us sing together song number\u00a089, entitled \u201cListen, Obey, and Be Blessed.\u201d After the song, you may remain standing for some announcements. Again, that\u2019s song number\u00a089."},
+       {p:"[After song:] Seating areas for the elderly and the infirm are clearly marked. [Indicate locations.] Others should not sit in these sections unless they are caring for those seated there. Please be careful when walking near these seating sections so as to respect the safety of our brothers and sisters. If a medical emergency arises at the convention site, please contact a nearby attendant, who will immediately notify First Aid."},
+       {p:"Baptism candidates should now be seated in [indicate location] for the baptism talk, which begins at 11:40\u00a0a.m. Please be seated."}]},
+  {t:"10:35",ti:"What Can Prevent Us From Being Happy?",type:"talk",slots:[{r:"Speaker"}],
+   sc:[{p:"That was an excerpt from the video Apply for the School for Kingdom Evangelizers! If you are in a position to expand your ministry, please watch the entire video on jw.org. We encourage you to speak to your circuit overseer when he visits your congregation about your interest in attending the School for Kingdom Evangelizers."},
+       {p:"In his Sermon on the Mount, Jesus identified four obstacles to happiness. Please give your attention to Brother §SPEAKER§ as he discusses them in the talk \u201cWhat Can Prevent Us From Being Happy?\u201d Brother §SPEAKER§, you have our full attention."}]},
+  {t:"10:50",ti:"Can You Discern the Principle Behind the Law?",type:"talk",slots:[{r:"Speaker"}],
+   sc:[{p:"Thank you, Brother §SPEAKER§, for that motivating talk! In his Sermon on the Mount, Jesus revealed the principles behind many of the commands in the Mosaic Law. How can learning to discern the principles behind Bible laws lead to eternal happiness? Please listen closely to Brother §NEXT§ as he answers that intriguing question in the talk \u201cCan You Discern the Principle Behind the Law?\u201d"}]},
+  {t:"11:15",ti:"Symposium (1/2): Lessons From the Land of Jesus — Salt and Light",type:"talk",slots:[{r:"Speaker"}],note:"First speaker introduces the next",
+   sc:[{p:"Thank you, Brother §SPEAKER§, for helping us deepen our love for Jehovah\u2014the Person behind Bible laws and principles. Jesus often illustrated deep spiritual truths with common physical things. The upcoming two-part symposium will deepen our appreciation for four gifts from God that would have been familiar to those who heard Jesus deliver the Sermon on the Mount. The first speaker will introduce the one to follow. Brother §SPEAKER§ will deliver the first talk, entitled \u201cLessons From the Land of Jesus\u2014Salt and Light.\u201d"},
+       {note:"[Since the first speaker will introduce the next, there is no need to announce the succeeding brother's name and congregation.]"}]},
+  {t:"11:26",ti:"Symposium (2/2): Lessons From the Land of Jesus — Plants and Animals",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"11:40",ti:"Baptism discourse: \"Your Father Who Looks On in Secret Will Repay You\"",type:"talk",slots:[{r:"Speaker"}],note:"Baptism candidates seated separately from 11:40",
+   sc:[{p:"Thank you, brothers, for those encouraging talks. We now extend a warm welcome to all who are getting baptized. We are thrilled that you have dedicated yourself to Jehovah, the happy God! What role will prayer play in your lifelong journey with Jehovah? How will Jehovah help you to live up to your dedication? Please listen closely to Brother §SPEAKER§ as he answers those questions in the baptism discourse entitled \u201cYour Father Who Looks On in Secret Will Repay You.\u201d"}]},
+  {t:"12:10",ti:"Song 51 · Immersion · Noon break",type:"video",
+   sc:[{note:"[The speaker will offer prayer at the conclusion of his talk. Thereafter, he will invite the audience to stand and join the candidates in singing song number 51, \"To God We Are Dedicated!\" Step to the lectern during the song. After the song, tell the candidates and the audience how to work in harmony with the arrangements for immersion. Request that the audience remain standing until all the candidates have filed out.]"},
+       {p:"All ___ of us in attendance may now enjoy Christian association during the noon break. [Language program and JW Stream figures if applicable.] As a reminder, the afternoon program will begin at 1:35."}]},
+  {t:"13:35",ti:"Session chairman — Saturday afternoon",type:"chair",slots:[{r:"Chairman"}],
+   sc:[{note:"[Step to the lectern:]"},
+       {p:"Good afternoon, brothers and sisters! In five minutes, the afternoon session will begin. Now is the time to come to your seats in order to enjoy this afternoon\u2019s music-video presentation. The countdown clock indicates when the video will begin."},
+       {note:"[Exit stage. 1:30 five-minute countdown begins.]"},
+       {p:"[When countdown finishes:] Now it\u2019s time for this afternoon\u2019s music video. As you watch, note the different ways our Christian ministry brings joy to people. Please enjoy the video!"},
+       {note:"[When music-video finishes, step to lectern:]"},
+       {p:"Our opening song highlights one of Jehovah\u2019s most appealing qualities\u2014his mercy. Please stand and sing song number\u00a0125, entitled \u201cHappy Are the Merciful!\u201d That\u2019s song number\u00a0125."},
+       {p:"[After song:] Please be seated. The Sermon on the Mount contains the largest uninterrupted collection of Jesus\u2019 teachings in the Gospels. How did Jesus begin his discourse? In the following symposium, we will consider nine keys to eternal happiness. Each speaker will introduce the one to follow. Brother §NEXT§ will present the first talk, entitled \u201cHappy Are Those Conscious of Their Spiritual Need.\u201d"},
+       {note:"[Since each speaker will introduce the next, there is no need to announce each succeeding brother's name and congregation.]"}]},
+  {t:"13:50",ti:"Symposium (1/9): \"Happy Are Those Conscious of Their Spiritual Need\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:03",ti:"Symposium (2/9): \"Happy Are Those Who Mourn\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:12",ti:"Symposium (3/9): \"Happy Are the Mild-Tempered\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:21",ti:"Symposium (4/9): \"Happy Are Those Hungering and Thirsting for Righteousness\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:30",ti:"Symposium (5/9): \"Happy Are the Merciful\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:39",ti:"Symposium (6/9): \"Happy Are the Pure in Heart\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:49",ti:"Symposium (7/9): \"Happy Are the Peacemakers\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"14:59",ti:"Symposium (8/9): \"Happy Are Those Who Have Been Persecuted for Righteousness' Sake\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"15:09",ti:"Symposium (9/9): \"Happy Are You When People Reproach You\"",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"15:20",ti:"Song 81 · Donation announcement",type:"video",
+   sc:[{p:"Thank you, brothers, for those encouraging talks. Our next song highlights the joy we find in our Christian ministry. We invite you to stand as we sing song number\u00a081, entitled \u201cThe Life of a Pioneer.\u201d After the song, you may remain standing for some announcements. That\u2019s song number\u00a081."},
+       {p:"[After song:] At Luke\u00a06:38, Jesus instructed his listeners to \u201cpractice giving.\u201d At our conventions, we have the opportunity to give financial support to the Kingdom work. Those who wish to donate can use any of the contribution boxes. [If possible, please donate online at donate.jw.org.] You may be seated."},
+       {p:"In his Sermon on the Mount, Jesus spoke about overcoming anxiety. What advice did he give? How can we apply it? And what benefits will we receive if we do so? Brother §NEXT§ will answer those questions in the talk \u201cWhy Are You Anxious?\u201d Brother §NEXT§, you have our attention."}]},
+  {t:"15:30",ti:"\"Why Are You Anxious?\"",type:"talk",slots:[{r:"Speaker"}],
+   sc:[{p:"Thank you, Brother §SPEAKER§, for highlighting how to apply Jesus\u2019 sound advice. Jesus compared the way to everlasting life to walking along a cramped road. What must we do to stay on that road? Please pay special attention to Brother §NEXT§ as he delivers the final talk of the day, entitled \u201cGo In Through the Narrow Gate.\u201d"}]},
+  {t:"15:55",ti:"\"Go In Through the Narrow Gate\"",type:"talk",slots:[{r:"Speaker"}],
+   sc:[{p:"Thank you, Brother §SPEAKER§, for explaining how we can stay on the road that leads to eternal life and happiness! What can we look forward to on tomorrow\u2019s program? In the morning symposium, we will consider lessons that we can apply from five of Jesus\u2019 Kingdom illustrations. The public Bible discourse will motivate newly interested ones to act on Bible truths they have learned. In the afternoon, we will watch Episode\u00a06 of The Good News According to Jesus. And the concluding talk will help us apply all that we learned at this convention! Be sure to get a good night\u2019s rest so that you can fully benefit from the final day of our convention."},
+       {p:"We are pleased to inform you that the attendance for this afternoon\u2019s session was __________. [JW Stream figures if applicable.] Now, let us stand and sing together song number\u00a021, entitled \u201cKeep On Seeking First the Kingdom.\u201d After the song, Brother §PRAYER_CLOSE§ will offer the closing prayer. Again, that\u2019s song number\u00a021."}]},
+  {t:"16:30",ti:"Closing prayer",type:"prayer",slots:[{r:"Brother"}]},
+ ]},
+ {label:"Sunday",sessions:[
+  {t:"09:20",ti:"Session chairman — Sunday morning",type:"chair",slots:[{r:"Chairman"}],
+   sc:[{note:"[Step to the lectern:]"},
+       {p:"Good morning, brothers and sisters! In five minutes, the morning session will begin with a music-video presentation. We invite you to come and find your place in the seating area now. The countdown clock indicates when the video will begin."},
+       {note:"[Exit stage. 9:15 five-minute countdown begins.]"},
+       {p:"[When countdown finishes:] This morning\u2019s music video will highlight how Jehovah strengthens his servants to endure in work that is good. Please enjoy the video!"},
+       {note:"[When music-video finishes, step to lectern:]"},
+       {p:"Welcome to this final day of our \u201cEternal Happiness\u201d Convention. Today\u2019s Scripture theme is from Matthew\u00a013:16: \u201cHappy are your eyes because they see and your ears because they hear.\u201d Today\u2019s program will help us not only to get the sense of Jesus\u2019 teachings but also to apply them."},
+       {p:"[FM and device reminders if applicable.] We invite you to stand as we sing together song number\u00a068, entitled \u201cSowing Kingdom Seed.\u201d After the song, Brother §PRAYER_OPEN§ will offer the opening prayer. Again, that\u2019s song number\u00a068."},
+       {note:"[After prayer, step to lectern:]"},
+       {p:"You may be seated. Jesus used simple illustrations to teach deep spiritual truths. As you listen to the following five-part symposium, look for lessons that you can apply from Jesus\u2019 Kingdom illustrations recorded in Matthew chapter\u00a013. Each speaker will introduce the one to follow. To begin, let\u2019s give our attention to Brother §NEXT§ as he presents the first talk, entitled \u201cApplying Lessons From Jesus\u2019 Illustrations\u2014Four Types of Soil.\u201d"},
+       {note:"[Since each speaker will introduce the next, there is no need to announce each succeeding brother's name and congregation.]"}]},
+  {t:"09:35",ti:"Opening prayer",type:"prayer",slots:[{r:"Brother"}]},
+  {t:"09:40",ti:"Symposium (1/5): Applying Lessons From Jesus' Illustrations — Four Types of Soil",type:"talk",slots:[{r:"Speaker"}],note:"Each speaker introduces the next"},
+  {t:"10:00",ti:"Symposium (2/5): Applying Lessons From Jesus' Illustrations — Wheat and Weeds",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"10:15",ti:"Symposium (3/5): Applying Lessons From Jesus' Illustrations — Mustard Grain",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"10:29",ti:"Symposium (4/5): Applying Lessons From Jesus' Illustrations — Leaven",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"10:43",ti:"Symposium (5/5): Applying Lessons From Jesus' Illustrations — Dragnet",type:"talk",slots:[{r:"Speaker"}]},
+  {t:"11:00",ti:"Song 64 · Announcements",type:"video",
+   sc:[{p:"Let us now stand and sing together song number\u00a064, entitled \u201cSharing Joyfully in the Harvest.\u201d After the song, you may remain standing during the announcements. Again, that\u2019s song number\u00a064."},
+       {p:"[After song:] Seating areas for the elderly and the infirm are clearly marked. [Indicate locations.] Please take your seats. We extend a warm welcome to all who accepted our invitation to attend this convention. [Any surplus item announcements per convention committee guidance.]"}]},
+  {t:"11:10",ti:"Public Bible Discourse: Have You Discovered the Treasure?",type:"talk",slots:[{r:"Speaker"}],note:"No prayer before public talk",
+   sc:[{p:"Jesus used two illustrations to highlight what we should do after discovering Bible truth. How can we show that we value what we have learned? Please enjoy the Bible-based discourse entitled \u201cHave You Discovered the Treasure?\u201d This talk will be given by Brother §SPEAKER§. Brother §SPEAKER§, you have our attention."},
+       {note:"[There is no prayer before the public talk. Exit the stage as usual after introducing the speaker.]"}]},
+  {t:"11:40",ti:"Summary of The Watchtower",type:"talk",slots:[{r:"Conductor"}],wt:true,note:"Add all participants using the + button",
+   sc:[{p:"Thank you, Brother §SPEAKER§, for explaining how we can show that we value Bible truth! How can you learn more about what the Bible teaches? If you would like to have Bible discussions, free of charge, at a time and place convenient for you, please give your contact information to one of the attendants or visit jw.org and fill out an online request for a Bible study. We will be happy to arrange for one of Jehovah\u2019s Witnesses to help you."},
+       {p:"Every week, Jehovah\u2019s Witnesses worldwide participate in a Bible study program using the Watchtower magazine. Please follow along in this week\u2019s study article as Brother §CONDUCTOR§ and those assisting him present a summary of this week\u2019s lesson."}]},
+  {t:"12:10",ti:"Song 140 · Noon break",type:"video",
+   sc:[{p:"Thank you, Brother §CONDUCTOR§, and all of your participants. The attendance for our morning session was __________. [JW Stream figures if applicable.] The noontime break will give us an opportunity to enjoy upbuilding association as we look forward to the afternoon session. Now, we invite all to stand, if possible, and join in singing song number\u00a0140, entitled \u201cLife Without End\u2014At Last!\u201d Again, that\u2019s song number\u00a0140."},
+       {p:"[After song:] The afternoon session will begin at 1:35."}]},
+  {t:"13:35",ti:"Session chairman — Sunday afternoon",type:"chair",slots:[{r:"Chairman"}],
+   sc:[{note:"[Step to the lectern:]"},
+       {p:"Good afternoon, brothers and sisters! In five minutes, our afternoon session will begin with a music-video presentation. Please come and take your seats in order to enjoy the presentation. The countdown clock indicates when the video will begin."},
+       {note:"[Exit stage. 1:30 five-minute countdown begins.]"},
+       {p:"[When countdown finishes:] Welcome, everyone! Our afternoon session will now begin with a music-video presentation. The video highlights the happiness of Jehovah\u2019s faithful people past and present. Please watch, listen, and enjoy the video!"},
+       {note:"[When music-video finishes, step to lectern:]"},
+       {p:"We have now reached the final session of our convention. The afternoon program will help us to accept and apply Jesus\u2019 teachings, which will lead to our eternal happiness. Let us stand and sing a song that reminds us of the primary reasons we have to be happy. The song is number\u00a0108, entitled \u201cGod\u2019s Loyal Love.\u201d Again, that\u2019s song number\u00a0108."},
+       {p:"[After song:] Please be seated. Jesus\u2019 teachings and miracles demonstrated that he was the long-awaited King of God\u2019s Kingdom. Still, not everyone responded positively to what he said and did. Why did Jesus\u2019 words and actions make some people happy but cause others to stumble? What can we learn from those who put faith in Jesus and those who did not? We invite you to watch and enjoy Episode\u00a06 of The Good News According to Jesus, entitled \u201cAre You the Coming One?\u201d"},
+       {note:"[Video crew begins video (45:00).]"}]},
+  {t:"13:50",ti:"Feature Bible Drama: The Good News According to Jesus — Episode 6 · \"Are You the Coming One?\"",type:"video"},
+  {t:"14:45",ti:"Video: \"What Did You Learn?\" (Governing Body)",type:"video",
+   sc:[{p:"Let us now stand and sing song number\u00a0120, which expresses our determination to imitate our King, Jesus Christ. The song is entitled \u201cImitate Christ\u2019s Mildness.\u201d After the song, there will be a few announcements. Again, that\u2019s song number\u00a0120."},
+       {p:"[After song:] Thank you for your generous financial support of the Kingdom work! Your donations support theocratic construction projects, disaster relief, and conventions throughout the world. Those who wish to donate can use any of the contribution boxes. [Donation details.] You may be seated."},
+       {p:"We have learned a great deal during these past three days about how to be truly happy. Have you chosen some key points that you plan to apply? To help us do so, let\u2019s give our attention to a member of the Governing Body as he presents the talk \u201cWhat Did You Learn?\u201d"},
+       {note:"[Video crew begins video (10:00).]"}]},
+  {t:"14:55",ti:"\"Happy Are Your Eyes Because They See\"",type:"talk",slots:[{r:"Speaker"}],note:"Final talk of the convention",
+   sc:[{p:"On one occasion, Jesus told his disciples: \u201cHappy are your eyes because they see.\u201d What does it mean to \u201csee\u201d spiritually? And how can this lead to our eternal happiness? Brother §SPEAKER§ will now present the final talk of this convention. His theme is \u201cHappy Are Your Eyes Because They See.\u201d"}]},
+  {t:"15:45",ti:"Closing prayer · Convention ends",type:"prayer",slots:[{r:"Brother"}],
+   sc:[{p:"Thank you, Brother §SPEAKER§. Your talk and this entire convention have helped us see how happy we will be as we accept what Jesus taught and apply what we learn!"},
+       {p:"Episodes\u00a04, 5, and 6 of The Good News According to Jesus, along with an updated version of The Good News According to Jesus\u2014Video Reference Guide, are available for download on jw.org and in the JW Library app."},
+       {p:"The attendance for this final session of our \u201cEternal Happiness\u201d Convention was ________. [JW Stream figures if applicable.] Let us conclude the convention by expressing our deep appreciation for the wonderful truths we have learned from Jesus. Please stand as we sing together the new original song entitled \u201cHappy Are These Eyes,\u201d which we heard sung in the last video of the concluding talk. After the song, Brother §PRAYER_CLOSE§ will conclude with prayer. Now, we invite all to stand and sing out along with the Watchtower chorus song number\u00a0163, entitled \u201cHappy Are These Eyes.\u201d"},
+       {note:"[During the song, the concluding speaker will rejoin you on stage, and after the song, he will conclude with prayer.]"}]},
+ ]}
+];
+
+let asgn={}, wt=[], info={}, scale=1, curF=null, sbDay='all', curView='assign', editIndex=null;
+const DEFAULT_SP=JSON.parse(JSON.stringify(SP));
+const INFO_FIELDS=[
+  ['fmFrequency','FM frequency','e.g. 87.8 MHz'],
+  ['baptismCandidates','Baptism candidates','number or short note'],
+  ['attendanceFriAM','Friday morning attendance',''],
+  ['attendanceFriPM','Friday afternoon attendance',''],
+  ['attendanceSatAM','Saturday morning / baptism attendance',''],
+  ['attendanceSatPM','Saturday afternoon attendance',''],
+  ['attendanceSunAM','Sunday morning attendance',''],
+  ['attendanceSunPM','Sunday final attendance',''],
+  ['announcementFri','Friday announcement / reminder','free text'],
+  ['announcementSat','Saturday announcement / reminder','free text'],
+  ['announcementSun','Sunday announcement / reminder','free text'],
+  ['generalNotes','General notes for chairman / local arrangements','free text']
+];
+
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
+function ini(n){n=(n||'?').trim()||'?';const p=n.split(/\s+/);return((p[0][0]||'?')+(p[p.length-1][0]||'')).toUpperCase()}
+function key(di,si,ri){return di+'_'+si+'_'+ri}
+function save(){try{localStorage.setItem('co10_public_v1',JSON.stringify({asgn,wt,info,scale,SP}))}catch(e){}}
+function load(){try{const d=localStorage.getItem('co10_public_v1');if(d){const p=JSON.parse(d);asgn=p.asgn||{};wt=p.wt||[];info=p.info||{};scale=p.scale||1;if(Array.isArray(p.SP))SP=p.SP;}}catch(e){}}
+function hasPrivateData(){return SP.length>0||Object.keys(asgn||{}).length>0||(wt&&wt.length>0)||Object.values(info||{}).some(function(v){return String(v||'').trim();});}
+function updateImportNotice(){var el=document.getElementById('importNotice');if(el)el.classList.toggle('hidden',hasPrivateData());}
+function applyScale(){document.documentElement.style.setProperty('--ui-scale',scale.toFixed(2));var el=document.getElementById('scaleLbl');if(el)el.textContent=Math.round(scale*100)+'%'}
+function adjScale(step){scale=Math.max(0.85,Math.min(1.35,+(scale+step).toFixed(2)));applyScale();save()}
+function resetScale(){scale=1;applyScale();save()}
+function infoVal(id){return (info&&info[id])?String(info[id]).trim():''}
+function fillInfo(id,fallback){var v=infoVal(id);return v?'<span class="fill">'+esc(v)+'</span>':(fallback||'<span class="fill">_______________</span>')}
+function normDays(s){var ds=[];if(s&&Array.isArray(s.days))ds=s.days.slice();else if(s&&s.d)ds=[s.d];ds=ds.filter(function(x){return ['Fri','Sat','Sun'].indexOf(x)>=0});return ds.length?Array.from(new Set(ds)):['Fri'];}
+function dayMatch(s,d){return d==='all'||normDays(s).indexOf(d)>=0}
+function dayText(s){return normDays(s).join(' / ')}
+
+function toggleSb(){
+  const s=document.getElementById('sb');
+  s.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  const sb=document.getElementById('sb');
+  const ham=document.getElementById('hamBtn');
+  if(sb.classList.contains('open')&&!sb.contains(e.target)&&!ham.contains(e.target)){
+    sb.classList.remove('open');
+  }
+});
+
+function fDay(d){
+  sbDay=d;
+  document.querySelectorAll('.day-filter .stab').forEach(function(b){b.classList.remove('on')});
+  var dfBtn=document.getElementById('df_'+d);
+  if(dfBtn)dfBtn.classList.add('on');
+  var note=document.getElementById('sbFilterNote');
+  if(note)note.textContent=d==='all'?'Showing all speakers':'Showing '+({Fri:'Friday',Sat:'Saturday',Sun:'Sunday'}[d]||d)+' speakers';
+  rSb();render();
+}
+function dayVisible(di){return sbDay==='all'||['Fri','Sat','Sun'][di]===sbDay}
+function rSb(){
+  const q=(document.getElementById('sbQ').value||'').toLowerCase();
+  const seen=new Set();
+  const list=SP.filter(function(s){
+    if(!dayMatch(s,sbDay))return false;
+    if(q&&s.n.toLowerCase().indexOf(q)<0&&s.c.toLowerCase().indexOf(q)<0)return false;
+    if(seen.has(s.n))return false;
+    seen.add(s.n);return true;
+  });
+  document.getElementById('sbList').innerHTML=list.map(function(s){
+    var ix=SP.indexOf(s);
+    return '<div class="spk" onclick="openSpEdit('+ix+')" title="Edit speaker"><div class="av">'+esc(ini(s.n))+'</div><div style="min-width:0"><div class="spk-name">'+esc(s.n)+'</div><div class="spk-cong">'+esc(s.c||'—')+'</div><div class="spk-days">'+esc(dayText(s))+'</div></div></div>';
+  }).join('');
+}
+
+function stats(){
+  let t=0,a=0;
+  DAYS.forEach(function(d,di){
+    if(!dayVisible(di))return;
+    d.sessions.forEach(function(s,si){
+      if(!s.slots)return;
+      s.slots.forEach(function(sl,ri){t++;if(asgn[key(di,si,ri)])a++;});
+    });
+  });
+  document.getElementById('sA').textContent=a;
+  document.getElementById('sT').textContent=t;
+  document.getElementById('sP').textContent=t?Math.round(a/t*100)+'%':'0%';
+}
+
+function setView(v){
+  curView=v;
+  document.body.setAttribute('data-print-view',v);
+  document.getElementById('vt1').classList.toggle('on',v==='assign');
+  document.getElementById('vt2').classList.toggle('on',v==='outline');
+  document.getElementById('vt3').classList.toggle('on',v==='info');
+  document.getElementById('v-assign').style.display=v==='assign'?'block':'none';
+  document.getElementById('v-outline').style.display=v==='outline'?'block':'none';
+  document.getElementById('v-info').style.display=v==='info'?'block':'none';
+}
+
+function render(){rAssign();rOutline();rInfo();stats();applyScale()}
+
+function btnHTML(v){
+  if(!v)return'<span class="asgn-icon">+</span><span>Assign\u2026</span>';
+  const cong=v.c?'<div class="asgn-c">'+v.c+'</div>':'';
+  return'<span class="asgn-icon">\u2713</span><span><div class="asgn-n">'+v.n+'</div>'+cong+'</span>';
+}
+
+function rAssign(){
+  var html='';
+  DAYS.forEach(function(d,di){
+    if(!dayVisible(di))return;
+    html+='<div class="day-block"><div class="day-hdr"><div class="day-hdr-label">'+d.label+'</div><div class="day-hdr-line"></div></div>';
+    d.sessions.forEach(function(s,si){
+      var bc=s.type==='video'?'bv':s.type==='prayer'?'bp':s.type==='chair'?'bc':'bt';
+      var bl=s.type==='video'?'Video':s.type==='prayer'?'Prayer':s.type==='chair'?'Chairman':'Talk';
+      var slots='';
+      if(s.slots){
+        s.slots.forEach(function(sl,ri){
+          var k=key(di,si,ri);var v=asgn[k]||null;
+          slots+='<div class="slot-row"><span class="slot-lbl">'+sl.r+'</span>';
+          slots+='<button class="asgn-btn'+(v?' set':'')+'" onclick="oModal(\''+k+'\',\''+s.ti.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\',\''+sl.r+'\')">'+btnHTML(v)+'</button>';
+          if(v)slots+='<button class="clr-btn" onclick="del(\''+k+'\')" title="Clear">\u2715</button>';
+          slots+='</div>';
+        });
+      }
+      var wtB='';
+      if(s.wt){
+        wtB='<div class="slot-row" style="align-items:flex-start;margin-top:2px"><span class="slot-lbl" style="padding-top:5px">Participants</span><div class="wt-parts">';
+        wt.forEach(function(p,i){
+          wtB+='<span class="chip"><span><div class="chip-n">'+(i+1)+'. '+esc(p.n)+'</div>'+(p.c?'<div class="chip-c">'+esc(p.c)+'</div>':'')+(p.role?'<div class="chip-c">'+esc(p.role)+'</div>':'')+'</span><span class="wt-tools"><button onclick="event.stopPropagation();movePart('+i+',-1)" title="Move up">↑</button><button onclick="event.stopPropagation();movePart('+i+',1)" title="Move down">↓</button><button onclick="event.stopPropagation();editPart('+i+')" title="Edit order note">✎</button><button onclick="event.stopPropagation();rmPart('+i+')" title="Remove">×</button></span></span>';
+        });
+        wtB+='<button class="add-chip" onclick="oModal(\'__wt__\',\'Watchtower Summary\',\'Participant\')">+ Add</button></div></div>';
+      }
+      html+='<div class="srow"><div class="srow-time"><span>'+s.t+'</span></div><div class="srow-body">';
+      html+='<div class="srow-top"><div class="srow-title">'+s.ti+'</div><span class="badge '+bc+'">'+bl+'</span></div>';
+      if(s.note)html+='<div class="srow-note">'+s.note+'</div>';
+      if(slots||wtB)html+='<div class="slots">'+slots+wtB+'</div>';
+      html+='</div></div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('v-assign').innerHTML=html;
+}
+
+function getVal(di,si,ri){return asgn[key(di,si,ri)]||null}
+function fmtFill(v){return v?'<span class="fill">'+esc(v.n)+(v.c?', '+esc(v.c):'')+'</span>':'<span class="fill">_______________</span>'}
+function findPrayer(di,last){
+  var sessions=DAYS[di].sessions;
+  var matches=[];
+  sessions.forEach(function(s,si){if(s.type==='prayer'&&s.slots)matches.push({s:s,si:si})});
+  if(!matches.length)return null;
+  var m=last?matches[matches.length-1]:matches[0];
+  return asgn[key(di,m.si,0)]||null;
+}
+
+function findWtConductor(di){
+  var sessions=DAYS[di].sessions;
+  for(var i=0;i<sessions.length;i++){if(sessions[i].wt&&sessions[i].slots){return asgn[key(di,i,0)]||null;}}
+  return null;
+}
+
+function resolveText(txt,di,si){
+  txt=txt.replace(/§SPEAKER§/g,function(){return fmtFill(getVal(di,si,0))});
+  txt=txt.replace(/§CONDUCTOR§/g,function(){return fmtFill(getVal(di,si,0)||findWtConductor(di))});
+  txt=txt.replace(/§NEXT§/g,function(){return fmtFill(getVal(di,si+1,0))});
+  txt=txt.replace(/§PRAYER_OPEN§/g,function(){return fmtFill(findPrayer(di,false))});
+  txt=txt.replace(/§PRAYER_CLOSE§/g,function(){return fmtFill(findPrayer(di,true))});
+  txt=txt.replace(/FM frequency ______/g,function(){return 'FM frequency '+fillInfo('fmFrequency')});
+  txt=txt.replace(/FM and device reminders if applicable\./g,function(){return infoVal('fmFrequency')?'FM frequency: '+fillInfo('fmFrequency')+'. Device reminders if applicable.':'FM and device reminders if applicable.'});
+  txt=txt.replace(/The attendance for the opening session of this[^.]* was ________\./g,function(){return 'The attendance for the opening session was '+fillInfo('attendanceFriAM')+'.'});
+  txt=txt.replace(/The attendance for this afternoon[^.]* was _+\./g,function(){return 'The attendance for this afternoon’s session was '+fillInfo(di===0?'attendanceFriPM':'attendanceSatPM')+'.'});
+  txt=txt.replace(/We are pleased to inform you that the attendance for this afternoon[^.]* was _+\./g,function(){return 'We are pleased to inform you that the attendance for this afternoon’s session was '+fillInfo('attendanceSatPM')+'.'});
+  txt=txt.replace(/All ___ of us in attendance/g,function(){return 'All '+fillInfo('attendanceSatAM','___')+' of us in attendance'});
+  txt=txt.replace(/The attendance for our morning session was _+\./g,function(){return 'The attendance for our morning session was '+fillInfo('attendanceSunAM')+'.'});
+  txt=txt.replace(/The attendance for this final session of our[^.]* was _+\./g,function(){return 'The attendance for this final session was '+fillInfo('attendanceSunPM')+'.'});
+  return txt;
+}
+
+function infoForSession(di,si,s){
+  var out=[];
+  if(s.ti.indexOf('Baptism discourse')>=0 && infoVal('baptismCandidates')) out.push('Baptism candidates: '+esc(infoVal('baptismCandidates')));
+  if(/Announcement|Announcements|announcement/.test(s.ti)){
+    var k=di===0?'announcementFri':di===1?'announcementSat':'announcementSun';
+    if(infoVal(k))out.push(esc(infoVal(k)));
+  }
+  if(s.type==='chair' && infoVal('generalNotes')) out.push(esc(infoVal('generalNotes')));
+  return out;
+}
+
+function rOutline(){
+  var html='';
+  DAYS.forEach(function(d,di){
+    if(!dayVisible(di))return;
+    html+='<div class="outline-day"><div class="outline-day-hdr">&#128197; '+d.label+'</div>';
+    d.sessions.forEach(function(s,si){
+      var bc=s.type==='video'?'bv':s.type==='prayer'?'bp':s.type==='chair'?'bc':'bt';
+      var bl=s.type==='video'?'Video':s.type==='prayer'?'Prayer':s.type==='chair'?'Chairman':'Talk';
+      var rightH='';
+      if(s.slots){
+        s.slots.forEach(function(sl,ri){
+          var v=asgn[key(di,si,ri)];
+          if(v){rightH+='<div class="ob-spk-name">'+esc(v.n)+'</div>'+(v.c?'<div class="ob-spk-cong">'+esc(v.c)+'</div>':'');}
+          else{rightH+='<div class="ob-unassigned">'+sl.r+': unassigned</div>';}
+        });
+      }
+      html+='<div class="oblock"><div class="ob-head">';
+      html+='<span class="ob-time">'+s.t+'</span>';
+      html+='<span class="ob-title">'+s.ti+'</span>';
+      html+='<div class="ob-right">'+rightH+'</div>';
+      html+='</div>';
+      var infos=infoForSession(di,si,s);
+      infos.forEach(function(x){html+='<div class="info-inline">'+x+'</div>';});
+      if(s.sc){
+        html+='<div class="ob-body">';
+        s.sc.forEach(function(item){
+          if(item.note){html+='<div class="ob-note-block">'+item.note+'</div>';}
+          else if(item.p){html+='<p>'+resolveText(item.p,di,si)+'</p>';}
+        });
+        if(s.wt&&wt.length){
+          html+='<div class="wt-panel"><div class="wt-panel-title">WT Study participants</div><div class="wt-parts">'+wt.map(function(p,i){return '<span class="chip"><span><div class="chip-n">'+(i+1)+'. '+esc(p.n)+'</div>'+(p.c?'<div class="chip-c">'+esc(p.c)+'</div>':'')+(p.role?'<div class="chip-c">'+esc(p.role)+'</div>':'')+'</span></span>';}).join('')+'</div></div>';
+        }
+        html+='</div>';
+      }
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('v-outline').innerHTML=html;
+}
+
+function oModal(k,title,role){
+  curF=k;
+  var t=role+' \u00b7 '+(title.length>36?title.slice(0,36)+'\u2026':title);
+  document.getElementById('mT').textContent=t;
+  document.getElementById('mQ').value='';
+  document.getElementById('ov').classList.add('open');
+  rModal();
+  setTimeout(function(){document.getElementById('mQ').focus()},60);
+}
+function cModal(){document.getElementById('ov').classList.remove('open');curF=null}
+
+function rModal(){
+  var q=(document.getElementById('mQ').value||'').toLowerCase();
+  var seen=new Set();
+  var list=SP.filter(function(s){
+    if(!dayMatch(s,sbDay))return false;
+    if(q&&s.n.toLowerCase().indexOf(q)<0&&s.c.toLowerCase().indexOf(q)<0)return false;
+    if(seen.has(s.n))return false;
+    seen.add(s.n);return true;
+  });
+  var g={Fri:[],Sat:[],Sun:[]};
+  list.forEach(function(s){normDays(s).forEach(function(d){if(g[d]&&g[d].indexOf(s)<0)g[d].push(s);});});
+  var dn={Fri:'Friday',Sat:'Saturday',Sun:'Sunday'};
+  var html='<div class="mi mi-manual" onclick="manual()"><div class="mi-av" style="background:#f0f0ec;color:#888">✎</div><div><div class="mi-n">Enter manually\u2026</div></div></div>';
+  ['Fri','Sat','Sun'].forEach(function(d){
+    if(!g[d].length)return;
+    html+='<div class="sec-lbl">'+dn[d]+'</div>';
+    g[d].forEach(function(s){
+      var sd=JSON.stringify(s).replace(/"/g,'&quot;');
+      var ix=SP.indexOf(s);
+      html+='<div class="mi" onclick=\'pickSp('+sd+')\' ><div class="mi-av">'+ini(s.n)+'</div><div style="min-width:0"><div class="mi-n">'+esc(s.n)+'</div><div class="mi-c">'+esc(s.c||'—')+'</div><div class="spk-days">'+esc(dayText(s))+'</div></div><button class="speaker-edit-btn" onclick="event.stopPropagation();editSp('+ix+')" title="Edit speaker info">✎ Edit</button></div>';
+    });
+  });
+  document.getElementById('mL').innerHTML=html;
+}
+
+function pickSp(s){pick({n:s.n,c:s.c||''})}
+function openSpEdit(i){
+  var s=SP[i];if(!s)return;
+  editIndex=i;
+  document.getElementById('spEditName').value=s.n||'';
+  document.getElementById('spEditCong').value=s.c||'';
+  var ds=normDays(s);['Fri','Sat','Sun'].forEach(function(d){var cb=document.getElementById('spDay'+d);if(cb)cb.checked=ds.indexOf(d)>=0;});
+  document.getElementById('spEditOv').classList.add('open');
+  setTimeout(function(){document.getElementById('spEditName').focus()},60);
+}
+function cSpEdit(){document.getElementById('spEditOv').classList.remove('open');editIndex=null}
+function editSp(i){openSpEdit(i)}
+function saveSpEdit(){
+  if(editIndex===null)return;
+  var s=SP[editIndex];if(!s)return;
+  var n=(document.getElementById('spEditName').value||'').trim();
+  var c=(document.getElementById('spEditCong').value||'').trim();
+  var days=['Fri','Sat','Sun'].filter(function(d){var cb=document.getElementById('spDay'+d);return cb&&cb.checked;});
+  if(!days.length){alert('Please select at least one day.');return;}
+  if(!n){alert('Please enter a name.');return;}
+  var oldN=s.n, oldC=s.c||'';
+  SP[editIndex]={n:n,c:c,d:days[0],days:days};
+  Object.keys(asgn).forEach(function(k){if(asgn[k]&&asgn[k].n===oldN&&asgn[k].c===oldC){asgn[k]={n:n,c:c};}});
+  wt.forEach(function(p){if(p&&p.n===oldN&&p.c===oldC){p.n=n;p.c=c;}});
+  save();rSb();render();rModal();cSpEdit();
+}
+function resetOneSpeaker(){
+  if(editIndex===null)return;
+  var cur=SP[editIndex];if(!cur)return;
+  var orig=DEFAULT_SP.find(function(x){return x.n===cur.n})||DEFAULT_SP[editIndex];
+  if(!orig){return;}
+  document.getElementById('spEditName').value=orig.n||'';
+  document.getElementById('spEditCong').value=orig.c||'';
+  var ds=normDays(orig);['Fri','Sat','Sun'].forEach(function(d){var cb=document.getElementById('spDay'+d);if(cb)cb.checked=ds.indexOf(d)>=0;});
+}
+function resetSpeakerList(){if(confirm('Clear the current speaker list? Assignments stay unchanged.')){SP=JSON.parse(JSON.stringify(DEFAULT_SP));save();rSb();render();}}
+
+function rInfo(){
+  var html='<div class="info-panel"><div class="info-title">Local info & free text</div><div class="info-sub">These fields are saved locally in your browser and inserted into the chairman outline where possible. Use the announcement fields for short local reminders.</div><div class="info-grid">';
+  INFO_FIELDS.forEach(function(f){
+    var id=f[0],label=f[1],ph=f[2]||'';var full=/announcement|generalNotes/.test(id);
+    html+='<div class="info-field '+(full?'full':'')+'"><label for="info_'+id+'">'+esc(label)+'</label>';
+    if(full)html+='<textarea id="info_'+id+'" placeholder="'+esc(ph)+'" oninput="setInfo(\''+id+'\',this.value)">'+esc(infoVal(id))+'</textarea>';
+    else html+='<input id="info_'+id+'" placeholder="'+esc(ph)+'" value="'+esc(infoVal(id))+'" oninput="setInfo(\''+id+'\',this.value)">';
+    html+='</div>';
+  });
+  html+='</div><div class="info-hint" style="margin-top:12px">Tip: Use 🔍− / 🔍+ for screen and mobile size. Use the single Day filter above for both speakers and program. Speaker details can be corrected by clicking a speaker in the left list or with ✎ Edit in the selection window. Speakers can belong to several days. Print outputs only the currently selected view.</div><div style="margin-top:12px"><button class="nb" onclick="resetSpeakerList()">Clear speaker list</button></div></div>';
+  document.getElementById('v-info').innerHTML=html;
+}
+function setInfo(id,val){info[id]=val;save();rOutline();}
+
+function pick(v){
+  if(!curF)return;
+  if(curF==='__wt__'){
+    var role=prompt('WT participant order / role note (optional):', v.role||'');
+    if(role===null)role='';
+    wt.push({n:v.n,c:v.c||'',role:(role||'').trim()});save();render();cModal();return;
+  }
+  asgn[curF]=v;save();render();cModal();
+}
+function manual(){
+  var n=prompt('Name:');if(!n||!n.trim())return;
+  var c=prompt('Congregation (optional):');
+  pick({n:n.trim(),c:(c||'').trim()});
+}
+function del(k){delete asgn[k];save();render()}
+function rmPart(i){wt.splice(i,1);save();render()}
+function movePart(i,dir){var j=i+dir;if(j<0||j>=wt.length)return;var tmp=wt[i];wt[i]=wt[j];wt[j]=tmp;save();render()}
+function editPart(i){var p=wt[i];if(!p)return;var role=prompt('WT participant order / role note:',p.role||'');if(role===null)return;p.role=(role||'').trim();save();render()}
+
+function doExport(){
+  var data={
+    type:'CO-10-26-E Editor backup',
+    version:'public-v1',
+    exportedAt:new Date().toISOString(),
+    asgn:asgn,
+    wt:wt,
+    info:info,
+    scale:scale,
+    SP:SP
+  };
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='CO-10-26-E_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+}
+
+function doImport(file){
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    try{
+      var p=JSON.parse(reader.result||'{}');
+      if(!p || (!p.asgn && !p.wt && !p.info && !p.SP)){alert('This does not look like a CO-10 backup JSON.');return;}
+      if(!confirm('Import this JSON backup? Current local assignments, notes and speaker edits will be replaced.'))return;
+      asgn=p.asgn||{};
+      wt=Array.isArray(p.wt)?p.wt:[];
+      info=p.info||{};
+      scale=typeof p.scale==='number'?p.scale:scale;
+      if(Array.isArray(p.SP)&&p.SP.length)SP=p.SP;
+      save();applyScale();rSb();render();setView(curView||'assign');
+      alert('Import completed.');
+    }catch(e){alert('Could not import JSON: '+e.message);}
+  };
+  reader.readAsText(file);
+}
+
+
+load();applyScale();fDay(sbDay||'all');setView('assign');
+</script>
+</body>
+</html>
 
