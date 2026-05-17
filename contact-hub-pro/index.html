@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.4.0</title>
+<title>ContactHub Pro V1.5.2</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -372,6 +372,47 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 [data-theme='dark'] #contactSearch:focus{box-shadow:0 0 0 5px rgba(59,130,246,.28);}
 [data-theme='dark'] #contactSearch::placeholder{color:#4a6080;}
 
+
+/* ── V1.5 Contacts-first layout ─────────────────────────────── */
+.templatesPanel{display:none!important;}
+.grid{grid-template-columns:minmax(680px,1.9fr) minmax(360px,.78fr)!important;gap:14px;}
+.contactsPanel{grid-column:1;}
+.previewPanel{grid-column:2;}
+.contactsPanel .list{max-height:calc(100vh - 365px);}
+.contactsPanel .cardItem{padding:12px;border-radius:16px;}
+.contactsPanel .cardName{font-size:15px;}
+.contactsPanel .lineAction{grid-template-columns:1fr auto auto;padding:6px 7px;}
+.previewPanel .panelHead h2::before{content:'⚡ ';}
+.quickMessageBox{border:1px solid #dbe7f4;background:linear-gradient(180deg,#ffffff,#f8fbff);border-radius:16px;padding:11px;display:grid;gap:9px;}
+.quickHint{font-size:12px;color:var(--muted);line-height:1.35;background:#f8fafc;border:1px dashed #c8d7e8;border-radius:12px;padding:7px 9px;}
+.compactDraftFields input{padding:7px 9px;font-size:12.5px;}
+.contactHeadActions{position:relative;align-items:center;}
+.toolsMenu{position:relative;display:inline-block;}
+.toolsMenu summary{list-style:none;border:1px solid #e2e8f0;background:#f1f5f9;color:#334155;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:850;cursor:pointer;white-space:nowrap;}
+.toolsMenu summary::-webkit-details-marker{display:none;}
+.toolsMenuBody{position:absolute;right:0;top:34px;z-index:60;min-width:220px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 40px rgba(15,23,42,.16);padding:8px;display:grid;gap:6px;}
+.toolsMenuBody button{width:100%;justify-content:flex-start;text-align:left;}
+.previewActions{display:grid;grid-template-columns:1fr 1fr;}
+.previewActions #btnCopyMessage{grid-column:1/-1;}
+@media(max-width:1280px){.grid{grid-template-columns:1fr!important}.previewPanel{grid-column:1}.contactsPanel .list{max-height:none}.panel{position:relative;top:0;max-height:none}.panel .panelBody{max-height:none}}
+@media(max-width:820px){.previewActions{grid-template-columns:1fr}.toolsMenuBody{left:0;right:auto}.contactHeadActions{justify-content:flex-start}.compactDraftFields{grid-template-columns:1fr}}
+[data-theme=dark] .quickMessageBox{background:linear-gradient(180deg,#1e293b,#1a2438);border-color:#2d3f55;}
+[data-theme=dark] .quickHint{background:#1a2438;border-color:#2d3f55;color:#7a98b4;}
+
+.quickMessageText{min-height:190px;font-size:14px;line-height:1.48;resize:vertical;}
+
+.quickWhoAmIGrid{display:grid;grid-template-columns:1fr;gap:4px;}
+.quickWhoAmIGrid input{font-weight:700;}
+.quickWhoAmIGrid .tinyHelp{font-size:11px;color:var(--muted);line-height:1.3;}
+.quickPlaceholderBar{display:flex;gap:6px;flex-wrap:wrap;}
+.quickPlaceholderBar button{font-family:var(--mono);font-size:11px;font-weight:850;background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:5px 7px;border-radius:999px;}
+.quickPlaceholderBar button:hover{background:#e8f0ff;color:#1d4ed8;}
+.greenSoftBtn{background:var(--green)!important;color:#fff!important;border-color:transparent!important;}
+[data-theme=dark] .quickPlaceholderBar button{background:#1a2438;border-color:#2d3f55;color:#c0d4ea;}
+[data-theme=dark] .quickPlaceholderBar button:hover{background:#1e3a5f;color:#93c5fd;}
+[data-theme=dark] .toolsMenu summary{background:#1e293b;border-color:#2d3f55;color:#94a3b8;}
+[data-theme=dark] .toolsMenuBody{background:#1e293b;border-color:#2d3f55;}
+
 </style>
 </head>
 <body>
@@ -380,8 +421,8 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.4.0</span></h1>
-        <p class="sub">Contacts · Congregations · Teams · Messaging · Team Captain Export</p>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.5.2</span></h1>
+        <p class="sub">Contacts · Congregations · Teams · Quick contact actions</p>
       </div>
     </div>
     <div class="toolbar">
@@ -401,7 +442,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
   <input class="fileInput" type="file" id="csvInput" accept="text/csv,.csv" />
 
   <div class="note utilityNote">
-    <span><strong>Workflow:</strong> choose a contact on the left, pick a message category/template in the middle, then use the ready preview on the right.</span>
+    <span><strong>Workflow:</strong> find a contact, select it, adjust the mini message if needed, then open WhatsApp or email.</span>
     <div class="smallBtns">
       <button class="mini ghost" id="btnSentItems">History</button>
       <button class="mini danger" id="btnClearLocal">Clear local data</button>
@@ -412,12 +453,12 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <section class="panel contactsPanel">
       <div class="panelHead">
         <div><h2>Contacts</h2><small id="contactCount">0</small></div>
-        <div class="smallBtns">
-          <button class="mini primary" id="btnMasterData">⚙️ Master data</button>
-          <button class="mini ghost" id="btnCongregations">🏛 Congregations</button>
+        <div class="smallBtns contactHeadActions">
+          <button class="primary mini" id="btnNewContact">+ Contact</button>
+          <button class="green mini greenSoftBtn" id="btnCongregations">🏛 Congregations</button>
+          <button class="mini ghost" id="btnMasterData">⚙️ Master data</button>
           <button class="mini ghost" id="btnMergeSelected">Merge</button>
           <button class="mini ghost" id="btnCaptainExport">📤 Captain Export</button>
-          <button class="primary mini" id="btnNewContact">+ Contact</button>
         </div>
       </div>
       <div class="panelBody stack">
@@ -466,10 +507,6 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
         <div class="list" id="templateList"></div>
 
         <div class="sectionTitle"><span id="templateEditTitle">Message composer</span><div class="smallBtns"><button class="mini ghost" id="btnDuplicateTemplate">Duplicate</button><button class="mini danger" id="btnDeleteTemplate">Delete</button></div></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
-          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Event name</label><input id="draft_eventName" placeholder="e.g. Circuit Assembly 2026"></div>
-          <div><label style="font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Date</label><input id="draft_date" placeholder="e.g. 14 June 2026"></div>
-        </div>
         <div id="templateEditor" class="stack"></div>
 
         <div class="sectionTitle"><span>Placeholders</span><span style="font-size:11px;color:var(--muted);font-weight:500">Click → insert into text field</span></div>
@@ -480,19 +517,28 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 
     <section class="panel previewPanel">
       <div class="panelHead">
-        <div><h2>Ready message</h2><small id="previewMeta">Select contact + template</small></div>
+        <div><h2>Ready message</h2><small id="previewMeta">Select contact</small></div>
         <button class="mini ghost" id="btnPrintPreview">Print</button>
       </div>
       <div class="panelBody stack">
-        <div class="sectionTitle"><span id="sendToTitle">Prepare for this contact</span></div>
+        <div class="sectionTitle"><span id="sendToTitle">Selected contact</span></div>
         <div class="recipientBox" id="recipientBox">Select a contact on the left.</div>
-        <div class="sendChoice">
-          <div><label id="lblChannel">Channel</label><select id="deliveryChannel"><option value="whatsapp">WhatsApp</option><option value="email">Email</option></select></div>
+        <input type="hidden" id="deliveryChannel" value="whatsapp">
+        <div class="quickMessageBox">
+          <div class="sectionTitle" style="margin:0"><span>Mini message</span><button class="mini ghost" id="btnResetQuickMessage">Reset text</button></div>
+          <div class="quickWhoAmIGrid">
+            <label for="quickSenderName">Who am I? / Signature name</label>
+            <input id="quickSenderName" placeholder="e.g. Marco" autocomplete="name">
+            <div class="tinyHelp">Used for {{senderName}} in the message footer.</div>
+          </div>
+          <textarea id="quickMessageText" class="quickMessageText" spellcheck="true"></textarea>
+          <div class="quickPlaceholderBar" id="quickPlaceholderBar"></div>
+          <div class="quickHint">Simple like Team Captain Manager: write one reusable text, add your sender name once, and use contact placeholders.</div>
         </div>
-        <div class="sectionTitle"><span id="subjectTitle">Email subject</span><button class="mini ghost" id="btnCopySubject">Copy</button></div>
-        <div class="subjectBox" id="subjectPreview">—</div>
+        <div class="sectionTitle hidden"><span id="subjectTitle">Email subject</span><button class="mini ghost" id="btnCopySubject">Copy</button></div>
+        <div class="subjectBox hidden" id="subjectPreview">—</div>
         <div class="sectionTitle"><span id="messageTitle">Ready message</span><button class="mini ghost" id="btnCopyMessageTop">Copy</button></div>
-        <div class="previewBox" id="messagePreview">Select contact and template.</div>
+        <div class="previewBox" id="messagePreview">Select contact and write a mini message.</div>
         <div class="previewMetaRow">
           <span class="kbdHint"><kbd>Ctrl</kbd>+<kbd>↵</kbd> send</span>
           <span class="charCounter" id="charCounter">0 characters</span>
@@ -521,9 +567,12 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.4.0', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.5.2', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en',activeView:'contacts',selectedCongId:null};
-const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','eventName','date','organization','email','emails','mobile','mobiles'];
+const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','organization','email','emails','mobile','mobiles','senderName'];
+const QUICK_MESSAGE_KEY='contacthub_pro_quickMessage_v152';
+const QUICK_SENDER_KEY='contacthub_pro_quickSenderName_v152';
+const DEFAULT_QUICK_MESSAGE='Dear {{firstName}},\n\n\n\nYour brother,\n{{senderName}}';
 // Template contexts — the "who am I writing to / for what occasion" dimension
 const CONTEXTS=[
   {id:'assembly', label:'Assembly / Convention', icon:'🏟', desc:'Volunteer assignments, team messages, captain greetings, reminders', defaultChannel:'whatsapp'},
@@ -835,14 +884,14 @@ function ensureUniqueContactIds(contacts){
 
 function init(){const saved=localStorage.getItem(STORAGE_KEY);try{state.data=saved?migrate(JSON.parse(saved)):emptyData();ensureUniqueContactIds(state.data.contacts)}catch{state.data=emptyData();toast('Could not read autosave data.')}
 state.uiLang='en';state.data.settings.uiLanguage='en';selectFirst();bind();applyLang();renderAll();saveStatus('Saved locally','ok')}
-function selectFirst(){}// no auto-selection on startup
+function selectFirst(){state.selectedTemplateId=state.data.templates[0]?.id||null}// no auto-contact selection on startup
 function saveSoon(){saveStatus('Saving...','warn');clearTimeout(state.autosaveTimer);state.autosaveTimer=setTimeout(saveNow,350)}
 function saveNow(){ensureUniqueContactIds(state.data.contacts);state.data.updatedAt=new Date().toISOString();state.data.settings.uiLanguage='en';localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));saveStatus(`Saved locally · ${nowNice()}`,'ok')}
 function saveStatus(t,mode){$('#saveStatus').innerHTML=`<span class="dot" style="background:${mode==='warn'?'#f59e0b':mode==='danger'?'#ef4444':'#15803d'}"></span> ${esc(t)}`}
 function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=msg;$('#toastWrap').appendChild(d);setTimeout(()=>d.remove(),3200)}
 function applyLang(){state.uiLang='en';document.querySelectorAll('[data-i18n]').forEach(el=>{el.removeAttribute('data-i18n')});renderTemplates();renderPlaceholders();renderCounts();renderPreview()}
 
-function renderAll(){renderCounts();renderFilters();renderAreaTabs();renderContacts();renderTemplates();renderTemplateEditor();renderPreview();renderPlaceholders()}
+function renderAll(){renderCounts();renderFilters();renderAreaTabs();renderContacts();renderTemplates();renderTemplateEditor();renderQuickTemplateSelect();renderQuickMessageTools();renderPreview();renderPlaceholders()}
 function renderCounts(){const nc=state.data.contacts.length;$('#contactCount').textContent=`${nc} contact${nc!==1?'s':''}`;$('#templateCount').textContent=`${state.data.templates.length} templates`}
 function renderFilters(){
   const oldTag=$('#contactTagFilter')?.value||'',oldRole=$('#contactRoleFilter')?.value||'',oldTeam=$('#contactTeamFilter')?.value||'',oldCong=$('#contactCongFilter')?.value||'';
@@ -950,6 +999,20 @@ function filteredTemplates(){
     return aKey.localeCompare(bKey);
   });
 }
+
+function renderQuickTemplateSelect(){
+  const sel=document.getElementById('quickTemplateSelect');
+  if(!sel)return;
+  const templates=[...(state.data.templates||[])].sort((a,b)=>((a.context||'')+(a.category||'')+a.title).localeCompare((b.context||'')+(b.category||'')+b.title));
+  if(!state.selectedTemplateId&&templates.length)state.selectedTemplateId=templates[0].id;
+  const current=state.selectedTemplateId;
+  sel.innerHTML=templates.length?templates.map(t=>{
+    const ctx=CONTEXTS.find(c=>c.id===(t.context||'personal'));
+    const label=[ctx?ctx.icon+' '+ctx.label:'Message',t.category,t.title].filter(Boolean).join(' · ');
+    return `<option value="${esc(t.id)}" ${t.id===current?'selected':''}>${esc(label)}</option>`;
+  }).join(''):'<option value="">No template available</option>';
+  sel.value=templates.some(t=>t.id===current)?current:(templates[0]?.id||'');
+}
 function renderTemplates(){
   const list=filteredTemplates(),el=$('#templateList');
   if(!list.length){el.innerHTML='<div class="empty">No templates found.<br><br><button class="primary mini" onclick="ContactHubPro.openTemplateEditor()">Create template</button></div>';return}
@@ -980,7 +1043,7 @@ function renderTemplates(){
     state.selectedTemplateId=c.dataset.template;
     const tt=getTemplate();
     if(tt&&tt.channel&&tt.channel!=='general')$('#deliveryChannel').value=tt.channel;
-    renderContextCards();renderTemplates();renderTemplateEditor();renderPreview();
+    renderContextCards();renderTemplates();renderTemplateEditor();renderQuickTemplateSelect();renderPreview();
   });
 }
 function getTemplate(){return state.data.templates.find(t=>t.id===state.selectedTemplateId)||null}
@@ -1008,84 +1071,72 @@ $('#tmpl_context').onchange=()=>{
   // Only suggest channel if currently on general or user hasn't changed it from the context default
   if(ctx&&(t.channel==='general'))$('#tmpl_channel').value=ctx.defaultChannel;
   t.channel=$('#tmpl_channel').value;
-  saveSoon();renderContextCards();renderTemplates();
+  saveSoon();renderContextCards();renderTemplates();renderQuickTemplateSelect();
 };
-$('#tmpl_channel').onchange=()=>{t.channel=$('#tmpl_channel').value;saveSoon();renderContextCards();renderTemplates();renderPreview();$('#deliveryChannel').value=t.channel!=='general'?t.channel:$('#deliveryChannel').value;};
-['title','category','subject','body','footer'].forEach(k=>{const el2=$('#tmpl_'+k);if(!el2)return;el2.oninput=()=>{t[k]=cleanNewlines(el2.value);saveSoon();if(k==='category')renderContextCards();renderTemplates();renderPreview()};if(['subject','body','footer'].includes(k)){el2.addEventListener('focus',()=>{window._lastTemplateFocus=el2;});}});
+$('#tmpl_channel').onchange=()=>{t.channel=$('#tmpl_channel').value;saveSoon();renderContextCards();renderTemplates();renderQuickTemplateSelect();renderPreview();$('#deliveryChannel').value=t.channel!=='general'?t.channel:$('#deliveryChannel').value;};
+['title','category','subject','body','footer'].forEach(k=>{const el2=$('#tmpl_'+k);if(!el2)return;el2.oninput=()=>{t[k]=cleanNewlines(el2.value);saveSoon();if(k==='category')renderContextCards();renderTemplates();renderQuickTemplateSelect();renderPreview()};if(['subject','body','footer'].includes(k)){el2.addEventListener('focus',()=>{window._lastTemplateFocus=el2;});}});
 }
 
+function getQuickSenderName(){const el=document.getElementById('quickSenderName');return (el?el.value:localStorage.getItem(QUICK_SENDER_KEY)||'').trim()}
+function setQuickSenderName(val){const el=document.getElementById('quickSenderName');if(el)el.value=val||'';localStorage.setItem(QUICK_SENDER_KEY,val||'')}
+function getQuickMessageRaw(){const el=document.getElementById('quickMessageText');return el?el.value:(localStorage.getItem(QUICK_MESSAGE_KEY)||DEFAULT_QUICK_MESSAGE)}
+function setQuickMessageRaw(val){const el=document.getElementById('quickMessageText');if(el)el.value=val;localStorage.setItem(QUICK_MESSAGE_KEY,val)}
+function renderQuickMessageTools(){
+  const sender=document.getElementById('quickSenderName');
+  if(sender&&!sender.dataset.ready){sender.value=localStorage.getItem(QUICK_SENDER_KEY)||'';sender.dataset.ready='1';}
+  const el=document.getElementById('quickMessageText');
+  if(el&&!el.dataset.ready){el.value=localStorage.getItem(QUICK_MESSAGE_KEY)||DEFAULT_QUICK_MESSAGE;el.dataset.ready='1';}
+  const bar=document.getElementById('quickPlaceholderBar');
+  if(bar){const items=['firstName','lastName','displayName','congregation','role','team','teams','email','mobile','senderName'];bar.innerHTML=items.map(k=>`<button type="button" data-quick-ph="${k}">{{${k}}}</button>`).join('');$$('[data-quick-ph]').forEach(btn=>btn.onclick=()=>insertQuickPlaceholder(btn.dataset.quickPh));}
+}
+function insertQuickPlaceholder(key){const el=document.getElementById('quickMessageText');if(!el)return;const token='{{'+key+'}}';const s=el.selectionStart??el.value.length,e=el.selectionEnd??el.value.length;el.value=el.value.slice(0,s)+token+el.value.slice(e);el.focus();el.selectionStart=el.selectionEnd=s+token.length;localStorage.setItem(QUICK_MESSAGE_KEY,el.value);renderPreview();}
 function renderPreview(){
-const t=getTemplate();
 const charEl=document.getElementById('charCounter');
-// Check if a congregation is the active recipient
+const raw=getQuickMessageRaw();
 const activeCong=state.selectedTarget?.isCong?(state.data.congregations||[]).find(cg=>cg.id===state.selectedTarget.congId):null;
 const c=activeCong?null:getContact();
-if(activeCong&&t){
-  // Congregation recipient mode
-  const data={firstName:activeCong.name,lastName:'',displayName:activeCong.name,recipientName:activeCong.name,greeting:activeCong.name,congregation:activeCong.name,role:'',team:'',teams:'',organization:'',email:activeCong.jwEmail||'',emails:activeCong.jwEmail||'',mobile:'',mobiles:'',...state.draftDetails};
-  const sub=renderText(cleanNewlines(t.subject),data);
-  const parts=[renderText(cleanNewlines(t.body),data),renderText(cleanNewlines(t.footer),data)].filter(x=>String(x||'').trim());
-  const body=parts.join('\n\n');
-  $('#previewMeta').textContent=`🏛 ${activeCong.name} · ${t.title}`;
-  $('#subjectPreview').textContent=sub||'—';
-  $('#messagePreview').textContent=body||'Template is empty.';
+if(activeCong){
+  const data={firstName:activeCong.name,lastName:'',displayName:activeCong.name,recipientName:activeCong.name,greeting:activeCong.name,congregation:activeCong.name,role:'',team:'',teams:'',organization:'',email:activeCong.jwEmail||'',emails:activeCong.jwEmail||'',mobile:'',mobiles:'',phone:'',senderName:getQuickSenderName()};
+  const body=renderText(raw,data).trim();
+  $('#previewMeta').textContent=`🏛 ${activeCong.name}`;
+  $('#subjectPreview').textContent='—';
+  $('#messagePreview').textContent=body||'Mini message is empty.';
   if(charEl){const len=body.length;charEl.textContent=`${len} characters`;charEl.className='charCounter'+(len>1600?' over':len>800?' warn':'');}
   let rows=`<div style="font-weight:900;font-size:14px;margin-bottom:5px;">🏛 ${esc(activeCong.name)}</div>`;
   rows+=`<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Congregation · Email only</div>`;
   rows+='<div class="pickRows">';
   rows+=`<div class="pickRow missing"><span class="pickIcon mis">—</span><span class="pickVal">No WhatsApp (congregation)</span></div>`;
-  if(activeCong.jwEmail){rows+=`<div class="pickRow email-row active"><span class="pickIcon em">@</span><span class="pickVal">${esc(activeCong.jwEmail)}</span><span class="openNow jwEmailBadge" style="font-size:10px">JW</span></div><button class="mini ghost" style="margin-top:4px;font-size:11px" onclick="copyText('${activeCong.jwEmail.replace(/'/g,"\\'")}')">⧉ Copy JW email (recommended for Windows Outlook)</button>`;}
+  if(activeCong.jwEmail){rows+=`<div class="pickRow email-row active"><span class="pickIcon em">@</span><span class="pickVal">${esc(activeCong.jwEmail)}</span><span class="openNow jwEmailBadge" style="font-size:10px">JW</span></div><button class="mini ghost" style="margin-top:4px;font-size:11px" onclick="copyText('${activeCong.jwEmail.replace(/'/g,"\\'")}')">⧉ Copy JW email</button>`;}
   else{rows+=`<div class="pickRow missing email-row"><span class="pickIcon mis">@</span><span class="pickVal">No JW email — edit congregation</span></div>`;}
   rows+=`</div><button class="mini ghost" style="margin-top:6px" onclick="state.selectedTarget=null;state.selectedCongId=null;renderPreview()">× Clear congregation recipient</button>`;
   $('#recipientBox').innerHTML=rows;
   return;
 }
-if(!c||!t){
-  $('#previewMeta').textContent='Select contact + template';
+if(!c){
+  $('#previewMeta').textContent='Select contact';
   $('#recipientBox').innerHTML='<span style="color:var(--muted);font-size:13px;">Select a contact on the left, or use ✉ Message on a congregation.</span>';
   $('#subjectPreview').textContent='—';
-  $('#messagePreview').textContent='Select contact and template.';
+  $('#messagePreview').textContent='Select a contact and write a mini message.';
   if(charEl){charEl.textContent='0 characters';charEl.className='charCounter';}
   return;
 }
-const data=renderData(c,t),sub=renderText(cleanNewlines(t.subject),data);
-const parts=[renderText(cleanNewlines(t.body),data),renderText(cleanNewlines(t.footer),data)].filter(x=>String(x||'').trim());
-const body=parts.join('\n\n');
-const channel=($('#deliveryChannel')&&$('#deliveryChannel').value)||t.channel||'whatsapp';
-
-ensureDefaultTarget(c,channel);
-$('#previewMeta').textContent=`${contactName(c)} · ${t.title}`;
-$('#subjectPreview').textContent=sub||'—';
-$('#messagePreview').textContent=body||'Template is empty.';
-if(charEl){
-  const len=body.length;
-  charEl.textContent=`${len} characters`;
-  charEl.className='charCounter'+(len>1600?' over':len>800?' warn':'');
-}
+const data=renderData(c,null);
+const body=renderText(raw,data).trim();
+$('#previewMeta').textContent=contactName(c);
+$('#subjectPreview').textContent='—';
+$('#messagePreview').textContent=body||'Mini message is empty.';
+if(charEl){const len=body.length;charEl.textContent=`${len} characters`;charEl.className='charCounter'+(len>1600?' over':len>800?' warn':'');}
 const mobiles=c.mobiles||[],emails=c.emails||[];
 let rows=`<div style="font-weight:900;font-size:14px;margin-bottom:5px;">${esc(contactName(c))}</div>`;
 rows+=`<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${esc([c.congregation,c.role].filter(Boolean).join(' · ')||'—')}</div>`;
 rows+='<div class="pickRows">';
-if(mobiles.length){
-  mobiles.forEach((m,i)=>{
-    const active=state.selectedTarget&&state.selectedTarget.channel==='whatsapp'&&state.selectedTarget.value===m.value;
-    rows+=`<button type="button" class="pickRow ${active?'active':''}" data-target-channel="whatsapp" data-target-value="${esc(m.value)}" title="Use this WhatsApp number">
-      <span class="pickIcon wa"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.852L0 24l6.335-1.513A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.002-1.368l-.36-.213-3.762.898.954-3.67-.234-.374A9.818 9.818 0 012.182 12C2.182 6.575 6.575 2.182 12 2.182S21.818 6.575 21.818 12 17.425 21.818 12 21.818z"/></svg></span>
-      <span class="pickVal">${esc(m.value)}</span><span class="openNow">Use</span>
-    </button>`;
-  });
-} else rows+=`<div class="pickRow missing"><span class="pickIcon mis">—</span><span class="pickVal">No mobile number</span><span class="pickLbl mis">WA</span></div>`;
-if(emails.length){
-  emails.forEach((e,i)=>{
-    const active=state.selectedTarget&&state.selectedTarget.channel==='email'&&state.selectedTarget.value===e.value;
-    rows+=`<button type="button" class="pickRow email-row ${active?'active':''}" data-target-channel="email" data-target-value="${esc(e.value)}" title="Use this email address">
-      <span class="pickIcon em">@</span><span class="pickVal">${esc(e.value)}</span><span class="openNow">Use</span>
-    </button>`;
-  });
-} else rows+=`<div class="pickRow missing email-row"><span class="pickIcon mis">@</span><span class="pickVal">No email address</span><span class="pickLbl mis">Mail</span></div>`;
+if(mobiles.length){mobiles.forEach(m=>{const active=state.selectedTarget&&state.selectedTarget.channel==='whatsapp'&&state.selectedTarget.value===m.value;rows+=`<button type="button" class="pickRow ${active?'active':''}" data-target-channel="whatsapp" data-target-value="${esc(m.value)}" title="Use this WhatsApp number"><span class="pickIcon wa">☘</span><span class="pickVal">${esc(m.value)}</span><span class="openNow">Use</span></button>`;});}
+else rows+=`<div class="pickRow missing"><span class="pickIcon mis">—</span><span class="pickVal">No mobile number</span><span class="pickLbl mis">WA</span></div>`;
+if(emails.length){emails.forEach(e=>{const active=state.selectedTarget&&state.selectedTarget.channel==='email'&&state.selectedTarget.value===e.value;rows+=`<button type="button" class="pickRow email-row ${active?'active':''}" data-target-channel="email" data-target-value="${esc(e.value)}" title="Use this email address"><span class="pickIcon em">@</span><span class="pickVal">${esc(e.value)}</span><span class="openNow">Use</span></button>`;});}
+else rows+=`<div class="pickRow missing email-row"><span class="pickIcon mis">@</span><span class="pickVal">No email address</span><span class="pickLbl mis">Mail</span></div>`;
 rows+='</div>';
 $('#recipientBox').innerHTML=rows;
-$$('[data-target-channel]').forEach(btn=>btn.onclick=()=>{state.selectedTarget={channel:btn.dataset.targetChannel,value:btn.dataset.targetValue};$('#deliveryChannel').value=state.selectedTarget.channel;renderPreview();});
+$$('[data-target-channel]').forEach(btn=>btn.onclick=()=>{state.selectedTarget={channel:btn.dataset.targetChannel,value:btn.dataset.targetValue};const sel=$('#deliveryChannel');if(sel)sel.value=state.selectedTarget.channel;renderPreview();});
 }
 function ensureDefaultTarget(c,channel){
   const list=channel==='email'?(c.emails||[]).map(e=>e.value):(c.mobiles||[]).map(m=>m.value);
@@ -1099,9 +1150,9 @@ function getSelectedTarget(channel){
   const c=getContact();if(!c)return'';ensureDefaultTarget(c,channel);return state.selectedTarget&&state.selectedTarget.channel===channel?state.selectedTarget.value:''
 }
 function recipientName(c,t){return c.firstName||firstWord(contactName(c))||contactName(c)||''}
-function renderData(c,t=null){const em=(c.emails||[]).map(e=>e.value),mo=(c.mobiles||[]).map(m=>m.value);const rn=recipientName(c,t);const ct=contactTeams(c);return{firstName:c.firstName||firstWord(contactName(c)),lastName:c.lastName||'',displayName:contactName(c),recipientName:rn,greeting:rn,congregation:c.congregation||'',role:c.role||'',team:ct[0]||'',teams:ct.join(', '),organization:c.organization||'',email:em[0]||'',emails:em.join(', '),mobile:mo[0]||'',mobiles:mo.join(', '),phone:mo[0]||'',...state.draftDetails}}
+function renderData(c,t=null){const em=(c.emails||[]).map(e=>e.value),mo=(c.mobiles||[]).map(m=>m.value);const rn=recipientName(c,t);const ct=contactTeams(c);return{firstName:c.firstName||firstWord(contactName(c)),lastName:c.lastName||'',displayName:contactName(c),recipientName:rn,greeting:rn,congregation:c.congregation||'',role:c.role||'',team:ct[0]||'',teams:ct.join(', '),organization:c.organization||'',email:em[0]||'',emails:em.join(', '),mobile:mo[0]||'',mobiles:mo.join(', '),phone:mo[0]||'',senderName:getQuickSenderName(),...state.draftDetails}}
 function renderText(text,data){return cleanNewlines(text).replace(/\{\{\s*([\w]+)\s*\}\}/g,(_,k)=>data[k]??'')}
-function renderPlaceholders(){const labels={firstName:'First name',lastName:'Last name',congregation:'Congregation',role:'Role(s)',team:'Team (1st)',teams:'All teams',eventName:'Event name',date:'Date',organization:'Company',email:'first email',emails:'all emails',mobile:'first mobile',mobiles:'all mobiles'};const el=$('#placeholderGrid');if(!el)return;el.innerHTML=PLACEHOLDERS.map(p=>`<div class="placeholder" data-ph="{{${p}}}"><code>{{${p}}}</code><span>${esc(labels[p]||p)}</span></div>`).join('');$$('[data-ph]').forEach(x=>x.onclick=()=>{const ph=x.dataset.ph;const ta=window._lastTemplateFocus;if(ta&&document.body.contains(ta)){const s=ta.selectionStart,e=ta.selectionEnd;ta.value=ta.value.slice(0,s)+ph+ta.value.slice(e);ta.selectionStart=ta.selectionEnd=s+ph.length;ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));}else{copyText(ph);toast('\ud83d\udccb '+ph+' kopiert (kein Textfeld aktiv)');}})}
+function renderPlaceholders(){const labels={firstName:'First name',lastName:'Last name',congregation:'Congregation',role:'Role(s)',team:'Team (1st)',teams:'All teams',eventName:'Event name',date:'Date',organization:'Company',email:'first email',emails:'all emails',mobile:'first mobile',mobiles:'all mobiles',senderName:'your name'};const el=$('#placeholderGrid');if(!el)return;el.innerHTML=PLACEHOLDERS.map(p=>`<div class="placeholder" data-ph="{{${p}}}"><code>{{${p}}}</code><span>${esc(labels[p]||p)}</span></div>`).join('');$$('[data-ph]').forEach(x=>x.onclick=()=>{const ph=x.dataset.ph;const ta=window._lastTemplateFocus;if(ta&&document.body.contains(ta)){const s=ta.selectionStart,e=ta.selectionEnd;ta.value=ta.value.slice(0,s)+ph+ta.value.slice(e);ta.selectionStart=ta.selectionEnd=s+ph.length;ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));}else{copyText(ph);toast('\ud83d\udccb '+ph+' kopiert (kein Textfeld aktiv)');}})}
 function uniqueValuesFrom(field){return [...new Set(state.data.contacts.map(c=>c[field]).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
 function masterList(key,defaults=[]){
   const raw=state.data.settings&&state.data.settings[key];
@@ -1399,7 +1450,7 @@ function deleteTemplate(){
 }
 
 function showSentItems(){const items=[...(state.data.sentItems||[])].reverse();showModal('History',items.length?`<div class="tableWrap"><table><thead><tr><th>Date</th><th>Contact</th><th>Channel</th><th>Message</th><th></th></tr></thead><tbody>${items.map((it,i)=>`<tr><td>${esc(new Date(it.createdAt).toLocaleString())}</td><td>${esc(it.contactName)}</td><td>${esc(it.channel)}</td><td style="white-space:pre-wrap">${esc(it.body.slice(0,500))}${it.body.length>500?'…':''}</td><td><button class="mini ghost" data-sent-copy="${esc(it.body)}">Copy</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No saved messages yet.</div>',`<button class="danger" id="clearSent">Clear history</button><button class="ghost" id="closeSent">Close</button>`);$('#closeSent').onclick=closeModal;$('#clearSent').onclick=()=>{if(confirm('Clear history?')){state.data.sentItems=[];closeModal();saveSoon();toast('History cleared.')}};$$('[data-sent-copy]').forEach(b=>b.onclick=()=>copyText(b.dataset.sentCopy))}
-function saveSent(){const c=getContact(),t=getTemplate();if(!c||!t)return toast('Select contact and template.');const item={id:uid('s'),createdAt:new Date().toISOString(),contactId:c.id,contactName:contactName(c),templateId:t.id,templateTitle:t.title,channel:($('#deliveryChannel')?.value||t.channel),subject:$('#subjectPreview').textContent==='—'?'':$('#subjectPreview').textContent,body:$('#messagePreview').textContent};state.data.sentItems=state.data.sentItems||[];state.data.sentItems.push(item);saveSoon();toast('Saved to history.')}
+function saveSent(){const c=getContact();const activeCong=state.selectedTarget?.isCong?(state.data.congregations||[]).find(cg=>cg.id===state.selectedTarget.congId):null;if(!c&&!activeCong)return toast('Select a contact first.');const channel=($('#deliveryChannel')?.value||'whatsapp');const item={id:uid('s'),createdAt:new Date().toISOString(),contactId:c?c.id:(activeCong?'cong:'+activeCong.id:''),contactName:c?contactName(c):(activeCong?activeCong.name:'Recipient'),templateId:'quick',templateTitle:'Mini message',channel,subject:'',body:$('#messagePreview').textContent};state.data.sentItems=state.data.sentItems||[];state.data.sentItems.push(item);saveSoon();toast('Saved to history.')}
 function showModal(title,body,foot=''){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modalFoot').innerHTML=foot;$('#modalOverlay').classList.add('show')}
 function closeModal(){$('#modalOverlay').classList.remove('show')}
 
@@ -1411,13 +1462,15 @@ if($('#btnNewCong'))$('#btnNewCong').onclick=()=>openCongEditor();
 if($('#btnCongregations'))$('#btnCongregations').onclick=openCongregationsModal;
 if($('#congSearch'))$('#congSearch').addEventListener('input',()=>{});
 var sortEl=document.getElementById('contactSortBy');if(sortEl){sortEl.value=state.sortBy||'lastName';sortEl.addEventListener('change',function(){state.sortBy=sortEl.value;renderContacts();});}
-['contactSearch','contactTagFilter','contactRoleFilter','contactTeamFilter','contactFavFilter','contactCongFilter'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',()=>{renderContacts();updateSelectionHint();});el.addEventListener('change',()=>{renderContacts();updateSelectionHint();});}});['templateSearch'].forEach(id=>$('#'+id).addEventListener('input',renderTemplates));
+['contactSearch','contactTagFilter','contactRoleFilter','contactTeamFilter','contactFavFilter','contactCongFilter'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',()=>{renderContacts();updateSelectionHint();});el.addEventListener('change',()=>{renderContacts();updateSelectionHint();});}});['templateSearch'].forEach(id=>{const el=$('#'+id);if(el)el.addEventListener('input',()=>{renderTemplates();renderQuickTemplateSelect();});});
 $('#contactBulkAction').onchange=e=>{const v=e.target.value;e.target.value='';if(v==='bulkEdit')openBulkEditModal();if(v==='delete')bulkDelete();if(v==='tag')bulkTag();if(v==='role')bulkSetRoles();if(v==='setTeam')bulkSetTeam();};
-$('#deliveryChannel').onchange=()=>{state.selectedTarget=null;renderPreview()};
-['draft_eventName','draft_date'].forEach(function(id){var el=document.getElementById(id);if(!el)return;var key=id.replace('draft_','');el.addEventListener('input',function(){state.draftDetails[key]=el.value;renderPreview();});});
-$('#btnCopyMessage').onclick=()=>copyText($('#messagePreview').textContent);$('#btnCopyMessageTop').onclick=()=>copyText($('#messagePreview').textContent);$('#btnCopySubject').onclick=()=>copyText($('#subjectPreview').textContent==='—'?'':$('#subjectPreview').textContent);const phBtn=$('#btnCopyPlaceholderList');if(phBtn)phBtn.onclick=()=>copyText(PLACEHOLDERS.map(p=>`{{${p}}}`).join('\n'));$('#btnPrintPreview').onclick=()=>print();
+if($('#deliveryChannel'))$('#deliveryChannel').onchange=()=>{state.selectedTarget=null;renderPreview()};
+const quickSender=$('#quickSenderName');if(quickSender)quickSender.addEventListener('input',()=>{localStorage.setItem(QUICK_SENDER_KEY,quickSender.value);renderPreview();});
+const quickText=$('#quickMessageText');if(quickText)quickText.addEventListener('input',()=>{localStorage.setItem(QUICK_MESSAGE_KEY,quickText.value);renderPreview();});
+const resetQuick=$('#btnResetQuickMessage');if(resetQuick)resetQuick.onclick=()=>{setQuickMessageRaw(DEFAULT_QUICK_MESSAGE);renderPreview();toast('Mini message reset.');};
+$('#btnCopyMessage').onclick=()=>copyText($('#messagePreview').textContent);$('#btnCopyMessageTop').onclick=()=>copyText($('#messagePreview').textContent);if($('#btnCopySubject'))$('#btnCopySubject').onclick=()=>copyText('');const phBtn=$('#btnCopyPlaceholderList');if(phBtn)phBtn.onclick=()=>copyText(PLACEHOLDERS.map(p=>`{{${p}}}`).join('\n'));$('#btnPrintPreview').onclick=()=>print();
 $('#btnOpenWhatsApp').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').value='whatsapp';renderPreview();const m=getSelectedTarget('whatsapp');if(!m)return toast('No mobile number selected.');openWhatsApp(m,$('#messagePreview').textContent);saveSent()};
-$('#btnOpenEmail').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').value='email';renderPreview();const e=getSelectedTarget('email');if(!e)return toast('No email address selected.');location.href=`mailto:${encodeURIComponent(e)}?subject=${encodeURIComponent($('#subjectPreview').textContent==='—'?'':$('#subjectPreview').textContent)}&body=${encodeURIComponent($('#messagePreview').textContent)}`;saveSent()};
+$('#btnOpenEmail').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').value='email';renderPreview();const e=getSelectedTarget('email');if(!e)return toast('No email address selected.');location.href=`mailto:${encodeURIComponent(e)}?body=${encodeURIComponent($('#messagePreview').textContent)}`;saveSent()};
 $('#btnInsertContact').onclick=openInsertContactModal;$('#btnSaveSent').onclick=saveSent;$('#btnSentItems').onclick=showSentItems;
 $('#btnStartEmpty').onclick=()=>{if(confirm('Start empty? Current local data will be replaced.')){state.data=emptyData();state.selectedContactId=null;state.selectedTemplateId=null;state.selectedContactIds.clear();saveNow();renderAll();toast('Started empty.')}};
 $('#btnClearLocal').onclick=()=>{if(confirm('Clear local data in this browser?')){localStorage.removeItem(STORAGE_KEY);state.data=emptyData();state.selectedContactId=null;state.selectedTemplateId=null;state.selectedContactIds.clear();renderAll();saveStatus('Local data cleared','danger');toast('Local data cleared.')}};
@@ -1531,10 +1584,7 @@ if(document.getElementById('btnTheme')){
 document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
     e.preventDefault();
-    var sel=document.getElementById('deliveryChannel');
-    var ch=sel?sel.value:'whatsapp';
-    if(ch==='email'){var b=document.getElementById('btnOpenEmail');if(b)b.click();}
-    else{var b=document.getElementById('btnOpenWhatsApp');if(b)b.click();}
+    var b=document.getElementById('btnOpenWhatsApp');if(b)b.click();
   }
 });
 function openWhatsApp(phone,msg){const p=String(phone||'').replace(/[^+\d]/g,'').replace(/^\+/,'');if(!p)return toast('Invalid number.');open(`https://wa.me/${p}${msg?`?text=${encodeURIComponent(msg)}`:''}`,'_blank','noopener')}
@@ -1777,6 +1827,6 @@ window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openIn
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.4.0 · Contact hub + message composer</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.5.2 · Contact hub + message composer</footer>
 </body>
 </html>
