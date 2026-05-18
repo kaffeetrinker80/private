@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Terminverwaltung Mini Test – Standalone & Team Mode</title>
+    <title>Terminverwaltung Mini Test – Standalone & Team Mode mit Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -92,14 +93,14 @@
             margin-bottom: 6px;
             color: #212529;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ced4da;
             border-radius: 4px;
             font-size: 14px;
         }
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: #163b5b;
             box-shadow: 0 0 0 3px rgba(22, 59, 91, 0.1);
@@ -121,13 +122,15 @@
         .back-btn { background: #6c757d; margin-bottom: 8px; }
         .back-btn:hover { background: #5a6268; }
 
-        .login-error {
-            color: #dc3545;
+        .login-error, .login-status {
             font-size: 12px;
             margin-top: 8px;
             display: none;
         }
+        .login-error { color: #dc3545; }
         .login-error.show { display: block; }
+        .login-status { color: #0066cc; }
+        .login-status.show { display: block; }
 
         .test-users {
             background: #f8f9fa;
@@ -209,6 +212,7 @@
             transition: background 0.2s;
         }
         button.btn:hover { background: #0f2844; }
+        button.btn:disabled { background: #ccc; cursor: not-allowed; }
         button.btn-secondary {
             background: #6c757d;
         }
@@ -263,6 +267,11 @@
             font-size: 13px;
             color: #004085;
         }
+        .info-box.success {
+            background: #d4edda;
+            border-color: #155724;
+            color: #155724;
+        }
 
         .mode-indicator {
             display: inline-block;
@@ -285,13 +294,24 @@
             flex-wrap: wrap;
             margin-top: 16px;
         }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #163b5b;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>📋 Terminverwaltung Mini Test</h1>
-    <p>Teste Standalone vs Team Mode mit Supabase</p>
+    <p>Teste Standalone vs Team Mode mit ECHTEM Supabase</p>
 </div>
 
 <!-- MODE SELECTION -->
@@ -322,12 +342,13 @@
         <label>Passwort</label>
         <input type="password" id="loginPassword" placeholder="test123marco" value="test123marco">
     </div>
+    <div class="login-status" id="loginStatus"></div>
     <div class="login-error" id="loginError"></div>
-    <button class="login-btn" onclick="handleLogin()">Anmelden</button>
+    <button class="login-btn" id="loginBtnSubmit" onclick="handleLogin()">Anmelden</button>
     <button class="back-btn" onclick="backToModeSelection()">Zurück</button>
     
     <div class="test-users">
-        <strong>Test-Accounts:</strong>
+        <strong>Test-Accounts (im Supabase):</strong>
         <div class="test-user">marco@nova-test.de / test123marco</div>
         <div class="test-user">diana@nova-test.de / test123diana</div>
         <div class="test-user">marcel@nova-test.de / test123marcel</div>
@@ -369,7 +390,7 @@
                     <label>Status</label>
                     <select id="inputStatus">
                         <option value="Rot">🔴 Rot (überfällig)</option>
-                        <option value="Gelb">🟡 Gelb (baldige Fälligkeitkeit)</option>
+                        <option value="Gelb">🟡 Gelb (baldige Fälligkeit)</option>
                         <option value="Grün" selected>🟢 Grün (in Planung)</option>
                     </select>
                 </div>
@@ -378,7 +399,7 @@
                     <input type="text" id="inputFacility" placeholder="z.B. NOVA Praxis München">
                 </div>
             </div>
-            <button class="btn" onclick="addTermin()">➕ Termin hinzufügen</button>
+            <button class="btn" id="addBtn" onclick="addTermin()">➕ Termin hinzufügen</button>
         </div>
 
         <!-- TERMINE TABLE -->
@@ -393,7 +414,6 @@
                             <th>Status</th>
                             <th>Facility</th>
                             <th>Erstellt von</th>
-                            <th>Erstellt am</th>
                             <th>Aktion</th>
                         </tr>
                     </thead>
@@ -434,6 +454,13 @@
     let currentUser = null;
     let termine = [];
 
+    // Initialize Supabase
+    async function initSupabase() {
+        if (window.supabaseClient) return;
+        const { createClient } = window.supabase;
+        window.supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+
     // === MODE SELECTION ===
     function chooseMode(mode) {
         currentMode = mode;
@@ -449,6 +476,8 @@
         document.getElementById('loginScreen').classList.remove('show');
         document.getElementById('modeSelection').style.display = 'block';
         currentMode = null;
+        document.getElementById('loginError').classList.remove('show');
+        document.getElementById('loginStatus').classList.remove('show');
     }
 
     // === STANDALONE MODE ===
@@ -469,6 +498,11 @@
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const errorEl = document.getElementById('loginError');
+        const statusEl = document.getElementById('loginStatus');
+        const btnEl = document.getElementById('loginBtnSubmit');
+
+        errorEl.classList.remove('show');
+        statusEl.classList.remove('show');
 
         if (!email || !password) {
             errorEl.textContent = 'Bitte füllen Sie alle Felder aus';
@@ -476,15 +510,30 @@
             return;
         }
 
-        // Simulate login (in real app, this calls Supabase Auth)
-        // For testing: just accept the test credentials
-        if ((email === 'marco@nova-test.de' && password === 'test123marco') ||
-            (email === 'diana@nova-test.de' && password === 'test123diana') ||
-            (email === 'marcel@nova-test.de' && password === 'test123marcel')) {
-            
-            currentUser = { email: email, mode: 'team' };
+        btnEl.disabled = true;
+        statusEl.textContent = 'Anmelden... ' + '<span class="loading"></span>';
+        statusEl.classList.add('show');
+
+        try {
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                errorEl.textContent = 'Anmeldung fehlgeschlagen: ' + error.message;
+                errorEl.classList.add('show');
+                btnEl.disabled = false;
+                statusEl.classList.remove('show');
+                return;
+            }
+
+            currentUser = { email: data.user.email, id: data.user.id, mode: 'team' };
             currentMode = 'team';
-            loadFromSupabase();
+            
+            statusEl.innerHTML = '✅ Angemeldet! Lade Daten...';
+            
+            await loadFromSupabase();
             document.getElementById('loginScreen').classList.remove('show');
             showApp();
             updateUI();
@@ -492,10 +541,32 @@
             document.getElementById('importBtn').style.display = 'none';
             document.getElementById('logoutSection').style.display = 'block';
             updateInfoBox();
-        } else {
-            errorEl.textContent = 'Email oder Passwort falsch. Nutze einen Test-Account!';
+            
+            // Subscribe to real-time updates
+            subscribeToTermine();
+
+        } catch (err) {
+            errorEl.textContent = 'Fehler: ' + err.message;
             errorEl.classList.add('show');
         }
+        btnEl.disabled = false;
+        statusEl.classList.remove('show');
+    }
+
+    // === REAL-TIME SUBSCRIPTION ===
+    function subscribeToTermine() {
+        if (!window.supabaseClient) return;
+        
+        window.supabaseClient
+            .channel('test_termine')
+            .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'test_termine' },
+                (payload) => {
+                    console.log('📡 Live update:', payload);
+                    loadFromSupabase();
+                }
+            )
+            .subscribe();
     }
 
     // === APP DISPLAY ===
@@ -505,7 +576,7 @@
 
     function updateUI() {
         document.getElementById('userInfo').textContent = currentUser.email;
-        document.getElementById('modeIndicator').textContent = currentMode === 'team' ? '👥 Team Mode' : '👤 Standalone';
+        document.getElementById('modeIndicator').textContent = currentMode === 'team' ? '👥 Team Mode (Supabase!)' : '👤 Standalone';
         document.getElementById('modeIndicator').classList.toggle('team', currentMode === 'team');
         renderTermine();
         document.getElementById('dataCount').textContent = termine.length;
@@ -515,13 +586,15 @@
         const infoEl = document.getElementById('infoBox');
         if (currentMode === 'standalone') {
             infoEl.innerHTML = '<strong>ℹ️ Standalone Mode:</strong> Deine Daten werden lokal gespeichert. Exportiere als JSON zum Sichern.';
+            infoEl.classList.remove('success');
         } else {
-            infoEl.innerHTML = '<strong>ℹ️ Team Mode:</strong> Deine Daten sind zentral in Supabase. Alle Team-Mitglieder sehen die Änderungen live! (Simulation)';
+            infoEl.innerHTML = '<strong>✅ Team Mode mit Supabase aktiv!</strong> Alle Änderungen werden LIVE synchronisiert. Öffne ein zweites Fenster und stelle fest wie Live-Updates funktionieren!';
+            infoEl.classList.add('success');
         }
     }
 
     // === TERMINE CRUD ===
-    function addTermin() {
+    async function addTermin() {
         const kunde = document.getElementById('inputKunde').value;
         const datum = document.getElementById('inputDatum').value;
         const status = document.getElementById('inputStatus').value;
@@ -532,40 +605,66 @@
             return;
         }
 
+        const btnEl = document.getElementById('addBtn');
+        btnEl.disabled = true;
+
         const termin = {
-            id: Date.now().toString(),
             kunde: kunde,
             datum: datum,
             status: status,
             facility: facility,
-            created_by: currentUser.email,
-            created_at: new Date().toLocaleString('de-DE')
+            created_by: currentUser.email
         };
 
-        termine.push(termin);
-        
-        if (currentMode === 'standalone') {
-            saveToLocalStorage();
-        } else {
-            saveToSupabase();
-        }
+        try {
+            if (currentMode === 'standalone') {
+                termin.id = Date.now().toString();
+                termine.push(termin);
+                saveToLocalStorage();
+            } else {
+                const { data, error } = await window.supabaseClient
+                    .from('test_termine')
+                    .insert([termin]);
+                
+                if (error) {
+                    alert('Fehler beim Speichern: ' + error.message);
+                    btnEl.disabled = false;
+                    return;
+                }
+                
+                await loadFromSupabase();
+            }
 
-        document.getElementById('inputKunde').value = '';
-        document.getElementById('inputDatum').value = '';
-        document.getElementById('inputFacility').value = '';
-        document.getElementById('inputStatus').value = 'Grün';
-        
-        updateUI();
+            document.getElementById('inputKunde').value = '';
+            document.getElementById('inputDatum').value = '';
+            document.getElementById('inputFacility').value = '';
+            document.getElementById('inputStatus').value = 'Grün';
+            
+            updateUI();
+        } catch (err) {
+            alert('Fehler: ' + err.message);
+        }
+        btnEl.disabled = false;
     }
 
-    function deleteTermin(id) {
-        termine = termine.filter(t => t.id !== id);
+    async function deleteTermin(id) {
         if (currentMode === 'standalone') {
+            termine = termine.filter(t => t.id !== id);
             saveToLocalStorage();
+            updateUI();
         } else {
-            saveToSupabase();
+            try {
+                const { error } = await window.supabaseClient
+                    .from('test_termine')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                await loadFromSupabase();
+            } catch (err) {
+                alert('Fehler beim Löschen: ' + err.message);
+            }
         }
-        updateUI();
     }
 
     function renderTermine() {
@@ -587,9 +686,8 @@
                     <td>${t.datum}</td>
                     <td><span class="status-badge ${statusClass}">${t.status}</span></td>
                     <td>${t.facility}</td>
-                    <td>${t.created_by}</td>
-                    <td style="font-size: 12px; color: #999;">${t.created_at}</td>
-                    <td><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="deleteTermin('${t.id}')">Löschen</button></td>
+                    <td style="font-size: 12px;">${t.created_by}</td>
+                    <td><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="deleteTermin(${t.id})">🗑️</button></td>
                 </tr>
             `;
             tbody.innerHTML += row;
@@ -606,19 +704,22 @@
         termine = data ? JSON.parse(data) : [];
     }
 
-    // === SUPABASE (SIMULATION) ===
-    function saveToSupabase() {
-        // In real app: fetch POST to Supabase
-        // For now: just log
-        console.log('📤 Würde zu Supabase speichern:', termine);
-        localStorage.setItem('termine_team_' + currentUser.email, JSON.stringify(termine));
-    }
-
-    function loadFromSupabase() {
-        // In real app: fetch GET from Supabase
-        // For now: load from localStorage simulation
-        const data = localStorage.getItem('termine_team_' + currentUser.email);
-        termine = data ? JSON.parse(data) : [];
+    // === SUPABASE ===
+    async function loadFromSupabase() {
+        try {
+            const { data, error } = await window.supabaseClient
+                .from('test_termine')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            termine = data || [];
+            renderTermine();
+            document.getElementById('dataCount').textContent = termine.length;
+        } catch (err) {
+            console.error('Fehler beim Laden:', err);
+            alert('Fehler: ' + err.message);
+        }
     }
 
     // === EXPORT/IMPORT ===
@@ -661,7 +762,10 @@
     }
 
     // === LOGOUT ===
-    function logout() {
+    async function logout() {
+        if (currentMode === 'team') {
+            await window.supabaseClient.auth.signOut();
+        }
         currentMode = null;
         currentUser = null;
         termine = [];
@@ -671,10 +775,12 @@
         document.getElementById('loginEmail').value = 'marco@nova-test.de';
         document.getElementById('loginPassword').value = 'test123marco';
         document.getElementById('loginError').classList.remove('show');
+        document.getElementById('loginStatus').classList.remove('show');
     }
 
-    // Initialize with mode selection
-    window.addEventListener('load', () => {
+    // Initialize
+    window.addEventListener('load', async () => {
+        await initSupabase();
         document.getElementById('inputDatum').valueAsDate = new Date();
     });
 </script>
