@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Terminverwaltung Mini Test – Standalone & Team Mode</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f5f7;
+            color: #212529;
+        }
+        .header {
+            background: #163b5b;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 4px; }
+        .header p { font-size: 12px; opacity: 0.9; }
+
+        /* MODE SELECTION SCREEN */
+        .mode-selection {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .mode-selection h2 {
+            font-size: 22px;
+            margin-bottom: 30px;
+            color: #163b5b;
+        }
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .mode-btn {
+            padding: 30px 20px;
+            border: 2px solid #d1d5db;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .mode-btn:hover {
+            border-color: #163b5b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .mode-btn-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .mode-btn small {
+            display: block;
+            font-size: 12px;
+            font-weight: normal;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        /* LOGIN SCREEN */
+        .login-screen {
+            display: none;
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .login-screen.show { display: block; }
+        .login-screen h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #163b5b;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #212529;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #163b5b;
+            box-shadow: 0 0 0 3px rgba(22, 59, 91, 0.1);
+        }
+        .login-btn, .logout-btn, .back-btn {
+            width: 100%;
+            padding: 12px;
+            background: #163b5b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        .login-btn:hover, .logout-btn:hover { background: #0f2844; }
+        .back-btn { background: #6c757d; margin-bottom: 8px; }
+        .back-btn:hover { background: #5a6268; }
+
+        .login-error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+        .login-error.show { display: block; }
+
+        .test-users {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+            font-size: 12px;
+        }
+        .test-users strong { display: block; margin-bottom: 8px; }
+        .test-user { margin: 4px 0; font-family: monospace; }
+
+        /* MAIN APP */
+        .app {
+            display: none;
+        }
+        .app.show { display: block; }
+
+        .topbar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #d1d5db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .topbar h2 { font-size: 16px; margin: 0; }
+        .user-info {
+            font-size: 12px;
+            color: #666;
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .section h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #163b5b;
+            border-bottom: 2px solid #163b5b;
+            padding-bottom: 8px;
+        }
+
+        /* FORM */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        .form-group { margin: 0; }
+
+        button.btn {
+            padding: 10px 20px;
+            background: #163b5b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+            transition: background 0.2s;
+        }
+        button.btn:hover { background: #0f2844; }
+        button.btn-secondary {
+            background: #6c757d;
+        }
+        button.btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* TABLE */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        table thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        table th {
+            font-weight: bold;
+            color: #163b5b;
+        }
+        table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-red { background: #f8d7da; color: #721c24; }
+        .status-yellow { background: #fff3cd; color: #856404; }
+        .status-green { background: #d4edda; color: #155724; }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #004085;
+        }
+
+        .mode-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e7f3ff;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #004085;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        .mode-indicator.team {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📋 Terminverwaltung Mini Test</h1>
+    <p>Teste Standalone vs Team Mode mit Supabase</p>
+</div>
+
+<!-- MODE SELECTION -->
+<div class="mode-selection" id="modeSelection">
+    <h2>Wie möchtest du arbeiten?</h2>
+    <div class="mode-buttons">
+        <button class="mode-btn" onclick="chooseMode('standalone')">
+            <div class="mode-btn-icon">👤</div>
+            <strong>Für mich allein</strong>
+            <small>Lokal, keine Anmeldung<br>JSON speichern/laden</small>
+        </button>
+        <button class="mode-btn" onclick="chooseMode('team')">
+            <div class="mode-btn-icon">👥</div>
+            <strong>Mit Team arbeiten</strong>
+            <small>Anmeldung erforderlich<br>Live-Synchronisation</small>
+        </button>
+    </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+    <h2>Team-Modus – Anmelden</h2>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="marco@nova-test.de" value="marco@nova-test.de">
+    </div>
+    <div class="form-group">
+        <label>Passwort</label>
+        <input type="password" id="loginPassword" placeholder="test123marco" value="test123marco">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" onclick="handleLogin()">Anmelden</button>
+    <button class="back-btn" onclick="backToModeSelection()">Zurück</button>
+    
+    <div class="test-users">
+        <strong>Test-Accounts:</strong>
+        <div class="test-user">marco@nova-test.de / test123marco</div>
+        <div class="test-user">diana@nova-test.de / test123diana</div>
+        <div class="test-user">marcel@nova-test.de / test123marcel</div>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="mainApp">
+    <div class="topbar">
+        <div>
+            <h2>Terminverwaltung
+                <span class="mode-indicator" id="modeIndicator">Standalone</span>
+            </h2>
+        </div>
+        <div class="user-info" id="userInfo"></div>
+    </div>
+
+    <div class="container">
+        <!-- INFO BOX -->
+        <div class="info-box" id="infoBox">
+            <strong>ℹ️ Standalone Mode:</strong> Deine Daten werden lokal gespeichert. Exportiere als JSON zum Sichern.
+        </div>
+
+        <!-- ADD TERMIN SECTION -->
+        <div class="section">
+            <h3>Neuer Termin</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kundenname</label>
+                    <input type="text" id="inputKunde" placeholder="z.B. Müller GmbH">
+                </div>
+                <div class="form-group">
+                    <label>Datum</label>
+                    <input type="date" id="inputDatum">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="inputStatus">
+                        <option value="Rot">🔴 Rot (überfällig)</option>
+                        <option value="Gelb">🟡 Gelb (baldige Fälligkeitkeit)</option>
+                        <option value="Grün" selected>🟢 Grün (in Planung)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Facility</label>
+                    <input type="text" id="inputFacility" placeholder="z.B. NOVA Praxis München">
+                </div>
+            </div>
+            <button class="btn" onclick="addTermin()">➕ Termin hinzufügen</button>
+        </div>
+
+        <!-- TERMINE TABLE -->
+        <div class="section">
+            <h3>Alle Termine</h3>
+            <div class="table-container">
+                <table id="terminTable">
+                    <thead>
+                        <tr>
+                            <th>Kunde</th>
+                            <th>Datum</th>
+                            <th>Status</th>
+                            <th>Facility</th>
+                            <th>Erstellt von</th>
+                            <th>Erstellt am</th>
+                            <th>Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="terminTbody">
+                    </tbody>
+                </table>
+                <p id="emptyMessage" style="text-align: center; color: #999; margin-top: 20px;">
+                    Noch keine Termine – füge einen hinzu!
+                </p>
+            </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="section">
+            <h3>Datenverwaltung</h3>
+            <div class="button-group">
+                <button class="btn btn-secondary" id="exportBtn" onclick="exportToJSON()">💾 JSON Exportieren</button>
+                <button class="btn btn-secondary" id="importBtn" onclick="triggerImport()">📂 JSON Importieren</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importFromJSON(event)">
+            </div>
+            <div style="margin-top: 12px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-size: 12px; color: #666;">
+                <strong>Datenanzahl:</strong> <span id="dataCount">0</span> Einträge
+            </div>
+        </div>
+
+        <!-- LOGOUT BUTTON -->
+        <div class="section" id="logoutSection" style="display: none;">
+            <button class="btn btn-secondary" onclick="logout()">🚪 Abmelden & Modus wechseln</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://avuimpwjslrgpdahyloa.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2dWltcHdqc2xyZ3BkYWh5bG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwOTc0MjAsImV4cCI6MjA5NDY3MzQyMH0.q6s3s36WOoGGLbH7gsWqyzY2b_36vUjAHqKrGrAhYEs';
+
+    let currentMode = null;
+    let currentUser = null;
+    let termine = [];
+
+    // === MODE SELECTION ===
+    function chooseMode(mode) {
+        currentMode = mode;
+        if (mode === 'standalone') {
+            initStandalone();
+        } else if (mode === 'team') {
+            document.getElementById('modeSelection').style.display = 'none';
+            document.getElementById('loginScreen').classList.add('show');
+        }
+    }
+
+    function backToModeSelection() {
+        document.getElementById('loginScreen').classList.remove('show');
+        document.getElementById('modeSelection').style.display = 'block';
+        currentMode = null;
+    }
+
+    // === STANDALONE MODE ===
+    function initStandalone() {
+        currentUser = { email: '👤 Lokal (Standalone)', mode: 'standalone' };
+        loadFromLocalStorage();
+        showApp();
+        updateUI();
+        document.getElementById('modeSelection').style.display = 'none';
+        document.getElementById('exportBtn').style.display = 'inline-block';
+        document.getElementById('importBtn').style.display = 'inline-block';
+        document.getElementById('logoutSection').style.display = 'block';
+        updateInfoBox();
+    }
+
+    // === TEAM MODE LOGIN ===
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorEl = document.getElementById('loginError');
+
+        if (!email || !password) {
+            errorEl.textContent = 'Bitte füllen Sie alle Felder aus';
+            errorEl.classList.add('show');
+            return;
+        }
+
+        // Simulate login (in real app, this calls Supabase Auth)
+        // For testing: just accept the test credentials
+        if ((email === 'marco@nova-test.de' && password === 'test123marco') ||
+            (email === 'diana@nova-test.de' && password === 'test123diana') ||
+            (email === 'marcel@nova-test.de' && password === 'test123marcel')) {
+            
+            currentUser = { email: email, mode: 'team' };
+            currentMode = 'team';
+            loadFromSupabase();
+            document.getElementById('loginScreen').classList.remove('show');
+            showApp();
+            updateUI();
+            document.getElementById('exportBtn').style.display = 'none';
+            document.getElementById('importBtn').style.display = 'none';
+            document.getElementById('logoutSection').style.display = 'block';
+            updateInfoBox();
+        } else {
+            errorEl.textContent = 'Email oder Passwort falsch. Nutze einen Test-Account!';
+            errorEl.classList.add('show');
+        }
+    }
+
+    // === APP DISPLAY ===
+    function showApp() {
+        document.getElementById('mainApp').classList.add('show');
+    }
+
+    function updateUI() {
+        document.getElementById('userInfo').textContent = currentUser.email;
+        document.getElementById('modeIndicator').textContent = currentMode === 'team' ? '👥 Team Mode' : '👤 Standalone';
+        document.getElementById('modeIndicator').classList.toggle('team', currentMode === 'team');
+        renderTermine();
+        document.getElementById('dataCount').textContent = termine.length;
+    }
+
+    function updateInfoBox() {
+        const infoEl = document.getElementById('infoBox');
+        if (currentMode === 'standalone') {
+            infoEl.innerHTML = '<strong>ℹ️ Standalone Mode:</strong> Deine Daten werden lokal gespeichert. Exportiere als JSON zum Sichern.';
+        } else {
+            infoEl.innerHTML = '<strong>ℹ️ Team Mode:</strong> Deine Daten sind zentral in Supabase. Alle Team-Mitglieder sehen die Änderungen live! (Simulation)';
+        }
+    }
+
+    // === TERMINE CRUD ===
+    function addTermin() {
+        const kunde = document.getElementById('inputKunde').value;
+        const datum = document.getElementById('inputDatum').value;
+        const status = document.getElementById('inputStatus').value;
+        const facility = document.getElementById('inputFacility').value;
+
+        if (!kunde || !datum || !facility) {
+            alert('Bitte füllen Sie alle Felder aus');
+            return;
+        }
+
+        const termin = {
+            id: Date.now().toString(),
+            kunde: kunde,
+            datum: datum,
+            status: status,
+            facility: facility,
+            created_by: currentUser.email,
+            created_at: new Date().toLocaleString('de-DE')
+        };
+
+        termine.push(termin);
+        
+        if (currentMode === 'standalone') {
+            saveToLocalStorage();
+        } else {
+            saveToSupabase();
+        }
+
+        document.getElementById('inputKunde').value = '';
+        document.getElementById('inputDatum').value = '';
+        document.getElementById('inputFacility').value = '';
+        document.getElementById('inputStatus').value = 'Grün';
+        
+        updateUI();
+    }
+
+    function deleteTermin(id) {
+        termine = termine.filter(t => t.id !== id);
+        if (currentMode === 'standalone') {
+            saveToLocalStorage();
+        } else {
+            saveToSupabase();
+        }
+        updateUI();
+    }
+
+    function renderTermine() {
+        const tbody = document.getElementById('terminTbody');
+        const empty = document.getElementById('emptyMessage');
+        
+        tbody.innerHTML = '';
+        if (termine.length === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+
+        termine.forEach(t => {
+            const statusClass = `status-${t.status === 'Rot' ? 'red' : t.status === 'Gelb' ? 'yellow' : 'green'}`;
+            const row = `
+                <tr>
+                    <td><strong>${t.kunde}</strong></td>
+                    <td>${t.datum}</td>
+                    <td><span class="status-badge ${statusClass}">${t.status}</span></td>
+                    <td>${t.facility}</td>
+                    <td>${t.created_by}</td>
+                    <td style="font-size: 12px; color: #999;">${t.created_at}</td>
+                    <td><button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="deleteTermin('${t.id}')">Löschen</button></td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // === LOCAL STORAGE ===
+    function saveToLocalStorage() {
+        localStorage.setItem('termine_standalone', JSON.stringify(termine));
+    }
+
+    function loadFromLocalStorage() {
+        const data = localStorage.getItem('termine_standalone');
+        termine = data ? JSON.parse(data) : [];
+    }
+
+    // === SUPABASE (SIMULATION) ===
+    function saveToSupabase() {
+        // In real app: fetch POST to Supabase
+        // For now: just log
+        console.log('📤 Würde zu Supabase speichern:', termine);
+        localStorage.setItem('termine_team_' + currentUser.email, JSON.stringify(termine));
+    }
+
+    function loadFromSupabase() {
+        // In real app: fetch GET from Supabase
+        // For now: load from localStorage simulation
+        const data = localStorage.getItem('termine_team_' + currentUser.email);
+        termine = data ? JSON.parse(data) : [];
+    }
+
+    // === EXPORT/IMPORT ===
+    function exportToJSON() {
+        const json = JSON.stringify(termine, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `termine_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function triggerImport() {
+        document.getElementById('importFile').click();
+    }
+
+    function importFromJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (Array.isArray(data)) {
+                    termine = data;
+                    if (currentMode === 'standalone') {
+                        saveToLocalStorage();
+                    }
+                    updateUI();
+                    alert(`✅ ${data.length} Termine importiert!`);
+                }
+            } catch (err) {
+                alert('❌ Fehler beim Import: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // === LOGOUT ===
+    function logout() {
+        currentMode = null;
+        currentUser = null;
+        termine = [];
+        document.getElementById('mainApp').classList.remove('show');
+        document.getElementById('modeSelection').style.display = 'block';
+        document.getElementById('loginScreen').classList.remove('show');
+        document.getElementById('loginEmail').value = 'marco@nova-test.de';
+        document.getElementById('loginPassword').value = 'test123marco';
+        document.getElementById('loginError').classList.remove('show');
+    }
+
+    // Initialize with mode selection
+    window.addEventListener('load', () => {
+        document.getElementById('inputDatum').valueAsDate = new Date();
+    });
+</script>
+
+</body>
+</html>
