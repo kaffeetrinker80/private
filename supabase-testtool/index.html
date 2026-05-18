@@ -557,16 +557,22 @@
     function subscribeToTermine() {
         if (!window.supabaseClient) return;
         
+        console.log('📡 Subscribing to real-time updates...');
+        
         window.supabaseClient
-            .channel('test_termine')
-            .on('postgres_changes', 
+            .channel('public:test_termine')
+            .on(
+                'postgres_changes',
                 { event: '*', schema: 'public', table: 'test_termine' },
                 (payload) => {
-                    console.log('📡 Live update:', payload);
+                    console.log('📡 Update received:', payload);
+                    // Reload data when anything changes
                     loadFromSupabase();
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log('Subscription status:', status);
+            });
     }
 
     // === APP DISPLAY ===
@@ -632,6 +638,8 @@
                     return;
                 }
                 
+                // Reload all data after insert
+                await new Promise(resolve => setTimeout(resolve, 500));
                 await loadFromSupabase();
             }
 
