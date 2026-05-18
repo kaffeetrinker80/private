@@ -453,6 +453,7 @@
     let currentMode = null;
     let currentUser = null;
     let termine = [];
+    let autoRefreshInterval = null;
 
     // Initialize Supabase
     async function initSupabase() {
@@ -542,8 +543,11 @@
             document.getElementById('logoutSection').style.display = 'block';
             updateInfoBox();
             
-            // Subscribe to real-time updates
-            subscribeToTermine();
+            // Start auto-refresh every 2 seconds in team mode
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(() => {
+                loadFromSupabase();
+            }, 2000);
 
         } catch (err) {
             errorEl.textContent = 'Fehler: ' + err.message;
@@ -771,6 +775,7 @@
 
     // === LOGOUT ===
     async function logout() {
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         if (currentMode === 'team') {
             await window.supabaseClient.auth.signOut();
         }
