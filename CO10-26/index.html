@@ -125,6 +125,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#11
 .walk-agenda-meta{font-size:10px;color:#777;line-height:1.35;margin-top:2px}
 .walk-status{font-size:10px;font-weight:800;border-radius:999px;padding:3px 8px;white-space:nowrap;background:#fff8e8;border:1px solid #f0d79b;color:#6b4a00}
 .walk-status.done{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.walk-agenda-check{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;border-radius:999px;padding:3px 8px;white-space:nowrap;background:#fff8e8;border:1px solid #f0d79b;color:#6b4a00;cursor:pointer;user-select:none}
+.walk-agenda-check.done{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.walk-agenda-check input{width:14px;height:14px;accent-color:#1D9E75;margin:0}
 .walk-empty-agenda{padding:18px;border:1px dashed #ccc;border-radius:10px;background:#fafaf7;color:#777;font-size:12px;line-height:1.5;text-align:center}
 .slot-row{display:flex;align-items:center;gap:8px}
 .slot-lbl{font-size:11px;color:#999;width:70px;flex-shrink:0}
@@ -922,7 +925,7 @@ function getWalkItems(){
       var raw=String(w.time||'').trim();
       var parsed=parseWalkTime(raw);
       items.push({
-        dayIndex:di,sessionIndex:si,day:d.label,programTime:s.t,title:s.ti,raw:raw,
+        key:walkKey(di,si),dayIndex:di,sessionIndex:si,day:d.label,programTime:s.t,title:s.ti,raw:raw,
         sortMinutes:parsed?parsed.minutes:99999,
         groupLabel:parsed?parsed.label:(raw||'No time entered'),
         noTime:!parsed,done:!!w.done,meta:speakerSummaryFor(di,si,s)
@@ -960,7 +963,7 @@ function rWalk(){
     html+='<div class="walk-agenda-item"><div class="walk-agenda-prog">'+esc(it.programTime)+'</div><div><div class="walk-agenda-title">'+esc(it.title)+'</div>';
     if(it.raw&&it.raw!==it.groupLabel)html+='<div class="walk-agenda-meta">Entered: '+esc(it.raw)+'</div>';
     if(it.meta)html+='<div class="walk-agenda-meta">'+esc(it.meta)+'</div>';
-    html+='</div><div class="walk-status'+(it.done?' done':'')+'">'+(it.done?'done':'open')+'</div></div>';
+    html+='</div><label class="walk-agenda-check'+(it.done?' done':'')+'"><input type="checkbox" '+(it.done?'checked':'')+' onchange="setWalkDone(\''+it.key+'\',this.checked)"> '+(it.done?'done':'open')+'</label></div>';
   });
   if(curGroup!==null)html+='</div>';
   if(curDay!==null)html+='</div>';
