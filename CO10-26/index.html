@@ -106,6 +106,26 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#11
 .walk-done input{width:14px;height:14px;accent-color:#1D9E75}
 .walk-clear{border:none;background:transparent;color:#aaa;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:5px}
 .walk-clear:hover{color:#c0392b;background:#FCEBEB}
+
+.walk-summary-panel{background:#fff;border:1px solid #e5e5e0;border-radius:12px;padding:14px;margin-bottom:16px}
+.walk-summary-title{font-size:13px;font-weight:700;margin-bottom:4px;color:#111}
+.walk-summary-sub{font-size:11px;color:#888;margin-bottom:12px;line-height:1.45}
+.walk-day{margin-top:14px}
+.walk-day:first-of-type{margin-top:0}
+.walk-day-title{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#666;margin:10px 0 8px}
+.walk-day-title:after{content:'';height:1px;background:#e7e7e1;flex:1}
+.walk-group{border:1px solid #ecece6;border-radius:10px;overflow:hidden;margin-bottom:8px;background:#fafaf7}
+.walk-group-head{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f4f4f0;border-bottom:1px solid #e8e8e2;padding:7px 10px}
+.walk-group-time{font-size:13px;font-weight:800;color:#0C447C;font-variant-numeric:tabular-nums}
+.walk-group-count{font-size:10px;color:#777;font-weight:700;background:#fff;border:1px solid #e0e0da;border-radius:999px;padding:2px 7px}
+.walk-agenda-item{display:grid;grid-template-columns:54px 1fr auto;gap:9px;align-items:start;padding:9px 10px;border-top:1px solid #eeeeea}
+.walk-agenda-item:first-child{border-top:none}
+.walk-agenda-prog{font-size:11px;font-weight:700;color:#999;font-variant-numeric:tabular-nums;padding-top:1px}
+.walk-agenda-title{font-size:12px;font-weight:700;line-height:1.35;color:#222}
+.walk-agenda-meta{font-size:10px;color:#777;line-height:1.35;margin-top:2px}
+.walk-status{font-size:10px;font-weight:800;border-radius:999px;padding:3px 8px;white-space:nowrap;background:#fff8e8;border:1px solid #f0d79b;color:#6b4a00}
+.walk-status.done{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.walk-empty-agenda{padding:18px;border:1px dashed #ccc;border-radius:10px;background:#fafaf7;color:#777;font-size:12px;line-height:1.5;text-align:center}
 .slot-row{display:flex;align-items:center;gap:8px}
 .slot-lbl{font-size:11px;color:#999;width:70px;flex-shrink:0}
 .asgn-btn{display:inline-flex;align-items:flex-start;gap:6px;padding:5px 10px;border-radius:7px;border:1.5px dashed #ccc;background:transparent;font-size:12px;color:#999;cursor:pointer;font-family:inherit;text-align:left;transition:background .15s}
@@ -256,10 +276,11 @@ body{font-size:calc(14px * var(--ui-scale))}
   .shell,.main{display:block;height:auto;overflow:visible}
   .scroll{overflow:visible;padding:0}
   body{background:#fff;font-size:11px}
-  #v-assign,#v-outline,#v-info{display:none!important}
+  #v-assign,#v-outline,#v-info,#v-walk{display:none!important}
   body[data-print-view="assign"] #v-assign{display:block!important}
   body[data-print-view="outline"] #v-outline{display:block!important}
   body[data-print-view="info"] #v-info{display:block!important}
+  body[data-print-view="walk"] #v-walk{display:block!important}
   .outline-day{page-break-after:always}
   .outline-day:last-child{page-break-after:avoid}
   .oblock,.srow{break-inside:avoid}
@@ -317,6 +338,7 @@ body{font-size:calc(14px * var(--ui-scale))}
       <button class="stab" id="df_Sat" onclick="fDay('Sat')">Sat</button>
       <button class="stab" id="df_Sun" onclick="fDay('Sun')">Sun</button>
     </div>
+    <button class="nb info-jump" onclick="setView('walk')" title="Sorted walkthrough agenda">🎙 Walkthrough Agenda</button>
     <button class="nb info-jump" onclick="setView('info')" title="FM frequency, announcements, baptism, attendance and chairman notes">📝 Local Info / Free Text</button>
   </div>
   <div class="import-notice" id="importNotice">
@@ -333,12 +355,14 @@ body{font-size:calc(14px * var(--ui-scale))}
   <div class="vtabs">
     <button class="vtab on" id="vt1" onclick="setView('assign')">✓ Assignments</button>
     <button class="vtab" id="vt2" onclick="setView('outline')">📄 Chairman Outline</button>
-    <button class="vtab info-tab" id="vt3" onclick="setView('info')">📝 Local Info / Free Text</button>
+    <button class="vtab" id="vt3" onclick="setView('walk')">🎙 Walkthrough Agenda</button>
+    <button class="vtab info-tab" id="vt4" onclick="setView('info')">📝 Local Info / Free Text</button>
   </div>
   <div class="vtab-bar"></div>
   <div class="scroll" id="scrollArea">
     <div id="v-assign"></div>
     <div id="v-outline" style="display:none"></div>
+    <div id="v-walk" style="display:none"></div>
     <div id="v-info" style="display:none"></div>
   </div>
 </div>
@@ -643,13 +667,15 @@ function setView(v){
   document.body.setAttribute('data-print-view',v);
   document.getElementById('vt1').classList.toggle('on',v==='assign');
   document.getElementById('vt2').classList.toggle('on',v==='outline');
-  document.getElementById('vt3').classList.toggle('on',v==='info');
+  document.getElementById('vt3').classList.toggle('on',v==='walk');
+  document.getElementById('vt4').classList.toggle('on',v==='info');
   document.getElementById('v-assign').style.display=v==='assign'?'block':'none';
   document.getElementById('v-outline').style.display=v==='outline'?'block':'none';
+  document.getElementById('v-walk').style.display=v==='walk'?'block':'none';
   document.getElementById('v-info').style.display=v==='info'?'block':'none';
 }
 
-function render(){rAssign();rOutline();rInfo();stats();applyScale();updateImportNotice();updateRestoreStatus()}
+function render(){rAssign();rOutline();rWalk();rInfo();stats();applyScale();updateImportNotice();updateRestoreStatus()}
 
 function btnHTML(v){
   if(!v)return'<span class="asgn-icon">+</span><span>Assign\u2026</span>';
@@ -665,7 +691,7 @@ function walkHTML(di,si){
     +((time||done)?'<button class="walk-clear" onclick="clearWalk(\''+wk+'\')" title="Clear walkthrough">✕</button>':'')
     +'</div>';
 }
-function setWalkTime(k,val){if(!walk[k])walk[k]={};walk[k].time=val;if(!String(val||'').trim()&&!walk[k].done)delete walk[k];save();}
+function setWalkTime(k,val){if(!walk[k])walk[k]={};walk[k].time=val;if(!String(val||'').trim()&&!walk[k].done)delete walk[k];save();rWalk();rOutline();updateImportNotice();}
 function setWalkDone(k,val){if(!walk[k])walk[k]={};walk[k].done=!!val;if(!String(walk[k].time||'').trim()&&!walk[k].done)delete walk[k];save();render();}
 function clearWalk(k){delete walk[k];save();render();}
 function walkInfo(di,si){var w=walk[walkKey(di,si)];if(!w||(!String(w.time||'').trim()&&!w.done))return '';return 'Walkthrough: '+(String(w.time||'').trim()?esc(w.time):'—')+(w.done?' · done':'');}
@@ -867,6 +893,80 @@ function resetOneSpeaker(){
   var ds=normDays(orig);['Fri','Sat','Sun'].forEach(function(d){var cb=document.getElementById('spDay'+d);if(cb)cb.checked=ds.indexOf(d)>=0;});
 }
 function resetSpeakerList(){if(confirm('Clear the current speaker list? Assignments stay unchanged.')){SP=JSON.parse(JSON.stringify(DEFAULT_SP));save();rSb();render();}}
+
+function parseWalkTime(raw){
+  raw=String(raw||'').trim();
+  if(!raw)return null;
+  var m=raw.match(/(?:^|\D)([01]?\d|2[0-3])\s*[\.:hH]\s*([0-5]\d)(?:\D|$)/);
+  if(!m){
+    m=raw.match(/(?:^|\D)([01]?\d|2[0-3])\s+([0-5]\d)(?:\D|$)/);
+  }
+  if(!m)return null;
+  var h=parseInt(m[1],10), min=parseInt(m[2],10);
+  return {minutes:h*60+min,label:String(h).padStart(2,'0')+':'+String(min).padStart(2,'0')};
+}
+function speakerSummaryFor(di,si,s){
+  var names=[];
+  if(s.slots){
+    s.slots.forEach(function(sl,ri){var v=asgn[key(di,si,ri)];if(v)names.push(sl.r+': '+v.n+(v.c?' · '+v.c:''));});
+  }
+  if(s.wt&&wt.length){names.push('WT participants: '+wt.map(function(p){return p.n}).join(', '));}
+  return names.join(' · ');
+}
+function getWalkItems(){
+  var items=[];
+  DAYS.forEach(function(d,di){
+    d.sessions.forEach(function(s,si){
+      var w=walk[walkKey(di,si)];
+      if(!w||(!String(w.time||'').trim()&&!w.done))return;
+      var raw=String(w.time||'').trim();
+      var parsed=parseWalkTime(raw);
+      items.push({
+        dayIndex:di,sessionIndex:si,day:d.label,programTime:s.t,title:s.ti,raw:raw,
+        sortMinutes:parsed?parsed.minutes:99999,
+        groupLabel:parsed?parsed.label:(raw||'No time entered'),
+        noTime:!parsed,done:!!w.done,meta:speakerSummaryFor(di,si,s)
+      });
+    });
+  });
+  items.sort(function(a,b){
+    return a.dayIndex-b.dayIndex || a.sortMinutes-b.sortMinutes || a.sessionIndex-b.sessionIndex;
+  });
+  return items;
+}
+function rWalk(){
+  var target=document.getElementById('v-walk');if(!target)return;
+  var items=getWalkItems();
+  var html='<div class="walk-summary-panel"><div class="walk-summary-title">Walkthrough agenda</div><div class="walk-summary-sub">All walkthrough fields are read from the assignment rows, normalized where possible, grouped by same time and sorted logically within each day. Examples like 8.20, 08:20 or 8:20 are treated as the same time.</div>';
+  if(!items.length){
+    html+='<div class="walk-empty-agenda">No walkthrough times entered yet. Add them in the Assignments view and they will appear here automatically.</div></div>';
+    target.innerHTML=html;return;
+  }
+  var curDay=null,curGroup=null;
+  items.forEach(function(it,idx){
+    if(curDay!==it.day){
+      if(curGroup!==null){html+='</div>';curGroup=null;}
+      if(curDay!==null)html+='</div>';
+      curDay=it.day;
+      html+='<div class="walk-day"><div class="walk-day-title">'+esc(it.day)+'</div>';
+    }
+    var groupKey=it.dayIndex+'|'+it.groupLabel;
+    if(curGroup!==groupKey){
+      if(curGroup!==null)html+='</div>';
+      curGroup=groupKey;
+      var count=items.filter(function(x){return x.dayIndex===it.dayIndex&&x.groupLabel===it.groupLabel}).length;
+      html+='<div class="walk-group"><div class="walk-group-head"><div class="walk-group-time">'+esc(it.groupLabel)+'</div><div class="walk-group-count">'+count+' part'+(count===1?'':'s')+'</div></div>';
+    }
+    html+='<div class="walk-agenda-item"><div class="walk-agenda-prog">'+esc(it.programTime)+'</div><div><div class="walk-agenda-title">'+esc(it.title)+'</div>';
+    if(it.raw&&it.raw!==it.groupLabel)html+='<div class="walk-agenda-meta">Entered: '+esc(it.raw)+'</div>';
+    if(it.meta)html+='<div class="walk-agenda-meta">'+esc(it.meta)+'</div>';
+    html+='</div><div class="walk-status'+(it.done?' done':'')+'">'+(it.done?'done':'open')+'</div></div>';
+  });
+  if(curGroup!==null)html+='</div>';
+  if(curDay!==null)html+='</div>';
+  html+='</div>';
+  target.innerHTML=html;
+}
 
 function rInfo(){
   var html='<div class="info-panel"><div class="info-title">Local info & free text</div><div class="info-sub">These fields are saved locally in your browser and inserted into the chairman outline where possible. Use the free-text announcement fields for short local reminders.</div><div class="info-grid">';
