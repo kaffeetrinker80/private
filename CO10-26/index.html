@@ -97,6 +97,15 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#11
 .srow-title{font-size:13px;font-weight:600;line-height:1.4;flex:1;min-width:0}
 .srow-note{font-size:11px;color:#999;font-style:italic;margin-bottom:7px;line-height:1.5}
 .slots{display:flex;flex-direction:column;gap:5px}
+.walk-row{display:flex;align-items:center;gap:8px;margin-top:7px;padding:7px 9px;border:1px solid #ecece6;border-radius:8px;background:#fafaf7;flex-wrap:wrap}
+.walk-row.done{background:#E1F5EE;border-color:#5DCAA5}
+.walk-lbl{font-size:11px;font-weight:700;color:#777;letter-spacing:.02em;white-space:nowrap}
+.walk-input{width:170px;max-width:100%;font-family:inherit;font-size:12px;border:1px solid #ddd;border-radius:7px;background:#fff;color:#111;padding:5px 8px;outline:none}
+.walk-input:focus{border-color:#85B7EB;background:#fff}
+.walk-done{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#666;cursor:pointer;user-select:none}
+.walk-done input{width:14px;height:14px;accent-color:#1D9E75}
+.walk-clear{border:none;background:transparent;color:#aaa;cursor:pointer;font-size:12px;padding:2px 4px;border-radius:5px}
+.walk-clear:hover{color:#c0392b;background:#FCEBEB}
 .slot-row{display:flex;align-items:center;gap:8px}
 .slot-lbl{font-size:11px;color:#999;width:70px;flex-shrink:0}
 .asgn-btn{display:inline-flex;align-items:flex-start;gap:6px;padding:5px 10px;border-radius:7px;border:1.5px dashed #ccc;background:transparent;font-size:12px;color:#999;cursor:pointer;font-family:inherit;text-align:left;transition:background .15s}
@@ -241,6 +250,9 @@ body{font-size:calc(14px * var(--ui-scale))}
 /* PRINT */
 @media print{
   .sb,.nav-actions,.ham,.tool-strip,.vtabs,.vtab-bar,.stat-bar,.clr-btn,.add-chip,.asgn-btn:not(.set),.ov{display:none!important}
+  .walk-row{padding:4px 0;border:none;background:transparent!important}
+  .walk-input{border:none;padding:0;background:transparent;width:auto;min-width:90px}
+  .walk-clear{display:none!important}
   .shell,.main{display:block;height:auto;overflow:visible}
   .scroll{overflow:visible;padding:0}
   body{background:#fff;font-size:11px}
@@ -284,7 +296,7 @@ body{font-size:calc(14px * var(--ui-scale))}
       <p>CO-10-26-E · Assignment &amp; Chairman Outline</p>
     </div>
     <div class="nav-actions">
-      <button class="nb" onclick="if(confirm('Reset assignments and local notes?')){asgn={};wt=[];info={};restoreStatus='';save();render()}">↺ <span>Reset</span></button>
+      <button class="nb" onclick="if(confirm('Reset assignments and local notes?')){asgn={};wt=[];info={};walk={};restoreStatus='';save();render()}">↺ <span>Reset</span></button>
       <button class="nb b" onclick="doExport()" title="Export JSON backup">↓ <span>JSON</span></button>
       <button class="nb" onclick="document.getElementById('importFile').click()" title="Import JSON backup">↑ <span>Import</span></button>
       <input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="doImport(this.files&&this.files[0]);this.value=''">
@@ -540,7 +552,7 @@ const DAYS=[
  ]}
 ];
 
-let asgn={}, wt=[], info={}, scale=1, curF=null, sbDay='all', curView='assign', editIndex=null, restoreStatus='';
+let asgn={}, wt=[], info={}, walk={}, scale=1, curF=null, sbDay='all', curView='assign', editIndex=null, restoreStatus='';
 const DEFAULT_SP=JSON.parse(JSON.stringify(SP));
 const INFO_FIELDS=[
   ['fmFrequency','FM frequency','e.g. 87.8 MHz'],
@@ -560,9 +572,10 @@ const INFO_FIELDS=[
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
 function ini(n){n=(n||'?').trim()||'?';const p=n.split(/\s+/);return((p[0][0]||'?')+(p[p.length-1][0]||'')).toUpperCase()}
 function key(di,si,ri){return di+'_'+si+'_'+ri}
-function save(){try{localStorage.setItem('co10_public_v1',JSON.stringify({asgn,wt,info,scale,SP,restoreStatus}))}catch(e){}}
-function load(){try{const d=localStorage.getItem('co10_public_v1');if(d){const p=JSON.parse(d);asgn=p.asgn||{};wt=p.wt||[];info=p.info||{};scale=p.scale||1;restoreStatus=p.restoreStatus||'';if(Array.isArray(p.SP))SP=p.SP;}}catch(e){}}
-function hasPrivateData(){return SP.length>0||Object.keys(asgn||{}).length>0||(wt&&wt.length>0)||Object.values(info||{}).some(function(v){return String(v||'').trim();});}
+function walkKey(di,si){return di+'_'+si}
+function save(){try{localStorage.setItem('co10_public_v1',JSON.stringify({asgn,wt,info,walk,scale,SP,restoreStatus}))}catch(e){}}
+function load(){try{const d=localStorage.getItem('co10_public_v1');if(d){const p=JSON.parse(d);asgn=p.asgn||{};wt=p.wt||[];info=p.info||{};walk=p.walk||{};scale=p.scale||1;restoreStatus=p.restoreStatus||'';if(Array.isArray(p.SP))SP=p.SP;}}catch(e){}}
+function hasPrivateData(){return SP.length>0||Object.keys(asgn||{}).length>0||(wt&&wt.length>0)||Object.values(info||{}).some(function(v){return String(v||'').trim();})||Object.values(walk||{}).some(function(v){return v&&(String(v.time||'').trim()||v.done);});}
 function updateImportNotice(){var el=document.getElementById('importNotice');if(el)el.classList.toggle('hidden',hasPrivateData());}
 function updateRestoreStatus(){var el=document.getElementById('restoreStatus');if(!el)return;if(restoreStatus){el.classList.add('show');el.innerHTML='✅ <strong>Backup restored:</strong> '+esc(restoreStatus);}else{el.classList.remove('show');el.innerHTML='';}}
 function applyScale(){document.documentElement.style.setProperty('--ui-scale',scale.toFixed(2));var el=document.getElementById('scaleLbl');if(el)el.textContent=Math.round(scale*100)+'%'}
@@ -643,6 +656,19 @@ function btnHTML(v){
   const cong=v.c?'<div class="asgn-c">'+v.c+'</div>':'';
   return'<span class="asgn-icon">\u2713</span><span><div class="asgn-n">'+v.n+'</div>'+cong+'</span>';
 }
+function walkHTML(di,si){
+  var wk=walkKey(di,si), w=walk[wk]||{}, done=!!w.done, time=String(w.time||'');
+  return '<div class="walk-row'+(done?' done':'')+'">'
+    +'<span class="walk-lbl">🎙 Walkthrough</span>'
+    +'<input class="walk-input" value="'+esc(time)+'" placeholder="time / note…" oninput="setWalkTime(\''+wk+'\',this.value)">'
+    +'<label class="walk-done"><input type="checkbox" '+(done?'checked':'')+' onchange="setWalkDone(\''+wk+'\',this.checked)"> done</label>'
+    +((time||done)?'<button class="walk-clear" onclick="clearWalk(\''+wk+'\')" title="Clear walkthrough">✕</button>':'')
+    +'</div>';
+}
+function setWalkTime(k,val){if(!walk[k])walk[k]={};walk[k].time=val;if(!String(val||'').trim()&&!walk[k].done)delete walk[k];save();}
+function setWalkDone(k,val){if(!walk[k])walk[k]={};walk[k].done=!!val;if(!String(walk[k].time||'').trim()&&!walk[k].done)delete walk[k];save();render();}
+function clearWalk(k){delete walk[k];save();render();}
+function walkInfo(di,si){var w=walk[walkKey(di,si)];if(!w||(!String(w.time||'').trim()&&!w.done))return '';return 'Walkthrough: '+(String(w.time||'').trim()?esc(w.time):'—')+(w.done?' · done':'');}
 
 function rAssign(){
   var html='';
@@ -674,6 +700,7 @@ function rAssign(){
       html+='<div class="srow-top"><div class="srow-title">'+s.ti+'</div><span class="badge '+bc+'">'+bl+'</span></div>';
       if(s.note)html+='<div class="srow-note">'+s.note+'</div>';
       if(slots||wtB)html+='<div class="slots">'+slots+wtB+'</div>';
+      html+=walkHTML(di,si);
       html+='</div></div>';
     });
     html+='</div>';
@@ -748,6 +775,7 @@ function rOutline(){
       html+='<div class="ob-right">'+rightH+'</div>';
       html+='</div>';
       var infos=infoForSession(di,si,s);
+      var wi=walkInfo(di,si);if(wi)infos.push(wi);
       infos.forEach(function(x){html+='<div class="info-inline">'+x+'</div>';});
       if(s.sc){
         html+='<div class="ob-body">';
@@ -881,6 +909,7 @@ function doExport(){
     asgn:asgn,
     wt:wt,
     info:info,
+    walk:walk,
     scale:scale,
     SP:SP,
     restoreStatus:restoreStatus
@@ -899,11 +928,12 @@ function doImport(file){
   reader.onload=function(){
     try{
       var p=JSON.parse(reader.result||'{}');
-      if(!p || (!p.asgn && !p.wt && !p.info && !p.SP)){alert('This does not look like a CO-10 backup JSON.');return;}
+      if(!p || (!p.asgn && !p.wt && !p.info && !p.SP && !p.walk)){alert('This does not look like a CO-10 backup JSON.');return;}
       if(!confirm('Import this JSON backup? Current local assignments, notes and speaker edits will be replaced.'))return;
       asgn=p.asgn||{};
       wt=Array.isArray(p.wt)?p.wt:[];
       info=p.info||{};
+      walk=p.walk||{};
       scale=typeof p.scale==='number'?p.scale:scale;
       if(Array.isArray(p.SP)&&p.SP.length)SP=p.SP;
       var exported=p.exportedAt?new Date(p.exportedAt).toLocaleString():'';
