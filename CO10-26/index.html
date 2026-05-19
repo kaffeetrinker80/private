@@ -73,11 +73,10 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#11
 .stat-l{font-size:10px;color:#888;margin-top:1px}
 
 /* VIEW TABS */
-.vtabs{display:flex;padding:12px 16px 0;flex-shrink:0;gap:0}
-.vtab{padding:7px 18px;font-size:12px;font-weight:500;border:1px solid #ddd;background:#f4f4f0;cursor:pointer;color:#666;font-family:inherit}
-.vtab:first-child{border-radius:7px 0 0 0;border-right:none}
-.vtab:last-child{border-radius:0 7px 0 0}
-.vtab.on{background:#fff;color:#111;border-bottom-color:#fff;z-index:1;position:relative}
+.vtabs{display:flex;padding:12px 16px 8px;flex-shrink:0;gap:8px;flex-wrap:wrap;background:#fff}
+.vtab{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 16px;font-size:12px;font-weight:650;border:1px solid #d9d9d2;border-radius:10px;background:#f7f7f4;cursor:pointer;color:#555;font-family:inherit;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+.vtab:hover{background:#fff;border-color:#b9cce2;box-shadow:0 2px 7px rgba(12,68,124,.08)}
+.vtab.on{background:#E6F1FB;color:#0C447C;border-color:#85B7EB;box-shadow:0 2px 8px rgba(12,68,124,.12);transform:translateY(-1px)}
 .vtab-bar{height:1px;background:#ddd;margin:0 16px;flex-shrink:0}
 
 /* SCROLL */
@@ -241,7 +240,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#11
 .tool-label{font-size:11px;color:#777;font-weight:600;margin-right:2px}
 .tool-strip .nb{background:#fff}
 .info-jump{background:#fff8e8!important;border-color:#f0d79b!important;color:#6b4a00!important}
-.vtab.info-tab{background:#fff8e8;color:#6b4a00;border-color:#f0d79b}.vtab.info-tab.on{background:#fff;color:#111;border-bottom-color:#fff}
+.vtab.info-tab{background:#fff8e8;color:#6b4a00;border-color:#f0d79b}.vtab.info-tab:hover{background:#fffaf0;border-color:#e1bd64}.vtab.info-tab.on{background:#fff3cd;color:#6b4a00;border-color:#e1bd64}
 
 :root{--ui-scale:1}
 body{font-size:calc(14px * var(--ui-scale))}
@@ -341,8 +340,6 @@ body{font-size:calc(14px * var(--ui-scale))}
       <button class="stab" id="df_Sat" onclick="fDay('Sat')">Sat</button>
       <button class="stab" id="df_Sun" onclick="fDay('Sun')">Sun</button>
     </div>
-    <button class="nb info-jump" onclick="setView('walk')" title="Sorted walkthrough agenda">🎙 Walkthrough Agenda</button>
-    <button class="nb info-jump" onclick="setView('info')" title="FM frequency, announcements, baptism, attendance and chairman notes">📝 Local Info / Free Text</button>
   </div>
   <div class="import-notice" id="importNotice">
     <strong>Please import data first.</strong>
