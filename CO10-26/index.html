@@ -241,6 +241,12 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f4f4f0;color:#11
 .tool-strip .nb{background:#fff}
 .info-jump{background:#fff8e8!important;border-color:#f0d79b!important;color:#6b4a00!important}
 .vtab.info-tab{background:#fff8e8;color:#6b4a00;border-color:#f0d79b}.vtab.info-tab:hover{background:#fffaf0;border-color:#e1bd64}.vtab.info-tab.on{background:#fff3cd;color:#6b4a00;border-color:#e1bd64}
+.vtab.locked{background:#fafafa;color:#999;border-color:#e2e2dc;box-shadow:none}
+.vtab.locked:hover{background:#fff;border-color:#d0d0ca;color:#777}
+.vtab.locked.on{background:#fff8e8;color:#6b4a00;border-color:#f0d79b;box-shadow:0 2px 8px rgba(107,74,0,.08)}
+.locked-panel{padding:18px;border:1px dashed #f0d79b;border-radius:12px;background:#fff8e8;color:#5d4200;font-size:12px;line-height:1.55}
+.locked-panel strong{display:block;font-size:14px;margin-bottom:5px;color:#5d4200}
+.locked-panel .nb{margin-top:10px}
 
 :root{--ui-scale:1}
 body{font-size:calc(14px * var(--ui-scale))}
@@ -354,7 +360,7 @@ body{font-size:calc(14px * var(--ui-scale))}
   </div>
   <div class="vtabs">
     <button class="vtab on" id="vt1" onclick="setView('assign')">✓ Assignments</button>
-    <button class="vtab" id="vt2" onclick="setView('outline')">📄 Chairman Outline</button>
+    <button class="vtab locked" id="vt2" onclick="setView('outline')">🔒 Chairman Outline</button>
     <button class="vtab" id="vt3" onclick="setView('walk')">🎙 Walkthrough Agenda</button>
     <button class="vtab info-tab" id="vt4" onclick="setView('info')">📝 Local Info / Free Text</button>
   </div>
@@ -600,6 +606,8 @@ function walkKey(di,si){return di+'_'+si}
 function save(){try{localStorage.setItem('co10_public_v1',JSON.stringify({asgn,wt,info,walk,scale,SP,restoreStatus}))}catch(e){}}
 function load(){try{const d=localStorage.getItem('co10_public_v1');if(d){const p=JSON.parse(d);asgn=p.asgn||{};wt=p.wt||[];info=p.info||{};walk=p.walk||{};scale=p.scale||1;restoreStatus=p.restoreStatus||'';if(Array.isArray(p.SP))SP=p.SP;}}catch(e){}}
 function hasPrivateData(){return SP.length>0||Object.keys(asgn||{}).length>0||(wt&&wt.length>0)||Object.values(info||{}).some(function(v){return String(v||'').trim();})||Object.values(walk||{}).some(function(v){return v&&(String(v.time||'').trim()||v.done);});}
+function hasBackupImported(){return !!String(restoreStatus||'').trim();}
+function updateOutlineLock(){var b=document.getElementById('vt2');if(!b)return;var unlocked=hasBackupImported();b.classList.toggle('locked',!unlocked);b.innerHTML=(unlocked?'📄':'🔒')+' Chairman Outline';}
 function updateImportNotice(){var el=document.getElementById('importNotice');if(el)el.classList.toggle('hidden',hasPrivateData());}
 function updateRestoreStatus(){var el=document.getElementById('restoreStatus');if(!el)return;if(restoreStatus){el.classList.add('show');el.innerHTML='✅ <strong>Backup restored:</strong> '+esc(restoreStatus);}else{el.classList.remove('show');el.innerHTML='';}}
 function applyScale(){document.documentElement.style.setProperty('--ui-scale',scale.toFixed(2));var el=document.getElementById('scaleLbl');if(el)el.textContent=Math.round(scale*100)+'%'}
@@ -675,7 +683,7 @@ function setView(v){
   document.getElementById('v-info').style.display=v==='info'?'block':'none';
 }
 
-function render(){rAssign();rOutline();rWalk();rInfo();stats();applyScale();updateImportNotice();updateRestoreStatus()}
+function render(){rAssign();rOutline();rWalk();rInfo();stats();applyScale();updateImportNotice();updateRestoreStatus();updateOutlineLock()}
 
 function btnHTML(v){
   if(!v)return'<span class="asgn-icon">+</span><span>Assign\u2026</span>';
@@ -780,6 +788,10 @@ function infoForSession(di,si,s){
 }
 
 function rOutline(){
+  if(!hasBackupImported()){
+    document.getElementById('v-outline').innerHTML='<div class="locked-panel"><strong>Chairman Outline is locked.</strong><div>For privacy, the full chairman outline only becomes visible after a private JSON backup has been imported. This public GitHub version contains only the empty tool frame.</div><button class="nb b" onclick="document.getElementById(\'importFile\').click()">↑ Import JSON backup</button></div>';
+    return;
+  }
   var html='';
   DAYS.forEach(function(d,di){
     if(!dayVisible(di))return;
