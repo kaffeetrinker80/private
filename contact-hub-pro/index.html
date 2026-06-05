@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.5.2</title>
+<title>ContactHub Pro V1.5.3</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -76,7 +76,7 @@ h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 .sectionTitle{margin:12px 0 7px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
 .hint{font-size:12px;color:var(--muted);line-height:1.35}
 .list{display:grid;gap:7px;max-height:52vh;overflow:auto;padding-right:2px}
-.cardItem{border:1px solid var(--line);background:#fff;border-radius:14px;padding:9px;transition:.13s ease;display:grid;gap:6px}
+.cardItem{border:1px solid var(--line);background:#fff;border-radius:14px;padding:9px;transition:.13s ease;display:grid;gap:6px;cursor:pointer;user-select:none}
 .cardItem:hover{border-color:#adc4fb;background:#fbfdff}.cardItem.active{border-color:#2563eb;background:#eef4ff;box-shadow:0 0 0 3px rgba(37,99,235,.07)}
 .cardTop{display:grid;grid-template-columns:auto 1fr auto auto;gap:6px;align-items:start}
 .check{width:17px;height:17px;margin:1px 0 0;accent-color:var(--accent)}
@@ -421,7 +421,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.5.2</span></h1>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.5.3</span></h1>
         <p class="sub">Contacts · Congregations · Teams · Quick contact actions</p>
       </div>
     </div>
@@ -567,7 +567,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.5.2', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.5.3', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en',activeView:'contacts',selectedCongId:null};
 const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','organization','email','emails','mobile','mobiles','senderName'];
 const QUICK_MESSAGE_KEY='contacthub_pro_quickMessage_v152';
@@ -929,7 +929,7 @@ el.innerHTML=list.map(c=>`<div class="cardItem ${c.id===state.selectedContactId?
   </div>
   <div class="chips">${(c.tags||[]).slice(0,5).map(t=>`<span class="chip blue">${esc(t)}</span>`).join('')}${c.source?`<span class="chip">${esc(c.source)}</span>`:''}</div>
 </div>`).join('');
-el.querySelectorAll('[data-select]').forEach(x=>x.onclick=()=>{state.selectedContactId=x.dataset.select;state.selectedTarget=null;renderContacts();renderPreview()});
+el.querySelectorAll('.cardItem').forEach(x=>x.onclick=()=>{state.selectedContactId=x.dataset.id;state.selectedTarget=null;renderContacts();renderPreview();});
 el.querySelectorAll('[data-check]').forEach(x=>{const upd=()=>{x.checked?state.selectedContactIds.add(x.dataset.check):state.selectedContactIds.delete(x.dataset.check);updateSelectionHint();};x.onclick=e=>e.stopPropagation();x.onchange=upd;x.oninput=upd;});
 el.querySelectorAll('[data-edit]').forEach(x=>x.onclick=e=>{e.stopPropagation();openContactEditor(x.dataset.edit)});
 el.querySelectorAll('[data-del]').forEach(x=>x.onclick=e=>{e.stopPropagation();quickDeleteContact(x.dataset.del)});
@@ -1276,8 +1276,7 @@ function contactCardText(c,format='full'){
   return lines.filter(Boolean).join('\n');
 }
 function openInsertContactModal(){
-  const t=getTemplate();
-  if(!t)return toast('Select or create a message first.');
+  const t=getTemplate(); // may be null — mini message fallback below
   const opts=state.data.contacts.slice().sort((a,b)=>(a.lastName||contactName(a)).localeCompare(b.lastName||contactName(b)));
   if(!opts.length)return toast('No contacts available.');
   showModal('Insert contact into message',`<div class="stack">
@@ -1318,7 +1317,7 @@ function openInsertContactModal(){
   $('#insSearch').oninput=fillSelect;$('#insContactId').onchange=update;$('#insFormat').onchange=update;fillSelect();
   $('#insCancel').onclick=closeModal;
   $('#insCopy').onclick=()=>copyText($('#insPreview').textContent);
-  $('#insAdd').onclick=()=>{const text=$('#insPreview').textContent.trim();if(!text||text==='No contact found.')return toast('No contact selected.');t.body=cleanNewlines((t.body||'').replace(/\s+$/,''))+'\n\n'+text+'\n';closeModal();saveSoon();renderTemplateEditor();renderPreview();toast('Contact inserted into message.');};
+  $('#insAdd').onclick=()=>{const text=$('#insPreview').textContent.trim();if(!text||text==='No contact found.')return toast('No contact selected.');const ta=document.getElementById('quickMessageText');if(!ta)return toast('No message field found.');const s=ta.selectionStart??ta.value.length,e=ta.selectionEnd??ta.value.length;const before=ta.value.slice(0,s).replace(/\s+$/,'');ta.value=before+'\n\n'+text+'\n'+ta.value.slice(e);localStorage.setItem(QUICK_MESSAGE_KEY,ta.value);closeModal();renderPreview();toast('Contact inserted into mini message.');};
 }
 
 
@@ -1827,6 +1826,6 @@ window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openIn
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.5.2 · Contact hub + message composer</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.5.3 · Contact hub + message composer</footer>
 </body>
 </html>
