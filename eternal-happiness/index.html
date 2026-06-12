@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>RC 2026 – Eternal Happiness – Notes</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #f6f4ef;
+  --card:       #ffffff;
+  --border:     #e4ddd2;
+  --text:       #1d1a15;
+  --text-sub:   #6a6058;
+  --text-ref:   #9c9188;
+
+  --fri:        #c66228;
+  --sat:        #2b7a4e;
+  --sun:        #1b5e8a;
+
+  --badge-address:   #c66228;
+  --badge-drama:     #6d3d90;
+  --badge-symposium: #2b7a4e;
+  --badge-baptism:   #1b5e8a;
+  --badge-public:    #1b5e8a;
+  --badge-wt:        #7a7060;
+  --badge-talk:      #5a5244;
+
+  --notes-bg:     #fffef9;
+  --notes-border: #e5dfc6;
+
+  --chip-bg:      #eaf5ee;
+  --chip-text:    #1a5933;
+  --chip-border:  #aed8bc;
+
+  --radius: 10px;
+  --shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.app-header {
+  position: sticky; top: 0; z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(0,0,0,.09);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px 5px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.app-branding {}
+
+.app-title {
+  font-size: 15px; font-weight: 800;
+  color: var(--text); letter-spacing: -.02em;
+  line-height: 1.2;
+}
+
+.app-subtitle {
+  font-size: 10.5px; color: var(--text-sub);
+  margin-top: 1px; font-weight: 400;
+}
+
+.header-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+.btn-hdr {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 5px 9px;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; color: var(--text-sub);
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-hdr:active { background: var(--border); color: var(--text); }
+
+/* ── DAY TABS ────────────────────────────── */
+.day-tabs {
+  display: flex; gap: 7px;
+  padding: 5px 14px 9px;
+  max-width: 700px; margin: 0 auto;
+}
+
+.tab-btn {
+  flex: 1; padding: 7px 4px;
+  border: 2px solid var(--border);
+  border-radius: 22px;
+  font-size: 12.5px; font-weight: 700;
+  background: var(--bg); color: var(--text-sub);
+  cursor: pointer; text-align: center;
+  transition: all .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-btn.t-fri { border-color: var(--fri); color: var(--fri); }
+.tab-btn.t-sat { border-color: var(--sat); color: var(--sat); }
+.tab-btn.t-sun { border-color: var(--sun); color: var(--sun); }
+.tab-btn.t-fri.active { background: var(--fri); color: #fff; }
+.tab-btn.t-sat.active { background: var(--sat); color: #fff; }
+.tab-btn.t-sun.active { background: var(--sun); color: #fff; }
+
+/* ── PANELS ──────────────────────────────── */
+.day-panel {
+  display: none;
+  padding: 14px 12px 20px;
+  max-width: 700px; margin: 0 auto;
+}
+.day-panel.active { display: block; }
+
+/* ── DAY THEME BANNER ────────────────────── */
+.day-theme {
+  border-radius: var(--radius);
+  padding: 11px 15px 10px;
+  margin-bottom: 12px;
+  border-left: 4px solid var(--day-color, var(--fri));
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-style: italic;
+  font-size: 13.5px; color: var(--text-sub);
+  line-height: 1.4;
+}
+.day-theme strong {
+  display: block; font-size: 10px; font-style: normal;
+  font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-ref); margin-top: 3px;
+}
+
+/* ── SESSION HEADER ──────────────────────── */
+.session-hdr {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 18px 0 8px;
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: .09em; text-transform: uppercase;
+  color: #fff;
+  background: var(--day-color, var(--fri));
+  padding: 4px 12px; border-radius: 6px;
+}
+
+/* ── ITEM CARD ───────────────────────────── */
+.item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 7px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+/* Simple (song / music) */
+.item-simple {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 13px;
+  opacity: .55;
+}
+.item-simple .item-time { font-size: 11px; font-weight: 700; color: var(--text-ref); min-width: 32px; }
+.item-simple .item-title { font-size: 12.5px; color: var(--text-sub); }
+
+/* Noteworthy header row */
+.item-hdr {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 11px 13px 7px;
+}
+
+.item-time {
+  font-size: 11.5px; font-weight: 800;
+  color: var(--day-color, var(--fri));
+  min-width: 34px; padding-top: 2px;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+.item-body { flex: 1; min-width: 0; }
+
+.badge {
+  display: inline-block;
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 4px;
+  color: #fff; margin-bottom: 3px;
+}
+.badge-address   { background: var(--badge-address); }
+.badge-drama     { background: var(--badge-drama); }
+.badge-symposium { background: var(--badge-symposium); }
+.badge-baptism   { background: var(--badge-baptism); }
+.badge-public    { background: var(--badge-public); }
+.badge-wt        { background: var(--badge-wt); }
+.badge-talk      { background: var(--badge-talk); }
+
+.item-title {
+  display: block;
+  font-size: 14px; font-weight: 700;
+  color: var(--text); line-height: 1.35;
+}
+
+.prog-refs {
+  font-size: 11px; color: var(--text-ref);
+  font-style: italic; margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* ── NOTES AREA ──────────────────────────── */
+.notes-area {
+  padding: 6px 12px 9px;
+  background: var(--notes-bg);
+  border-top: 1px solid var(--notes-border);
+}
+
+.notes-ta {
+  width: 100%;
+  border: 1px solid var(--notes-border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 13.5px; font-family: inherit;
+  background: #fff; color: var(--text);
+  resize: none; min-height: 56px;
+  outline: none; line-height: 1.55;
+  transition: border-color .15s, box-shadow .15s;
+  field-sizing: content;
+}
+.notes-ta:focus {
+  border-color: var(--day-color, var(--fri));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--day-color, var(--fri)) 12%, transparent);
+}
+.notes-ta::placeholder { color: #bfb8ae; }
+
+/* ── BIBLE REFS ───────────────────────────── */
+.refs-row {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin-top: 6px;
+}
+
+.ref-chip {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  border-radius: 14px;
+  padding: 2px 3px 2px 9px;
+  font-size: 11.5px;
+}
+.ref-link {
+  color: var(--chip-text); text-decoration: none;
+  font-weight: 700; line-height: 1.3;
+}
+.ref-link:hover { text-decoration: underline; }
+.ref-del {
+  border: none; background: none;
+  color: var(--chip-text); opacity: .5;
+  cursor: pointer; font-size: 15px;
+  padding: 0 4px; line-height: 1;
+}
+.ref-del:hover { opacity: 1; }
+
+/* ── NOTES ACTIONS ────────────────────────── */
+.notes-actions { margin-top: 6px; display: flex; gap: 6px; align-items: center; }
+
+.btn-add-ref {
+  background: none;
+  border: 1.5px dashed var(--chip-border);
+  border-radius: 14px;
+  padding: 3px 11px;
+  font-size: 12px; font-weight: 600;
+  color: var(--chip-text);
+  cursor: pointer;
+  transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-add-ref:hover, .btn-add-ref:active { background: var(--chip-bg); }
+
+/* ── SYMPOSIUM PARTS ─────────────────────── */
+.symp-parts {
+  border-top: 1px solid var(--notes-border);
+}
+
+.symp-part {
+  border-bottom: 1px solid var(--notes-border);
+}
+.symp-part:last-child { border-bottom: none; }
+
+.part-hdr {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 9px 13px 4px 22px;
+}
+
+.part-bullet {
+  color: var(--day-color, var(--fri));
+  font-size: 11px; padding-top: 3px; flex-shrink: 0;
+}
+
+.part-body { flex: 1; min-width: 0; }
+
+.part-title {
+  font-size: 13.5px; font-weight: 700;
+  color: var(--text); line-height: 1.3; display: block;
+}
+
+/* ── MODAL OVERLAY ───────────────────────── */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.48);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (min-width: 520px) { .modal-bg { align-items: center; } }
+
+.modal-box {
+  background: var(--card);
+  border-radius: 18px 18px 0 0;
+  width: 100%; max-width: 480px;
+  max-height: 90vh; overflow-y: auto;
+  padding: 20px 18px 28px;
+  animation: slUp .22s ease;
+}
+@media (min-width: 520px) {
+  .modal-box { border-radius: 16px; margin: 16px; }
+}
+
+@keyframes slUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-top {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 16px;
+}
+.modal-top h3 { font-size: 17px; font-weight: 800; }
+.modal-x {
+  border: none; background: var(--bg);
+  border-radius: 50%; width: 32px; height: 32px;
+  font-size: 16px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  color: var(--text-sub);
+}
+
+.form-row { margin-bottom: 11px; }
+.form-row label {
+  display: block; font-size: 11px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+  color: var(--text-sub); margin-bottom: 4px;
+}
+.form-row select, .form-row input {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 9px;
+  font-size: 15px; font-family: inherit;
+  background: var(--bg); color: var(--text);
+  outline: none; appearance: auto;
+}
+.form-row select:focus, .form-row input:focus {
+  border-color: var(--day-color, var(--fri));
+}
+.form-inline { display: flex; gap: 9px; }
+.form-inline .form-row { flex: 1; }
+
+.ref-preview {
+  border: 1px solid var(--chip-border);
+  background: var(--chip-bg);
+  border-radius: 9px;
+  padding: 10px 13px; font-size: 13px;
+  font-weight: 700; color: var(--chip-text);
+  min-height: 40px; line-height: 1.45;
+}
+.ref-preview a { color: var(--chip-text); }
+
+.modal-btns { display: flex; gap: 9px; margin-top: 16px; }
+
+.btn-cancel {
+  padding: 12px 16px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; font-size: 14px; font-weight: 600;
+  cursor: pointer; color: var(--text-sub);
+}
+
+.btn-insert {
+  flex: 1; padding: 12px;
+  background: var(--day-color, var(--fri));
+  color: #fff; border: none;
+  border-radius: 10px; font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-insert:active { opacity: .85; }
+
+/* ── TOAST ───────────────────────────────── */
+.toast {
+  position: fixed; bottom: 22px; left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: #1d1a15; color: #fff;
+  padding: 8px 18px; border-radius: 22px;
+  font-size: 13px; z-index: 400;
+  transition: transform .28s ease;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── FOOTER ──────────────────────────────── */
+.app-footer {
+  text-align: center;
+  padding: 18px 16px 44px;
+  font-size: 11px; color: var(--text-ref);
+}
+
+/* ── PRINT ───────────────────────────────── */
+@media print {
+  .app-header, .notes-actions, .ref-del, .btn-add-ref,
+  .toast, .modal-bg, .app-footer { display: none !important; }
+
+  body { background: white; font-size: 12px; }
+
+  .day-panel { display: block !important; padding: 0; }
+  .day-panel + .day-panel { page-break-before: always; margin-top: 0; }
+
+  .print-day-title {
+    display: block !important;
+    font-size: 18px; font-weight: 900;
+    padding: 8px 0 4px;
+    border-bottom: 2px solid #000;
+    margin-bottom: 10px;
+  }
+
+  .item { box-shadow: none; border: 1px solid #ccc; margin-bottom: 5px; break-inside: avoid; }
+  .item-simple { opacity: .45; }
+
+  .notes-ta {
+    border: none; background: transparent;
+    padding: 4px 0; min-height: unset;
+    field-sizing: content;
+  }
+
+  .session-hdr {
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .day-theme {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+.print-day-title { display: none; }
+
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ── APP HEADER ── -->
+<header class="app-header">
+  <div class="header-top">
+    <div class="app-branding">
+      <div class="app-title">RC 2026 · Eternal Happiness</div>
+      <div class="app-subtitle">Convention Notes — Munich English Congregation</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-hdr" onclick="exportJSON()" title="Export JSON">💾 Export</button>
+      <button class="btn-hdr" onclick="triggerImport()" title="Import JSON">📂 Import</button>
+      <button class="btn-hdr" onclick="window.print()" title="Print">🖨️</button>
+    </div>
+  </div>
+  <div class="day-tabs">
+    <button class="tab-btn t-fri" id="tab-friday"   onclick="switchDay('friday')">Friday</button>
+    <button class="tab-btn t-sat" id="tab-saturday" onclick="switchDay('saturday')">Saturday</button>
+    <button class="tab-btn t-sun" id="tab-sunday"   onclick="switchDay('sunday')">Sunday</button>
+  </div>
+</header>
+
+<!-- ── PANELS ── -->
+<div id="panel-friday"   class="day-panel" style="--day-color:var(--fri)"></div>
+<div id="panel-saturday" class="day-panel" style="--day-color:var(--sat)"></div>
+<div id="panel-sunday"   class="day-panel" style="--day-color:var(--sun)"></div>
+
+<!-- ── FOOTER ── -->
+<footer class="app-footer">
+  Made with Love © – RC 2026 Munich · Eternal Happiness Notes v1.0.0
+</footer>
+
+<!-- ── BIBLE PICKER MODAL ── -->
+<div class="modal-bg" id="modal-bible" style="display:none" onclick="modalBgClick(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-top">
+      <h3>📖 Add Bible Reference</h3>
+      <button class="modal-x" onclick="closeBiblePicker()">✕</button>
+    </div>
+
+    <div class="form-row">
+      <label>Book</label>
+      <select id="bp-book" onchange="previewRef()"></select>
+    </div>
+
+    <div class="form-inline">
+      <div class="form-row">
+        <label>Chapter</label>
+        <input type="number" id="bp-chapter" min="1" placeholder="e.g. 5" oninput="previewRef()">
+      </div>
+      <div class="form-row">
+        <label>Verse</label>
+        <input type="number" id="bp-verse" min="1" placeholder="e.g. 3" oninput="previewRef()">
+      </div>
+      <div class="form-row">
+        <label>To verse</label>
+        <input type="number" id="bp-vend" min="1" placeholder="e.g. 5" oninput="previewRef()">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label>Preview</label>
+      <div class="ref-preview" id="bp-preview">Choose a book and chapter…</div>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeBiblePicker()">Cancel</button>
+      <button class="btn-insert" id="btn-insert" onclick="insertRef()">Insert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILE INPUT FOR IMPORT ── -->
+<input type="file" id="import-file" accept=".json" style="display:none" onchange="doImport(event)">
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════
+//  PROGRAM DATA
+// ═══════════════════════════════════════════
+
+const PROG = {
+  friday: {
+    label: 'Friday',
+    theme: '"Happy are those conscious of their spiritual need"',
+    themeRef: 'Matthew 5:3',
+    sessions: [
+      { name: 'Morning', items: [
+        { id:'f-m-01', t:'9:20',  type:'music',  title:'Music-Video Presentation' },
+        { id:'f-m-02', t:'9:30',  type:'song',   title:'Song No. 160 and Prayer' },
+        { id:'f-m-03', t:'9:40',  type:'address', lbl:"CHAIRMAN'S ADDRESS",
+          title:'Abundant Happiness Forever—Is It Realistic?', refs:'Psalm 16:11; 100:2' },
+        { id:'f-m-04', t:'10:10', type:'drama',  lbl:'FEATURE BIBLE DRAMA',
+          title:'The Good News According to Jesus: Episode 4 — "This Is Why I Have Come"',
+          refs:'Matthew 4:23-25; 8:1-4, 14-17; 9:1-17; 12:1-21; Mark 1:21–3:19; Luke 4:31-44; 5:12–6:16; John 5:1-47' },
+        { id:'f-m-05', t:'11:05', type:'song',   title:'Song No. 17 and Announcements' },
+        { id:'f-m-06', t:'11:15', type:'symposium', lbl:'SYMPOSIUM',
+          title:'Messianic Prophecy Fulfilled!',
+          parts:[
+            { id:'f-m-06a', title:'"He Himself Took Our Sicknesses"', refs:'Matthew 8:16, 17; Psalm 32:1, 2; Isaiah 53:4, 5' },
+            { id:'f-m-06b', title:'"He Will Not Quarrel"',            refs:'Matthew 12:15-21; Isaiah 42:1-4' },
+            { id:'f-m-06c', title:'"Without an Illustration He Would Not Speak"', refs:'Matthew 13:34, 35; Psalm 78:2' },
+          ]},
+        { id:'f-m-07', t:'12:10', type:'song',   title:'Song No. 14 and Intermission' },
+      ]},
+      { name: 'Afternoon', items: [
+        { id:'f-a-01', t:'1:35', type:'music', title:'Music-Video Presentation' },
+        { id:'f-a-02', t:'1:45', type:'song',  title:'Song No. 23' },
+        { id:'f-a-03', t:'1:50', type:'talk',
+          title:'What Did Jesus Teach Regarding the Sabbath?', refs:'Matthew 12:1-14; John 5:1-17' },
+        { id:'f-a-04', t:'2:10', type:'symposium', lbl:'SYMPOSIUM',
+          title:'Imitate Those Who Ministered to Jesus!',
+          parts:[
+            { id:'f-a-04a', title:'The Apostles',  refs:'Luke 6:13, 15, 16' },
+            { id:'f-a-04b', title:'Many Women',    refs:'Matthew 27:55; Mark 15:40; Luke 8:1-3' },
+          ]},
+        { id:'f-a-05', t:'2:50', type:'song',  title:'Song No. 76 and Announcements' },
+        { id:'f-a-06', t:'3:00', type:'talk',
+          title:'"Happy Are Those Who Wash Their Robes"', refs:'Revelation 7:9, 10, 13-15; 22:14; John 5:24-29' },
+        { id:'f-a-07', t:'3:30', type:'song',  title:'Song No. 155 and Closing Prayer' },
+      ]},
+    ]
+  },
+
+  saturday: {
+    label: 'Saturday',
+    theme: '"There is more happiness in giving than there is in receiving"',
+    themeRef: 'Acts 20:35',
+    sessions: [
+      { name: 'Morning', items: [
+        { id:'s-m-01', t:'9:20',  type:'music', title:'Music-Video Presentation' },
+        { id:'s-m-02', t:'9:30',  type:'song',  title:'Song No. 111 and Prayer' },
+        { id:'s-m-03', t:'9:40',  type:'talk',
+          title:'"He Opened His Mouth and Began Teaching Them"', refs:'Matthew 5:1, 2' },
+        { id:'s-m-04', t:'9:50',  type:'drama', lbl:'FEATURE BIBLE DRAMA',
+          title:'The Good News According to Jesus: Episode 5 — "Astounded at His Way of Teaching"',
+          refs:'Matthew 5:3–7:29; Luke 6:17-49' },
+        { id:'s-m-05', t:'10:25', type:'song',  title:'Song No. 89 and Announcements' },
+        { id:'s-m-06', t:'10:35', type:'talk',
+          title:'What Can Prevent Us From Being Happy?', refs:'Luke 6:24-26' },
+        { id:'s-m-07', t:'10:50', type:'talk',
+          title:'Can You Discern the Principle Behind the Law?', refs:'Matthew 5:17-48' },
+        { id:'s-m-08', t:'11:15', type:'symposium', lbl:'SYMPOSIUM',
+          title:'Lessons From the Land of Jesus',
+          parts:[
+            { id:'s-m-08a', title:'Salt and Light',     refs:'Matthew 5:13-16' },
+            { id:'s-m-08b', title:'Plants and Animals', refs:'Genesis 1:28, 29; Matthew 6:19, 26, 28; 7:6, 10, 15, 16' },
+          ]},
+        { id:'s-m-09', t:'11:40', type:'baptism', lbl:'BAPTISM',
+          title:'"Your Father Who Looks On in Secret Will Repay You"', refs:'Matthew 6:6' },
+        { id:'s-m-10', t:'12:10', type:'song',  title:'Song No. 51 and Intermission' },
+      ]},
+      { name: 'Afternoon', items: [
+        { id:'s-a-01', t:'1:35', type:'music', title:'Music-Video Presentation' },
+        { id:'s-a-02', t:'1:45', type:'song',  title:'Song No. 125' },
+        { id:'s-a-03', t:'1:50', type:'symposium', lbl:'SYMPOSIUM',
+          title:'"Happy Are . . ."',
+          parts:[
+            { id:'s-a-03a', title:'"Those Conscious of Their Spiritual Need"',            refs:'Matthew 5:3' },
+            { id:'s-a-03b', title:'"Those Who Mourn"',                                    refs:'Matthew 5:4' },
+            { id:'s-a-03c', title:'"The Mild-Tempered"',                                  refs:'Matthew 5:5' },
+            { id:'s-a-03d', title:'"Those Hungering and Thirsting for Righteousness"',    refs:'Matthew 5:6' },
+            { id:'s-a-03e', title:'"The Merciful"',                                       refs:'Matthew 5:7' },
+            { id:'s-a-03f', title:'"The Pure in Heart"',                                  refs:'Matthew 5:8' },
+            { id:'s-a-03g', title:'"The Peacemakers"',                                    refs:'Matthew 5:9' },
+            { id:'s-a-03h', title:'"Those Who Have Been Persecuted for Righteousness\'s Sake"', refs:'Matthew 5:10' },
+            { id:'s-a-03i', title:'"You When People Reproach You"',                       refs:'Matthew 5:11, 12' },
+          ]},
+        { id:'s-a-04', t:'3:20', type:'song',  title:'Song No. 81 and Announcements' },
+        { id:'s-a-05', t:'3:30', type:'talk',
+          title:'"Why Are You Anxious?"', refs:'Matthew 6:19-33' },
+        { id:'s-a-06', t:'3:55', type:'talk',
+          title:'"Go In Through the Narrow Gate"', refs:'Matthew 7:1-5, 12-14, 16-18, 24-27' },
+        { id:'s-a-07', t:'4:30', type:'song',  title:'Song No. 21 and Closing Prayer' },
+      ]},
+    ]
+  },
+
+  sunday: {
+    label: 'Sunday',
+    theme: '"Happy are your eyes because they see and your ears because they hear"',
+    themeRef: 'Matthew 13:16',
+    sessions: [
+      { name: 'Morning', items: [
+        { id:'su-m-01', t:'9:20',  type:'music', title:'Music-Video Presentation' },
+        { id:'su-m-02', t:'9:30',  type:'song',  title:'Song No. 68 and Prayer' },
+        { id:'su-m-03', t:'9:40',  type:'symposium', lbl:'SYMPOSIUM',
+          title:"Applying Lessons From Jesus' Illustrations",
+          parts:[
+            { id:'su-m-03a', title:'Four Types of Soil', refs:'Matthew 13:18-23' },
+            { id:'su-m-03b', title:'Wheat and Weeds',    refs:'Matthew 13:24-30' },
+            { id:'su-m-03c', title:'Mustard Grain',      refs:'Matthew 13:31, 32' },
+            { id:'su-m-03d', title:'Leaven',             refs:'Matthew 13:33' },
+            { id:'su-m-03e', title:'Dragnet',            refs:'Matthew 13:47-50' },
+          ]},
+        { id:'su-m-04', t:'11:00', type:'song',   title:'Song No. 64 and Announcements' },
+        { id:'su-m-05', t:'11:10', type:'public', lbl:'PUBLIC BIBLE DISCOURSE',
+          title:'Have You Discovered the Treasure?', refs:'Matthew 13:44-46' },
+        { id:'su-m-06', t:'11:40', type:'wt',     title:'Summary of The Watchtower' },
+        { id:'su-m-07', t:'12:10', type:'song',   title:'Song No. 140 and Intermission' },
+      ]},
+      { name: 'Afternoon', items: [
+        { id:'su-a-01', t:'1:35', type:'music', title:'Music-Video Presentation' },
+        { id:'su-a-02', t:'1:45', type:'song',  title:'Song No. 108' },
+        { id:'su-a-03', t:'1:50', type:'drama', lbl:'FEATURE BIBLE DRAMA',
+          title:'The Good News According to Jesus: Episode 6 — "Are You the Coming One?"',
+          refs:'Matthew 8:5-13; 11:2-30; 12:22–13:53; Mark 3:19–4:34; Luke 7:1–8:21' },
+        { id:'su-a-04', t:'2:35', type:'song',  title:'Song No. 120 and Announcements' },
+        { id:'su-a-05', t:'2:45', type:'talk',  title:'What Did You Learn?' },
+        { id:'su-a-06', t:'2:55', type:'talk',
+          title:'"Happy Are Your Eyes Because They See"',
+          refs:'Matthew 7:1-5; 13:16, 17; Luke 6:46-49; 10:21; John 17:6; James 1:22-25' },
+        { id:'su-a-07', t:'3:45', type:'song',  title:'Song No. 163 and Closing Prayer' },
+      ]},
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════
+//  BIBLE BOOKS
+// ═══════════════════════════════════════════
+
+const BOOKS = [
+  {n:1,name:'Genesis',slug:'genesis'},{n:2,name:'Exodus',slug:'exodus'},{n:3,name:'Leviticus',slug:'leviticus'},
+  {n:4,name:'Numbers',slug:'numbers'},{n:5,name:'Deuteronomy',slug:'deuteronomy'},{n:6,name:'Joshua',slug:'joshua'},
+  {n:7,name:'Judges',slug:'judges'},{n:8,name:'Ruth',slug:'ruth'},{n:9,name:'1 Samuel',slug:'1-samuel'},
+  {n:10,name:'2 Samuel',slug:'2-samuel'},{n:11,name:'1 Kings',slug:'1-kings'},{n:12,name:'2 Kings',slug:'2-kings'},
+  {n:13,name:'1 Chronicles',slug:'1-chronicles'},{n:14,name:'2 Chronicles',slug:'2-chronicles'},
+  {n:15,name:'Ezra',slug:'ezra'},{n:16,name:'Nehemiah',slug:'nehemiah'},{n:17,name:'Esther',slug:'esther'},
+  {n:18,name:'Job',slug:'job'},{n:19,name:'Psalms',slug:'psalms'},{n:20,name:'Proverbs',slug:'proverbs'},
+  {n:21,name:'Ecclesiastes',slug:'ecclesiastes'},{n:22,name:'Song of Solomon',slug:'song-of-solomon'},
+  {n:23,name:'Isaiah',slug:'isaiah'},{n:24,name:'Jeremiah',slug:'jeremiah'},{n:25,name:'Lamentations',slug:'lamentations'},
+  {n:26,name:'Ezekiel',slug:'ezekiel'},{n:27,name:'Daniel',slug:'daniel'},{n:28,name:'Hosea',slug:'hosea'},
+  {n:29,name:'Joel',slug:'joel'},{n:30,name:'Amos',slug:'amos'},{n:31,name:'Obadiah',slug:'obadiah'},
+  {n:32,name:'Jonah',slug:'jonah'},{n:33,name:'Micah',slug:'micah'},{n:34,name:'Nahum',slug:'nahum'},
+  {n:35,name:'Habakkuk',slug:'habakkuk'},{n:36,name:'Zephaniah',slug:'zephaniah'},{n:37,name:'Haggai',slug:'haggai'},
+  {n:38,name:'Zechariah',slug:'zechariah'},{n:39,name:'Malachi',slug:'malachi'},
+  {n:40,name:'Matthew',slug:'matthew'},{n:41,name:'Mark',slug:'mark'},{n:42,name:'Luke',slug:'luke'},
+  {n:43,name:'John',slug:'john'},{n:44,name:'Acts',slug:'acts'},{n:45,name:'Romans',slug:'romans'},
+  {n:46,name:'1 Corinthians',slug:'1-corinthians'},{n:47,name:'2 Corinthians',slug:'2-corinthians'},
+  {n:48,name:'Galatians',slug:'galatians'},{n:49,name:'Ephesians',slug:'ephesians'},{n:50,name:'Philippians',slug:'philippians'},
+  {n:51,name:'Colossians',slug:'colossians'},{n:52,name:'1 Thessalonians',slug:'1-thessalonians'},
+  {n:53,name:'2 Thessalonians',slug:'2-thessalonians'},{n:54,name:'1 Timothy',slug:'1-timothy'},
+  {n:55,name:'2 Timothy',slug:'2-timothy'},{n:56,name:'Titus',slug:'titus'},{n:57,name:'Philemon',slug:'philemon'},
+  {n:58,name:'Hebrews',slug:'hebrews'},{n:59,name:'James',slug:'james'},{n:60,name:'1 Peter',slug:'1-peter'},
+  {n:61,name:'2 Peter',slug:'2-peter'},{n:62,name:'1 John',slug:'1-john'},{n:63,name:'2 John',slug:'2-john'},
+  {n:64,name:'3 John',slug:'3-john'},{n:65,name:'Jude',slug:'jude'},{n:66,name:'Revelation',slug:'revelation'},
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+
+const SK = 'rc2026-eternalHappiness-notes-v1';
+let notes     = {};   // { id: string }
+let bRefs     = {};   // { id: [{label, url}] }
+let curDay    = 'friday';
+let bpTarget  = null; // item id for bible picker
+
+// ═══════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════
+
+function load() {
+  try {
+    const raw = localStorage.getItem(SK);
+    if (raw) { const d = JSON.parse(raw); notes = d.notes||{}; bRefs = d.bRefs||{}; }
+  } catch(e) {}
+}
+
+function save() {
+  try { localStorage.setItem(SK, JSON.stringify({notes, bRefs})); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function buildUrl(book, ch, v, ve) {
+  const base = `https://www.jw.org/en/library/bible/nwt/books/${book.slug}/${ch}/`;
+  if (!v) return base;
+  const anchor = `v${book.n}${String(ch).padStart(3,'0')}${String(v).padStart(3,'0')}`;
+  return base + '#' + anchor;
+}
+
+function buildLabel(bookName, ch, v, ve) {
+  if (!ch) return bookName;
+  if (!v)  return `${bookName} ${ch}`;
+  if (!ve) return `${bookName} ${ch}:${v}`;
+  return `${bookName} ${ch}:${v}–${ve}`;
+}
+
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+const NON_NOTE = new Set(['music', 'song']);
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+
+function renderAll() {
+  fillBookSelect();
+  ['friday','saturday','sunday'].forEach(d => renderDay(d));
+}
+
+function renderDay(dk) {
+  const day = PROG[dk];
+  const el  = document.getElementById(`panel-${dk}`);
+  let html  = '';
+
+  // Print-only title
+  html += `<div class="print-day-title">${esc(day.label)} — Eternal Happiness 2026</div>`;
+
+  // Theme banner
+  html += `<div class="day-theme">
+    ${esc(day.theme)}
+    <strong>${esc(day.themeRef)}</strong>
+  </div>`;
+
+  day.sessions.forEach(sess => {
+    html += `<div class="session-hdr">${esc(sess.name)}</div>`;
+    sess.items.forEach(item => {
+      html += item.type === 'symposium' ? renderSymp(item) : renderItem(item);
+    });
+  });
+
+  el.innerHTML = html;
+  // Resize visible textareas
+  el.querySelectorAll('textarea.notes-ta').forEach(ta => resize(ta));
+}
+
+function renderItem(item) {
+  if (NON_NOTE.has(item.type)) {
+    return `<div class="item item-simple">
+      <span class="item-time">${esc(item.t||'')}</span>
+      <span class="item-title">${esc(item.title)}</span>
+    </div>`;
+  }
+  const badgeClass = `badge-${item.type}`;
+  return `<div class="item">
+    <div class="item-hdr">
+      <span class="item-time">${esc(item.t||'')}</span>
+      <div class="item-body">
+        ${item.lbl ? `<span class="badge ${badgeClass}">${esc(item.lbl)}</span>` : ''}
+        <span class="item-title">${esc(item.title)}</span>
+        ${item.refs ? `<div class="prog-refs">${esc(item.refs)}</div>` : ''}
+      </div>
+    </div>
+    ${notesArea(item.id)}
+  </div>`;
+}
+
+function renderSymp(item) {
+  const partsHtml = item.parts.map(p => `
+    <div class="symp-part">
+      <div class="part-hdr">
+        <span class="part-bullet">▸</span>
+        <div class="part-body">
+          <span class="part-title">${esc(p.title)}</span>
+          ${p.refs ? `<div class="prog-refs">${esc(p.refs)}</div>` : ''}
+        </div>
+      </div>
+      ${notesArea(p.id)}
+    </div>
+  `).join('');
+
+  return `<div class="item">
+    <div class="item-hdr">
+      <span class="item-time">${esc(item.t||'')}</span>
+      <div class="item-body">
+        <span class="badge badge-symposium">${esc(item.lbl||'SYMPOSIUM')}</span>
+        <span class="item-title">${esc(item.title)}</span>
+      </div>
+    </div>
+    <div class="symp-parts">${partsHtml}</div>
+  </div>`;
+}
+
+function notesArea(id) {
+  const txt  = notes[id] || '';
+  const refs = bRefs[id]  || [];
+  const chips = refs.map((r,i) =>
+    `<span class="ref-chip">
+       <a href="${esc(r.url)}" target="_blank" rel="noopener" class="ref-link">📖 ${esc(r.label)}</a>
+       <button class="ref-del" onclick="delRef('${esc(id)}',${i})" aria-label="Remove">×</button>
+     </span>`
+  ).join('');
+
+  return `<div class="notes-area">
+    <textarea class="notes-ta" id="ta-${esc(id)}"
+      placeholder="Notes…"
+      oninput="onNote(this,'${esc(id)}')"
+    >${esc(txt)}</textarea>
+    <div class="refs-row" id="rr-${esc(id)}">${chips}</div>
+    <div class="notes-actions">
+      <button class="btn-add-ref" onclick="openBP('${esc(id)}')">+ Bible text</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  NOTE INPUT
+// ═══════════════════════════════════════════
+
+function onNote(ta, id) {
+  resize(ta);
+  notes[id] = ta.value;
+  save();
+}
+
+function resize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(56, ta.scrollHeight) + 'px';
+}
+
+// ═══════════════════════════════════════════
+//  DAY SWITCHING
+// ═══════════════════════════════════════════
+
+function switchDay(dk) {
+  curDay = dk;
+  ['friday','saturday','sunday'].forEach(d => {
+    const panel = document.getElementById(`panel-${d}`);
+    const tab   = document.getElementById(`tab-${d}`);
+    const isActive = d === dk;
+    panel.classList.toggle('active', isActive);
+    tab.classList.toggle('active', isActive);
+    if (isActive) {
+      // Resize after paint (handles textareas in previously hidden panels)
+      requestAnimationFrame(() => {
+        panel.querySelectorAll('textarea.notes-ta').forEach(ta => resize(ta));
+      });
+    }
+  });
+}
+
+// ═══════════════════════════════════════════
+//  BIBLE PICKER
+// ═══════════════════════════════════════════
+
+function fillBookSelect() {
+  const sel = document.getElementById('bp-book');
+  sel.innerHTML = BOOKS.map(b => `<option value="${b.n}">${b.name}</option>`).join('');
+}
+
+const DAY_COLORS = { friday:'#c66228', saturday:'#2b7a4e', sunday:'#1b5e8a' };
+
+function openBP(id) {
+  bpTarget = id;
+  ['bp-chapter','bp-verse','bp-vend'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('bp-preview').innerHTML = 'Choose a book and chapter…';
+  // Set day color on modal
+  document.getElementById('modal-bible').style.setProperty('--day-color', DAY_COLORS[curDay] || '#c66228');
+  document.getElementById('modal-bible').style.display = 'flex';
+  setTimeout(() => document.getElementById('bp-chapter').focus(), 250);
+}
+
+function closeBiblePicker() {
+  document.getElementById('modal-bible').style.display = 'none';
+  bpTarget = null;
+}
+
+function modalBgClick(e) {
+  if (e.target.id === 'modal-bible') closeBiblePicker();
+}
+
+function previewRef() {
+  const bIdx = parseInt(document.getElementById('bp-book').value) - 1;
+  const book = BOOKS[bIdx];
+  const ch   = document.getElementById('bp-chapter').value;
+  const v    = document.getElementById('bp-verse').value;
+  const ve   = document.getElementById('bp-vend').value;
+  const prev = document.getElementById('bp-preview');
+
+  if (!book || !ch) { prev.textContent = 'Choose a book and chapter…'; return; }
+
+  const label = buildLabel(book.name, ch, v||null, ve||null);
+  const url   = buildUrl(book, parseInt(ch), v?parseInt(v):null, ve?parseInt(ve):null);
+  prev.innerHTML = `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a> ↗`;
+}
+
+function insertRef() {
+  if (!bpTarget) return;
+  const bIdx = parseInt(document.getElementById('bp-book').value) - 1;
+  const book = BOOKS[bIdx];
+  const ch   = document.getElementById('bp-chapter').value;
+  const v    = document.getElementById('bp-verse').value;
+  const ve   = document.getElementById('bp-vend').value;
+
+  if (!book || !ch) { toast('Please select a book and chapter'); return; }
+
+  const label = buildLabel(book.name, ch, v||null, ve||null);
+  const url   = buildUrl(book, parseInt(ch), v?parseInt(v):null, ve?parseInt(ve):null);
+
+  if (!bRefs[bpTarget]) bRefs[bpTarget] = [];
+  const idx = bRefs[bpTarget].length;
+  bRefs[bpTarget].push({ label, url });
+  save();
+
+  // Inject chip without full re-render
+  const rr = document.getElementById(`rr-${bpTarget}`);
+  if (rr) {
+    const chip = document.createElement('span');
+    chip.className = 'ref-chip';
+    chip.innerHTML = `<a href="${esc(url)}" target="_blank" rel="noopener" class="ref-link">📖 ${esc(label)}</a>
+      <button class="ref-del" onclick="delRef('${esc(bpTarget)}',${idx})" aria-label="Remove">×</button>`;
+    rr.appendChild(chip);
+  }
+
+  toast(`✓ ${label} added`);
+  closeBiblePicker();
+}
+
+function delRef(id, idx) {
+  if (!bRefs[id]) return;
+  bRefs[id].splice(idx, 1);
+  save();
+  // Re-render just this chip row
+  const rr = document.getElementById(`rr-${id}`);
+  if (rr) {
+    rr.innerHTML = (bRefs[id]||[]).map((r,i) =>
+      `<span class="ref-chip">
+         <a href="${esc(r.url)}" target="_blank" rel="noopener" class="ref-link">📖 ${esc(r.label)}</a>
+         <button class="ref-del" onclick="delRef('${esc(id)}',${i})" aria-label="Remove">×</button>
+       </span>`
+    ).join('');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  EXPORT / IMPORT
+// ═══════════════════════════════════════════
+
+function exportJSON() {
+  const payload = {
+    _tool:     'RC 2026 Eternal Happiness Notes',
+    _version:  '1.0.0',
+    _exported: new Date().toISOString(),
+    notes,
+    bRefs
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,16);
+  a.download = `rc2026-notes-${ts}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exported ✓');
+}
+
+function triggerImport() {
+  document.getElementById('import-file').value = '';
+  document.getElementById('import-file').click();
+}
+
+function doImport(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const d = JSON.parse(e.target.result);
+      const hasData = Object.values(notes).some(v=>v) || Object.values(bRefs).some(v=>v&&v.length);
+      if (hasData && !confirm('Import will overwrite existing notes. Continue?')) return;
+      notes = d.notes || {};
+      bRefs = d.bRefs || {};
+      save();
+      renderAll();
+      switchDay(curDay);
+      toast('Imported ✓');
+    } catch(err) {
+      alert('Import failed: invalid or corrupted JSON file.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════
+//  KEYBOARD
+// ═══════════════════════════════════════════
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('modal-bible').style.display !== 'none') closeBiblePicker();
+  }
+});
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+  load();
+  renderAll();
+  switchDay('friday');
+});
+</script>
+</body>
+</html>
