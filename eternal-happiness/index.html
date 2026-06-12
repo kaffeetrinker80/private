@@ -226,7 +226,7 @@ body {
   width: 100%;
   border: 1px solid var(--notes-border);
   border-radius: 7px;
-  padding: 8px 10px;
+  padding: 8px 32px 8px 10px;
   font-size: 13.5px; font-family: inherit;
   background: #fff; color: var(--text);
   resize: none; min-height: 56px;
@@ -239,6 +239,26 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--day-color, var(--fri)) 12%, transparent);
 }
 .notes-ta::placeholder { color: #bfb8ae; }
+
+.notes-wrap { position: relative; }
+
+.btn-clear-ta {
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 18px; height: 18px;
+  border: none;
+  background: var(--text-ref);
+  border-radius: 50%;
+  font-size: 10px; font-weight: 700;
+  line-height: 1; cursor: pointer;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s, background .15s;
+}
+.btn-clear-ta.vis { opacity: 1; pointer-events: auto; }
+.btn-clear-ta:hover { background: var(--text-sub); }
 
 /* ── BIBLE REFS ───────────────────────────── */
 .refs-row {
@@ -496,7 +516,7 @@ body {
 
 <!-- ── FOOTER ── -->
 <footer class="app-footer">
-  Made with Love © – RC 2026 Munich · Eternal Happiness Notes v1.0.0
+  Made with Love © – RC 2026 Munich · Eternal Happiness Notes v1.1.0
 </footer>
 
 <!-- ── BIBLE PICKER MODAL ── -->
@@ -870,10 +890,14 @@ function notesArea(id) {
   ).join('');
 
   return `<div class="notes-area">
-    <textarea class="notes-ta" id="ta-${esc(id)}"
-      placeholder="Notes…"
-      oninput="onNote(this,'${esc(id)}')"
-    >${esc(txt)}</textarea>
+    <div class="notes-wrap">
+      <textarea class="notes-ta" id="ta-${esc(id)}"
+        placeholder="Notes…"
+        oninput="onNote(this,'${esc(id)}')"
+      >${esc(txt)}</textarea>
+      <button class="btn-clear-ta${txt ? ' vis' : ''}" id="clr-${esc(id)}"
+        onclick="clearNote('${esc(id)}')" aria-label="Clear notes" title="Clear notes">✕</button>
+    </div>
     <div class="refs-row" id="rr-${esc(id)}">${chips}</div>
     <div class="notes-actions">
       <button class="btn-add-ref" onclick="openBP('${esc(id)}')">+ Bible text</button>
@@ -889,6 +913,20 @@ function onNote(ta, id) {
   resize(ta);
   notes[id] = ta.value;
   save();
+  const clr = document.getElementById(`clr-${id}`);
+  if (clr) clr.classList.toggle('vis', ta.value.length > 0);
+}
+
+function clearNote(id) {
+  const ta = document.getElementById(`ta-${id}`);
+  if (!ta) return;
+  ta.value = '';
+  notes[id] = '';
+  save();
+  resize(ta);
+  const clr = document.getElementById(`clr-${id}`);
+  if (clr) clr.classList.remove('vis');
+  ta.focus();
 }
 
 function resize(ta) {
