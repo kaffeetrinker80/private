@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Regional Convention 2026 – Eternal Happiness – Notes</title>
+<title>RC 2026 – Eternal Happiness – Notes</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -577,7 +577,7 @@ body {
 <header class="app-header">
   <div class="header-top">
     <div class="app-branding">
-      <div class="app-title">RC 2026 · Eternal Happiness</div>
+      <div class="app-title">Regional Convention 2026 · Eternal Happiness</div>
       <div class="app-subtitle">Convention Notes</div>
     </div>
     <div class="header-actions">
@@ -600,7 +600,7 @@ body {
 
 <!-- ── FOOTER ── -->
 <footer class="app-footer">
-  Made with Love © – RC 2026 Munich · Eternal Happiness Notes v1.3.1
+  Made with Love © – RC 2026 Munich · Eternal Happiness Notes v1.3.2
 </footer>
 
 <!-- ── BIBLE PICKER MODAL ── -->
@@ -909,18 +909,41 @@ function songInfo(title) {
 function scriptureLinkData(segment, inheritedBook) {
   let txt = segment.trim().replace(/[–—]/g, '-');
   let book = inheritedBook;
+  let matchedName = '';
+
+  // Program references sometimes use singular/short book names, e.g. “Psalm”
+  // while the Bible list uses “Psalms”. Accept those common variants.
+  const aliases = [
+    { alias: 'Psalm', bookName: 'Psalms' },
+    { alias: 'Song of Songs', bookName: 'Song of Solomon' }
+  ];
+
   const named = BOOKS.find(b => txt.toLowerCase().startsWith(b.name.toLowerCase() + ' '));
   if (named) {
     book = named;
-    txt = txt.slice(named.name.length).trim();
+    matchedName = named.name;
+  } else {
+    const aliasMatch = aliases.find(a => txt.toLowerCase().startsWith(a.alias.toLowerCase() + ' '));
+    if (aliasMatch) {
+      book = BOOKS.find(b => b.name === aliasMatch.bookName) || null;
+      matchedName = aliasMatch.alias;
+    }
   }
+
+  if (matchedName) txt = txt.slice(matchedName.length).trim();
   if (!book) return null;
+
   const m = txt.match(/^(\d+)(?::(\d+))?(?:\s*-\s*(\d+))?/);
   if (!m) return null;
   const ch = Number(m[1]);
   const v = m[2] ? Number(m[2]) : null;
   const ve = m[3] ? Number(m[3]) : null;
-  return { book, label: `${named ? book.name + ' ' : ''}${segment.trim().replace(/[–—]/g,'–')}`, url: buildUrl(book,ch,v,ve) };
+  const shown = segment.trim().replace(/[–—]/g,'–');
+  return {
+    book,
+    label: matchedName ? shown : shown,
+    url: buildUrl(book, ch, v, ve)
+  };
 }
 
 function renderProgramRefs(refs) {
