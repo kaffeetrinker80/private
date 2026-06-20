@@ -96,11 +96,6 @@
       --c-theme: var(--primary);
       --c-soft: rgba(197, 168, 255, 0.1);
     }
-    .card.placeholder {
-      --c-theme: #64748b; 
-      --c-soft: rgba(100, 116, 139, 0.1);
-      border-style: dashed;
-    }
 
     .card:hover { transform: translateY(-5px); border-color: var(--c-theme); }
     .card.active-project:hover { box-shadow: 0 10px 30px rgba(197, 168, 255, 0.15); }
@@ -125,7 +120,7 @@
 
     @media (min-width: 768px) {
       .hero h1 { font-size: 4rem; }
-      .grid { grid-template-columns: repeat(2, 1fr); }
+      .grid { grid-template-columns: repeat(3, 1fr); }
     }
   </style>
 </head>
@@ -186,19 +181,6 @@
         <div class="meta">Utility · QR Code</div>
         <div class="card-actions">
           <a class="btn-card" href="qr-tool/index.html">Open Tool</a>
-        </div>
-      </article>
-
-      <!-- PLACEHOLDER -->
-      <article class="card placeholder">
-        <div class="icon-wrap">
-          <span style="font-size: 24px; color: var(--muted);">?</span>
-        </div>
-        <h2>Future Drafts</h2>
-        <p>More ideas in the pipeline. This spot is reserved for the next thing worth building.</p>
-        <div class="meta">Placeholder</div>
-        <div class="card-actions">
-          <a class="btn-card" href="#" onclick="return false;">Reserved</a>
         </div>
       </article>
 
