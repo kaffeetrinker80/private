@@ -11,6 +11,7 @@
 <link rel="manifest" href="site.webmanifest">
 
 <meta name="theme-color" content="#172f4d">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Audio Patchbay — Format & Transcription Deck</title>
@@ -177,6 +178,38 @@
     box-shadow: 0 0 16px var(--accent-soft), 0 0 0 1px var(--accent-soft);
   }
   .mode-toggle button:not(.active):hover { color: var(--text); }
+
+  .error-banner {
+    display: none;
+    margin: 16px 30px 0;
+    background: rgba(214, 54, 74, 0.08);
+    border: 1px solid var(--red);
+    color: #9c2233;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .error-banner button {
+    background: none; border: none; color: #9c2233;
+    font-size: 16px; cursor: pointer; line-height: 1;
+  }
+
+  .engine-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    background: none;
+    border: 1px solid var(--hairline);
+    color: var(--text-muted);
+    border-radius: 4px;
+    padding: 4px 9px;
+    cursor: pointer;
+    margin-left: 6px;
+  }
+  .engine-btn:hover { color: var(--text); border-color: var(--text-dim); }
 
   /* ---------- Whisper model toggle ---------- */
   .model-toggle-wrap {
@@ -446,6 +479,12 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+  .engine-status-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+  }
   .engine-status {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10.5px;
@@ -507,6 +546,8 @@
     </div>
   </header>
 
+  <div class="error-banner" id="errorBanner"></div>
+
   <div class="model-toggle-wrap" id="modelToggleWrap" style="display:none;">
     <span class="model-label mono">WHISPER MODEL</span>
     <div class="model-toggle" id="modelToggle">
@@ -534,7 +575,11 @@
   </div>
 
   <footer>
-    <div class="engine-status mono" id="engineStatus">FFmpeg: <span>nicht geladen</span> · Whisper: <span>nicht geladen</span></div>
+    <div class="engine-status-row">
+      <span class="engine-status mono" id="engineStatus">FFmpeg: <span>nicht geladen</span> · Whisper: <span>nicht geladen</span></span>
+      <button class="engine-btn" id="preloadFfmpegBtn">FFmpeg jetzt laden</button>
+      <button class="engine-btn" id="preloadWhisperBtn">Whisper jetzt laden</button>
+    </div>
     <div class="signature">
       <span>Made with Love © — Audio Patchbay v1.1</span>
       <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
@@ -802,6 +847,13 @@ function escapeHtml(s) {
   return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
+function showError(msg) {
+  const banner = $('#errorBanner');
+  banner.innerHTML = `<span>${escapeHtml(msg)}</span><button aria-label="Schließen">×</button>`;
+  banner.style.display = 'flex';
+  banner.querySelector('button').addEventListener('click', () => { banner.style.display = 'none'; });
+}
+
 function wireChannelRow(row, ch) {
   row.querySelectorAll('.fmt-chip').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -926,6 +978,7 @@ async function ensureFFmpeg() {
     return ffmpeg;
   } catch (e) {
     setLed(led1, 'err');
+    showError(`FFmpeg konnte nicht geladen werden: ${e.message || e}. Tipp: Diese Seite muss über http:// oder https:// geöffnet werden — nicht per Doppelklick (file://). Lokal z. B. mit "python -m http.server" testen, oder über GitHub Pages öffnen.`);
     throw e;
   }
 }
@@ -976,7 +1029,7 @@ async function convertChannel(ch) {
     await ff.deleteFile(outputName).catch(() => {});
   } catch (e) {
     console.error(e);
-    ch.status = 'error'; ch.statusText = 'Fehler bei der Konvertierung';
+    ch.status = 'error'; ch.statusText = `Fehler: ${e.message || e}`;
   }
   renderChannels();
 }
@@ -1017,6 +1070,7 @@ async function ensureTranscriber() {
     return transcriber;
   } catch (e) {
     setLed(led2, 'err');
+    showError(`Whisper konnte nicht geladen werden: ${e.message || e}. Tipp: Diese Seite muss über http:// oder https:// geöffnet werden — nicht per Doppelklick (file://).`);
     throw e;
   }
 }
@@ -1073,7 +1127,7 @@ async function transcribeChannel(ch) {
     ch.status = 'done'; ch.progress = 100; ch.statusText = 'Fertig';
   } catch (e) {
     console.error(e);
-    ch.status = 'error'; ch.statusText = 'Fehler bei der Transkription';
+    ch.status = 'error'; ch.statusText = `Fehler: ${e.message || e}`;
   }
   renderChannels();
 }
@@ -1088,6 +1142,16 @@ renderAllBtn.addEventListener('click', async () => {
     if (mode === 'transcribe' && !ch.transcript) await transcribeChannel(ch);
   }
   renderAllBtn.disabled = channels.length === 0;
+});
+
+// ---------------------------------------------------------------------------
+// Manual engine preload (and a clear place to see load errors directly)
+// ---------------------------------------------------------------------------
+$('#preloadFfmpegBtn').addEventListener('click', async () => {
+  try { await ensureFFmpeg(); } catch (e) { /* already surfaced via showError */ }
+});
+$('#preloadWhisperBtn').addEventListener('click', async () => {
+  try { await ensureTranscriber(); } catch (e) { /* already surfaced via showError */ }
 });
 
 // ---------------------------------------------------------------------------
