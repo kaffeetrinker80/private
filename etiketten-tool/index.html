@@ -444,7 +444,7 @@
         <button id="orientationPortrait" type="button">Hochformat (A4 Hoch)</button>
         <button id="orientationLandscape" type="button">Querformat (A4 Quer)</button>
       </div>
-      <div class="help">Bestimmt nur die Ausrichtung des gedruckten Blatts (Papierformat). Manche Etiketten-Layouts – z. B. breite Regal- oder Ordneretiketten – lassen sich nur im Querformat sauber drucken. Spalten/Zeilen/Maße unten bleiben unverändert, ggf. Seitenränder anpassen.</div>
+      <div class="help">Bestimmt die Ausrichtung des gedruckten Blatts. Beim Umschalten werden Spalten/Zeilen automatisch so neu berechnet, dass die Etiketten ins gewählte Format passen (Etikettengröße, Abstände und Ränder bleiben gleich). Bei Bedarf danach Spalten/Zeilen/Ränder unten von Hand feinjustieren.</div>
 
       <div class="grid2">
         <div><label>Spalten</label><input id="cols" type="number" min="1" max="10" step="1"></div>
@@ -685,6 +685,25 @@
     document.documentElement.style.setProperty('--page-h', landscape ? '210mm' : '297mm');
     const pageSizeStyle = byId('pageSizeStyle');
     if(pageSizeStyle) pageSizeStyle.textContent = '@page{size:A4 ' + (landscape ? 'landscape' : 'portrait') + ';margin:0}';
+  }
+
+  function fitLayoutToOrientation(){
+    const landscape = state.orientation === 'landscape';
+    const pageW = landscape ? 297 : 210;
+    const pageH = landscape ? 210 : 297;
+    const l = state.layout;
+
+    const availW = Math.max(l.labelW, pageW - l.marginLeft - l.marginRight);
+    const availH = Math.max(l.labelH, pageH - l.marginTop - l.marginBottom);
+
+    const fitCols = Math.max(1, Math.floor((availW + l.gapX) / (l.labelW + l.gapX)));
+    const fitRows = Math.max(1, Math.floor((availH + l.gapY) / (l.labelH + l.gapY)));
+
+    if(fitCols !== l.cols || fitRows !== l.rows){
+      l.cols = fitCols;
+      l.rows = fitRows;
+      state.preset = 'custom';
+    }
   }
 
   function plainLines(value){
@@ -1134,8 +1153,20 @@
     el.showCutmarks.addEventListener('change', function(){ state.showCutmarks = el.showCutmarks.checked; renderPreview(); });
     el.showBorders.addEventListener('change', function(){ state.showBorders = el.showBorders.checked; renderPreview(); });
 
-    el.orientationPortrait.addEventListener('click', function(){ state.orientation = 'portrait'; syncForm(); });
-    el.orientationLandscape.addEventListener('click', function(){ state.orientation = 'landscape'; syncForm(); });
+    el.orientationPortrait.addEventListener('click', function(){
+      if(state.orientation !== 'portrait'){
+        state.orientation = 'portrait';
+        fitLayoutToOrientation();
+      }
+      syncForm();
+    });
+    el.orientationLandscape.addEventListener('click', function(){
+      if(state.orientation !== 'landscape'){
+        state.orientation = 'landscape';
+        fitLayoutToOrientation();
+      }
+      syncForm();
+    });
 
     el.editMode.addEventListener('change', function(){ state.editMode = el.editMode.value; syncForm(); });
     el.headline.addEventListener('input', function(){ state.headline = el.headline.value; renderPreview(); });
