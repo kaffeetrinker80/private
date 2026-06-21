@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!-- Icons + Manifest -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" href="favicon.ico">
+
+<link rel="manifest" href="site.webmanifest">
+
+<meta name="theme-color" content="#172f4d">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Patchbay — Format & Transcription Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #e9e7ee;
+    --panel: #faf9fc;
+    --channel: #ffffff;
+    --channel-hover: #f1eff6;
+    --hairline: #ddd9e4;
+    --hairline-soft: #e7e4ed;
+    --text: #211c29;
+    --text-muted: #6e6678;
+    --text-dim: #a59cb0;
+    --cyan: #00c2d1;
+    --cyan-text: #0093a3;
+    --cyan-soft: rgba(0, 194, 209, 0.12);
+    --magenta: #e0177e;
+    --magenta-text: #b30f64;
+    --magenta-soft: rgba(224, 23, 126, 0.12);
+    --amber: #c9790a;
+    --green: #1c9c64;
+    --red: #d6364a;
+    --accent: var(--cyan);
+    --accent-text: var(--cyan-text);
+    --accent-soft: var(--cyan-soft);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  :root.mode-transcribe {
+    --accent: var(--magenta);
+    --accent-text: var(--magenta-text);
+    --accent-soft: var(--magenta-soft);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--void);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+  }
+
+  body {
+    padding: 28px 16px 60px;
+    background-image:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(0,194,209,0.07), transparent 60%);
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  .deck {
+    max-width: 920px;
+    margin: 0 auto;
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    position: relative;
+    box-shadow: 0 30px 70px -35px rgba(33,28,41,0.22), inset 0 1px 0 rgba(255,255,255,0.6);
+    overflow: hidden;
+  }
+
+  .rivet {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fdfdfe, #cac4d3);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 1px 1px rgba(33,28,41,0.15);
+  }
+  .rivet.tl { top: 12px; left: 12px; }
+  .rivet.tr { top: 12px; right: 12px; }
+  .rivet.bl { bottom: 12px; left: 12px; }
+  .rivet.br { bottom: 12px; right: 12px; }
+
+  /* ---------- Header / faceplate ---------- */
+  header {
+    padding: 26px 30px 22px;
+    border-bottom: 1px solid var(--hairline);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), transparent 60%);
+  }
+
+  .brand { display: flex; align-items: center; gap: 14px; }
+
+  .led-strip { display: flex; gap: 6px; margin-bottom: 10px; }
+  .led {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--hairline);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.4);
+    transition: background .3s, box-shadow .3s;
+  }
+  .led.lit { background: var(--green); box-shadow: 0 0 8px var(--green), 0 0 2px var(--green); }
+  .led.busy { background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: pulse 1s ease-in-out infinite; }
+  .led.err { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+  .eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent-text);
+    margin-bottom: 2px;
+  }
+
+  .title-block h1 {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 800;
+    font-size: 38px;
+    letter-spacing: 1px;
+    margin: 0;
+    line-height: 0.9;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, var(--text), #4a4256);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .title-block p {
+    margin: 6px 0 0;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.4px;
+  }
+
+  .mode-toggle {
+    display: flex;
+    background: var(--channel);
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 4px;
+    align-self: center;
+  }
+  .mode-toggle button {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .25s ease;
+  }
+  .mode-toggle button.active {
+    color: #0d0b11;
+    background: var(--accent);
+    box-shadow: 0 0 16px var(--accent-soft), 0 0 0 1px var(--accent-soft);
+  }
+  .mode-toggle button:not(.active):hover { color: var(--text); }
+
+  /* ---------- Whisper model toggle ---------- */
+  .model-toggle-wrap {
+    padding: 14px 30px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .model-label {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .model-toggle { display: flex; gap: 6px; }
+  .model-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--text-muted);
+    background: var(--channel);
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    padding: 6px 13px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .model-chip:hover { border-color: var(--text-dim); color: var(--text); }
+  .model-chip.active {
+    color: var(--accent-text);
+    border-color: var(--accent-text);
+    background: var(--accent-soft);
+  }
+
+  /* ---------- Drop zone ---------- */
+  .dropzone-wrap { padding: 22px 30px 4px; }
+  .dropzone {
+    border: 1.5px dashed var(--hairline);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .dropzone .dz-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    color: var(--accent-text);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .dropzone .dz-text { font-size: 14px; color: var(--text); margin: 0 0 4px; }
+  .dropzone .dz-sub { font-size: 11.5px; color: var(--text-dim); margin: 0; }
+  .dropzone input[type=file] { display: none; }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 30px 0;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .toolbar .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+  .btn-render-all {
+    background: var(--accent);
+    color: #0d0b11;
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    box-shadow: 0 0 18px var(--accent-soft);
+    transition: transform .15s, opacity .15s;
+  }
+  .btn-render-all:hover { transform: translateY(-1px); }
+  .btn-render-all:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* ---------- Channel list ---------- */
+  .channels { padding: 16px 30px 8px; display: flex; flex-direction: column; gap: 10px; }
+
+  .empty-state {
+    padding: 30px 10px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12.5px;
+  }
+
+  .channel {
+    background: var(--channel);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    transition: background .2s;
+  }
+  .channel:hover { background: var(--channel-hover); }
+
+  .ch-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent-text);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 1px;
+    opacity: 0.8;
+  }
+
+  .ch-main { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ch-info { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .ch-name {
+    font-size: 13.5px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+  }
+  .ch-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+  }
+  .ch-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 1px 6px;
+    letter-spacing: 0.5px;
+  }
+
+  canvas.waveform { width: 100%; height: 30px; display: block; border-radius: 4px; }
+
+  .ch-progress {
+    height: 4px;
+    background: var(--hairline-soft);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .ch-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-soft);
+    transition: width .2s ease;
+  }
+  .ch-status-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.4px;
+  }
+
+  .ch-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; min-width: 150px; }
+  .chip-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--text-dim); }
+  .chip.active {
+    color: #0d0b11;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .chip.quality { font-size: 9px; padding: 3px 7px; opacity: 0.85; }
+
+  .ch-actions { display: flex; gap: 6px; align-items: center; }
+  .ch-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--accent-text);
+    color: var(--accent-text);
+    background: transparent;
+    border-radius: var(--radius-sm);
+    padding: 7px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  .ch-btn:hover { background: var(--accent-soft); }
+  .ch-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .ch-btn.download { border-color: var(--green); color: var(--green); }
+  .ch-btn.download:hover { background: rgba(93,255,160,0.12); }
+  .ch-remove {
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; font-size: 16px; line-height: 1; padding: 4px;
+  }
+  .ch-remove:hover { color: var(--red); }
+
+  .transcript-panel {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    background: var(--panel);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: none;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  .transcript-panel.open { display: block; }
+  .transcript-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--text);
+    display: flex;
+    gap: 10px;
+  }
+  .transcript-line .ts { color: var(--accent-text); flex-shrink: 0; opacity: 0.9; font-weight: 700; }
+  .transcript-actions {
+    display: flex; gap: 8px; margin-top: 10px;
+    border-top: 1px solid var(--hairline-soft); padding-top: 10px;
+  }
+  .transcript-actions button {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    background: none; border: 1px solid var(--hairline);
+    color: var(--text-muted); border-radius: 4px;
+    padding: 5px 10px; cursor: pointer;
+  }
+  .transcript-actions button:hover { color: var(--text); border-color: var(--text-dim); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 8px;
+    padding: 16px 30px 22px;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .engine-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+  }
+  .engine-status span { color: var(--text-muted); }
+  .signature {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .signature a { color: var(--text-muted); text-decoration: none; }
+  .signature a:hover { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .channel { grid-template-columns: 1fr; }
+    .ch-num { display: none; }
+    .ch-controls { align-items: flex-start; width: 100%; }
+    .chip-row { justify-content: flex-start; }
+    .ch-name { max-width: 100%; }
+    header { padding: 22px 18px; }
+    .dropzone-wrap, .toolbar, .channels { padding-left: 18px; padding-right: 18px; }
+    footer { padding-left: 18px; padding-right: 18px; flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .led.busy { animation: none; }
+    * { transition-duration: 0.01ms !important; }
+  }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <span class="rivet tl"></span><span class="rivet tr"></span>
+  <span class="rivet bl"></span><span class="rivet br"></span>
+
+  <header>
+    <div class="brand">
+      <div class="title-block">
+        <div class="led-strip">
+          <div class="led" id="led1"></div>
+          <div class="led" id="led2"></div>
+          <div class="led" id="led3"></div>
+        </div>
+        <span class="eyebrow mono">AUDIO //</span>
+        <h1>Patchbay</h1>
+        <p>Format conversion &amp; transcription deck</p>
+      </div>
+    </div>
+    <div class="mode-toggle">
+      <button id="modeConvertBtn" class="active">CONVERT</button>
+      <button id="modeTranscribeBtn">TRANSCRIBE</button>
+    </div>
+  </header>
+
+  <div class="model-toggle-wrap" id="modelToggleWrap" style="display:none;">
+    <span class="model-label mono">WHISPER MODEL</span>
+    <div class="model-toggle" id="modelToggle">
+      <button class="model-chip active" data-model="base">BASE · ~150 MB</button>
+      <button class="model-chip" data-model="small">SMALL · ~500 MB, genauer</button>
+    </div>
+  </div>
+
+  <div class="dropzone-wrap">
+    <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Audiodateien auswählen">
+      <span class="dz-icon">▁▂▃▅▇▅▃▂▁</span>
+      <p class="dz-text">Dateien hier ablegen oder klicken zum Auswählen</p>
+      <p class="dz-sub">WAV · MP3 · OGG · FLAC · M4A/AAC · OPUS · AIFF — mehrere Dateien gleichzeitig möglich</p>
+      <input type="file" id="fileInput" multiple accept="audio/*">
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span class="count mono" id="channelCount">0 Kanäle geladen</span>
+    <button class="btn-render-all" id="renderAllBtn" disabled>RENDER ALL ▸</button>
+  </div>
+
+  <div class="channels" id="channels">
+    <div class="empty-state" id="emptyState">— keine Dateien geladen —</div>
+  </div>
+
+  <footer>
+    <div class="engine-status mono" id="engineStatus">FFmpeg: <span>nicht geladen</span> · Whisper: <span>nicht geladen</span></div>
+    <div class="signature">
+      <span>Made with Love © — Audio Patchbay v1.1</span>
+      <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
+    </div>
+  </footer>
+</div>
+
+<script type="module">
+// ---------------------------------------------------------------------------
+// PATCHBAY — single-file offline audio converter & transcriber
+// FFmpeg.wasm for format conversion, Transformers.js (Whisper) for transcription
+// ---------------------------------------------------------------------------
+
+const FFMPEG_VERSION = '0.12.10';
+const FFMPEG_CORE_VERSION = '0.12.6';
+const FFMPEG_UTIL_VERSION = '0.12.1';
+const FFMPEG_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/umd`;
+const FFMPEG_UTIL_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/util@${FFMPEG_UTIL_VERSION}/dist/umd`;
+const FFMPEG_CORE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/umd`;
+
+const WHISPER_MODELS = {
+  base:  { id: 'Xenova/whisper-base',  label: 'Base · ~150 MB' },
+  small: { id: 'Xenova/whisper-small', label: 'Small · ~500 MB' },
+};
+let whisperModelKey = 'base';
+let loadedWhisperModelKey = null;
+
+// Canvas 2D fillStyle can't resolve CSS custom properties, so we mirror the
+// accent colors here as plain hex values for waveform drawing.
+const WAVE_COLORS = { convert: '#00c2d1', transcribe: '#e0177e' };
+
+const FORMATS = {
+  wav:  { label: 'WAV',  mime: 'audio/wav',  lossy: false },
+  mp3:  { label: 'MP3',  mime: 'audio/mpeg', lossy: true  },
+  ogg:  { label: 'OGG',  mime: 'audio/ogg',  lossy: true  },
+  flac: { label: 'FLAC', mime: 'audio/flac', lossy: false },
+  m4a:  { label: 'M4A',  mime: 'audio/mp4',  lossy: true  },
+  opus: { label: 'OPUS', mime: 'audio/ogg',  lossy: true  },
+  aiff: { label: 'AIFF', mime: 'audio/aiff', lossy: false },
+};
+const QUALITY_PRESETS = { low: 128, med: 192, high: 320 };
+
+let mode = 'convert'; // 'convert' | 'transcribe'
+let channels = [];
+let chId = 0;
+
+let ffmpeg = null;
+let ffmpegReady = false;
+let transcriber = null;
+let transcriberReady = false;
+
+const $ = (sel) => document.querySelector(sel);
+const channelsEl = $('#channels');
+const emptyState = $('#emptyState');
+const channelCount = $('#channelCount');
+const renderAllBtn = $('#renderAllBtn');
+const dropzone = $('#dropzone');
+const fileInput = $('#fileInput');
+const led1 = $('#led1'), led2 = $('#led2'), led3 = $('#led3');
+const engineStatus = $('#engineStatus');
+
+function setLed(led, state) {
+  led.classList.remove('lit', 'busy', 'err');
+  if (state) led.classList.add(state);
+}
+
+function updateEngineStatus() {
+  const ff = ffmpegReady
+    ? '<span style="color:var(--green)">geladen</span>'
+    : '<span>nicht geladen — lädt automatisch beim ersten Convert</span>';
+  const modelLabel = WHISPER_MODELS[whisperModelKey].label;
+  const whLoaded = transcriberReady && loadedWhisperModelKey === whisperModelKey;
+  const wh = whLoaded
+    ? `<span style="color:var(--green)">${modelLabel} geladen</span>`
+    : `<span>${modelLabel} — lädt automatisch beim ersten Transcribe</span>`;
+  engineStatus.innerHTML = `FFmpeg: ${ff} · Whisper: ${wh}`;
+}
+
+function fmtBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB';
+  return (b / (1024 * 1024)).toFixed(1) + ' MB';
+}
+function fmtTime(s) {
+  if (!isFinite(s)) return '--:--';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${String(sec).padStart(2, '0')}`;
+}
+function extOf(name) {
+  const m = /\.([a-z0-9]+)$/i.exec(name);
+  return m ? m[1].toLowerCase() : 'audio';
+}
+function baseName(name) {
+  return name.replace(/\.[a-z0-9]+$/i, '');
+}
+
+// ---------------------------------------------------------------------------
+// Channel model
+// ---------------------------------------------------------------------------
+function createChannel(file) {
+  chId += 1;
+  return {
+    id: chId,
+    file,
+    name: file.name,
+    ext: extOf(file.name),
+    size: file.size,
+    duration: null,
+    audioBuffer: null,
+    peaks: null,
+    targetFormat: 'mp3',
+    quality: 'med',
+    status: 'idle', // idle | decoding | processing | done | error
+    progress: 0,
+    statusText: '',
+    outputBlob: null,
+    outputName: null,
+    transcript: null,
+    transcriptOpen: false,
+  };
+}
+
+async function decodeForWaveform(ch) {
+  try {
+    const buf = await ch.file.arrayBuffer();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuffer = await ctx.decodeAudioData(buf.slice(0));
+    ch.audioBuffer = audioBuffer;
+    ch.duration = audioBuffer.duration;
+    ch.peaks = computePeaks(audioBuffer, 80);
+    ctx.close();
+  } catch (e) {
+    ch.audioBuffer = null;
+    ch.duration = null;
+    ch.peaks = null;
+  }
+  renderChannels();
+}
+
+function computePeaks(audioBuffer, bins) {
+  const data = audioBuffer.getChannelData(0);
+  const blockSize = Math.floor(data.length / bins) || 1;
+  const peaks = [];
+  for (let i = 0; i < bins; i++) {
+    let max = 0;
+    const start = i * blockSize;
+    for (let j = 0; j < blockSize; j++) {
+      const v = Math.abs(data[start + j] || 0);
+      if (v > max) max = v;
+    }
+    peaks.push(max);
+  }
+  return peaks;
+}
+
+function drawWaveform(canvas, peaks, color) {
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  const c = canvas.getContext('2d');
+  c.scale(dpr, dpr);
+  c.clearRect(0, 0, w, h);
+  if (!peaks) {
+    c.strokeStyle = 'rgba(255,255,255,0.08)';
+    c.beginPath(); c.moveTo(0, h / 2); c.lineTo(w, h / 2); c.stroke();
+    return;
+  }
+  const barW = w / peaks.length;
+  c.fillStyle = color;
+  peaks.forEach((p, i) => {
+    const barH = Math.max(2, p * h);
+    c.fillRect(i * barW, (h - barH) / 2, Math.max(1, barW - 1.5), barH);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Rendering
+// ---------------------------------------------------------------------------
+function renderChannels() {
+  channelCount.textContent = `${channels.length} Kanal${channels.length === 1 ? '' : 'äle'} geladen`;
+  renderAllBtn.disabled = channels.length === 0;
+  emptyState.style.display = channels.length === 0 ? 'block' : 'none';
+
+  channelsEl.querySelectorAll('.channel').forEach(n => n.remove());
+
+  channels.forEach((ch, idx) => {
+    const row = document.createElement('div');
+    row.className = 'channel';
+    row.dataset.id = ch.id;
+
+    const accentColor = mode === 'convert' ? 'var(--cyan)' : 'var(--magenta)';
+    const waveHex = WAVE_COLORS[mode];
+
+    const formatChips = Object.entries(FORMATS).map(([key, f]) =>
+      `<button class="chip fmt-chip ${ch.targetFormat === key ? 'active' : ''}" data-key="${key}">${f.label}</button>`
+    ).join('');
+
+    const showQuality = FORMATS[ch.targetFormat].lossy;
+    const qualityChips = showQuality ? `
+      <div class="chip-row">
+        ${Object.entries(QUALITY_PRESETS).map(([key, kbps]) =>
+          `<button class="chip quality q-chip ${ch.quality === key ? 'active' : ''}" data-key="${key}">${kbps}k</button>`
+        ).join('')}
+      </div>` : '';
+
+    let actionHtml = '';
+    if (mode === 'convert') {
+      if (ch.status === 'done' && ch.outputBlob) {
+        actionHtml = `<button class="ch-btn download" data-action="download">⬇ ${ch.outputName} · ${fmtBytes(ch.outputBlob.size)}</button>`;
+      } else {
+        actionHtml = `<button class="ch-btn" data-action="convert" ${ch.status === 'processing' ? 'disabled' : ''}>${ch.status === 'processing' ? 'Rendert…' : 'Convert ▸'}</button>`;
+      }
+    } else {
+      if (ch.transcript) {
+        actionHtml = `<button class="ch-btn" data-action="toggle-transcript">${ch.transcriptOpen ? 'Transcript ▴' : 'Transcript ▾'}</button>`;
+      } else {
+        actionHtml = `<button class="ch-btn" data-action="transcribe" ${ch.status === 'processing' ? 'disabled' : ''}>${ch.status === 'processing' ? 'Transkribiert…' : 'Transcribe ▸'}</button>`;
+      }
+    }
+
+    const controlsHtml = mode === 'convert'
+      ? `<div class="chip-row">${formatChips}</div>${qualityChips}<div class="ch-actions">${actionHtml}</div>`
+      : `<div class="ch-actions">${actionHtml}</div>`;
+
+    row.innerHTML = `
+      <div class="ch-num mono">CH ${String(idx + 1).padStart(2, '0')}</div>
+      <div class="ch-main">
+        <div class="ch-info">
+          <span class="ch-name" title="${ch.name}">${ch.name}</span>
+          <span class="ch-badge">${ch.ext.toUpperCase()}</span>
+          <span class="ch-meta mono">${fmtTime(ch.duration)} · ${fmtBytes(ch.size)}</span>
+          <button class="ch-remove" data-action="remove" aria-label="Entfernen">×</button>
+        </div>
+        <canvas class="waveform"></canvas>
+        <div class="ch-progress"><div class="ch-progress-fill" style="width:${ch.progress}%; background:${accentColor}; box-shadow:0 0 8px ${accentColor}"></div></div>
+        <div class="ch-status-text mono">${ch.statusText || ''}</div>
+      </div>
+      <div class="ch-controls">${controlsHtml}</div>
+      ${mode === 'transcribe' && ch.transcript ? renderTranscriptPanel(ch) : ''}
+    `;
+
+    channelsEl.appendChild(row);
+    drawWaveform(row.querySelector('.waveform'), ch.peaks, waveHex);
+    wireChannelRow(row, ch);
+  });
+}
+
+function renderTranscriptPanel(ch) {
+  const lines = ch.transcript.chunks.map(c =>
+    `<div class="transcript-line"><span class="ts">${fmtTime(c.timestamp[0])}</span><span>${escapeHtml(c.text.trim())}</span></div>`
+  ).join('');
+  return `
+    <div class="transcript-panel ${ch.transcriptOpen ? 'open' : ''}">
+      ${lines}
+      <div class="transcript-actions">
+        <button data-action="copy-transcript">Copy text</button>
+        <button data-action="download-transcript">Download .txt</button>
+      </div>
+    </div>`;
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function wireChannelRow(row, ch) {
+  row.querySelectorAll('.fmt-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      ch.targetFormat = btn.dataset.key;
+      ch.status = 'idle'; ch.outputBlob = null; ch.progress = 0; ch.statusText = '';
+      renderChannels();
+    });
+  });
+  row.querySelectorAll('.q-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      ch.quality = btn.dataset.key;
+      renderChannels();
+    });
+  });
+  const removeBtn = row.querySelector('[data-action="remove"]');
+  if (removeBtn) removeBtn.addEventListener('click', () => {
+    channels = channels.filter(c => c.id !== ch.id);
+    renderChannels();
+  });
+  const convertBtn = row.querySelector('[data-action="convert"]');
+  if (convertBtn) convertBtn.addEventListener('click', () => convertChannel(ch));
+  const downloadBtn = row.querySelector('[data-action="download"]');
+  if (downloadBtn) downloadBtn.addEventListener('click', () => triggerDownload(ch.outputBlob, ch.outputName));
+  const transcribeBtn = row.querySelector('[data-action="transcribe"]');
+  if (transcribeBtn) transcribeBtn.addEventListener('click', () => transcribeChannel(ch));
+  const toggleBtn = row.querySelector('[data-action="toggle-transcript"]');
+  if (toggleBtn) toggleBtn.addEventListener('click', () => { ch.transcriptOpen = !ch.transcriptOpen; renderChannels(); });
+  const copyBtn = row.querySelector('[data-action="copy-transcript"]');
+  if (copyBtn) copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(ch.transcript.text.trim());
+    copyBtn.textContent = 'Copied ✓';
+    setTimeout(() => copyBtn.textContent = 'Copy text', 1500);
+  });
+  const dlTxtBtn = row.querySelector('[data-action="download-transcript"]');
+  if (dlTxtBtn) dlTxtBtn.addEventListener('click', () => {
+    const blob = new Blob([ch.transcript.text.trim()], { type: 'text/plain' });
+    triggerDownload(blob, `${baseName(ch.name)}.txt`);
+  });
+}
+
+function triggerDownload(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+// ---------------------------------------------------------------------------
+// File intake
+// ---------------------------------------------------------------------------
+function addFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.size > 0);
+  files.forEach(file => {
+    const ch = createChannel(file);
+    channels.push(ch);
+    decodeForWaveform(ch);
+  });
+  renderChannels();
+}
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+fileInput.addEventListener('change', (e) => { addFiles(e.target.files); fileInput.value = ''; });
+['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+  e.preventDefault(); dropzone.classList.add('drag');
+}));
+['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
+  e.preventDefault(); dropzone.classList.remove('drag');
+}));
+dropzone.addEventListener('drop', (e) => { if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+
+// ---------------------------------------------------------------------------
+// Mode toggle
+// ---------------------------------------------------------------------------
+$('#modeConvertBtn').addEventListener('click', () => setMode('convert'));
+$('#modeTranscribeBtn').addEventListener('click', () => setMode('transcribe'));
+function setMode(m) {
+  mode = m;
+  document.documentElement.classList.toggle('mode-transcribe', m === 'transcribe');
+  $('#modeConvertBtn').classList.toggle('active', m === 'convert');
+  $('#modeTranscribeBtn').classList.toggle('active', m === 'transcribe');
+  $('#modelToggleWrap').style.display = m === 'transcribe' ? 'flex' : 'none';
+  renderAllBtn.textContent = m === 'convert' ? 'RENDER ALL ▸' : 'TRANSCRIBE ALL ▸';
+  renderChannels();
+}
+
+document.querySelectorAll('.model-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    whisperModelKey = btn.dataset.model;
+    document.querySelectorAll('.model-chip').forEach(b => b.classList.toggle('active', b === btn));
+    updateEngineStatus();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// FFmpeg lazy loading + conversion
+// ---------------------------------------------------------------------------
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = () => reject(new Error('Failed to load ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureFFmpeg() {
+  if (ffmpegReady) return ffmpeg;
+  setLed(led1, 'busy');
+  try {
+    if (!window.FFmpegWASM) await loadScript(`${FFMPEG_BASE}/ffmpeg.js`);
+    if (!window.FFmpegUtil) await loadScript(`${FFMPEG_UTIL_BASE}/index.js`);
+    const { FFmpeg } = window.FFmpegWASM;
+    ffmpeg = new FFmpeg();
+    await ffmpeg.load({
+      coreURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
+    });
+    ffmpegReady = true;
+    setLed(led1, 'lit');
+    updateEngineStatus();
+    return ffmpeg;
+  } catch (e) {
+    setLed(led1, 'err');
+    throw e;
+  }
+}
+
+function buildFfmpegArgs(inputName, outputName, targetFormat, quality) {
+  const kbps = QUALITY_PRESETS[quality];
+  switch (targetFormat) {
+    case 'wav':  return ['-i', inputName, '-c:a', 'pcm_s16le', outputName];
+    case 'mp3':  return ['-i', inputName, '-c:a', 'libmp3lame', '-b:a', `${kbps}k`, outputName];
+    case 'ogg':  return ['-i', inputName, '-c:a', 'libvorbis', '-b:a', `${kbps}k`, outputName];
+    case 'flac': return ['-i', inputName, '-c:a', 'flac', outputName];
+    case 'm4a':  return ['-i', inputName, '-c:a', 'aac', '-b:a', `${kbps}k`, '-movflags', '+faststart', outputName];
+    case 'opus': return ['-i', inputName, '-c:a', 'libopus', '-b:a', `${kbps}k`, outputName];
+    case 'aiff': return ['-i', inputName, '-c:a', 'pcm_s16be', outputName];
+    default: throw new Error('Unbekanntes Zielformat');
+  }
+}
+
+async function convertChannel(ch) {
+  ch.status = 'processing'; ch.progress = 0; ch.statusText = 'Lade Engine…';
+  renderChannels();
+  try {
+    const ff = await ensureFFmpeg();
+    ch.statusText = 'Konvertiere…';
+    renderChannels();
+
+    const inputName = `in_${ch.id}.${ch.ext}`;
+    const outputName = `out_${ch.id}.${ch.targetFormat}`;
+
+    const onProgress = ({ progress }) => {
+      ch.progress = Math.min(100, Math.max(0, Math.round((progress || 0) * 100)));
+      updateChannelProgressOnly(ch);
+    };
+    ff.on('progress', onProgress);
+
+    await ff.writeFile(inputName, await window.FFmpegUtil.fetchFile(ch.file));
+    await ff.exec(buildFfmpegArgs(inputName, outputName, ch.targetFormat, ch.quality));
+    const data = await ff.readFile(outputName);
+
+    ff.off ? ff.off('progress', onProgress) : null;
+
+    const blob = new Blob([data.buffer], { type: FORMATS[ch.targetFormat].mime });
+    ch.outputBlob = blob;
+    ch.outputName = `${baseName(ch.name)}.${ch.targetFormat}`;
+    ch.status = 'done'; ch.progress = 100; ch.statusText = 'Fertig';
+
+    await ff.deleteFile(inputName).catch(() => {});
+    await ff.deleteFile(outputName).catch(() => {});
+  } catch (e) {
+    console.error(e);
+    ch.status = 'error'; ch.statusText = 'Fehler bei der Konvertierung';
+  }
+  renderChannels();
+}
+
+function updateChannelProgressOnly(ch) {
+  const row = channelsEl.querySelector(`.channel[data-id="${ch.id}"]`);
+  if (!row) return;
+  const fill = row.querySelector('.ch-progress-fill');
+  const txt = row.querySelector('.ch-status-text');
+  if (fill) fill.style.width = ch.progress + '%';
+  if (txt) txt.textContent = ch.statusText + (ch.progress ? ` (${ch.progress}%)` : '');
+}
+
+// ---------------------------------------------------------------------------
+// Transcription (Whisper via Transformers.js)
+// ---------------------------------------------------------------------------
+async function ensureTranscriber() {
+  if (transcriberReady && loadedWhisperModelKey === whisperModelKey) return transcriber;
+  transcriberReady = false;
+  setLed(led2, 'busy');
+  try {
+    const mod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+    const { pipeline, env } = mod;
+    env.allowLocalModels = false;
+    const modelId = WHISPER_MODELS[whisperModelKey].id;
+    transcriber = await pipeline('automatic-speech-recognition', modelId, {
+      progress_callback: (p) => {
+        if (p.status === 'progress') {
+          const pct = Math.round(p.progress || 0);
+          engineStatus.innerHTML = `FFmpeg: <span>${ffmpegReady ? 'geladen' : 'nicht geladen'}</span> · Whisper: <span style="color:var(--accent-text)">lädt ${WHISPER_MODELS[whisperModelKey].label} ${p.file ? '— ' + p.file + ' ' : ''}${pct}%</span>`;
+        }
+      },
+    });
+    loadedWhisperModelKey = whisperModelKey;
+    transcriberReady = true;
+    setLed(led2, 'lit');
+    updateEngineStatus();
+    return transcriber;
+  } catch (e) {
+    setLed(led2, 'err');
+    throw e;
+  }
+}
+
+async function getMono16kFloatArray(ch) {
+  let audioBuffer = ch.audioBuffer;
+  if (!audioBuffer) {
+    // Original format couldn't be decoded directly by the browser — transcode to WAV via FFmpeg first.
+    const ff = await ensureFFmpeg();
+    const inputName = `tin_${ch.id}.${ch.ext}`;
+    const outputName = `tout_${ch.id}.wav`;
+    await ff.writeFile(inputName, await window.FFmpegUtil.fetchFile(ch.file));
+    await ff.exec(['-i', inputName, '-c:a', 'pcm_s16le', outputName]);
+    const data = await ff.readFile(outputName);
+    await ff.deleteFile(inputName).catch(() => {});
+    await ff.deleteFile(outputName).catch(() => {});
+    const blob = new Blob([data.buffer], { type: 'audio/wav' });
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    audioBuffer = await ctx.decodeAudioData(await blob.arrayBuffer());
+    ctx.close();
+    ch.audioBuffer = audioBuffer;
+    ch.duration = audioBuffer.duration;
+  }
+  const targetRate = 16000;
+  const offline = new OfflineAudioContext(1, Math.ceil(audioBuffer.duration * targetRate), targetRate);
+  const src = offline.createBufferSource();
+  src.buffer = audioBuffer;
+  src.connect(offline.destination);
+  src.start(0);
+  const rendered = await offline.startRendering();
+  return rendered.getChannelData(0);
+}
+
+async function transcribeChannel(ch) {
+  ch.status = 'processing'; ch.progress = 0; ch.statusText = 'Lade Whisper…';
+  renderChannels();
+  try {
+    const tr = await ensureTranscriber();
+    ch.statusText = 'Bereite Audio vor…';
+    renderChannels();
+    const floatArray = await getMono16kFloatArray(ch);
+    ch.statusText = 'Transkribiere…';
+    ch.progress = 50;
+    renderChannels();
+
+    const result = await tr(floatArray, {
+      chunk_length_s: 30,
+      stride_length_s: 5,
+      return_timestamps: true,
+    });
+
+    ch.transcript = result;
+    ch.transcriptOpen = true;
+    ch.status = 'done'; ch.progress = 100; ch.statusText = 'Fertig';
+  } catch (e) {
+    console.error(e);
+    ch.status = 'error'; ch.statusText = 'Fehler bei der Transkription';
+  }
+  renderChannels();
+}
+
+// ---------------------------------------------------------------------------
+// Render all
+// ---------------------------------------------------------------------------
+renderAllBtn.addEventListener('click', async () => {
+  renderAllBtn.disabled = true;
+  for (const ch of channels) {
+    if (mode === 'convert' && ch.status !== 'done') await convertChannel(ch);
+    if (mode === 'transcribe' && !ch.transcript) await transcribeChannel(ch);
+  }
+  renderAllBtn.disabled = channels.length === 0;
+});
+
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+setLed(led3, 'lit');
+updateEngineStatus();
+renderChannels();
+</script>
+</body>
+</html>
