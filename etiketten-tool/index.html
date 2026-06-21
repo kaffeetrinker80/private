@@ -27,6 +27,8 @@
       --danger-bg:#fee2e2;
       --shadow:0 12px 34px rgba(15,23,42,.12);
       --radius:18px;
+      --page-w:210mm;
+      --page-h:297mm;
     }
 
     *{box-sizing:border-box}
@@ -294,8 +296,8 @@
     }
 
     .sheet{
-      width:210mm;
-      min-height:297mm;
+      width:var(--page-w);
+      min-height:var(--page-h);
       background:#fff;
       box-shadow:0 15px 42px rgba(15,23,42,.18);
       position:relative;
@@ -400,10 +402,10 @@
       main{grid-template-columns:1fr}
       .panel{position:relative;top:0;max-height:none}
       .sheet{transform:scale(.55)}
-      .page-holder{height:166mm}
+      .page-holder{height:calc(var(--page-h) * 0.55 + 14px)}
     }
 
-    @page{size:A4 portrait;margin:0}
+    /* @page Größe/Ausrichtung wird dynamisch über #pageSizeStyle gesetzt (siehe Script) */
 
     @media print{
       body{background:#fff}
@@ -413,18 +415,19 @@
       .page-stage{display:block}
       .page-holder{page-break-after:always;height:auto!important}
       .page-holder:last-child{page-break-after:auto}
-      .sheet{width:210mm;height:297mm;min-height:297mm;box-shadow:none;transform:none!important;overflow:hidden}
+      .sheet{width:var(--page-w);height:var(--page-h);min-height:var(--page-h);box-shadow:none;transform:none!important;overflow:hidden}
     }
   </style>
+  <style id="pageSizeStyle">@page{size:A4 portrait;margin:0}</style>
 </head>
 <body>
 <header>
   <div class="hero">
     <div>
       <h1>Etiketten & Badgecard Tool</h1>
-      <p>A4-Etiketten, Kongress-Badges, Smart Paste, Duplex, Bild, JSON & Druckansicht.</p>
+      <p>A4-Etiketten, Kongress-Badges, Smart Paste, Duplex, Bild, Hoch-/Querformat, JSON & Druckansicht.</p>
     </div>
-    <div class="version-badge">V1.4.4 · Badge & Label Studio</div>
+    <div class="version-badge">V1.5.0 · Badge & Label Studio</div>
   </div>
 </header>
 
@@ -435,6 +438,13 @@
       <label>Standardformat</label>
       <select id="presetSelect"></select>
       <div class="help">Alle Maße sind in mm. Beim Drucken bitte <b>100 % / tatsächliche Größe</b> einstellen.</div>
+
+      <label>Seitenausrichtung beim Drucken</label>
+      <div class="format-buttons">
+        <button id="orientationPortrait" type="button">Hochformat (A4 Hoch)</button>
+        <button id="orientationLandscape" type="button">Querformat (A4 Quer)</button>
+      </div>
+      <div class="help">Bestimmt nur die Ausrichtung des gedruckten Blatts (Papierformat). Manche Etiketten-Layouts – z. B. breite Regal- oder Ordneretiketten – lassen sich nur im Querformat sauber drucken. Spalten/Zeilen/Maße unten bleiben unverändert, ggf. Seitenränder anpassen.</div>
 
       <div class="grid2">
         <div><label>Spalten</label><input id="cols" type="number" min="1" max="10" step="1"></div>
@@ -588,7 +598,7 @@
       <div class="help">Alles bleibt lokal im Browser. Bilder im JSON können die Datei größer machen.</div>
     </div>
 
-    <div class="footer-note">Made with Love © – Label Tool V 1.4.4</div>
+    <div class="footer-note">Made with Love © – Label Tool V 1.5.0</div>
   </aside>
 
   <section class="preview-wrap">
@@ -604,7 +614,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '1.4.4';
+  const VERSION = '1.5.0';
 
   const PRESETS = {
     half:{name:'A4 halbseitig – 2 Etiketten, 210 × 148,5 mm',cols:1,rows:2,labelW:210,labelH:148.5,gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},
@@ -625,6 +635,7 @@
     version:VERSION,
     preset:'badge',
     layout:copy(PRESETS.badge),
+    orientation:'portrait',
     editMode:'same',
     headline:'BEISPIELTITEL',
     subline:'Untertitel',
@@ -668,13 +679,21 @@
     return String(Number(value || 0)) + 'mm';
   }
 
+  function applyOrientation(){
+    const landscape = state.orientation === 'landscape';
+    document.documentElement.style.setProperty('--page-w', landscape ? '297mm' : '210mm');
+    document.documentElement.style.setProperty('--page-h', landscape ? '210mm' : '297mm');
+    const pageSizeStyle = byId('pageSizeStyle');
+    if(pageSizeStyle) pageSizeStyle.textContent = '@page{size:A4 ' + (landscape ? 'landscape' : 'portrait') + ';margin:0}';
+  }
+
   function plainLines(value){
     const lines = String(value || '').replace(/\r/g,'').split('\n').map(function(line){return line.trim();}).filter(Boolean);
     return {headline:lines[0] || '', subline:lines.slice(1).join('\n')};
   }
 
   function cacheElements(){
-    ['presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','editMode','smartPaste','headline','subline','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','advancedToggle','advancedBox','advancedHtml','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','duplexMode','duplexHint','backHeadline','backSubline','backHeadlineSize','backSublineSize','pageStage','countInfo','importFile'].forEach(function(id){
+    ['presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','orientationPortrait','orientationLandscape','editMode','smartPaste','headline','subline','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','advancedToggle','advancedBox','advancedHtml','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','duplexMode','duplexHint','backHeadline','backSubline','backHeadlineSize','backSublineSize','pageStage','countInfo','importFile'].forEach(function(id){
       el[id] = byId(id);
     });
   }
@@ -685,6 +704,7 @@
     Object.assign(fresh, imported);
     fresh.version = VERSION;
     fresh.layout = Object.assign({}, DEFAULT_STATE.layout, imported.layout || {});
+    fresh.orientation = imported.orientation === 'landscape' ? 'landscape' : 'portrait';
     fresh.style = Object.assign({}, DEFAULT_STATE.style, imported.style || {});
     fresh.backStyle = Object.assign({}, DEFAULT_STATE.backStyle, imported.backStyle || {});
     fresh.image = Object.assign({}, DEFAULT_STATE.image, imported.image || {});
@@ -740,6 +760,10 @@
 
     el.showCutmarks.checked = !!state.showCutmarks;
     el.showBorders.checked = !!state.showBorders;
+
+    setActive(el.orientationPortrait, state.orientation !== 'landscape');
+    setActive(el.orientationLandscape, state.orientation === 'landscape');
+    applyOrientation();
 
     el.editMode.value = state.editMode;
     byId('sameEditor').style.display = state.editMode === 'same' ? 'block' : 'none';
@@ -1110,6 +1134,9 @@
     el.showCutmarks.addEventListener('change', function(){ state.showCutmarks = el.showCutmarks.checked; renderPreview(); });
     el.showBorders.addEventListener('change', function(){ state.showBorders = el.showBorders.checked; renderPreview(); });
 
+    el.orientationPortrait.addEventListener('click', function(){ state.orientation = 'portrait'; syncForm(); });
+    el.orientationLandscape.addEventListener('click', function(){ state.orientation = 'landscape'; syncForm(); });
+
     el.editMode.addEventListener('change', function(){ state.editMode = el.editMode.value; syncForm(); });
     el.headline.addEventListener('input', function(){ state.headline = el.headline.value; renderPreview(); });
     el.subline.addEventListener('input', function(){ state.subline = el.subline.value; renderPreview(); });
@@ -1176,7 +1203,7 @@
     byId('exportBtn').addEventListener('click', function(){
       state.version = VERSION;
       const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-      downloadJson('etiketten_tool_backup_v1-4-4_' + stamp + '.json', state);
+      downloadJson('etiketten_tool_backup_v1-5-0_' + stamp + '.json', state);
     });
 
     byId('importBtn').addEventListener('click', function(){ el.importFile.click(); });
