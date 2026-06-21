@@ -969,6 +969,10 @@ async function ensureFFmpeg() {
     const { FFmpeg } = window.FFmpegWASM;
     ffmpeg = new FFmpeg();
     await ffmpeg.load({
+      // The internal worker chunk can't be spawned directly from a cross-origin
+      // CDN URL (browsers block `new Worker()` across origins). Fetching it
+      // ourselves and handing over a same-origin blob URL fixes that.
+      classWorkerURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_BASE}/814.ffmpeg.js`, 'text/javascript'),
       coreURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
       wasmURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
     });
