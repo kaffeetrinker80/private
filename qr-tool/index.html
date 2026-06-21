@@ -11,6 +11,7 @@
 <link rel="manifest" href="site.webmanifest">
 
 <meta name="theme-color" content="#172f4d">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QR Code Generator</title>
@@ -367,16 +368,19 @@
     </div>
     <div class="header-titles">
       <h1>QR Code Generator</h1>
-      <div class="subtitle">URL, IBAN/SEPA, WLAN &amp; vCard — mit Logo &amp; Download</div>
+      <div class="subtitle">Mehrzweck-QR-Generator — mit Logo, farbigen Ecken &amp; Direktversand</div>
     </div>
   </div>
 </header>
 
 <div class="tabbar" id="tabbar">
   <button class="tab-btn active" data-tab="url">🔗 URL / Text</button>
-  <button class="tab-btn" data-tab="iban">💳 IBAN / SEPA</button>
+  <button class="tab-btn" data-tab="mail">✉️ E-Mail</button>
+  <button class="tab-btn" data-tab="whatsapp">💬 WhatsApp</button>
+  <button class="tab-btn" data-tab="sms">📱 SMS</button>
   <button class="tab-btn" data-tab="wifi">📶 WLAN</button>
   <button class="tab-btn" data-tab="vcard">👤 vCard</button>
+  <button class="tab-btn" data-tab="iban">💳 IBAN / SEPA</button>
 </div>
 
 <main>
@@ -390,6 +394,54 @@
       <div class="field">
         <label>Inhalt</label>
         <textarea id="url-input" placeholder="https://beispiel.de oder beliebiger Text …"></textarea>
+      </div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="tab-panel card" id="panel-mail">
+      <h2>E-Mail senden</h2>
+      <p class="card-hint">Gescannt öffnet sich direkt eine neue E-Mail mit vorausgefüllten Feldern.</p>
+      <div class="field">
+        <label>Empfänger</label>
+        <input type="email" id="mail-to" placeholder="name@beispiel.de">
+      </div>
+      <div class="field">
+        <label>Betreff <span class="opt">(optional)</span></label>
+        <input type="text" id="mail-subject" placeholder="z. B. Rückfrage">
+      </div>
+      <div class="field">
+        <label>Nachricht <span class="opt">(optional)</span></label>
+        <textarea id="mail-body" placeholder="Vorausgefüllter Nachrichtentext …"></textarea>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="tab-panel card" id="panel-whatsapp">
+      <h2>WhatsApp-Nachricht</h2>
+      <p class="card-hint">Gescannt öffnet sich WhatsApp mit fertiger Nachricht an diese Nummer.</p>
+      <div class="field">
+        <label>Telefonnummer <span class="opt">(mit Ländervorwahl, z. B. 49 für DE)</span></label>
+        <input type="tel" id="wa-number" placeholder="z. B. 49 1701234567" autocomplete="off">
+        <div class="iban-status empty" id="wa-status">Nummer eingeben …</div>
+      </div>
+      <div class="field">
+        <label>Nachricht <span class="opt">(optional)</span></label>
+        <textarea id="wa-message" placeholder="Vorausgefüllter Nachrichtentext …"></textarea>
+      </div>
+    </div>
+
+    <!-- SMS -->
+    <div class="tab-panel card" id="panel-sms">
+      <h2>SMS senden</h2>
+      <p class="card-hint">Gescannt öffnet sich die SMS-App mit fertiger Nachricht an diese Nummer.</p>
+      <div class="field">
+        <label>Telefonnummer</label>
+        <input type="tel" id="sms-number" placeholder="z. B. +49 1701234567" autocomplete="off">
+        <div class="iban-status empty" id="sms-status">Nummer eingeben …</div>
+      </div>
+      <div class="field">
+        <label>Nachricht <span class="opt">(optional)</span></label>
+        <textarea id="sms-message" placeholder="Vorausgefüllter Nachrichtentext …"></textarea>
       </div>
     </div>
 
@@ -516,6 +568,21 @@
       </div>
       <div class="presets-row" id="color-presets"></div>
 
+      <div class="checkbox-row" style="margin-top:16px;">
+        <input type="checkbox" id="eye-color-toggle">
+        <label for="eye-color-toggle">Eckmarker farbig einfärben</label>
+      </div>
+      <div class="control-grid" id="eye-color-field" style="display:none; margin-top:10px;">
+        <div class="color-field">
+          <label>Eckmarker-Farbe</label>
+          <div class="color-input-wrap">
+            <input type="color" id="eye-color" value="#dc2626">
+            <input type="text" id="eye-color-text" value="#dc2626">
+          </div>
+        </div>
+      </div>
+      <div class="presets-row" id="eye-color-presets" style="display:none;"></div>
+
       <div class="slider-field" style="margin-top:16px;">
         <label><span>Fehlerkorrektur</span><span id="ec-label">Q — empfohlen</span></label>
         <div class="radio-group" id="ec-group">
@@ -564,7 +631,7 @@
 
 <div class="toast" id="toast"></div>
 
-<footer>Made with Love © – QR Generator Tool V 1.0.0 · <a href="mailto:cryptopower@outlook.de">Feedback</a></footer>
+<footer>Made with Love © – QR Generator Tool V 1.0.1 · <a href="mailto:cryptopower@outlook.de">Feedback</a></footer>
 
 <script>
 //---------------------------------------------------------------------
@@ -2904,6 +2971,8 @@ var qrcode = function() {
     activeTab: 'url',
     fgColor: '#0f172a',
     bgColor: '#ffffff',
+    eyeColorEnabled: false,
+    eyeColor: '#dc2626',
     ecLevel: 'Q',
     ecManual: false,
     logoDataUrl: null,
@@ -3101,6 +3170,69 @@ var qrcode = function() {
   }
 
   // ---------------------------------------------------------------
+  // Email / WhatsApp / SMS builders
+  // ---------------------------------------------------------------
+  function buildMailto(){
+    var to = ($('mail-to').value || '').trim();
+    if (!to) return '';
+    var subject = ($('mail-subject').value || '').trim();
+    var body = ($('mail-body').value || '').trim();
+    var params = [];
+    if (subject) params.push('subject=' + encodeURIComponent(subject));
+    if (body) params.push('body=' + encodeURIComponent(body));
+    var qs = params.length ? ('?' + params.join('&')) : '';
+    return 'mailto:' + to + qs;
+  }
+
+  function cleanPhoneForWa(v){
+    var digits = (v || '').replace(/[^\d]/g, '');
+    if (digits.indexOf('00') === 0){ digits = digits.substring(2); }
+    return digits;
+  }
+
+  function buildWhatsapp(){
+    var num = cleanPhoneForWa($('wa-number').value);
+    var statusEl = $('wa-status');
+    if (!($('wa-number').value || '').trim()){
+      statusEl.className = 'iban-status empty';
+      statusEl.textContent = 'Nummer eingeben …';
+    } else if (num.length < 8){
+      statusEl.className = 'iban-status invalid';
+      statusEl.textContent = '✕ zu kurz — mit Ländervorwahl eingeben, z. B. 49 …';
+    } else {
+      statusEl.className = 'iban-status valid';
+      statusEl.textContent = '✓ wird kodiert als +' + num;
+    }
+    if (!num) return '';
+    var msg = ($('wa-message').value || '').trim();
+    var qs = msg ? ('?text=' + encodeURIComponent(msg)) : '';
+    return 'https://wa.me/' + num + qs;
+  }
+
+  function cleanPhoneForSms(v){
+    return (v || '').replace(/[\s-]/g, '');
+  }
+
+  function buildSms(){
+    var num = cleanPhoneForSms($('sms-number').value);
+    var statusEl = $('sms-status');
+    if (!num){
+      statusEl.className = 'iban-status empty';
+      statusEl.textContent = 'Nummer eingeben …';
+    } else if (!/^\+?[\d]{6,15}$/.test(num)){
+      statusEl.className = 'iban-status invalid';
+      statusEl.textContent = '✕ ungültiges Format';
+    } else {
+      statusEl.className = 'iban-status valid';
+      statusEl.textContent = '✓ wird kodiert als ' + num;
+    }
+    if (!num) return '';
+    var msg = ($('sms-message').value || '').trim();
+    var qs = msg ? ('?body=' + encodeURIComponent(msg)) : '';
+    return 'sms:' + num + qs;
+  }
+
+  // ---------------------------------------------------------------
   // Payload resolver
   // ---------------------------------------------------------------
   function getPayload(){
@@ -3108,6 +3240,9 @@ var qrcode = function() {
     if (state.activeTab === 'iban'){ return buildEPC(); }
     if (state.activeTab === 'wifi'){ return buildWifi(); }
     if (state.activeTab === 'vcard'){ return buildVCard(); }
+    if (state.activeTab === 'mail'){ return buildMailto(); }
+    if (state.activeTab === 'whatsapp'){ return buildWhatsapp(); }
+    if (state.activeTab === 'sms'){ return buildSms(); }
     return '';
   }
 
@@ -3122,6 +3257,15 @@ var qrcode = function() {
     ctx.arcTo(x, y+h, x, y, r);
     ctx.arcTo(x, y, x+w, y, r);
     ctx.closePath();
+  }
+
+  // The three 7x7 finder patterns ("eyes") sit at fixed positions regardless
+  // of QR version: top-left, top-right, bottom-left.
+  function isFinderZone(row, col, count){
+    if (row < 7 && col < 7) return true;
+    if (row < 7 && col >= count-7) return true;
+    if (row >= count-7 && col < 7) return true;
+    return false;
   }
 
   function renderCanvas(qr, payload){
@@ -3142,12 +3286,25 @@ var qrcode = function() {
     ctx.clearRect(0,0,actualSize,actualSize);
     ctx.fillStyle = state.bgColor;
     ctx.fillRect(0,0,actualSize,actualSize);
-    ctx.fillStyle = state.fgColor;
 
+    // Pass 1: body modules (skip eye zones if they'll be recolored)
+    ctx.fillStyle = state.fgColor;
     for (var row=0; row<count; row++){
       for (var col=0; col<count; col++){
-        if (qr.isDark(row,col)){
+        if (qr.isDark(row,col) && !(state.eyeColorEnabled && isFinderZone(row,col,count))){
           ctx.fillRect((col+margin)*cellSize, (row+margin)*cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    // Pass 2: eye/finder-pattern modules in their own color
+    if (state.eyeColorEnabled){
+      ctx.fillStyle = state.eyeColor;
+      for (var row2=0; row2<count; row2++){
+        for (var col2=0; col2<count; col2++){
+          if (qr.isDark(row2,col2) && isFinderZone(row2,col2,count)){
+            ctx.fillRect((col2+margin)*cellSize, (row2+margin)*cellSize, cellSize, cellSize);
+          }
         }
       }
     }
@@ -3170,11 +3327,14 @@ var qrcode = function() {
     var count = meta.count, margin = meta.margin;
     var cell = 10;
     var total = (count + margin*2) * cell;
-    var rects = '';
+    var bodyRects = '';
+    var eyeRects = '';
     for (var r=0;r<count;r++){
       for (var c=0;c<count;c++){
         if (qr.isDark(r,c)){
-          rects += '<rect x="'+((c+margin)*cell)+'" y="'+((r+margin)*cell)+'" width="'+cell+'" height="'+cell+'"/>';
+          var rect = '<rect x="'+((c+margin)*cell)+'" y="'+((r+margin)*cell)+'" width="'+cell+'" height="'+cell+'"/>';
+          if (state.eyeColorEnabled && isFinderZone(r,c,count)){ eyeRects += rect; }
+          else { bodyRects += rect; }
         }
       }
     }
@@ -3186,9 +3346,10 @@ var qrcode = function() {
       logoSvg = '<rect x="'+(lx-pad)+'" y="'+(ly-pad)+'" width="'+(logoPx+pad*2)+'" height="'+(logoPx+pad*2)+'" fill="#ffffff" rx="'+(pad*0.6)+'"/>' +
         '<image href="'+state.logoDataUrl+'" x="'+lx+'" y="'+ly+'" width="'+logoPx+'" height="'+logoPx+'"/>';
     }
+    var eyeGroup = state.eyeColorEnabled ? ('<g fill="'+state.eyeColor+'">' + eyeRects + '</g>') : '';
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+total+' '+total+'" width="'+total+'" height="'+total+'">' +
       '<rect width="100%" height="100%" fill="'+state.bgColor+'"/>' +
-      '<g fill="'+state.fgColor+'">' + rects + '</g>' + logoSvg + '</svg>';
+      '<g fill="'+state.fgColor+'">' + bodyRects + '</g>' + eyeGroup + logoSvg + '</svg>';
   }
 
   function rebuild(){
@@ -3227,7 +3388,10 @@ var qrcode = function() {
   // ---------------------------------------------------------------
   var watchedIds = ['url-input','iban-name','iban-bic','iban-amount','iban-purpose',
     'wifi-ssid','wifi-pass','wifi-hidden',
-    'vc-vorname','vc-nachname','vc-firma','vc-telefon','vc-email','vc-website','vc-adresse'];
+    'vc-vorname','vc-nachname','vc-firma','vc-telefon','vc-email','vc-website','vc-adresse',
+    'mail-to','mail-subject','mail-body',
+    'wa-number','wa-message',
+    'sms-number','sms-message'];
   for (var wi=0; wi<watchedIds.length; wi++){
     var el = $(watchedIds[wi]);
     on(el, 'input', rebuild);
@@ -3271,6 +3435,34 @@ var qrcode = function() {
       rebuild();
     });
     presetsRow.appendChild(sw);
+  });
+
+  // ---------------------------------------------------------------
+  // Eye / finder-pattern color controls
+  // ---------------------------------------------------------------
+  var EYE_PRESETS = ['#dc2626', '#16a34a', '#0f766e', '#1d4ed8', '#ea580c'];
+
+  on($('eye-color-toggle'), 'change', function(){
+    state.eyeColorEnabled = this.checked;
+    $('eye-color-field').style.display = this.checked ? 'grid' : 'none';
+    $('eye-color-presets').style.display = this.checked ? 'flex' : 'none';
+    rebuild();
+  });
+  syncColor('eye-color', 'eye-color-text', 'eyeColor');
+
+  var eyePresetsRow = $('eye-color-presets');
+  EYE_PRESETS.forEach(function(c){
+    var sw = document.createElement('div');
+    sw.className = 'preset-swatch';
+    sw.style.background = c;
+    on(sw, 'click', function(){
+      $('eye-color').value = c; $('eye-color-text').value = c; state.eyeColor = c;
+      var sws = eyePresetsRow.querySelectorAll('.preset-swatch');
+      for (var i=0;i<sws.length;i++){ sws[i].classList.remove('active'); }
+      sw.classList.add('active');
+      rebuild();
+    });
+    eyePresetsRow.appendChild(sw);
   });
 
   // ---------------------------------------------------------------
