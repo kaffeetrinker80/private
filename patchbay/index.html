@@ -581,7 +581,7 @@
       <button class="engine-btn" id="preloadWhisperBtn">Whisper jetzt laden</button>
     </div>
     <div class="signature">
-      <span>Made with Love © — Audio Patchbay v1.3</span>
+      <span>Made with Love © — Audio Patchbay v1.4</span>
       <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
     </div>
   </footer>
@@ -598,7 +598,7 @@ const FFMPEG_CORE_VERSION = '0.12.10';
 const FFMPEG_UTIL_VERSION = '0.12.1';
 const FFMPEG_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/umd`;
 const FFMPEG_UTIL_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/util@${FFMPEG_UTIL_VERSION}/dist/umd`;
-const FFMPEG_CORE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/umd`;
+const FFMPEG_CORE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm`;
 
 const WHISPER_MODELS = {
   base:  { id: 'Xenova/whisper-base',  label: 'Base · ~150 MB' },
@@ -998,7 +998,7 @@ async function ensureFFmpeg() {
     return ffmpeg;
   } catch (e) {
     setLed(led1, 'err');
-    showError(`FFmpeg konnte nicht geladen werden: ${e.message || e}. Tipp: Diese Seite muss über http:// oder https:// geöffnet werden — nicht per Doppelklick (file://). Lokal z. B. mit "python -m http.server" testen, oder über GitHub Pages öffnen.`);
+    showError(`FFmpeg konnte nicht geladen werden: ${e.message || e}. Falls du die Datei per Doppelklick geöffnet hast (file:// in der Adresszeile) — das funktioniert nicht. Stattdessen über http(s):// öffnen, z. B. via GitHub Pages oder lokal mit "python -m http.server".`);
     throw e;
   }
 }
