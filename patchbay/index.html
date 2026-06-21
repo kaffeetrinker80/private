@@ -581,7 +581,7 @@
       <button class="engine-btn" id="preloadWhisperBtn">Whisper jetzt laden</button>
     </div>
     <div class="signature">
-      <span>Made with Love © — Audio Patchbay v1.2</span>
+      <span>Made with Love © — Audio Patchbay v1.3</span>
       <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
     </div>
   </footer>
@@ -960,6 +960,20 @@ function loadScript(src) {
   });
 }
 
+async function fetchAndBlobURL(url, mime) {
+  let resp;
+  try {
+    resp = await fetch(url);
+  } catch (e) {
+    throw new Error(`Netzwerkfehler beim Laden von ${url}: ${e.message || e}`);
+  }
+  if (!resp.ok) {
+    throw new Error(`HTTP ${resp.status} (${resp.statusText}) beim Laden von ${url}`);
+  }
+  const blob = await resp.blob();
+  return URL.createObjectURL(new Blob([blob], { type: mime }));
+}
+
 async function ensureFFmpeg() {
   if (ffmpegReady) return ffmpeg;
   setLed(led1, 'busy');
@@ -971,10 +985,12 @@ async function ensureFFmpeg() {
     await ffmpeg.load({
       // The internal worker chunk can't be spawned directly from a cross-origin
       // CDN URL (browsers block `new Worker()` across origins). Fetching it
-      // ourselves and handing over a same-origin blob URL fixes that.
-      classWorkerURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_BASE}/814.ffmpeg.js`, 'text/javascript'),
-      coreURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await window.FFmpegUtil.toBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
+      // ourselves and handing over a same-origin blob URL fixes that. We also
+      // check each response status explicitly so a failed/blocked file shows
+      // up as a precise error instead of the generic "failed to import".
+      classWorkerURL: await fetchAndBlobURL(`${FFMPEG_BASE}/814.ffmpeg.js`, 'text/javascript'),
+      coreURL: await fetchAndBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await fetchAndBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
     });
     ffmpegReady = true;
     setLed(led1, 'lit');
