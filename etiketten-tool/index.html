@@ -29,6 +29,7 @@
       --radius:18px;
       --page-w:210mm;
       --page-h:297mm;
+      --zoom:1;
     }
 
     *{box-sizing:border-box}
@@ -281,6 +282,52 @@
 
     .preview-toolbar h2{margin:0}
 
+    .preview-toolbar-actions{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .zoom-controls{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      background:#eef3f8;
+      border-radius:999px;
+      padding:3px;
+    }
+
+    .zoom-controls button{
+      width:26px;
+      height:26px;
+      padding:0;
+      border-radius:999px;
+      background:transparent;
+      font-size:1rem;
+      line-height:1;
+      font-weight:800;
+    }
+
+    .zoom-controls button:hover{background:#fff}
+
+    .zoom-controls .zoom-value{
+      min-width:42px;
+      text-align:center;
+      font-size:.78rem;
+      font-weight:750;
+      color:#334155;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .zoom-controls .zoom-fit{
+      width:auto;
+      padding:0 10px;
+      font-size:.74rem;
+      border-radius:999px;
+    }
+
     .page-stage{
       display:flex;
       flex-wrap:wrap;
@@ -293,6 +340,11 @@
       font-weight:850;
       color:var(--muted);
       margin:0 0 8px;
+    }
+
+    .page-holder{
+      width:calc(var(--page-w) * var(--zoom));
+      height:calc(var(--page-h) * var(--zoom) + 22px);
     }
 
     .sheet{
@@ -308,6 +360,7 @@
       gap:var(--gap-y) var(--gap-x);
       align-content:start;
       transform-origin:top left;
+      transform:scale(var(--zoom));
     }
 
     .label-card{
@@ -391,29 +444,52 @@
       border-top:.2mm solid rgba(15,23,42,.13);
     }
 
-    .footer-note{
-      color:var(--muted);
-      font-size:.76rem;
-      margin-top:12px;
+    .site-footer{
+      max-width:1480px;
+      margin:6px auto 28px;
+      padding:0 18px;
       text-align:center;
     }
+
+    .site-footer-inner{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      gap:9px;
+      color:var(--muted);
+      font-size:.8rem;
+    }
+
+    .site-footer-sep{opacity:.6}
+
+    .site-footer-feedback{
+      color:var(--accent-dark);
+      text-decoration:none;
+      font-weight:750;
+      padding:4px 12px;
+      border-radius:999px;
+      background:rgba(31,95,139,.1);
+      transition:.15s ease;
+    }
+
+    .site-footer-feedback:hover{background:rgba(31,95,139,.18)}
 
     @media(max-width:1050px){
       main{grid-template-columns:1fr}
       .panel{position:relative;top:0;max-height:none}
-      .sheet{transform:scale(.55)}
-      .page-holder{height:calc(var(--page-h) * 0.55 + 14px)}
+      :root{--zoom:.55}
     }
 
     /* @page Größe/Ausrichtung wird dynamisch über #pageSizeStyle gesetzt (siehe Script) */
 
     @media print{
       body{background:#fff}
-      header,.panel,.preview-toolbar,.page-title,.footer-note{display:none!important}
+      header,.panel,.preview-toolbar,.page-title,.site-footer{display:none!important}
       main{display:block;max-width:none;margin:0;padding:0}
       .preview-wrap{border:0;box-shadow:none;padding:0;background:#fff;overflow:visible;min-height:0}
       .page-stage{display:block}
-      .page-holder{page-break-after:always;height:auto!important}
+      .page-holder{page-break-after:always;width:auto!important;height:auto!important}
       .page-holder:last-child{page-break-after:auto}
       .sheet{width:var(--page-w);height:var(--page-h);min-height:var(--page-h);box-shadow:none;transform:none!important;overflow:hidden}
     }
@@ -427,7 +503,7 @@
       <h1>Etiketten & Badgecard Tool</h1>
       <p>A4-Etiketten, Kongress-Badges, Smart Paste, Duplex, Bild, Hoch-/Querformat, JSON & Druckansicht.</p>
     </div>
-    <div class="version-badge">V1.5.0 · Badge & Label Studio</div>
+    <div class="version-badge">Badge & Label Studio</div>
   </div>
 </header>
 
@@ -597,18 +673,33 @@
       </div>
       <div class="help">Alles bleibt lokal im Browser. Bilder im JSON können die Datei größer machen.</div>
     </div>
-
-    <div class="footer-note">Made with Love © – Label Tool V 1.5.0</div>
   </aside>
 
   <section class="preview-wrap">
     <div class="preview-toolbar">
       <h2>Vorschau</h2>
-      <div class="help" id="countInfo">–</div>
+      <div class="preview-toolbar-actions">
+        <div class="help" id="countInfo">–</div>
+        <div class="zoom-controls">
+          <button id="zoomOut" type="button" title="Verkleinern">−</button>
+          <span class="zoom-value" id="zoomValue" title="Auf 100 % zurücksetzen">100%</span>
+          <button id="zoomIn" type="button" title="Vergrößern">+</button>
+          <button class="zoom-fit" id="zoomFit" type="button" title="Ganze Seite einpassen">Einpassen</button>
+        </div>
+      </div>
     </div>
     <div class="page-stage" id="pageStage"></div>
   </section>
 </main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <span class="site-footer-version">Etiketten & Badgecard Tool · V1.5.0</span>
+    <span class="site-footer-sep">·</span>
+    <span>Made with Love ©</span>
+    <a class="site-footer-feedback" href="mailto:cryptopower@outlook.de?subject=Feedback%3A%20Etiketten%20%26%20Badgecard%20Tool%20V1.5.0">✉ Feedback</a>
+  </div>
+</footer>
 
 <script>
 (function(){
@@ -659,6 +750,7 @@
   };
 
   let state = copy(DEFAULT_STATE);
+  let zoom = 1;
   const el = {};
 
   function copy(obj){
@@ -711,8 +803,30 @@
     return {headline:lines[0] || '', subline:lines.slice(1).join('\n')};
   }
 
+  function applyZoom(){
+    zoom = Math.max(0.2, Math.min(2, zoom));
+    document.documentElement.style.setProperty('--zoom', zoom);
+    if(el.zoomValue) el.zoomValue.textContent = Math.round(zoom * 100) + '%';
+  }
+
+  function fitZoom(){
+    const wrap = document.querySelector('.preview-wrap');
+    if(!wrap) return;
+    const landscape = state.orientation === 'landscape';
+    const pageWmm = landscape ? 297 : 210;
+    const pageHmm = landscape ? 210 : 297;
+    const mmToPx = 96 / 25.4;
+    const availW = wrap.clientWidth - 32;
+    const availH = window.innerHeight - wrap.getBoundingClientRect().top - 40;
+    const fitW = availW / (pageWmm * mmToPx);
+    const fitH = availH / (pageHmm * mmToPx);
+    zoom = Math.max(0.2, Math.min(1, Math.min(fitW, fitH)));
+    zoom = Math.round(zoom * 100) / 100;
+    applyZoom();
+  }
+
   function cacheElements(){
-    ['presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','orientationPortrait','orientationLandscape','editMode','smartPaste','headline','subline','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','advancedToggle','advancedBox','advancedHtml','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','duplexMode','duplexHint','backHeadline','backSubline','backHeadlineSize','backSublineSize','pageStage','countInfo','importFile'].forEach(function(id){
+    ['presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','orientationPortrait','orientationLandscape','editMode','smartPaste','headline','subline','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','advancedToggle','advancedBox','advancedHtml','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','duplexMode','duplexHint','backHeadline','backSubline','backHeadlineSize','backSublineSize','pageStage','countInfo','zoomOut','zoomIn','zoomFit','zoomValue','importFile'].forEach(function(id){
       el[id] = byId(id);
     });
   }
@@ -1167,6 +1281,11 @@
       }
       syncForm();
     });
+
+    el.zoomOut.addEventListener('click', function(){ zoom = Math.round((zoom - 0.1) * 100) / 100; applyZoom(); });
+    el.zoomIn.addEventListener('click', function(){ zoom = Math.round((zoom + 0.1) * 100) / 100; applyZoom(); });
+    el.zoomValue.addEventListener('click', function(){ zoom = 1; applyZoom(); });
+    el.zoomFit.addEventListener('click', fitZoom);
 
     el.editMode.addEventListener('change', function(){ state.editMode = el.editMode.value; syncForm(); });
     el.headline.addEventListener('input', function(){ state.headline = el.headline.value; renderPreview(); });
