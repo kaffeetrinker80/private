@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>TalkScroll · Teleprompter & Script Reader</title>
   <style>
     :root {
@@ -29,6 +29,7 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      height: 100dvh;
     }
 
     button, input, textarea { font: inherit; }
@@ -43,6 +44,9 @@
       gap: 18px;
       padding: 18px;
     }
+    .app.sidebar-collapsed { grid-template-columns: minmax(0, 1fr); }
+
+    .sidebar.is-collapsed { display: none; }
 
     .app-footer {
       flex: 0 0 auto;
@@ -59,7 +63,9 @@
     .light-mode .app-footer a { color: var(--accent-strong); }
 
     .sidebar-toggle-btn {
-      display: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       pointer-events: auto;
       background: rgba(17,25,35,.72);
       border: 1px solid rgba(255,255,255,.12);
@@ -207,6 +213,8 @@
       border-radius: 20px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
     }
 
     .stage-header {
@@ -254,8 +262,9 @@
     }
 
     .reader {
-      position: absolute;
-      inset: 0;
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
       overflow-y: auto;
       scrollbar-width: thin;
       padding: var(--reader-top-padding, 38vh) 10vw var(--reader-bottom-padding, 56vh);
@@ -288,11 +297,11 @@
     .light-mode .script mark { background: rgba(255, 196, 46, .9); color: #241900; }
 
     .stage-controls {
-      position: absolute;
+      position: relative;
       z-index: 6;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
+      align-self: center;
+      flex: 0 0 auto;
+      margin-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
       display: flex;
       align-items: center;
       gap: 10px;
@@ -415,7 +424,6 @@
         gap: 12px;
       }
       .sidebar { max-height: 46vh; }
-      .sidebar.is-collapsed { display: none; }
       .btn { padding: 12px 14px; font-size: 1rem; min-height: 44px; }
       .toolbar, .profile-actions { gap: 10px; }
       .option-row { gap: 12px; }
@@ -426,7 +434,6 @@
       .stage-controls .btn { padding: 12px 16px; font-size: 1.05rem; }
       .profile-actions .btn { min-height: 44px; }
       .badge, .timer { font-size: .9rem; padding: 9px 13px; }
-      .sidebar-toggle-btn { display: inline-flex; }
       .app-footer { font-size: .8rem; padding: 6px 14px 10px; flex-wrap: wrap; }
     }
 
@@ -552,7 +559,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
   </main>
 
   <footer class="app-footer">
-    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.3</span></span>
+    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.4</span></span>
     <a href="mailto:cryptopower@outlook.de?subject=TalkScroll%20Feedback">✉ Feedback</a>
   </footer>
 
@@ -595,6 +602,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     const compactBlankToggle = document.getElementById('compactBlankToggle');
     const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
     const sidebarPanel = document.querySelector('.sidebar');
+    const appEl = document.querySelector('.app');
     const cameraPosition = document.getElementById('cameraPosition');
     const cameraPositionValue = document.getElementById('cameraPositionValue');
     const statusBadge = document.getElementById('statusBadge');
@@ -1444,6 +1452,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     [speed, fontSize, lineHeight, lightToggle, guideToggle, cameraPosition, compactBlankToggle].forEach(el => el.addEventListener('input', updateControls));
     sidebarToggleBtn.addEventListener('click', () => {
       const collapsed = sidebarPanel.classList.toggle('is-collapsed');
+      appEl.classList.toggle('sidebar-collapsed', collapsed);
       sidebarToggleBtn.setAttribute('aria-expanded', String(!collapsed));
     });
     cameraPosition.addEventListener('input', () => {
