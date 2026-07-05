@@ -108,7 +108,13 @@
 
     .card h2 { font-size: 1.4rem; color: #fff; margin: 0 0 10px; }
     .card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; flex-grow: 1; }
-    .meta { font-size: .75rem; font-weight: 600; color: var(--c-theme); background: var(--c-soft); padding: 5px 12px; border-radius: 999px; margin-bottom: 24px; display: inline-block; width: fit-content; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .meta, .language {
+      font-size: .75rem; font-weight: 600; padding: 5px 12px; border-radius: 999px;
+      display: inline-block; width: fit-content; margin: 0;
+    }
+    .meta { color: var(--c-theme); background: var(--c-soft); }
+    .language { color: var(--text); background: rgba(255, 255, 255, 0.07); border: 1px solid var(--border); }
 
     .btn-card { 
       width: 100%; text-align: center; text-decoration: none; font-weight: 600; padding: 14px; border-radius: 14px; 
@@ -147,11 +153,14 @@
 
       <article class="card active-project">
         <div class="icon-wrap">
-          <img src="./contact-hub-pro/android-chrome-192x192.png" alt="Icon" onerror="this.src='./placeholder-icon.png'">
+          <img src="./contact-hub-pro/android-chrome-192x192.png" alt="Contact Hub Pro Icon" onerror="this.src='./placeholder-icon.png'">
         </div>
         <h2>Contact Hub Pro</h2>
         <p>Personal contact manager with message composer, templates, and WhatsApp integration — built for quick, personalized outreach.</p>
-        <div class="meta">Contacts · Messaging</div>
+        <div class="meta-row">
+          <div class="meta">Contacts · Messaging</div>
+          <div class="language">EN</div>
+        </div>
         <div class="card-actions">
           <a class="btn-card" href="contact-hub-pro/index.html">Launch Hub</a>
         </div>
@@ -159,37 +168,61 @@
 
       <article class="card active-project">
         <div class="icon-wrap">
-          <img src="./patchbay/android-chrome-192x192.png" alt="Icon" onerror="this.src='./placeholder-icon.png'">
+          <img src="./patchbay/android-chrome-192x192.png" alt="Audio Patchbay Icon" onerror="this.src='./placeholder-icon.png'">
         </div>
         <h2>Audio Patchbay</h2>
-        <p>All-round local audio converter with built-in transcription features — modify, convert, and extract text from audio files instantly.</p>
-        <div class="meta">Audio · Conversion</div>
+        <p>Lokaler Audio-Konverter mit Transkript-Funktion — Audiodateien schnell umwandeln, bearbeiten und Text daraus extrahieren.</p>
+        <div class="meta-row">
+          <div class="meta">Audio · Konvertierung</div>
+          <div class="language">DE</div>
+        </div>
         <div class="card-actions">
-          <a class="btn-card" href="patchbay/index.html">Open Patchbay</a>
+          <a class="btn-card" href="patchbay/index.html">Patchbay öffnen</a>
         </div>
       </article>
 
       <article class="card active-project">
         <div class="icon-wrap">
-          <img src="./etiketten-tool/android-chrome-192x192.png" alt="Icon">
+          <img src="./talkscroll/android-chrome-192x192.png" alt="Talkscroll Icon" onerror="this.src='./placeholder-icon.png'">
+        </div>
+        <h2>Talkscroll</h2>
+        <p>Teleprompter für Vorträge und Präsentationen — mit anpassbarer Lesegeschwindigkeit, Timer und klarer, fokussierter Ansicht.</p>
+        <div class="meta-row">
+          <div class="meta">Teleprompter · Präsentation</div>
+          <div class="language">DE / EN</div>
+        </div>
+        <div class="card-actions">
+          <a class="btn-card" href="talkscroll/index.html">Talkscroll öffnen</a>
+        </div>
+      </article>
+
+      <article class="card active-project">
+        <div class="icon-wrap">
+          <img src="./etiketten-tool/android-chrome-192x192.png" alt="Etiketten-Tool Icon" onerror="this.src='./placeholder-icon.png'">
         </div>
         <h2>Etiketten-Tool</h2>
-        <p>Fast, print-ready label generator for everyday use — household, organization, whatever needs a label.</p>
-        <div class="meta">Utility · Print</div>
+        <p>Schneller, druckfertiger Etiketten-Generator für Haushalt, Organisation und alles, was eine klare Beschriftung braucht.</p>
+        <div class="meta-row">
+          <div class="meta">Alltag · Druck</div>
+          <div class="language">DE</div>
+        </div>
         <div class="card-actions">
-          <a class="btn-card" href="etiketten-tool/index.html">Open Tool</a>
+          <a class="btn-card" href="etiketten-tool/index.html">Tool öffnen</a>
         </div>
       </article>
 
       <article class="card active-project">
         <div class="icon-wrap">
-          <img src="./qr-tool/android-chrome-192x192.png" alt="Icon" onerror="this.src='./placeholder-icon.png'">
+          <img src="./qr-tool/android-chrome-192x192.png" alt="QR-Tool Icon" onerror="this.src='./placeholder-icon.png'">
         </div>
         <h2>QR-Tool</h2>
-        <p>Quick QR code generator for everyday use — create, customize, and export codes in seconds.</p>
-        <div class="meta">Utility · QR Code</div>
+        <p>QR-Codes für den Alltag erstellen, anpassen und exportieren — zum Beispiel für WLAN, vCards, IBAN und mehr.</p>
+        <div class="meta-row">
+          <div class="meta">Alltag · QR-Codes</div>
+          <div class="language">DE</div>
+        </div>
         <div class="card-actions">
-          <a class="btn-card" href="qr-tool/index.html">Open Tool</a>
+          <a class="btn-card" href="qr-tool/index.html">Tool öffnen</a>
         </div>
       </article>
 
