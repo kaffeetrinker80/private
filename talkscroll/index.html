@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- Icons + Manifest -->
+<!-- Icons + Manifest -->
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -56,6 +56,7 @@
       padding: 18px;
     }
     .app.sidebar-collapsed { grid-template-columns: minmax(0, 1fr); }
+    .app.sidebar-collapsed .stage { min-width: 0; }
 
     .sidebar.is-collapsed { display: none; }
 
@@ -82,8 +83,12 @@
       border: 1px solid rgba(255,255,255,.12);
       color: #e5edf7;
       border-radius: 999px;
-      padding: 8px 13px;
-      font-size: 1.1rem;
+      width: 38px;
+      min-width: 38px;
+      height: 38px;
+      padding: 0;
+      font-size: 1.08rem;
+      font-weight: 800;
       line-height: 1;
       backdrop-filter: blur(8px);
     }
@@ -278,7 +283,8 @@
       min-height: 0;
       overflow-y: auto;
       scrollbar-width: thin;
-      padding: var(--reader-top-padding, 38vh) 10vw var(--reader-bottom-padding, 56vh);
+      /* The extra space keeps the last lines readable above the fixed controls. */
+      padding: var(--reader-top-padding, 38vh) 10vw calc(var(--reader-bottom-padding, 56vh) + 86px);
       scroll-behavior: auto;
     }
     .reader::-webkit-scrollbar { width: 10px; }
@@ -308,11 +314,14 @@
     .light-mode .script mark { background: rgba(255, 196, 46, .9); color: #241900; }
 
     .stage-controls {
-      position: relative;
-      z-index: 6;
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
       align-self: center;
       flex: 0 0 auto;
-      margin-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      margin: 0;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -425,26 +434,19 @@
 
     .fullscreen-only { display: none; }
 
-    /* Tablet-friendly layout: sidebar and stage stack vertically, touch targets grow.
-       Intentionally not tuned further down for phone-sized screens. */
+    /* Tablet: same simple sidebar toggle as desktop. The stage stays usable and the
+       settings panel scrolls independently instead of inflating every control. */
     @media (max-width: 1024px) {
       .app {
         grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(0, 1fr);
+        grid-template-rows: minmax(0, 42vh) minmax(360px, 1fr);
         padding: 12px;
         gap: 12px;
+        overflow-y: auto;
       }
-      .sidebar { max-height: 46vh; }
-      .btn { padding: 12px 14px; font-size: 1rem; min-height: 44px; }
-      .toolbar, .profile-actions { gap: 10px; }
-      .option-row { gap: 12px; }
-      .toggle { font-size: .96rem; gap: 10px; }
-      .toggle input[type="checkbox"] { width: 20px; height: 20px; }
-      input[type="range"] { height: 30px; }
-      .stage-controls { padding: 10px; gap: 12px; }
-      .stage-controls .btn { padding: 12px 16px; font-size: 1.05rem; }
-      .profile-actions .btn { min-height: 44px; }
-      .badge, .timer { font-size: .9rem; padding: 9px 13px; }
+      .app.sidebar-collapsed { grid-template-rows: minmax(0, 1fr); }
+      .sidebar { max-height: none; }
+      .stage { min-height: 360px; }
       .app-footer { font-size: .8rem; padding: 6px 14px 10px; flex-wrap: wrap; }
     }
 
@@ -548,7 +550,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
     <section class="stage" id="stage">
       <div class="stage-header">
         <div class="stage-header-left">
-          <button class="btn sidebar-toggle-btn" id="sidebarToggleBtn" title="Einstellungen ein-/ausblenden" aria-expanded="true">☰</button>
+          <button class="btn sidebar-toggle-btn" id="sidebarToggleBtn" title="Einstellungen ausblenden" aria-label="Einstellungen ausblenden" aria-expanded="true">☰</button>
           <div class="badge" id="statusBadge">Bereit</div>
         </div>
         <div class="timer" id="timer" title="Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.">
@@ -570,7 +572,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
   </main>
 
   <footer class="app-footer">
-    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.4</span></span>
+    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.7</span></span>
     <a href="mailto:cryptopower@outlook.de?subject=TalkScroll%20Feedback">✉ Feedback</a>
   </footer>
 
@@ -673,8 +675,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         cameraMode: 'Kamera-Modus',
         compactBlank: 'Leerzeilen kompakt',
         compactBlankTitle: 'Macht den Abstand zwischen Absätzen (Leerzeilen) kleiner, ohne den Zeilenabstand im Text zu verändern.',
-        sidebarToggleTitle: 'Einstellungen ein-/ausblenden',
-        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Textmarker:</strong> Wort in <kbd>==doppelte==</kbd> Gleichheitszeichen setzen, um es beim Scrollen farbig hervorzuheben — wird auch aus Word-Markierungen (Textmarker-Farbe) beim Import automatisch übernommen.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Das ☰-Symbol oben links blendet die Seitenleiste ein/aus.',
+        sidebarHideTitle: 'Einstellungen ausblenden',
+        sidebarShowTitle: 'Einstellungen einblenden',
+        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Textmarker:</strong> Wort in <kbd>==doppelte==</kbd> Gleichheitszeichen setzen, um es beim Scrollen farbig hervorzuheben — wird auch aus Word-Markierungen (Textmarker-Farbe) beim Import automatisch übernommen.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Die Schaltfläche oben links blendet die Seitenleiste ein oder aus.',
         timerLabel: 'Talkzeit',
         timerTitle: 'Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.',
         restartTitle: 'Zurück zum Anfang',
@@ -747,8 +750,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         cameraMode: 'Camera mode',
         compactBlank: 'Compact blank lines',
         compactBlankTitle: 'Shrinks the gap between paragraphs (blank lines) without changing the line spacing within the text.',
-        sidebarToggleTitle: 'Toggle settings panel',
-        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Highlighting:</strong> wrap a word in <kbd>==double==</kbd> equals signs to highlight it while scrolling — this is also picked up automatically from Word text highlighting on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The ☰ icon top-left shows/hides the sidebar.',
+        sidebarHideTitle: 'Hide settings',
+        sidebarShowTitle: 'Show settings',
+        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Highlighting:</strong> wrap a word in <kbd>==double==</kbd> equals signs to highlight it while scrolling — this is also picked up automatically from Word text highlighting on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The button in the top-left shows or hides the sidebar.',
         timerLabel: 'Talk Time',
         timerTitle: 'Starts with the first press of Start and keeps running when you pause the text.',
         restartTitle: 'Back to start',
@@ -811,6 +815,16 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       playBtn.textContent = isPlaying ? tr('pause') : tr('start');
     }
 
+    function updateSidebarToggle() {
+      const sidebarIsHidden = sidebarPanel.classList.contains('is-collapsed');
+      const label = sidebarIsHidden ? tr('sidebarShowTitle') : tr('sidebarHideTitle');
+      sidebarToggleBtn.textContent = sidebarIsHidden ? '⚙' : '☰';
+      sidebarToggleBtn.title = label;
+      sidebarToggleBtn.setAttribute('aria-label', label);
+      sidebarToggleBtn.setAttribute('aria-expanded', String(!sidebarIsHidden));
+      sidebarToggleBtn.classList.toggle('is-collapsed', sidebarIsHidden);
+    }
+
     function applyLanguage(language, { persist = true } = {}) {
       currentLanguage = language === 'en' ? 'en' : 'de';
       if (persist) localStorage.setItem(languageStorageKey, currentLanguage);
@@ -849,7 +863,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       document.getElementById('cameraToggleLabel').textContent = tr('cameraMode');
       document.getElementById('compactBlankToggleLabel').textContent = tr('compactBlank');
       compactBlankToggle.title = tr('compactBlankTitle');
-      sidebarToggleBtn.title = tr('sidebarToggleTitle');
+      updateSidebarToggle();
       keyboardHint.innerHTML = tr('keyboardHint');
       timerLabel.textContent = tr('timerLabel');
       document.getElementById('timer').title = tr('timerTitle');
@@ -1464,7 +1478,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     sidebarToggleBtn.addEventListener('click', () => {
       const collapsed = sidebarPanel.classList.toggle('is-collapsed');
       appEl.classList.toggle('sidebar-collapsed', collapsed);
-      sidebarToggleBtn.setAttribute('aria-expanded', String(!collapsed));
+      updateSidebarToggle();
     });
     cameraPosition.addEventListener('input', () => {
       if (!cameraToggle.checked) lastStandardPosition = Number(cameraPosition.value);
