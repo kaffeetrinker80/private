@@ -431,23 +431,16 @@
     }
 
     @media (max-width: 920px) {
-      body { overflow: auto; }
-      .app { min-height: 100vh; height: auto; grid-template-columns: 1fr; padding: 12px; }
-      .sidebar { min-height: auto; }
-      .stage { height: 72vh; min-height: 520px; }
-      .script { font-size: 38px; }
+      .reader { padding-left: 8vw; padding-right: 8vw; }
+      .toolbar.wide { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 560px) {
-      .app { gap: 12px; }
-      .sidebar { padding: 14px; }
-      .stage { min-height: 440px; height: 67vh; }
-      .script { font-size: 30px; }
-      .reader { padding-left: 8vw; padding-right: 8vw; }
-      .toolbar.wide { grid-template-columns: 1fr 1fr; }
+      .app { gap: 10px; padding: 10px; }
+      .sidebar { padding: 14px; max-height: 42vh; }
       .brand-row { gap: 8px; }
       .language-switch button { min-width: 34px; padding-inline: 7px; }
-      .stage-controls { max-width: calc(100% - 20px); }
+      .stage-controls { max-width: calc(100% - 20px); flex-wrap: wrap; justify-content: center; }
     }
   </style>
 </head>
@@ -559,7 +552,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
   </main>
 
   <footer class="app-footer">
-    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.2</span></span>
+    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.3</span></span>
     <a href="mailto:cryptopower@outlook.de?subject=TalkScroll%20Feedback">✉ Feedback</a>
   </footer>
 
@@ -693,6 +686,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         deleteProfileConfirm: 'Leseprofil „{name}“ wirklich löschen?',
         clearConfirm: 'Skript wirklich leeren?',
         readDocxError: 'Keine gültige DOCX-Hauptdatei gefunden.',
+        demoText: 'Willkommen bei TalkScroll.\n\nDieser Teleprompter läuft komplett lokal in deinem Browser. Du kannst den Text direkt bearbeiten, die Geschwindigkeit einstellen und mit Leertaste starten oder pausieren.\n\nKleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch während des Vortrags an.',
         readPdfError: 'Die PDF-Datei konnte nicht gelesen werden. Ist sie eventuell nur gescannt (Bild ohne Text)?',
         pdfLibMissing: 'Die PDF-Bibliothek konnte nicht geladen werden (Internetverbindung nötig).',
         importUnsupported: 'Dieses Dateiformat wird in dieser Version noch nicht unterstützt. Bitte nutze TXT, MD, DOCX oder PDF.',
@@ -766,6 +760,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         deleteProfileConfirm: 'Delete reading profile “{name}”?',
         clearConfirm: 'Clear this script?',
         readDocxError: 'No valid DOCX main document was found.',
+        demoText: 'Welcome to TalkScroll.\n\nThis teleprompter runs entirely locally in your browser. You can edit the text directly, adjust the speed, and start or pause with the spacebar.\n\nSmall tip: use the up and down arrow keys to adjust the speed even while you\u2019re presenting.',
         readPdfError: 'The PDF file could not be read. It might be a scanned image without real text.',
         pdfLibMissing: 'The PDF library could not be loaded (an internet connection is required).',
         importUnsupported: 'This file format is not supported in this version yet. Please use TXT, MD, DOCX or PDF.',
@@ -844,6 +839,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       renderPlayButton();
       setStatus(statusKey, statusParams);
       updateProfileUi(profileSelect.value || preferredProfileId);
+      if (isDemoText) editor.value = tr('demoText');
       updateText();
     }
 
@@ -892,6 +888,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     let lastCursorPosition = 0;
     let profiles = [];
     let preferredProfileId = '';
+    // True until the user edits, imports, or clears the editor — lets applyLanguage()
+    // swap the built-in welcome text to the right language, without ever touching
+    // a real script the user has typed or imported.
+    let isDemoText = true;
     // Flat, ascending list of { node, start, end } describing which DOM text node
     // renders which character range of editor.value. Blank-line separators and
     // ==highlight== marker characters have no run of their own (they are "gaps"),
@@ -1329,6 +1329,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           camera: cameraToggle.checked,
           cameraPosition: cameraPosition.value,
           compactBlank: compactBlankToggle.checked,
+          isDemoText,
           activeProfileId: profileSelect.value || preferredProfileId || ''
         }));
       }, 250);
@@ -1346,6 +1347,15 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         guideToggle.checked = saved.guide !== false;
         cameraToggle.checked = !!saved.camera;
         compactBlankToggle.checked = !!saved.compactBlank;
+        if (typeof saved.isDemoText === 'boolean') {
+          isDemoText = saved.isDemoText;
+        } else if (typeof saved.text === 'string') {
+          // Older saved data has no isDemoText flag yet — infer it so a real script
+          // saved before this fix is never mistaken for the built-in welcome text.
+          const knownDemoTexts = [i18n.de.demoText, i18n.en.demoText];
+          isDemoText = knownDemoTexts.includes(saved.text.trim());
+        }
+        if (typeof saved.isDemoText === 'boolean') isDemoText = saved.isDemoText;
         cameraPosition.value = saved.cameraPosition ?? cameraPosition.value;
         lastStandardPosition = Number(cameraPosition.value);
         preferredProfileId = saved.activeProfileId ?? '';
@@ -1426,6 +1436,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     langEnBtn.addEventListener('click', () => applyLanguage('en'));
 
     editor.addEventListener('input', () => {
+      isDemoText = false;
       rememberCursorPosition();
       updateText();
     });
@@ -1494,6 +1505,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       setStatus('importing');
       try {
         editor.value = await importFile(file);
+        isDemoText = false;
         updateText();
         restart();
         setStatus('ready');
@@ -1509,7 +1521,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     cursorJumpBtn.addEventListener('pointerdown', rememberCursorPosition);
     cursorJumpBtn.addEventListener('click', () => jumpToCursor());
     document.getElementById('clearBtn').addEventListener('click', () => {
-      if (confirm(tr('clearConfirm'))) { editor.value = ''; updateText(); restart(); }
+      if (confirm(tr('clearConfirm'))) { editor.value = ''; isDemoText = false; updateText(); restart(); }
     });
 
     document.addEventListener('keydown', event => {
