@@ -58,7 +58,19 @@
     .app-footer a:hover { text-decoration: underline; }
     .light-mode .app-footer a { color: var(--accent-strong); }
 
-    .sidebar-toggle-btn { display: none; }
+    .sidebar-toggle-btn {
+      display: none;
+      pointer-events: auto;
+      background: rgba(17,25,35,.72);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #e5edf7;
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 1.1rem;
+      line-height: 1;
+      backdrop-filter: blur(8px);
+    }
+    .sidebar-toggle-btn:hover { background: rgba(17,25,35,.72); border-color: rgba(255,255,255,.12); transform: none; }
 
     .panel {
       background: rgba(24, 33, 45, .94);
@@ -219,6 +231,7 @@
       backdrop-filter: blur(8px);
       pointer-events: auto;
     }
+    .stage-header-left { display: flex; align-items: center; gap: 10px; }
     .timer { font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 7px; }
     .timer-label { color: inherit; opacity: .78; font-size: .75rem; font-weight: 750; letter-spacing: .03em; text-transform: uppercase; }
     .timer-value { font-weight: 800; }
@@ -523,7 +536,10 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
 
     <section class="stage" id="stage">
       <div class="stage-header">
-        <div class="badge" id="statusBadge">Bereit</div>
+        <div class="stage-header-left">
+          <button class="btn sidebar-toggle-btn" id="sidebarToggleBtn" title="Einstellungen ein-/ausblenden" aria-expanded="true">☰</button>
+          <div class="badge" id="statusBadge">Bereit</div>
+        </div>
         <div class="timer" id="timer" title="Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.">
           <span class="timer-label" id="timerLabel">Talkzeit</span><span class="timer-value" id="timerValue">00:00</span>
         </div>
@@ -534,7 +550,6 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
         <div class="script" id="script"></div>
       </div>
       <div class="stage-controls">
-        <button class="btn sidebar-toggle-btn" id="sidebarToggleBtn" title="Einstellungen ein-/ausblenden">⚙</button>
         <button class="btn" id="restartBtn" title="Zurück zum Anfang">↺</button>
         <button class="btn primary" id="playBtn">▶ Start</button>
         <span class="speed-chip" id="speedChip">28 px/s</span>
@@ -544,7 +559,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
   </main>
 
   <footer class="app-footer">
-    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.1</span></span>
+    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.2</span></span>
     <a href="mailto:cryptopower@outlook.de?subject=TalkScroll%20Feedback">✉ Feedback</a>
   </footer>
 
@@ -647,7 +662,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlank: 'Leerzeilen kompakt',
         compactBlankTitle: 'Macht den Abstand zwischen Absätzen (Leerzeilen) kleiner, ohne den Zeilenabstand im Text zu verändern.',
         sidebarToggleTitle: 'Einstellungen ein-/ausblenden',
-        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Textmarker:</strong> Wort in <kbd>==doppelte==</kbd> Gleichheitszeichen setzen, um es beim Scrollen farbig hervorzuheben — wird auch aus Word-Markierungen (Textmarker-Farbe) beim Import automatisch übernommen.',
+        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Textmarker:</strong> Wort in <kbd>==doppelte==</kbd> Gleichheitszeichen setzen, um es beim Scrollen farbig hervorzuheben — wird auch aus Word-Markierungen (Textmarker-Farbe) beim Import automatisch übernommen.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Das ☰-Symbol oben links blendet die Seitenleiste ein/aus.',
         timerLabel: 'Talkzeit',
         timerTitle: 'Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.',
         restartTitle: 'Zurück zum Anfang',
@@ -720,7 +735,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlank: 'Compact blank lines',
         compactBlankTitle: 'Shrinks the gap between paragraphs (blank lines) without changing the line spacing within the text.',
         sidebarToggleTitle: 'Toggle settings panel',
-        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Highlighting:</strong> wrap a word in <kbd>==double==</kbd> equals signs to highlight it while scrolling — this is also picked up automatically from Word text highlighting on import.',
+        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Highlighting:</strong> wrap a word in <kbd>==double==</kbd> equals signs to highlight it while scrolling — this is also picked up automatically from Word text highlighting on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The ☰ icon top-left shows/hides the sidebar.',
         timerLabel: 'Talk Time',
         timerTitle: 'Starts with the first press of Start and keeps running when you pause the text.',
         restartTitle: 'Back to start',
@@ -1417,7 +1432,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     ['click', 'keyup', 'select', 'focus'].forEach(eventName => editor.addEventListener(eventName, rememberCursorPosition));
     [speed, fontSize, lineHeight, lightToggle, guideToggle, cameraPosition, compactBlankToggle].forEach(el => el.addEventListener('input', updateControls));
     sidebarToggleBtn.addEventListener('click', () => {
-      sidebarPanel.classList.toggle('is-collapsed');
+      const collapsed = sidebarPanel.classList.toggle('is-collapsed');
+      sidebarToggleBtn.setAttribute('aria-expanded', String(!collapsed));
     });
     cameraPosition.addEventListener('input', () => {
       if (!cameraToggle.checked) lastStandardPosition = Number(cameraPosition.value);
@@ -1434,6 +1450,32 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     });
     playBtn.addEventListener('click', togglePlay);
     restartBtn.addEventListener('click', restart);
+
+    // Touch/pen equivalent of the spacebar shortcut: tapping the reading area toggles
+    // Start/Pause. Only for touch/pen pointers, so mouse users on desktop keep their
+    // usual click-to-focus behaviour unchanged. A genuine tap (little movement, quick)
+    // is distinguished from a drag/scroll gesture so manual scrolling still works.
+    let readerTapStart = null;
+    const READER_TAP_MAX_MOVE = 12;
+    const READER_TAP_MAX_MS = 500;
+
+    reader.addEventListener('pointerdown', event => {
+      if (event.pointerType === 'mouse') return;
+      readerTapStart = { x: event.clientX, y: event.clientY, t: Date.now() };
+    });
+
+    reader.addEventListener('pointerup', event => {
+      if (event.pointerType === 'mouse' || !readerTapStart) return;
+      const dx = Math.abs(event.clientX - readerTapStart.x);
+      const dy = Math.abs(event.clientY - readerTapStart.y);
+      const dt = Date.now() - readerTapStart.t;
+      readerTapStart = null;
+      if (dx < READER_TAP_MAX_MOVE && dy < READER_TAP_MAX_MOVE && dt < READER_TAP_MAX_MS) {
+        togglePlay();
+      }
+    });
+
+    reader.addEventListener('pointercancel', () => { readerTapStart = null; });
     topRestartBtn.addEventListener('click', restart);
     profileSelect.addEventListener('change', () => updateProfileUi(profileSelect.value));
     applyProfileBtn.addEventListener('click', () => applyProfile(getSelectedProfile()));
