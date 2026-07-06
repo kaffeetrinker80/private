@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.5.3</title>
+<title>ContactHub Pro V1.5.4</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -421,7 +421,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.5.3</span></h1>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.5.4</span></h1>
         <p class="sub">Contacts · Congregations · Teams · Quick contact actions</p>
       </div>
     </div>
@@ -431,6 +431,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
       <button class="ghost" id="btnImportJson">Import JSON</button>
       <button class="green" id="btnImportCsv">Import Outlook CSV</button>
       <button class="themeToggle" id="btnTheme">🌙 Dark</button>
+      <button class="ghost" id="btnLanguage" title="Change language">🇩🇪 DE</button>
       <button class="primary" id="btnExportJson">Export backup</button>
       <button class="ghost" id="btnExportCsv">📤 Export</button>
     </div>
@@ -567,7 +568,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.5.3', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.5.4', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en',activeView:'contacts',selectedCongId:null};
 const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','organization','email','emails','mobile','mobiles','senderName'];
 const QUICK_MESSAGE_KEY='contacthub_pro_quickMessage_v152';
@@ -582,6 +583,586 @@ const CONTEXTS=[
   {id:'work', label:'Work / Other', icon:'💼', desc:'Appointments, external contacts, secular matters', defaultChannel:'email'},
 ];
 const I18N={en:{merge:'Merge'}};
+
+/* ── V1.5.4: Complete DE / EN interface toggle ───────────────────── */
+const UI_DE = {
+  "Contacts · Congregations · Teams · Quick contact actions": "Kontakte · Versammlungen · Teams · Schnelle Kontaktaktionen",
+  "Saved locally": "Lokal gespeichert",
+  "Start empty": "Leer starten",
+  "Import JSON": "JSON importieren",
+  "Import Outlook CSV": "Outlook-CSV importieren",
+  "Dark": "Dunkel",
+  "🌙 Dark": "🌙 Dunkel",
+  "☀️ Light": "☀️ Hell",
+  "Light": "Hell",
+  "Export backup": "Sicherung exportieren",
+  "Export": "Exportieren",
+  "Workflow:": "Ablauf:",
+  "find a contact, select it, adjust the mini message if needed, then open WhatsApp or email.": "Kontakt suchen, auswählen, die kurze Nachricht bei Bedarf anpassen und dann WhatsApp oder E-Mail öffnen.",
+  "History": "Verlauf",
+  "Clear local data": "Lokale Daten löschen",
+  "Contacts": "Kontakte",
+  "Congregations": "Versammlungen",
+  "Master data": "Stammdaten",
+  "Merge": "Zusammenführen",
+  "Captain Export": "Export für Teamleiter",
+  "Search name, congregation, role, tag, email, mobile...": "Name, Versammlung, Aufgabe, Tag, E-Mail, Mobilnummer suchen ...",
+  "All congregation roles": "Alle Versammlungsaufgaben",
+  "All tags": "Alle Tags",
+  "All Assembly / Convention teams": "Alle Kreiskongress-/Kongress-Teams",
+  "⭐ All contacts": "⭐ Alle Kontakte",
+  "⭐ Favorites only": "⭐ Nur Favoriten",
+  "☆ Non-favorites only": "☆ Ohne Favoriten",
+  "All congregations": "Alle Versammlungen",
+  "Bulk actions...": "Mehrfachaktionen ...",
+  "Bulk edit selected...": "Ausgewählte gesammelt bearbeiten ...",
+  "Add / replace congregation role": "Versammlungsaufgabe hinzufügen / ersetzen",
+  "🏷 Assign Assembly / Convention team": "🏷 Kreiskongress-/Kongress-Team zuweisen",
+  "Add tag": "Tag hinzufügen",
+  "Delete selected": "Ausgewählte löschen",
+  "Select visible": "Sichtbare auswählen",
+  "Clear selection": "Auswahl aufheben",
+  "Copy list": "Liste kopieren",
+  "Export selected CSV": "Ausgewählte CSV exportieren",
+  "Bulk edit selected": "Ausgewählte bearbeiten",
+  "Message templates": "Nachrichtenvorlagen",
+  "Template": "Vorlage",
+  "Ready message": "Fertige Nachricht",
+  "Select contact": "Kontakt auswählen",
+  "Print": "Drucken",
+  "Selected contact": "Ausgewählter Kontakt",
+  "Select a contact on the left.": "Wähle links einen Kontakt aus.",
+  "Mini message": "Kurze Nachricht",
+  "Reset text": "Text zurücksetzen",
+  "Who am I? / Signature name": "Wer bin ich? / Name in der Signatur",
+  "e.g. Marco": "z. B. Marco",
+  "Used for {{senderName}} in the message footer.": "Wird für {{senderName}} am Ende der Nachricht verwendet.",
+  "Simple like Team Captain Manager: write one reusable text, add your sender name once, and use contact placeholders.": "Einfach wie im Team Captain Manager: einen wiederverwendbaren Text schreiben, den eigenen Namen einmal eintragen und Kontaktplatzhalter verwenden.",
+  "Email subject": "E-Mail-Betreff",
+  "Copy": "Kopieren",
+  "Ctrl": "Strg",
+  "send": "senden",
+  "characters": "Zeichen",
+  "WhatsApp": "WhatsApp",
+  "Email": "E-Mail",
+  "Insert contact": "Kontakt einfügen",
+  "Save to history": "Im Verlauf speichern",
+  "Modal": "Dialog",
+  "Close": "Schließen",
+  "Made with love © – ContactHub Pro V1.5.4 · Contact hub + message composer": "Mit Liebe gemacht © – ContactHub Pro V1.5.4 · Kontakte & Nachrichten erstellen",
+  "No contacts found.": "Keine Kontakte gefunden.",
+  "Create contact": "Kontakt erstellen",
+  "Edit": "Bearbeiten",
+  "Delete": "Löschen",
+  "Save as vCard": "Als vCard speichern",
+  "Remove favorite": "Favorit entfernen",
+  "Set favorite": "Als Favorit markieren",
+  "Favorite set.": "Favorit gesetzt.",
+  "Favorite removed.": "Favorit entfernt.",
+  "No templates found.": "Keine Vorlagen gefunden.",
+  "Create template": "Vorlage erstellen",
+  "Select or create a message.": "Nachricht auswählen oder erstellen.",
+  "All": "Alle",
+  "Show all templates": "Alle Vorlagen anzeigen",
+  "Assembly / Convention": "Kreiskongress / Kongress",
+  "Volunteer assignments, team messages, captain greetings, reminders": "Zuteilungen, Teamnachrichten, Grüße für Teamleiter, Erinnerungen",
+  "Congregation": "Versammlung",
+  "Info requests, announcements, invitations to a congregation": "Anfragen, Bekanntmachungen und Einladungen an eine Versammlung",
+  "PTC / Talk": "PTC / Vortrag",
+  "Talk confirmations, reminders, topic changes, follow-ups": "Vortragsbestätigungen, Erinnerungen, Themenänderungen, Nachfassen",
+  "Personal": "Persönlich",
+  "Quick notes, thank-you messages, general contact": "Kurze Nachrichten, Dankeschöns, allgemeiner Kontakt",
+  "Work / Other": "Arbeit / Sonstiges",
+  "Appointments, external contacts, secular matters": "Termine, externe Kontakte, berufliche Angelegenheiten",
+  "No template available": "Keine Vorlage vorhanden",
+  "Message": "Nachricht",
+  "Template name": "Name der Vorlage",
+  "e.g. Talk reminder, Team greeting...": "z. B. Vortragserinnerung, Teamgruß ...",
+  "Context": "Bereich",
+  "Sub-category": "Unterkategorie",
+  "(optional label)": "(optionale Bezeichnung)",
+  "e.g. Reminder, Confirmation, Team...": "z. B. Erinnerung, Bestätigung, Team ...",
+  "Channel": "Kanal",
+  "Any": "Beliebig",
+  "(email only)": "(nur E-Mail)",
+  "Placeholders like {{firstName}} work here.": "Platzhalter wie {{firstName}} funktionieren hier.",
+  "Write the message. Click a placeholder below to insert contact data.": "Nachricht schreiben. Unten auf einen Platzhalter klicken, um Kontaktdaten einzufügen.",
+  "Footer / signature": "Fußzeile / Signatur",
+  "Your name, phone, address...": "Dein Name, Telefon, Adresse ...",
+  "First name": "Vorname",
+  "Last name": "Nachname",
+  "Role(s)": "Aufgabe(n)",
+  "Team (1st)": "Team (erstes)",
+  "All teams": "Alle Teams",
+  "Event name": "Name der Veranstaltung",
+  "Date": "Datum",
+  "Company": "Firma",
+  "first email": "erste E-Mail-Adresse",
+  "all emails": "alle E-Mail-Adressen",
+  "first mobile": "erste Mobilnummer",
+  "all mobiles": "alle Mobilnummern",
+  "your name": "dein Name",
+  "Mini message is empty.": "Kurze Nachricht ist leer.",
+  "Congregation · Email only": "Versammlung · nur E-Mail",
+  "No WhatsApp (congregation)": "Kein WhatsApp (Versammlung)",
+  "Copy JW email": "JW-E-Mail kopieren",
+  "No JW email — edit congregation": "Keine JW-E-Mail – Versammlung bearbeiten",
+  "Clear congregation recipient": "Empfänger-Versammlung entfernen",
+  "Select a contact on the left, or use ✉ Message on a congregation.": "Wähle links einen Kontakt aus oder nutze ✉ Nachricht bei einer Versammlung.",
+  "Use this WhatsApp number": "Diese WhatsApp-Nummer verwenden",
+  "Use this email address": "Diese E-Mail-Adresse verwenden",
+  "Use": "Verwenden",
+  "No mobile number": "Keine Mobilnummer",
+  "No email address": "Keine E-Mail-Adresse",
+  "No saved messages yet.": "Noch keine gespeicherten Nachrichten.",
+  "Clear history": "Verlauf löschen",
+  "History cleared.": "Verlauf gelöscht.",
+  "Select a contact first.": "Bitte zuerst einen Kontakt auswählen.",
+  "Recipient": "Empfänger",
+  "Saved to history.": "Im Verlauf gespeichert.",
+  "Copy contact list": "Kontaktliste kopieren",
+  "Copy selected contacts": "Ausgewählte Kontakte kopieren",
+  "Select contacts or use the current filter to create a list.": "Kontakte auswählen oder den aktuellen Filter für eine Liste verwenden.",
+  "No contacts to copy.": "Keine Kontakte zum Kopieren.",
+  "No contacts to export.": "Keine Kontakte zum Exportieren.",
+  "CSV could not be read.": "CSV konnte nicht gelesen werden.",
+  "Outlook CSV Import": "Outlook-CSV-Import",
+  "File:": "Datei:",
+  "For existing contacts you can merge or skip on import.": "Bestehende Kontakte können beim Import zusammengeführt oder übersprungen werden.",
+  "Rows": "Zeilen",
+  "existing": "vorhanden",
+  "Mobile": "Mobil",
+  "Review": "Prüfen",
+  "If contact already exists": "Wenn Kontakt bereits vorhanden ist",
+  "Merge / add missing data": "Zusammenführen / fehlende Daten ergänzen",
+  "Skip": "Überspringen",
+  "Import": "Importieren",
+  "All contacts": "Alle Kontakte",
+  "Only without warnings": "Nur ohne Warnungen",
+  "Outlook Company": "Outlook-Firma",
+  "Use as congregation, clear Company": "Als Versammlung verwenden, Firma leeren",
+  "Use as congregation, keep Company": "Als Versammlung verwenden, Firma behalten",
+  "Keep as Company only": "Nur als Firma behalten",
+  "Outlook Categories": "Outlook-Kategorien",
+  "Use as roles + import tags": "Als Aufgaben + Import-Tags verwenden",
+  "Use as import tags only": "Nur als Import-Tags verwenden",
+  "Ignore categories": "Kategorien ignorieren",
+  "Status": "Status",
+  "Name": "Name",
+  "E-Mails": "E-Mails",
+  "Notes": "Notizen",
+  "Nothing importable.": "Nichts importierbar.",
+  "Cancel": "Abbrechen",
+  "Smart Export": "Intelligenter Export",
+  "Choose what to export. You can export congregations as a list, contacts filtered by tag or congregation, or a full JSON backup.": "Wähle aus, was exportiert werden soll: Versammlungen als Liste, Kontakte nach Tag oder Versammlung oder eine vollständige JSON-Sicherung.",
+  "Export type": "Exportart",
+  "All contacts (CSV)": "Alle Kontakte (CSV)",
+  "Contacts by tag (CSV)": "Kontakte nach Tag (CSV)",
+  "Contacts by congregation (CSV)": "Kontakte nach Versammlung (CSV)",
+  "Congregation list only (CSV)": "Nur Versammlungsliste (CSV)",
+  "Congregation + all their publishers (CSV)": "Versammlung + alle zugehörigen Verkündiger (CSV)",
+  "Selected contacts (CSV)": "Ausgewählte Kontakte (CSV)",
+  "Full backup (JSON)": "Vollständige Sicherung (JSON)",
+  "Filter": "Filter",
+  "Download": "Herunterladen",
+  "Tag": "Tag",
+  "No congregations to export.": "Keine Versammlungen zum Exportieren.",
+  "No contacts available.": "Keine Kontakte vorhanden.",
+  "No contacts selected.": "Keine Kontakte ausgewählt.",
+  "Selection cleared.": "Auswahl aufgehoben.",
+  "Contact deleted.": "Kontakt gelöscht.",
+  "Contacts merged.": "Kontakte zusammengeführt.",
+  "Merge contacts": "Kontakte zusammenführen",
+  "Missing data, emails, mobile numbers, and tags will be added.": "Fehlende Daten, E-Mail-Adressen, Mobilnummern und Tags werden ergänzt.",
+  "No contacts match the selected filter.": "Keine Kontakte passen zum gewählten Filter.",
+  "Backup exported.": "Sicherung exportiert.",
+  "Current data": "Aktuelle Daten",
+  "Imported data": "Importierte Daten",
+  "Replace": "Ersetzen",
+  "Add / merge": "Hinzufügen / zusammenführen",
+  "Start empty? Current local data will be replaced.": "Leer starten? Die aktuellen lokalen Daten werden ersetzt.",
+  "Started empty.": "Leer gestartet.",
+  "Clear local data in this browser?": "Lokale Daten in diesem Browser löschen?",
+  "Local data cleared": "Lokale Daten gelöscht",
+  "No mobile number selected.": "Keine Mobilnummer ausgewählt.",
+  "No email address selected.": "Keine E-Mail-Adresse ausgewählt.",
+  "Mini message reset.": "Kurze Nachricht zurückgesetzt.",
+  "Copied.": "Kopiert.",
+  "Copy failed.": "Kopieren fehlgeschlagen.",
+  "Invalid number.": "Ungültige Nummer.",
+  "vCard saved.": "vCard gespeichert.",
+  "Add tag:": "Tag hinzufügen:",
+  "Tag added.": "Tag hinzugefügt.",
+  "Assign congregation roles": "Versammlungsaufgaben zuweisen",
+  "Choose one or more congregation roles for the selected contacts.": "Wähle eine oder mehrere Versammlungsaufgaben für die ausgewählten Kontakte.",
+  "Additional congregation roles": "Weitere Versammlungsaufgaben",
+  "comma-separated": "durch Komma getrennt",
+  "Mode": "Modus",
+  "Add to existing roles": "Zu bestehenden Aufgaben hinzufügen",
+  "Replace existing roles": "Bestehende Aufgaben ersetzen",
+  "Clear roles": "Aufgaben leeren",
+  "Apply": "Anwenden",
+  "Bulk edit selected contacts": "Ausgewählte Kontakte gesammelt bearbeiten",
+  "No change": "Keine Änderung",
+  "Set to selected": "Auf Auswahl setzen",
+  "Clear congregation": "Versammlung leeren",
+  "Clear all roles": "Alle Aufgaben leeren",
+  "Add selected": "Ausgewählte hinzufügen",
+  "Replace with selected": "Durch Auswahl ersetzen",
+  "All Assembly / Convention team assignments cleared.": "Alle Kreiskongress-/Kongress-Teamzuweisungen wurden entfernt.",
+  "Remove Assembly / Convention team assignments from ALL contacts? This cannot be undone.": "Kreiskongress-/Kongress-Teamzuweisungen von ALLEN Kontakten entfernen? Dies kann nicht rückgängig gemacht werden.",
+  "Congregation details": "Angaben zur Versammlung",
+  "Congregation name": "Name der Versammlung",
+  "City / Location": "Ort / Standort",
+  "JW congregation email (jwpub.org)": "JW-Versammlungs-E-Mail (jwpub.org)",
+  "Format: CONG + 8-digit number + @jwpub.org. Only visible here, not on individual publisher contacts.": "Format: CONG + 8-stellige Nummer + @jwpub.org. Nur hier sichtbar, nicht bei einzelnen Verkündigerkontakten.",
+  "Zoom meeting": "Zoom-Zusammenkunft",
+  "Meeting ID": "Meeting-ID",
+  "Passcode": "Kenncode",
+  "Join link": "Beitrittslink",
+  "New congregation": "Neue Versammlung",
+  "Edit congregation": "Versammlung bearbeiten",
+  "Save": "Speichern",
+  "Congregation saved.": "Versammlung gespeichert.",
+  "Congregation deleted.": "Versammlung gelöscht.",
+  "Please enter a congregation name.": "Bitte einen Namen der Versammlung eingeben.",
+  "No JW email for this congregation yet. Please edit it first.": "Für diese Versammlung ist noch keine JW-E-Mail hinterlegt. Bitte zuerst bearbeiten.",
+  "Choose a contact. The congregation name will be added there as a note, tag, role, or company. The congregation entry will then be removed.": "Wähle einen Kontakt. Der Name der Versammlung wird dort als Notiz, Tag, Aufgabe oder Firma ergänzt. Anschließend wird der Versammlungseintrag entfernt.",
+  "Search contact": "Kontakt suchen",
+  "Type name...": "Name eingeben ...",
+  "Save as": "Speichern als",
+  "Note": "Notiz",
+  "Congregation role": "Versammlungsaufgabe",
+  "Company / Organisation": "Firma / Organisation",
+  "Apply & remove congregation entry": "Anwenden & Versammlungseintrag entfernen",
+  "No contact selected.": "Kein Kontakt ausgewählt.",
+  "No contacts with congregation": "Keine Kontakte mit der Versammlung",
+  "Edit congregations": "Versammlungen bearbeiten",
+  "No congregations yet.": "Noch keine Versammlungen.",
+  "Search congregations...": "Versammlungen suchen ...",
+  "New": "Neu",
+  "Select a congregation to view or edit its details.": "Eine Versammlung auswählen, um ihre Angaben anzuzeigen oder zu bearbeiten.",
+  "Edit selected": "Ausgewählte bearbeiten",
+  "Export all": "Alle exportieren",
+  "Clean up": "Bereinigen",
+  "Saved locally ·": "Lokal gespeichert ·",
+  "Saving...": "Wird gespeichert ...",
+  "Could not read autosave data.": "Automatische Speicherung konnte nicht gelesen werden.",
+  "Local data cleared.": "Lokale Daten gelöscht.",
+  "No name": "Kein Name",
+  "primary": "primär",
+  "other": "weitere",
+  "New contact": "Neuer Kontakt",
+  "Edit contact": "Kontakt bearbeiten",
+  "Contact details": "Kontaktdaten",
+  "Display name": "Anzeigename",
+  "Organisation / company": "Organisation / Firma",
+  "Active": "Aktiv",
+  "Inactive": "Inaktiv",
+  "Language": "Sprache",
+  "Contact roles": "Kontaktaufgaben",
+  "Assembly / Convention teams": "Kreiskongress-/Kongress-Teams",
+  "Tags": "Tags",
+  "Email addresses": "E-Mail-Adressen",
+  "Mobile numbers": "Mobilnummern",
+  "Add email": "E-Mail hinzufügen",
+  "Add mobile": "Mobilnummer hinzufügen",
+  "Save contact": "Kontakt speichern",
+  "Template created.": "Vorlage erstellt.",
+  "Template duplicated.": "Vorlage dupliziert.",
+  "Template deleted.": "Vorlage gelöscht.",
+  "Select a template first.": "Bitte zuerst eine Vorlage auswählen.",
+  "New template": "Neue Vorlage",
+  "Edit template": "Vorlage bearbeiten",
+  "Duplicate": "Duplizieren",
+  "General": "Allgemein",
+  "Reminder": "Erinnerung",
+  "Confirmation": "Bestätigung",
+  "Assignment": "Zuteilung",
+  "Team": "Team",
+  "Enquiry": "Anfrage",
+  "Announcement": "Bekanntmachung",
+  "Appointment": "Termin",
+  "No contact found.": "Kein Kontakt gefunden.",
+  "Save to local data": "In lokalen Daten speichern",
+  "Insert selected contact": "Ausgewählten Kontakt einfügen",
+  "Contact list": "Kontaktliste",
+  "Select all": "Alle auswählen",
+  "Deselect all": "Auswahl aufheben",
+  "Clear": "Leeren",
+  "Import completed.": "Import abgeschlossen."
+};
+Object.assign(UI_DE, {
+  "Contact information": "Kontaktdaten",
+  "Emails, one per line": "E-Mail-Adressen, eine pro Zeile",
+  "Mobile numbers, one per line": "Mobilnummern, eine pro Zeile",
+  "0179... becomes +49 179...": "0179 ... wird zu +49 179 ...",
+  "Company (per-person only)": "Firma (nur für einzelne Personen)",
+  "Optional: employer or secular organization. Congregation → use the Congregation field above. If Outlook imported the congregation as Company, use the button below.": "Optional: Arbeitgeber oder weltliche Organisation. Für eine Versammlung das Feld „Versammlung“ oben verwenden. Falls Outlook die Versammlung als Firma importiert hat, unten die passende Schaltfläche nutzen.",
+  "Move Company field value into Congregation": "Wert aus Firma in Versammlung verschieben",
+  "Move Congregation value into Company field": "Wert aus Versammlung in Firma verschieben",
+  "Company → Cong": "Firma → Vers.",
+  "Cong → Company": "Vers. → Firma",
+  "comma-separated, e.g. PTC, Elder, MS, Publisher": "durch Komma getrennt, z. B. PTC, Ältester, DA, Verkündiger",
+  "Assembly / Convention assignments": "Kreiskongress-/Kongress-Zuteilungen",
+  "Teams, captains, departments": "Teams, Teamleiter, Abteilungen",
+  "Multiple assignments can be selected. Create or edit available options under Master data.": "Mehrere Zuteilungen können ausgewählt werden. Verfügbare Optionen unter „Stammdaten“ anlegen oder ändern.",
+  "Tags & notes": "Tags & Notizen",
+  "No tags yet — type one below to create.": "Noch keine Tags – unten einen neuen eingeben.",
+  "New tags": "Neue Tags",
+  "(comma-separated)": "(durch Komma getrennt)",
+  "e.g. JW, Attendant, Volunteer": "z. B. JW, Ordner, Helfer",
+  "Company field is empty.": "Das Feld „Firma“ ist leer.",
+  "No congregation selected.": "Keine Versammlung ausgewählt.",
+  "Contact saved.": "Kontakt gespeichert.",
+  "Central master data. Role and team changes apply to all contacts immediately. Add congregations here — then add email / city in the 🏛 tab.": "Zentrale Stammdaten. Änderungen an Aufgaben und Teams wirken sofort für alle Kontakte. Versammlungen hier anlegen und danach im 🏛-Tab E-Mail / Ort ergänzen.",
+  "Assembly / Convention team assignments (one per line)": "Kreiskongress-/Kongress-Teamzuweisungen (eine pro Zeile)",
+  "Congregations (one per line)": "Versammlungen (eine pro Zeile)",
+  "New names → auto-created in 🏛 tab.": "Neue Namen → werden im 🏛-Tab automatisch angelegt.",
+  "Removing a name deletes the congregation and clears it from all publishers.": "Das Entfernen eines Namens löscht die Versammlung und entfernt sie bei allen Verkündigern.",
+  "Tags (one per line)": "Tags (einer pro Zeile)",
+  "Tags are informational — removing here does not delete them from contacts.": "Tags dienen nur zur Information – das Entfernen hier löscht sie nicht bei Kontakten.",
+  "Reset:": "Zurücksetzen:",
+  "🔄 Clear all Assembly / Convention team assignments": "🔄 Alle Kreiskongress-/Kongress-Teamzuweisungen entfernen",
+  "Master data saved.": "Stammdaten gespeichert.",
+  "Company / Congregation tools": "Werkzeuge für Firma / Versammlung",
+  "Applies to selected contacts. Useful after Outlook import, where congregation is often stored in Company.": "Gilt für die ausgewählten Kontakte. Nützlich nach einem Outlook-Import, wenn die Versammlung oft als Firma gespeichert wurde.",
+  "Applies to visible contacts. Useful after Outlook import, where congregation is often stored in Company.": "Gilt für die sichtbaren Kontakte. Nützlich nach einem Outlook-Import, wenn die Versammlung oft als Firma gespeichert wurde.",
+  "Direction": "Richtung",
+  "Company → Congregation, then clear Company": "Firma → Versammlung, danach Firma leeren",
+  "Company → Congregation, keep Company": "Firma → Versammlung, Firma behalten",
+  "Congregation → Company, then clear Congregation": "Versammlung → Firma, danach Versammlung leeren",
+  "Congregation → Company, keep Congregation": "Versammlung → Firma, Versammlung behalten",
+  "Only update empty target?": "Nur leeres Zielfeld aktualisieren?",
+  "Yes, safer": "Ja, sicherer",
+  "No, overwrite target": "Nein, Zielfeld überschreiben",
+  "Insert contact into message": "Kontakt in Nachricht einfügen",
+  "Search a contact, choose what should be inserted, and add it directly to the main message. Useful when writing to person A and attaching contact XY.": "Kontakt suchen, auswählen, welche Angaben eingefügt werden sollen, und direkt in die Nachricht übernehmen. Praktisch, wenn du Person A schreibst und Kontakt XY anfügst.",
+  "Search name, congregation, role, email, mobile...": "Name, Versammlung, Aufgabe, E-Mail, Mobilnummer suchen ...",
+  "Contact to insert": "Einzufügender Kontakt",
+  "Insert format": "Einfügeformat",
+  "Name only": "Nur Name",
+  "Contact only — email/mobile": "Nur Kontaktdaten – E-Mail/Mobil",
+  "Name + congregation only": "Name + nur Versammlung",
+  "Name + role + congregation + contact": "Name + Aufgabe + Versammlung + Kontakt",
+  "Full contact incl. notes": "Vollständiger Kontakt inkl. Notizen",
+  "Preview": "Vorschau",
+  "Insert into main message": "In Nachricht einfügen",
+  "Copy only": "Nur kopieren",
+  "No message field found.": "Kein Nachrichtenfeld gefunden.",
+  "Contact inserted into mini message.": "Kontakt in die kurze Nachricht eingefügt.",
+  "No email/mobile stored.": "Keine E-Mail/Mobilnummer gespeichert.",
+  "Choose which contacts to share with a team captain. The JSON export can be imported directly into this tool — the captain can then message the contacts straight away.": "Wähle die Kontakte aus, die mit einem Teamleiter geteilt werden sollen. Der JSON-Export kann direkt in dieses Tool importiert werden – der Teamleiter kann die Kontakte anschließend sofort anschreiben.",
+  "Filter by Assembly / Convention team": "Nach Kreiskongress-/Kongress-Team filtern",
+  "Filter by Tag": "Nach Tag filtern",
+  "Active & inactive": "Aktiv & inaktiv",
+  "✅ Active only": "✅ Nur aktiv",
+  "⬜ Inactive only": "⬜ Nur inaktiv",
+  "Include templates": "Vorlagen einschließen",
+  "Yes — include all templates": "Ja – alle Vorlagen einschließen",
+  "No — contacts only": "Nein – nur Kontakte",
+  "→ Select filters above": "→ Oben Filter auswählen",
+  "⬇ Export CSV": "⬇ CSV exportieren",
+  "⬇ Export JSON for Captain": "⬇ JSON für Teamleiter exportieren",
+  "✅ Exported": "✅ Exportiert",
+  "as JSON.": "als JSON.",
+  "as CSV.": "als CSV.",
+  "Templates": "Vorlagen",
+  "Sent": "Gesendet",
+  "Full restore": "Vollständig wiederherstellen",
+  "JSON merged.": "JSON zusammengeführt.",
+  "Replace everything?": "Alles ersetzen?",
+  "Restore done.": "Wiederherstellung abgeschlossen.",
+  "JSON could not be read.": "JSON konnte nicht gelesen werden.",
+  "Copies selected contacts. If nothing is selected, it uses the currently visible filtered contacts.": "Kopiert ausgewählte Kontakte. Wenn nichts ausgewählt ist, werden die aktuell sichtbaren gefilterten Kontakte verwendet.",
+  "Line format": "Zeilenformat",
+  "Last name First name, Congregation": "Nachname Vorname, Versammlung",
+  "Congregation, Last name First name": "Versammlung, Nachname Vorname",
+  "First Last, Congregation, Role": "Vorname Nachname, Versammlung, Aufgabe",
+  "Role · Last name First name, Congregation": "Aufgabe · Nachname Vorname, Versammlung",
+  "Contact card format": "Kontaktkartenformat",
+  "Sort order": "Sortierung",
+  "Last name": "Nachname",
+  "Congregation, then last name": "Versammlung, dann Nachname",
+  "Role, then last name": "Aufgabe, dann Nachname",
+  "Apply to selected": "Auf Auswahl anwenden",
+  "Additional teams": "Weitere Teams",
+  "Add to existing team assignments": "Zu bestehenden Teamzuweisungen hinzufügen",
+  "Replace existing team assignments": "Bestehende Teamzuweisungen ersetzen",
+  "Clear team assignments": "Teamzuweisungen leeren",
+  "Choose one or more teams for the selected contacts.": "Wähle ein oder mehrere Teams für die ausgewählten Kontakte.",
+  "Assign Assembly / Convention teams": "Kreiskongress-/Kongress-Teams zuweisen",
+  "Bulk edit applied to": "Sammelbearbeitung angewendet auf",
+  "Updated": "Aktualisiert",
+  "set active.": "auf aktiv gesetzt.",
+  "set inactive.": "auf inaktiv gesetzt.",
+  "No congregations yet.": "Noch keine Versammlungen.",
+  "No congregations to clean up.": "Keine Versammlungen zum Bereinigen.",
+  "Clean up congregation entries": "Versammlungseinträge bereinigen",
+  "The following entries look like they may be roles, people, or temporary notes rather than actual congregations.": "Die folgenden Einträge wirken eher wie Aufgaben, Personen oder vorläufige Notizen als wie echte Versammlungen.",
+  "suspicious": "auffällig",
+  "no JW email": "keine JW-E-Mail",
+  "Move to a contact": "Zu einem Kontakt verschieben",
+  "Move selected congregation to Company": "Ausgewählte Versammlung in Firma verschieben",
+  "This cannot be undone.": "Dies kann nicht rückgängig gemacht werden.",
+  "Role": "Aufgabe",
+  "Roles": "Aufgaben",
+  "Teams": "Teams",
+  "JW Email": "JW-E-Mail",
+  "JW E-mail": "JW-E-Mail",
+  "City": "Ort",
+  "Zoom ID": "Zoom-ID",
+  "Zoom Link": "Zoom-Link",
+  "Zoom Passcode": "Zoom-Kenncode",
+  "Contact": "Kontakt",
+  "No saved messages yet.": "Noch keine gespeicherten Nachrichten.",
+  "No template available": "Keine Vorlage vorhanden",
+  "Full backup": "Vollständige Sicherung",
+  "Current local data will be replaced.": "Die aktuellen lokalen Daten werden ersetzt.",
+  "New template": "Neue Vorlage",
+  "copy": "Kopie",
+  "warm": "freundlich",
+  "friendly": "locker",
+  "formal": "formell",
+  "casual": "locker",
+  "professional": "professionell"
+});
+Object.assign(UI_DE, {
+  "+ Contact": "+ Kontakt",
+  "🏛 Congregations": "🏛 Versammlungen",
+  "⚙️ Master data": "⚙️ Stammdaten",
+  "📤 Captain Export": "📤 Export für Teamleiter",
+  "↕ Last name": "↕ Nachname",
+  "↕ First name": "↕ Vorname",
+  "Select a contact and write a mini message.": "Kontakt auswählen und eine kurze Nachricht schreiben.",
+  "Click → insert into text field": "Klicken → in Textfeld einfügen",
+  "+ Template": "+ Vorlage",
+  "Message composer": "Nachrichten-Editor",
+  "📤 Export": "📤 Exportieren",
+  "⚡ Ready message": "⚡ Fertige Nachricht",
+  "New contacts": "Neue Kontakte",
+  "— none —": "— keine —",
+  "Congregation roles": "Versammlungsaufgaben",
+  "Role(s)": "Aufgabe(n)",
+  "All Assembly / Convention teams": "Alle Kreiskongress-/Kongress-Teams",
+  "All congregation roles": "Alle Versammlungsaufgaben",
+  "No contact found.": "Kein Kontakt gefunden.",
+  "Sent": "Gesendet",
+  "ContactHub Pro": "ContactHub Pro"
+});
+const I18N_TEXT_ORIGINAL = new WeakMap();
+const I18N_ATTR_ORIGINAL = new WeakMap();
+
+function localizeDynamicString(value){
+  const original=String(value??'');
+  if(state.uiLang!=='de') return original;
+  const match=original.match(/^(\s*)([\s\S]*?)(\s*)$/);
+  const lead=match?match[1]:'', core=match?match[2]:original, tail=match?match[3]:'';
+  let out=UI_DE[core]||core;
+
+  const rules=[
+    [/^(\d+) contacts?$/,(_,n)=>`${n} Kontakt${Number(n)===1?'':'e'}`],
+    [/^(\d+) templates$/,(_,n)=>`${n} Vorlage${Number(n)===1?'':'n'}`],
+    [/^(\d+) selected\. Use role search\/filter, then select contacts for copy\/export\.$/,(_,n)=>`${n} ausgewählt. Über Suche oder Filter eingrenzen und dann Kontakte zum Kopieren/Exportieren auswählen.`],
+    [/^(\d+) visible contact\(s\) selected\.$/,(_,n)=>`${n} sichtbare Kontakt${Number(n)===1?'':'e'} ausgewählt.`],
+    [/^(\d+) contact\(s\) deleted\.$/,(_,n)=>`${n} Kontakt${Number(n)===1?'':'e'} gelöscht.`],
+    [/^(\d+) contact\(s\) will be exported\.$/,(_,n)=>`${n} Kontakt${Number(n)===1?'':'e'} werden exportiert.`],
+    [/^Exported (\d+) contacts?\.$/,(_,n)=>`${n} Kontakt${Number(n)===1?'':'e'} exportiert.`],
+    [/^Exported (\d+) selected contacts?\.$/,(_,n)=>`${n} ausgewählte Kontakt${Number(n)===1?'':'e'} exportiert.`],
+    [/^Exported (\d+) congregations?\.$/,(_,n)=>`${n} Versammlung${Number(n)===1?'':'en'} exportiert.`],
+    [/^Exported congregation \+ (\d+) publishers?\.$/,(_,n)=>`Versammlung + ${n} Verkündiger exportiert.`],
+    [/^Congregation roles updated for (\d+) contact\(s\)\.$/,(_,n)=>`Versammlungsaufgaben für ${n} Kontakt${Number(n)===1?'':'e'} aktualisiert.`],
+    [/^CSV import: (\d+) added, (\d+) merged, (\d+) skipped\.$/,(_,a,b,c)=>`CSV-Import: ${a} hinzugefügt, ${b} zusammengeführt, ${c} übersprungen.`],
+    [/^(\d+) characters$/,(_,n)=>`${n} Zeichen`],
+    [/^All (\d+) contacts$/,(_,n)=>`Alle ${n} Kontakte`],
+    [/^(\d+) contacts with tag "(.+)"$/,(_,n,tag)=>`${n} Kontakte mit Tag „${tag}“`],
+    [/^(\d+) contacts in congregation "(.+)"$/,(_,n,name)=>`${n} Kontakte in der Versammlung „${name}“`],
+    [/^(\d+) congregation entries \(name, city, JW email, notes\)$/,(_,n)=>`${n} Versammlungseinträge (Name, Ort, JW-E-Mail, Notizen)`],
+    [/^1 congregation \+ (\d+) publisher contacts? from "(.+)"$/,(_,n,name)=>`1 Versammlung + ${n} Verkündigerkontakt${Number(n)===1?'':'e'} aus „${name}“`],
+    [/^(\d+) selected contacts?$/,(_,n)=>`${n} ausgewählte Kontakt${Number(n)===1?'':'e'}`],
+    [/^Full backup \((\d+) contacts, (\d+) congregations, (\d+) templates\)$/,(_,a,b,c)=>`Vollständige Sicherung (${a} Kontakte, ${b} Versammlungen, ${c} Vorlagen)`],
+    [/^Congregation renamed · (\d+) publishers? updated\.$/,(_,n)=>`Versammlung umbenannt · ${n} Verkündiger aktualisiert.`],
+    [/^"(.+)" saved\.$/,(_,name)=>`„${name}“ gespeichert.`],
+    [/^"(.+)" deleted\.$/,(_,name)=>`„${name}“ gelöscht.`],
+    [/^No contacts with congregation "(.+)" found\.$/,(_,name)=>`Keine Kontakte mit der Versammlung „${name}“ gefunden.`],
+    [/^📨 (.+) selected as recipient — choose a template to compose\.$/,(_,name)=>`📨 ${name} als Empfänger ausgewählt – zum Erstellen eine Vorlage wählen.`],
+    [/^✓ "(.+)" saved as (.+) on (.+)\.$/,(_,value,label,name)=>`✓ „${value}“ als ${localizeDynamicString(label)} bei ${name} gespeichert.`],
+    [/^✓ "(.+)" moved to Company on (\d+) contact\(s\)\.$/,(_,name,n)=>`✓ „${name}“ bei ${n} Kontakt${Number(n)===1?'':'e'} in das Feld Firma verschoben.`],
+    [/^No contacts with tag "(.+)"\.$/,(_,tag)=>`Keine Kontakte mit Tag „${tag}“.`],
+    [/^No contacts in congregation "(.+)"\.$/,(_,name)=>`Keine Kontakte in der Versammlung „${name}“.`],
+    [/^Delete contact: (.+)\?$/,(_,name)=>`Kontakt löschen: ${name}?`],
+    [/^Delete congregation: "?(.+?)"?\?$/,(_,name)=>`Versammlung löschen: „${name}“?`],
+    [/^Delete template: (.+)\?$/,(_,name)=>`Vorlage löschen: ${name}?`],
+    [/^Move "(.+)" to contact$/,(_,name)=>`„${name}“ zu Kontakt verschieben`],
+    [/^(\d+) selected contact\(s\)\.$/,(_,n)=>`${n} Kontakt${Number(n)===1?'':'e'} ausgewählt.`],
+    [/^Delete (\d+) selected contact\(s\)\?$/,(_,n)=>`${n} ausgewählte Kontakt${Number(n)===1?'':'e'} löschen?`],
+    [/^… and (\d+) more$/,(_,n)=>`… und ${n} weitere`],
+    [/^WhatsApp: (.+)$/,(_,n)=>`WhatsApp: ${n}`],
+  ];
+  for(const [pattern,replacer] of rules){
+    if(pattern.test(out)){out=out.replace(pattern,replacer);break;}
+  }
+  return lead+out+tail;
+}
+function tr(value){return localizeDynamicString(value);}
+
+function translateAttr(el,attr){
+  const attrs=I18N_ATTR_ORIGINAL.get(el)||{};
+  if(!(attr in attrs)){attrs[attr]=el.getAttribute(attr);I18N_ATTR_ORIGINAL.set(el,attrs);}
+  const original=attrs[attr];
+  if(original!==null){const translated=tr(original);if(el.getAttribute(attr)!==translated)el.setAttribute(attr,translated);}
+}
+function translateDom(root=document.body){
+  if(!root)return;
+  const blocked='script,style,textarea,.previewBox,.subjectBox,.sharePreview,#btnLanguage,#btnTheme,#saveStatus';
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+    acceptNode(node){
+      const parent=node.parentElement;
+      if(!parent||parent.closest(blocked))return NodeFilter.FILTER_REJECT;
+      return node.nodeValue.trim()?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes=[];
+  while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(node=>{
+    if(!I18N_TEXT_ORIGINAL.has(node))I18N_TEXT_ORIGINAL.set(node,node.nodeValue);
+    const translated=tr(I18N_TEXT_ORIGINAL.get(node));if(node.nodeValue!==translated)node.nodeValue=translated;
+  });
+  const elements=[...(root.matches?.('[placeholder],[title],[aria-label]')?[root]:[]),...root.querySelectorAll?.('[placeholder],[title],[aria-label]')||[]];
+  elements.forEach(el=>{
+    ['placeholder','title','aria-label'].forEach(attr=>{if(el.hasAttribute(attr))translateAttr(el,attr);});
+  });
+}
+let languageObserver=null, languageObserverQueued=false;
+function startLanguageObserver(){
+  if(languageObserver)return;
+  languageObserver=new MutationObserver(()=>{
+    if(languageObserverQueued||state.uiLang!=='de')return;
+    languageObserverQueued=true;
+    queueMicrotask(()=>{languageObserverQueued=false;translateDom(document.body);});
+  });
+  languageObserver.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['placeholder','title','aria-label']});
+}
+function updateThemeButton(){
+  const btn=$('#btnTheme');
+  if(!btn)return;
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  btn.textContent=tr(isDark?'☀️ Light':'🌙 Dark');
+}
+function updateLanguageButton(){
+  const btn=$('#btnLanguage');
+  if(!btn)return;
+  const german=state.uiLang==='de';
+  btn.textContent=german?'🇩🇪 DE':'🇬🇧 EN';
+  btn.title=german?'Sprache: Deutsch – zu English wechseln':'Language: English – switch to Deutsch';
+  btn.setAttribute('aria-label',btn.title);
+}
+function defaultQuickMessage(){
+  return state.uiLang==='de'
+    ? 'Hallo {{firstName}},\n\n\n\nDein Bruder,\n{{senderName}}'
+    : DEFAULT_QUICK_MESSAGE;
+}
+
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 const uid=p=>`${p}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
@@ -883,15 +1464,26 @@ function ensureUniqueContactIds(contacts){
 }
 
 function init(){const saved=localStorage.getItem(STORAGE_KEY);try{state.data=saved?migrate(JSON.parse(saved)):emptyData();ensureUniqueContactIds(state.data.contacts)}catch{state.data=emptyData();toast('Could not read autosave data.')}
-state.uiLang='en';state.data.settings.uiLanguage='en';selectFirst();bind();applyLang();renderAll();saveStatus('Saved locally','ok')}
+const savedLanguage=state.data.settings?.i18nReady===true?state.data.settings.uiLanguage:'de';
+state.uiLang=['de','en'].includes(savedLanguage)?savedLanguage:'de';
+state.data.settings.uiLanguage=state.uiLang;state.data.settings.i18nReady=true;
+selectFirst();bind();startLanguageObserver();applyLang();saveStatus('Saved locally','ok')}
 function selectFirst(){state.selectedTemplateId=state.data.templates[0]?.id||null}// no auto-contact selection on startup
 function saveSoon(){saveStatus('Saving...','warn');clearTimeout(state.autosaveTimer);state.autosaveTimer=setTimeout(saveNow,350)}
-function saveNow(){ensureUniqueContactIds(state.data.contacts);state.data.updatedAt=new Date().toISOString();state.data.settings.uiLanguage='en';localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));saveStatus(`Saved locally · ${nowNice()}`,'ok')}
-function saveStatus(t,mode){$('#saveStatus').innerHTML=`<span class="dot" style="background:${mode==='warn'?'#f59e0b':mode==='danger'?'#ef4444':'#15803d'}"></span> ${esc(t)}`}
-function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=msg;$('#toastWrap').appendChild(d);setTimeout(()=>d.remove(),3200)}
-function applyLang(){state.uiLang='en';document.querySelectorAll('[data-i18n]').forEach(el=>{el.removeAttribute('data-i18n')});renderTemplates();renderPlaceholders();renderCounts();renderPreview()}
+function saveNow(){ensureUniqueContactIds(state.data.contacts);state.data.updatedAt=new Date().toISOString();state.data.settings.uiLanguage=state.uiLang;state.data.settings.i18nReady=true;localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));saveStatus(`Saved locally · ${nowNice()}`,'ok')}
+function saveStatus(t,mode){$('#saveStatus').innerHTML=`<span class="dot" style="background:${mode==='warn'?'#f59e0b':mode==='danger'?'#ef4444':'#15803d'}"></span> ${esc(tr(t))}`}
+function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=tr(msg);$('#toastWrap').appendChild(d);setTimeout(()=>d.remove(),3200)}
+function applyLang(){
+  state.uiLang=state.uiLang==='en'?'en':'de';
+  state.data.settings.uiLanguage=state.uiLang;state.data.settings.i18nReady=true;
+  document.documentElement.lang=state.uiLang;
+  updateLanguageButton();
+  updateThemeButton();
+  renderAll();
+  translateDom(document.body);
+}
 
-function renderAll(){renderCounts();renderFilters();renderAreaTabs();renderContacts();renderTemplates();renderTemplateEditor();renderQuickTemplateSelect();renderQuickMessageTools();renderPreview();renderPlaceholders()}
+function renderAll(){renderCounts();renderFilters();renderAreaTabs();renderContacts();renderTemplates();renderTemplateEditor();renderQuickTemplateSelect();renderQuickMessageTools();renderPreview();renderPlaceholders();translateDom(document.querySelector('.app'))}
 function renderCounts(){const nc=state.data.contacts.length;$('#contactCount').textContent=`${nc} contact${nc!==1?'s':''}`;$('#templateCount').textContent=`${state.data.templates.length} templates`}
 function renderFilters(){
   const oldTag=$('#contactTagFilter')?.value||'',oldRole=$('#contactRoleFilter')?.value||'',oldTeam=$('#contactTeamFilter')?.value||'',oldCong=$('#contactCongFilter')?.value||'';
@@ -958,7 +1550,7 @@ function selectedContactIds(){
 function selectedContacts(){const ids=selectedContactIds();return state.data.contacts.filter(c=>ids.includes(c.id));}
 function updateSelectionHint(){const ids=selectedContactIds();const el=$('#selectionHint');if(el)el.textContent=`${ids.length} selected. Use role search/filter, then select contacts for copy/export.`;}
 function quickDeleteContact(id){const c=state.data.contacts.find(x=>x.id===id);if(!c)return;if(confirm(`Delete contact: ${contactName(c)}?`)){state.data.contacts=state.data.contacts.filter(x=>x.id!==id);state.selectedContactIds.delete(id);if(state.selectedContactId===id)state.selectedContactId=state.data.contacts[0]?.id||null;saveSoon();renderAll();toast('Contact deleted.')}}
-function mergeSelectedContacts(){const ids=selectedContactIds();if(ids.length<2)return toast('Please select at least 2 contacts.');const contacts=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean);const primary=contacts.find(c=>c.id===state.selectedContactId)||contacts[0];showModal('Merge contacts',`<p class="hint">Diese Contacts werden in <strong>${esc(contactName(primary))}</strong> Missing data, emails, mobile numbers, and tags will be added.</p><ul>${contacts.map(c=>`<li>${esc(contactName(c))}</li>`).join('')}</ul>`,`<button class="ghost" id="mergeCancel">Cancel</button><button class="primary" id="mergeNow">Merge</button>`);$('#mergeCancel').onclick=closeModal;$('#mergeNow').onclick=()=>{contacts.filter(c=>c.id!==primary.id).forEach(c=>mergeInto(primary,c));state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id)||c.id===primary.id);state.selectedContactIds.clear();state.selectedContactId=primary.id;closeModal();saveSoon();renderAll();toast('Contacts merged.')}} 
+function mergeSelectedContacts(){const ids=selectedContactIds();if(ids.length<2)return toast('Please select at least 2 contacts.');const contacts=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean);const primary=contacts.find(c=>c.id===state.selectedContactId)||contacts[0];showModal('Merge contacts',`<p class="hint">These contacts will be merged into <strong>${esc(contactName(primary))}</strong>. Missing data, emails, mobile numbers, and tags will be added.</p><ul>${contacts.map(c=>`<li>${esc(contactName(c))}</li>`).join('')}</ul>`,`<button class="ghost" id="mergeCancel">Cancel</button><button class="primary" id="mergeNow">Merge</button>`);$('#mergeCancel').onclick=closeModal;$('#mergeNow').onclick=()=>{contacts.filter(c=>c.id!==primary.id).forEach(c=>mergeInto(primary,c));state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id)||c.id===primary.id);state.selectedContactIds.clear();state.selectedContactId=primary.id;closeModal();saveSoon();renderAll();toast('Contacts merged.')}} 
 function mergeInto(target,src){target.emails=uniqueBy([...(target.emails||[]),...(src.emails||[])],e=>e.value);target.mobiles=uniqueBy([...(target.mobiles||[]),...(src.mobiles||[])],m=>digitsOnly(m.value));['firstName','lastName','displayName','congregation','role','organization','language'].forEach(k=>{if(!target[k]&&src[k])target[k]=src[k]});target.languages=[...new Set([...(target.languages||[target.language]).filter(Boolean),...(src.languages||[src.language]).filter(Boolean)])];target.tags=[...new Set([...(target.tags||[]),...(src.tags||[])])];target.teams=[...new Set([...contactTeams(target),...contactTeams(src)])];target.team=target.teams.join(', ');if(src.notes)target.notes=[target.notes,src.notes].filter(Boolean).join('\n---\n')}
 
 function renderAreaTabs(){renderContextCards()}// compat alias
@@ -1079,13 +1671,13 @@ $('#tmpl_channel').onchange=()=>{t.channel=$('#tmpl_channel').value;saveSoon();r
 
 function getQuickSenderName(){const el=document.getElementById('quickSenderName');return (el?el.value:localStorage.getItem(QUICK_SENDER_KEY)||'').trim()}
 function setQuickSenderName(val){const el=document.getElementById('quickSenderName');if(el)el.value=val||'';localStorage.setItem(QUICK_SENDER_KEY,val||'')}
-function getQuickMessageRaw(){const el=document.getElementById('quickMessageText');return el?el.value:(localStorage.getItem(QUICK_MESSAGE_KEY)||DEFAULT_QUICK_MESSAGE)}
+function getQuickMessageRaw(){const el=document.getElementById('quickMessageText');return el?el.value:(localStorage.getItem(QUICK_MESSAGE_KEY)||defaultQuickMessage())}
 function setQuickMessageRaw(val){const el=document.getElementById('quickMessageText');if(el)el.value=val;localStorage.setItem(QUICK_MESSAGE_KEY,val)}
 function renderQuickMessageTools(){
   const sender=document.getElementById('quickSenderName');
   if(sender&&!sender.dataset.ready){sender.value=localStorage.getItem(QUICK_SENDER_KEY)||'';sender.dataset.ready='1';}
   const el=document.getElementById('quickMessageText');
-  if(el&&!el.dataset.ready){el.value=localStorage.getItem(QUICK_MESSAGE_KEY)||DEFAULT_QUICK_MESSAGE;el.dataset.ready='1';}
+  if(el&&!el.dataset.ready){el.value=localStorage.getItem(QUICK_MESSAGE_KEY)||defaultQuickMessage();el.dataset.ready='1';}
   const bar=document.getElementById('quickPlaceholderBar');
   if(bar){const items=['firstName','lastName','displayName','congregation','role','team','teams','email','mobile','senderName'];bar.innerHTML=items.map(k=>`<button type="button" data-quick-ph="${k}">{{${k}}}</button>`).join('');$$('[data-quick-ph]').forEach(btn=>btn.onclick=()=>insertQuickPlaceholder(btn.dataset.quickPh));}
 }
@@ -1152,7 +1744,7 @@ function getSelectedTarget(channel){
 function recipientName(c,t){return c.firstName||firstWord(contactName(c))||contactName(c)||''}
 function renderData(c,t=null){const em=(c.emails||[]).map(e=>e.value),mo=(c.mobiles||[]).map(m=>m.value);const rn=recipientName(c,t);const ct=contactTeams(c);return{firstName:c.firstName||firstWord(contactName(c)),lastName:c.lastName||'',displayName:contactName(c),recipientName:rn,greeting:rn,congregation:c.congregation||'',role:c.role||'',team:ct[0]||'',teams:ct.join(', '),organization:c.organization||'',email:em[0]||'',emails:em.join(', '),mobile:mo[0]||'',mobiles:mo.join(', '),phone:mo[0]||'',senderName:getQuickSenderName(),...state.draftDetails}}
 function renderText(text,data){return cleanNewlines(text).replace(/\{\{\s*([\w]+)\s*\}\}/g,(_,k)=>data[k]??'')}
-function renderPlaceholders(){const labels={firstName:'First name',lastName:'Last name',congregation:'Congregation',role:'Role(s)',team:'Team (1st)',teams:'All teams',eventName:'Event name',date:'Date',organization:'Company',email:'first email',emails:'all emails',mobile:'first mobile',mobiles:'all mobiles',senderName:'your name'};const el=$('#placeholderGrid');if(!el)return;el.innerHTML=PLACEHOLDERS.map(p=>`<div class="placeholder" data-ph="{{${p}}}"><code>{{${p}}}</code><span>${esc(labels[p]||p)}</span></div>`).join('');$$('[data-ph]').forEach(x=>x.onclick=()=>{const ph=x.dataset.ph;const ta=window._lastTemplateFocus;if(ta&&document.body.contains(ta)){const s=ta.selectionStart,e=ta.selectionEnd;ta.value=ta.value.slice(0,s)+ph+ta.value.slice(e);ta.selectionStart=ta.selectionEnd=s+ph.length;ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));}else{copyText(ph);toast('\ud83d\udccb '+ph+' kopiert (kein Textfeld aktiv)');}})}
+function renderPlaceholders(){const labels={firstName:'First name',lastName:'Last name',congregation:'Congregation',role:'Role(s)',team:'Team (1st)',teams:'All teams',eventName:'Event name',date:'Date',organization:'Company',email:'first email',emails:'all emails',mobile:'first mobile',mobiles:'all mobiles',senderName:'your name'};const el=$('#placeholderGrid');if(!el)return;el.innerHTML=PLACEHOLDERS.map(p=>`<div class="placeholder" data-ph="{{${p}}}"><code>{{${p}}}</code><span>${esc(labels[p]||p)}</span></div>`).join('');$$('[data-ph]').forEach(x=>x.onclick=()=>{const ph=x.dataset.ph;const ta=window._lastTemplateFocus;if(ta&&document.body.contains(ta)){const s=ta.selectionStart,e=ta.selectionEnd;ta.value=ta.value.slice(0,s)+ph+ta.value.slice(e);ta.selectionStart=ta.selectionEnd=s+ph.length;ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));}else{copyText(ph);toast('📋 '+ph+' copied (no text field active)');}})}
 function uniqueValuesFrom(field){return [...new Set(state.data.contacts.map(c=>c[field]).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
 function masterList(key,defaults=[]){
   const raw=state.data.settings&&state.data.settings[key];
@@ -1261,18 +1853,18 @@ function contactCardText(c,format='full'){
   const name=contactName(c);
   const roles=(c.roles&&c.roles.length?c.roles:splitTags(c.role)).join(', ');
   const contactLines=[];
-  if((c.mobiles||[]).length)contactLines.push(`Mobile: ${(c.mobiles||[]).map(m=>m.value).join(', ')}`);
-  if((c.emails||[]).length)contactLines.push(`Email: ${(c.emails||[]).map(e=>e.value).join(', ')}`);
+  if((c.mobiles||[]).length)contactLines.push(`${tr('Mobile')}: ${(c.mobiles||[]).map(m=>m.value).join(', ')}`);
+  if((c.emails||[]).length)contactLines.push(`${tr('Email')}: ${(c.emails||[]).map(e=>e.value).join(', ')}`);
   if(format==='name')return name;
-  if(format==='contact')return contactLines.length?contactLines.join('\n'):'No email/mobile stored.';
+  if(format==='contact')return contactLines.length?contactLines.join('\n'):tr('No email/mobile stored.');
   const lines=[];
   lines.push(name);
   if(format!=='contactOnly'){
-    if(roles&&format!=='short')lines.push(`Role(s): ${roles}`);
-    if(c.congregation)lines.push(`Congregation: ${c.congregation}`);
+    if(roles&&format!=='short')lines.push(`${tr('Role(s)')}: ${roles}`);
+    if(c.congregation)lines.push(`${tr('Congregation')}: ${c.congregation}`);
   }
   if(format!=='short')lines.push(...contactLines);
-  if(format==='full'&&c.notes)lines.push(`Notes: ${c.notes}`);
+  if(format==='full'&&c.notes)lines.push(`${tr('Notes')}: ${c.notes}`);
   return lines.filter(Boolean).join('\n');
 }
 function openInsertContactModal(){
@@ -1399,14 +1991,14 @@ function openTemplateEditor(){
   const activeCtx=CONTEXTS.find(c=>c.id===state.activeArea)||CONTEXTS.find(c=>c.id==='personal');
   const t=normalizeTemplateShape({
     id:uid('t'),
-    title:'New template',
+    title:state.uiLang==='de'?'Neue Vorlage':'New template',
     context:activeCtx.id,
     category:'',
-    language:'en',
+    language:state.uiLang,
     tone:'',
     channel:activeCtx.defaultChannel,
     subject:'',
-    body:'Hi {{firstName}},\n\n',
+    body:state.uiLang==='de'?'Hallo {{firstName}},\n\n':'Hi {{firstName}},\n\n',
     footer:''
   });
   state.data.templates.push(t);
@@ -1450,11 +2042,11 @@ function deleteTemplate(){
 
 function showSentItems(){const items=[...(state.data.sentItems||[])].reverse();showModal('History',items.length?`<div class="tableWrap"><table><thead><tr><th>Date</th><th>Contact</th><th>Channel</th><th>Message</th><th></th></tr></thead><tbody>${items.map((it,i)=>`<tr><td>${esc(new Date(it.createdAt).toLocaleString())}</td><td>${esc(it.contactName)}</td><td>${esc(it.channel)}</td><td style="white-space:pre-wrap">${esc(it.body.slice(0,500))}${it.body.length>500?'…':''}</td><td><button class="mini ghost" data-sent-copy="${esc(it.body)}">Copy</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No saved messages yet.</div>',`<button class="danger" id="clearSent">Clear history</button><button class="ghost" id="closeSent">Close</button>`);$('#closeSent').onclick=closeModal;$('#clearSent').onclick=()=>{if(confirm('Clear history?')){state.data.sentItems=[];closeModal();saveSoon();toast('History cleared.')}};$$('[data-sent-copy]').forEach(b=>b.onclick=()=>copyText(b.dataset.sentCopy))}
 function saveSent(){const c=getContact();const activeCong=state.selectedTarget?.isCong?(state.data.congregations||[]).find(cg=>cg.id===state.selectedTarget.congId):null;if(!c&&!activeCong)return toast('Select a contact first.');const channel=($('#deliveryChannel')?.value||'whatsapp');const item={id:uid('s'),createdAt:new Date().toISOString(),contactId:c?c.id:(activeCong?'cong:'+activeCong.id:''),contactName:c?contactName(c):(activeCong?activeCong.name:'Recipient'),templateId:'quick',templateTitle:'Mini message',channel,subject:'',body:$('#messagePreview').textContent};state.data.sentItems=state.data.sentItems||[];state.data.sentItems.push(item);saveSoon();toast('Saved to history.')}
-function showModal(title,body,foot=''){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;$('#modalFoot').innerHTML=foot;$('#modalOverlay').classList.add('show')}
+function showModal(title,body,foot=''){$('#modalTitle').textContent=tr(title);$('#modalBody').innerHTML=body;$('#modalFoot').innerHTML=foot;translateDom($('#modalOverlay'));$('#modalOverlay').classList.add('show')}
 function closeModal(){$('#modalOverlay').classList.remove('show')}
 
 function bind(){
-$('#btnCloseModal').onclick=closeModal;$('#modalOverlay').onclick=e=>{if(e.target.id==='modalOverlay')closeModal()};
+$('#btnCloseModal').onclick=closeModal;$('#modalOverlay').onclick=e=>{if(e.target.id==='modalOverlay')closeModal()};if($('#btnLanguage'))$('#btnLanguage').onclick=()=>{state.uiLang=state.uiLang==='de'?'en':'de';applyLang();saveSoon();};
 $('#btnNewContact').onclick=()=>openContactEditor();$('#btnMasterData').onclick=openMasterData;$('#btnMergeSelected').onclick=mergeSelectedContacts;$('#btnNewTemplate').onclick=openTemplateEditor;$('#btnDuplicateTemplate').onclick=duplicateTemplate;$('#btnDeleteTemplate').onclick=deleteTemplate;$('#btnSelectVisible').onclick=selectVisibleContacts;$('#btnClearSelection').onclick=clearContactSelection;
 if($('#btnCaptainExport'))$('#btnCaptainExport').onclick=openCaptainExport;$('#btnCopyContactList').onclick=openContactListModal;$('#btnExportSelectedCsv').onclick=exportSelectedContactsCsv;if($('#btnBulkEditSelected'))$('#btnBulkEditSelected').onclick=openBulkEditModal;if($('#btnBulkDeleteSelected'))$('#btnBulkDeleteSelected').onclick=bulkDelete;
 if($('#btnNewCong'))$('#btnNewCong').onclick=()=>openCongEditor();
@@ -1466,7 +2058,7 @@ $('#contactBulkAction').onchange=e=>{const v=e.target.value;e.target.value='';if
 if($('#deliveryChannel'))$('#deliveryChannel').onchange=()=>{state.selectedTarget=null;renderPreview()};
 const quickSender=$('#quickSenderName');if(quickSender)quickSender.addEventListener('input',()=>{localStorage.setItem(QUICK_SENDER_KEY,quickSender.value);renderPreview();});
 const quickText=$('#quickMessageText');if(quickText)quickText.addEventListener('input',()=>{localStorage.setItem(QUICK_MESSAGE_KEY,quickText.value);renderPreview();});
-const resetQuick=$('#btnResetQuickMessage');if(resetQuick)resetQuick.onclick=()=>{setQuickMessageRaw(DEFAULT_QUICK_MESSAGE);renderPreview();toast('Mini message reset.');};
+const resetQuick=$('#btnResetQuickMessage');if(resetQuick)resetQuick.onclick=()=>{setQuickMessageRaw(defaultQuickMessage());renderPreview();toast('Mini message reset.');};
 $('#btnCopyMessage').onclick=()=>copyText($('#messagePreview').textContent);$('#btnCopyMessageTop').onclick=()=>copyText($('#messagePreview').textContent);if($('#btnCopySubject'))$('#btnCopySubject').onclick=()=>copyText('');const phBtn=$('#btnCopyPlaceholderList');if(phBtn)phBtn.onclick=()=>copyText(PLACEHOLDERS.map(p=>`{{${p}}}`).join('\n'));$('#btnPrintPreview').onclick=()=>print();
 $('#btnOpenWhatsApp').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').value='whatsapp';renderPreview();const m=getSelectedTarget('whatsapp');if(!m)return toast('No mobile number selected.');openWhatsApp(m,$('#messagePreview').textContent);saveSent()};
 $('#btnOpenEmail').onclick=()=>{if($('#deliveryChannel'))$('#deliveryChannel').value='email';renderPreview();const e=getSelectedTarget('email');if(!e)return toast('No email address selected.');location.href=`mailto:${encodeURIComponent(e)}?body=${encodeURIComponent($('#messagePreview').textContent)}`;saveSent()};
@@ -1577,7 +2169,7 @@ if(document.getElementById('btnTheme')){
     var html=document.documentElement;
     var isDark=html.getAttribute('data-theme')==='dark';
     html.setAttribute('data-theme',isDark?'light':'dark');
-    document.getElementById('btnTheme').textContent=isDark?'🌙 Dark':'☀️ Light';
+    updateThemeButton();
   };
 }
 document.addEventListener('keydown',function(e){
@@ -1826,6 +2418,6 @@ window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openIn
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.5.3 · Contact hub + message composer</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.5.4 · Contact hub + message composer</footer>
 </body>
 </html>
