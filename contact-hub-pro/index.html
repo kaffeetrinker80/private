@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.6.2</title>
+<title>ContactHub Pro V1.6.3</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -443,6 +443,28 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 [data-theme=dark] .detailEmpty,[data-theme=dark] .detailSection,[data-theme=dark] .contactDataLine{background:#1a2438;border-color:#2d3f55;color:#cbd5e1;}
 [data-theme=dark] .detailIdentity{background:linear-gradient(135deg,#1a2e4a,#1e3a5f);border-color:#2d4e75;}
 [data-theme=dark] .detailSectionTitle,[data-theme=dark] .contactDataLine .dataType{color:#7a98b4;}
+
+/* ── V1.6.3: fixed contact filter bar / independently scrollable list ── */
+.contactsPanel .panelBody.contactPanelBody{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  overflow:hidden;
+  min-height:0;
+}
+.contactFilterArea{flex:0 0 auto;display:grid;gap:9px;}
+.contactSearchRow{display:block;}
+.contactSearchRow #contactSearch{width:100%;}
+.contactFilterGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.contactsPanel .list{
+  flex:1 1 auto;
+  min-height:120px;
+  max-height:none;
+  overflow-y:auto;
+  padding-right:4px;
+  margin-right:-4px;
+}
+@media(max-width:820px){.contactFilterGrid{grid-template-columns:1fr;}}
 @media(max-width:1280px){.grid{grid-template-columns:1fr!important;}.detailsPanel{grid-column:1;}.contactsPanel .list{max-height:none;}.panel{position:relative;top:0;max-height:none;}.panel .panelBody{max-height:none;}}
 @media(max-width:820px){.detailCopyGrid,.detailActions{grid-template-columns:1fr;}.detailCopyGrid .wide,.detailActions .wide{grid-column:auto;}.detailIdentity{flex-direction:column;}.rolePickGrid{grid-template-columns:1fr 1fr;}}
 
@@ -454,7 +476,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.6.2</span></h1>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.6.3</span></h1>
         <p class="sub">Contacts · Congregations · Teams · Quick contact actions</p>
       </div>
     </div>
@@ -494,34 +516,36 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
           <button class="mini ghost" id="btnCaptainExport">📤 Captain Export</button>
         </div>
       </div>
-      <div class="panelBody stack">
-        <div class="row">
-          <input id="contactSearch" placeholder="Search name, congregation, role, tag, email, mobile..." />
-          <select id="contactSortBy" title="Sortierung"><option value="lastName">↕ Last name</option><option value="firstName">↕ First name</option></select>
+      <div class="panelBody contactPanelBody">
+        <div class="contactFilterArea">
+          <div class="contactSearchRow">
+            <input id="contactSearch" placeholder="Search name, congregation, role, tag, email, mobile..." />
+          </div>
+          <div class="contactFilterGrid">
+            <select id="contactSortBy" title="Sort order"><option value="lastName">↕ Last name</option><option value="firstName">↕ First name</option></select>
+            <select id="contactRoleFilter"><option value="">All congregation roles</option></select>
+          </div>
+          <div class="contactFilterGrid">
+            <select id="contactTagFilter"><option value="">All tags</option></select>
+            <select id="contactTeamFilter"><option value="">All Assembly / Convention teams</option></select>
+          </div>
+          <div class="contactFilterGrid">
+            <select id="contactFavFilter"><option value="">⭐ All contacts</option><option value="fav">⭐ Favorites only</option><option value="nofav">☆ Non-favorites only</option></select>
+            <select id="contactCongFilter"><option value="">All congregations</option></select>
+          </div>
+          <div>
+            <select id="contactBulkAction"><option value="">Bulk actions...</option><option value="bulkEdit">Bulk edit selected...</option><option value="role">Add / replace congregation role</option><option value="setTeam">🏷 Assign Assembly / Convention team</option><option value="tag">Add tag</option><option value="delete">Delete selected</option></select>
+          </div>
+          <div class="contactToolRow">
+            <button class="mini ghost" id="btnSelectVisible">Select visible</button>
+            <button class="mini ghost" id="btnClearSelection">Clear selection</button>
+            <button class="mini ghost" id="btnCopyContactList">Copy list</button>
+            <button class="mini ghost" id="btnExportSelectedCsv">Export selected CSV</button>
+            <button class="mini ghost" id="btnBulkEditSelected">Bulk edit selected</button>
+            <button class="mini danger" id="btnBulkDeleteSelected">Delete selected</button>
+          </div>
+          <div class="hint" id="selectionHint">0 selected. Use role search/filter, then select contacts for copy/export.</div>
         </div>
-        <div class="row">
-          <select id="contactRoleFilter"><option value="">All congregation roles</option></select>
-        </div>
-        <div class="row">
-          <select id="contactTagFilter"><option value="">All tags</option></select>
-          <select id="contactTeamFilter"><option value="">All Assembly / Convention teams</option></select>
-        </div>
-        <div class="row">
-          <select id="contactFavFilter"><option value="">⭐ All contacts</option><option value="fav">⭐ Favorites only</option><option value="nofav">☆ Non-favorites only</option></select>
-          <select id="contactCongFilter"><option value="">All congregations</option></select>
-        </div>
-        <div>
-          <select id="contactBulkAction"><option value="">Bulk actions...</option><option value="bulkEdit">Bulk edit selected...</option><option value="role">Add / replace congregation role</option><option value="setTeam">🏷 Assign Assembly / Convention team</option><option value="tag">Add tag</option><option value="delete">Delete selected</option></select>
-        </div>
-        <div class="contactToolRow">
-          <button class="mini ghost" id="btnSelectVisible">Select visible</button>
-          <button class="mini ghost" id="btnClearSelection">Clear selection</button>
-          <button class="mini ghost" id="btnCopyContactList">Copy list</button>
-          <button class="mini ghost" id="btnExportSelectedCsv">Export selected CSV</button>
-          <button class="mini ghost" id="btnBulkEditSelected">Bulk edit selected</button>
-          <button class="mini danger" id="btnBulkDeleteSelected">Delete selected</button>
-        </div>
-        <div class="hint" id="selectionHint">0 selected. Use role search/filter, then select contacts for copy/export.</div>
         <div class="list" id="contactList"></div>
       </div>
     </section>
@@ -548,7 +572,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.6.2', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.6.3', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedContactIds:new Set(),sortBy:'lastName',autosaveTimer:null,uiLang:'en',selectedCongId:null};
 
 /* ── V1.5.5: Complete DE / EN interface toggle ───────────────────── */
@@ -613,7 +637,7 @@ const UI_DE = {
   "Insert contact": "Kontakt einfügen",
     "Modal": "Dialog",
   "Close": "Schließen",
-  "Made with love © – ContactHub Pro V1.6.2 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.2 · Kontakt- und Datenverwaltung",
+  "Made with love © – ContactHub Pro V1.6.3 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.3 · Kontakt- und Datenverwaltung",
   "No contacts found.": "Keine Kontakte gefunden.",
   "Create contact": "Kontakt erstellen",
   "Edit": "Bearbeiten",
@@ -1046,8 +1070,8 @@ Object.assign(UI_DE,{
   "Email addresses copied.": "E-Mail-Adressen kopiert.",
   "Mobile numbers copied.": "Mobilnummern kopiert.",
   "Data copied.": "Daten kopiert.",
-  "ContactHub Pro V1.6.2 · Contact hub + data editor": "ContactHub Pro V1.6.2 · Kontakt- und Datenverwaltung",
-  "Made with love © – ContactHub Pro V1.6.2 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.2 · Kontakt- und Datenverwaltung",
+  "ContactHub Pro V1.6.3 · Contact hub + data editor": "ContactHub Pro V1.6.3 · Kontakt- und Datenverwaltung",
+  "Made with love © – ContactHub Pro V1.6.3 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.3 · Kontakt- und Datenverwaltung",
   "Copy available contact data": "Vorhandene Kontaktdaten kopieren"
 });
 const I18N_TEXT_ORIGINAL = new WeakMap();
@@ -1930,7 +1954,7 @@ function firstWord(s){return String(s||'').trim().split(/\s+/)[0]||''}
 function splitTags(v){return Array.isArray(v)?v:String(v||'').split(/[,;]/).map(x=>x.trim()).filter(Boolean)}
 function uniqueBy(arr,fn){const seen=new Set();return arr.filter(x=>{const k=fn(x);if(!k||seen.has(k))return false;seen.add(k);return true})}
 
-/* ── V1.6.2: data-hub helpers restored after the messaging-module cleanup ── */
+/* ── V1.6.3: data-hub helpers restored after the messaging-module cleanup ── */
 function masterList(key,defaults=[]){
   const stored=state.data?.settings?.[key];
   const values=Array.isArray(stored)&&stored.length?stored:defaults;
@@ -2030,6 +2054,6 @@ window.ContactHubPro={openMasterData,openCaptainExport,openBulkEditModal,openCon
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.6.2 · Contact hub + data editor</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.6.3 · Contact hub + data editor</footer>
 </body>
 </html>
