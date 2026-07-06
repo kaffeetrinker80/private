@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.5.4</title>
+<title>ContactHub Pro V1.5.5</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -431,7 +431,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
       <button class="ghost" id="btnImportJson">Import JSON</button>
       <button class="green" id="btnImportCsv">Import Outlook CSV</button>
       <button class="themeToggle" id="btnTheme">🌙 Dark</button>
-      <button class="ghost" id="btnLanguage" title="Change language">🇩🇪 DE</button>
+      <button class="ghost" id="btnLanguage" title="Switch language: DE / EN">DE / EN</button>
       <button class="primary" id="btnExportJson">Export backup</button>
       <button class="ghost" id="btnExportCsv">📤 Export</button>
     </div>
@@ -568,9 +568,9 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.5.4', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.5.5', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedTemplateId:null,activeArea:'All',selectedContactIds:new Set(),selectedTarget:null,sortBy:'lastName',draftDetails:{date:'',eventName:'',topic:'',assignment:'',location:'',custom1:'',custom2:''},autosaveTimer:null,uiLang:'en',activeView:'contacts',selectedCongId:null};
-const PLACEHOLDERS=['firstName','lastName','congregation','role','team','teams','organization','email','emails','mobile','mobiles','senderName'];
+const PLACEHOLDERS=['firstName','lastName','displayName','congregation','role','team','teams','organization','email','emails','mobile','mobiles','senderName'];
 const QUICK_MESSAGE_KEY='contacthub_pro_quickMessage_v152';
 const QUICK_SENDER_KEY='contacthub_pro_quickSenderName_v152';
 const DEFAULT_QUICK_MESSAGE='Dear {{firstName}},\n\n\n\nYour brother,\n{{senderName}}';
@@ -584,7 +584,7 @@ const CONTEXTS=[
 ];
 const I18N={en:{merge:'Merge'}};
 
-/* ── V1.5.4: Complete DE / EN interface toggle ───────────────────── */
+/* ── V1.5.5: Complete DE / EN interface toggle ───────────────────── */
 const UI_DE = {
   "Contacts · Congregations · Teams · Quick contact actions": "Kontakte · Versammlungen · Teams · Schnelle Kontaktaktionen",
   "Saved locally": "Lokal gespeichert",
@@ -649,7 +649,7 @@ const UI_DE = {
   "Save to history": "Im Verlauf speichern",
   "Modal": "Dialog",
   "Close": "Schließen",
-  "Made with love © – ContactHub Pro V1.5.4 · Contact hub + message composer": "Mit Liebe gemacht © – ContactHub Pro V1.5.4 · Kontakte & Nachrichten erstellen",
+  "Made with love © – ContactHub Pro V1.5.5 · Contact hub + message composer": "Mit Liebe gemacht © – ContactHub Pro V1.5.5 · Kontakte & Nachrichten erstellen",
   "No contacts found.": "Keine Kontakte gefunden.",
   "Create contact": "Kontakt erstellen",
   "Edit": "Bearbeiten",
@@ -691,6 +691,7 @@ const UI_DE = {
   "Your name, phone, address...": "Dein Name, Telefon, Adresse ...",
   "First name": "Vorname",
   "Last name": "Nachname",
+  "Full name": "Vollständiger Name",
   "Role(s)": "Aufgabe(n)",
   "Team (1st)": "Team (erstes)",
   "All teams": "Alle Teams",
@@ -846,6 +847,7 @@ const UI_DE = {
   "Export all": "Alle exportieren",
   "Clean up": "Bereinigen",
   "Saved locally ·": "Lokal gespeichert ·",
+  "Saving...": "Speichere...",
   "Saving...": "Wird gespeichert ...",
   "Could not read autosave data.": "Automatische Speicherung konnte nicht gelesen werden.",
   "Local data cleared.": "Lokale Daten gelöscht.",
@@ -1152,10 +1154,10 @@ function updateThemeButton(){
 function updateLanguageButton(){
   const btn=$('#btnLanguage');
   if(!btn)return;
-  const german=state.uiLang==='de';
-  btn.textContent=german?'🇩🇪 DE':'🇬🇧 EN';
-  btn.title=german?'Sprache: Deutsch – zu English wechseln':'Language: English – switch to Deutsch';
+  btn.textContent='DE / EN';
+  btn.title=state.uiLang==='de'?'Sprache umschalten: DE / EN':'Switch language: DE / EN';
   btn.setAttribute('aria-label',btn.title);
+  btn.setAttribute('data-active-language',state.uiLang);
 }
 function defaultQuickMessage(){
   return state.uiLang==='de'
@@ -1471,7 +1473,7 @@ selectFirst();bind();startLanguageObserver();applyLang();saveStatus('Saved local
 function selectFirst(){state.selectedTemplateId=state.data.templates[0]?.id||null}// no auto-contact selection on startup
 function saveSoon(){saveStatus('Saving...','warn');clearTimeout(state.autosaveTimer);state.autosaveTimer=setTimeout(saveNow,350)}
 function saveNow(){ensureUniqueContactIds(state.data.contacts);state.data.updatedAt=new Date().toISOString();state.data.settings.uiLanguage=state.uiLang;state.data.settings.i18nReady=true;localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));saveStatus(`Saved locally · ${nowNice()}`,'ok')}
-function saveStatus(t,mode){$('#saveStatus').innerHTML=`<span class="dot" style="background:${mode==='warn'?'#f59e0b':mode==='danger'?'#ef4444':'#15803d'}"></span> ${esc(tr(t))}`}
+function saveStatus(t,mode){const localized=state.uiLang==='de'?String(t).replace(/^Saved locally(?= ·|$)/,'Lokal gespeichert').replace(/^Saving\.\.\.$/,'Speichere...'):t;$('#saveStatus').innerHTML=`<span class="dot" style="background:${mode==='warn'?'#f59e0b':mode==='danger'?'#ef4444':'#15803d'}"></span> ${esc(localized)}`}
 function toast(msg){const d=document.createElement('div');d.className='toast';d.textContent=tr(msg);$('#toastWrap').appendChild(d);setTimeout(()=>d.remove(),3200)}
 function applyLang(){
   state.uiLang=state.uiLang==='en'?'en':'de';
@@ -1679,7 +1681,7 @@ function renderQuickMessageTools(){
   const el=document.getElementById('quickMessageText');
   if(el&&!el.dataset.ready){el.value=localStorage.getItem(QUICK_MESSAGE_KEY)||defaultQuickMessage();el.dataset.ready='1';}
   const bar=document.getElementById('quickPlaceholderBar');
-  if(bar){const items=['firstName','lastName','displayName','congregation','role','team','teams','email','mobile','senderName'];bar.innerHTML=items.map(k=>`<button type="button" data-quick-ph="${k}">{{${k}}}</button>`).join('');$$('[data-quick-ph]').forEach(btn=>btn.onclick=()=>insertQuickPlaceholder(btn.dataset.quickPh));}
+  if(bar){const items=['firstName','lastName','displayName','congregation','role','team','teams','email','mobile','senderName'];bar.innerHTML=items.map(k=>`<button type="button" data-quick-ph="${k}" title="${esc(placeholderLabel(k))}">{{${k}}}</button>`).join('');$$('[data-quick-ph]').forEach(btn=>btn.onclick=()=>insertQuickPlaceholder(btn.dataset.quickPh));}
 }
 function insertQuickPlaceholder(key){const el=document.getElementById('quickMessageText');if(!el)return;const token='{{'+key+'}}';const s=el.selectionStart??el.value.length,e=el.selectionEnd??el.value.length;el.value=el.value.slice(0,s)+token+el.value.slice(e);el.focus();el.selectionStart=el.selectionEnd=s+token.length;localStorage.setItem(QUICK_MESSAGE_KEY,el.value);renderPreview();}
 function renderPreview(){
@@ -1744,7 +1746,12 @@ function getSelectedTarget(channel){
 function recipientName(c,t){return c.firstName||firstWord(contactName(c))||contactName(c)||''}
 function renderData(c,t=null){const em=(c.emails||[]).map(e=>e.value),mo=(c.mobiles||[]).map(m=>m.value);const rn=recipientName(c,t);const ct=contactTeams(c);return{firstName:c.firstName||firstWord(contactName(c)),lastName:c.lastName||'',displayName:contactName(c),recipientName:rn,greeting:rn,congregation:c.congregation||'',role:c.role||'',team:ct[0]||'',teams:ct.join(', '),organization:c.organization||'',email:em[0]||'',emails:em.join(', '),mobile:mo[0]||'',mobiles:mo.join(', '),phone:mo[0]||'',senderName:getQuickSenderName(),...state.draftDetails}}
 function renderText(text,data){return cleanNewlines(text).replace(/\{\{\s*([\w]+)\s*\}\}/g,(_,k)=>data[k]??'')}
-function renderPlaceholders(){const labels={firstName:'First name',lastName:'Last name',congregation:'Congregation',role:'Role(s)',team:'Team (1st)',teams:'All teams',eventName:'Event name',date:'Date',organization:'Company',email:'first email',emails:'all emails',mobile:'first mobile',mobiles:'all mobiles',senderName:'your name'};const el=$('#placeholderGrid');if(!el)return;el.innerHTML=PLACEHOLDERS.map(p=>`<div class="placeholder" data-ph="{{${p}}}"><code>{{${p}}}</code><span>${esc(labels[p]||p)}</span></div>`).join('');$$('[data-ph]').forEach(x=>x.onclick=()=>{const ph=x.dataset.ph;const ta=window._lastTemplateFocus;if(ta&&document.body.contains(ta)){const s=ta.selectionStart,e=ta.selectionEnd;ta.value=ta.value.slice(0,s)+ph+ta.value.slice(e);ta.selectionStart=ta.selectionEnd=s+ph.length;ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));}else{copyText(ph);toast('📋 '+ph+' copied (no text field active)');}})}
+const PLACEHOLDER_LABELS={
+  en:{firstName:'First name',lastName:'Last name',displayName:'Full name',congregation:'Congregation',role:'Role(s)',team:'Team (first)',teams:'All teams',eventName:'Event name',date:'Date',organization:'Company',email:'First email address',emails:'All email addresses',mobile:'First mobile number',mobiles:'All mobile numbers',senderName:'Your name'},
+  de:{firstName:'Vorname',lastName:'Nachname',displayName:'Vollständiger Name',congregation:'Versammlung',role:'Aufgabe(n)',team:'Team (erstes)',teams:'Alle Teams',eventName:'Name der Veranstaltung',date:'Datum',organization:'Firma',email:'Erste E-Mail-Adresse',emails:'Alle E-Mail-Adressen',mobile:'Erste Mobilnummer',mobiles:'Alle Mobilnummern',senderName:'Dein Name'}
+};
+function placeholderLabel(key){return (PLACEHOLDER_LABELS[state.uiLang]||PLACEHOLDER_LABELS.en)[key]||key}
+function renderPlaceholders(){const el=$('#placeholderGrid');if(!el)return;el.innerHTML=PLACEHOLDERS.map(p=>`<div class="placeholder" data-ph="{{${p}}}" title="${esc(placeholderLabel(p))}"><code>{{${p}}}</code><span>${esc(placeholderLabel(p))}</span></div>`).join('');$$('[data-ph]').forEach(x=>x.onclick=()=>{const ph=x.dataset.ph;const ta=window._lastTemplateFocus;if(ta&&document.body.contains(ta)){const s=ta.selectionStart,e=ta.selectionEnd;ta.value=ta.value.slice(0,s)+ph+ta.value.slice(e);ta.selectionStart=ta.selectionEnd=s+ph.length;ta.focus();ta.dispatchEvent(new Event('input',{bubbles:true}));}else{copyText(ph);toast('📋 '+ph+' copied (no text field active)');}})}
 function uniqueValuesFrom(field){return [...new Set(state.data.contacts.map(c=>c[field]).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
 function masterList(key,defaults=[]){
   const raw=state.data.settings&&state.data.settings[key];
@@ -2418,6 +2425,6 @@ window.ContactHubPro={openContactEditor,openTemplateEditor,openMasterData,openIn
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.5.4 · Contact hub + message composer</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.5.5 · Contact hub + message composer</footer>
 </body>
 </html>
