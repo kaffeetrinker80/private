@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Icons + Manifest -->
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" href="favicon.ico">
-
-<link rel="manifest" href="site.webmanifest">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Smart Collage · Photo Layout Studio</title>
@@ -331,7 +323,7 @@ select{
 }
 .overlay.show{display:grid}
 .modal{
-  width:min(560px,100%);max-height:82vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);
+  width:min(600px,100%);max-height:82vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);
   border-radius:16px;box-shadow:var(--shadow)
 }
 .modal-head{
@@ -341,17 +333,34 @@ select{
 .modal-head h2{margin:0;font-size:15px;font-weight:650;letter-spacing:-.01em}
 .modal-body{padding:18px}
 .kbd-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px}
-.steps{list-style:none;counter-reset:st;margin:0;padding:0;display:grid;gap:11px}
-.steps li{counter-increment:st;display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start}
-.steps li::before{
-  content:counter(st);width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
-  background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700
+.steps{list-style:none;counter-reset:st;margin:0;padding:0;display:grid;gap:13px}
+.steps li{
+  counter-increment:st;display:grid;grid-template-columns:24px minmax(0,1fr);
+  column-gap:11px;row-gap:2px;align-items:start
 }
-.steps b{display:block;font-size:13px;font-weight:650;margin-bottom:2px}
-.steps span{font-size:12.5px;color:var(--muted);line-height:1.5}
-.tips{margin:0;padding:0 0 0 16px;display:grid;gap:7px}
-.tips li{font-size:12.5px;color:var(--muted);line-height:1.5}
-.modal-body .eyebrow{margin-bottom:11px}
+.steps li::before{
+  content:counter(st);grid-column:1;grid-row:1 / span 2;
+  width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;
+  font-variant-numeric:tabular-nums
+}
+.steps b{grid-column:2;grid-row:1;font-size:13px;font-weight:650;line-height:1.35;min-width:0}
+.steps span{grid-column:2;grid-row:2;font-size:12.5px;color:var(--muted);line-height:1.5;min-width:0;hyphens:none}
+.tips{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.tips li{
+  position:relative;padding-left:16px;font-size:12.5px;color:var(--muted);line-height:1.5;min-width:0
+}
+.tips li::before{
+  content:"";position:absolute;left:3px;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.7
+}
+.modal-body .eyebrow{margin:0 0 12px}
+.modal-body .divider{margin:20px 0}
+.kbd-row span{min-width:0;overflow-wrap:anywhere}
+@media(max-width:560px){
+  .kbd-grid{grid-template-columns:1fr;gap:8px}
+  .overlay{padding:12px;align-items:start}
+  .modal{max-height:88vh}
+}
 .kbd-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted)}
 kbd{
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;padding:2px 6px;border-radius:6px;
