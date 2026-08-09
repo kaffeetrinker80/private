@@ -439,7 +439,7 @@ body.focus .exit-focus{display:inline-flex}
         </svg>
       </div>
       <div>
-        <div class="brand-title">Smart Collage <span class="pill">v1.3</span></div>
+        <div class="brand-title">Smart Collage <span class="pill">v1.4</span></div>
         <div class="brand-sub" data-i18n="brand.sub">Photo Layout Studio · everything stays on your device</div>
       </div>
     </div>
@@ -505,7 +505,7 @@ body.focus .exit-focus{display:inline-flex}
         </div>
         <div class="layouts" id="layouts"></div>
       </div>
-      <div class="foot">Made with Love © – Smart Collage V 1.3</div>
+      <div class="foot">Made with Love © – Smart Collage V 1.4</div>
     </aside>
 
     <!-- ============ CENTER ============ -->
@@ -545,7 +545,7 @@ body.focus .exit-focus{display:inline-flex}
           </div>
         </div>
       </div>
-      <div class="workfoot">Made with Love © – Smart Collage V 1.3</div>
+      <div class="workfoot">Made with Love © – Smart Collage V 1.4</div>
     </section>
 
     <!-- ============ RIGHT ============ -->
@@ -655,7 +655,12 @@ body.focus .exit-focus{display:inline-flex}
               <div class="field-head"><span data-i18n="f.rotate">Rotation</span><output class="val" id="rotateVal">0°</output></div>
               <input id="rotateRange" type="range" min="-45" max="45" value="0">
             </label>
+            <label class="field">
+              <div class="field-head"><span data-i18n="f.focus">Crop focus (vertical)</span><output class="val" id="focusVal">50%</output></div>
+              <input id="focusRange" type="range" min="0" max="100" value="50">
+            </label>
             <div class="rowbtns">
+              <button class="btn sm" id="autoFocusBtn" data-i18n="btn.autoFocus">Auto focus</button>
               <button class="btn sm" id="centerBtn" data-i18n="btn.center">Center</button>
               <button class="btn sm" id="swapBtn" data-i18n="btn.swap">Swap next</button>
               <button class="btn sm" id="resetPhotoBtn" data-i18n="btn.reset">Reset</button>
@@ -798,7 +803,7 @@ body.focus .exit-focus{display:inline-flex}
           </div>
           <input type="file" id="projectInput" accept=".json,application/json" hidden>
         </div>
-        <div class="foot">Made with Love © – Smart Collage V 1.3</div>
+        <div class="foot">Made with Love © – Smart Collage V 1.4</div>
       </div>
     </aside>
   </main>
@@ -914,6 +919,8 @@ const I18N={
   'look.Original':'Original','look.Vivid':'Vivid','look.Soft':'Soft','look.Mono':'Mono','look.Noir':'Noir',
   'look.Sepia':'Sepia','look.Warm':'Warm','look.Cool':'Cool','look.Faded':'Faded',
   'st.start':'Add photos to begin','st.photo':'photo','st.photos':'photos','st.frame':'frame','st.frames':'frames','st.text':'text',
+  't.fmtPortrait':'Canvas set to portrait 4:5 — mostly upright photos','t.fmtLandscape':'Canvas set to landscape',
+  'f.focus':'Crop focus (vertical)','btn.autoFocus':'Auto focus','t.focus':'Focus recalculated',
   'ui.dblReset':'Double-click to reset','ui.options':'options','ui.empty':'Empty','ui.noText':'(empty)','ui.yourText':'Your text','ui.remove':'Remove',
   'ui.applyLayout':'Apply this layout',
   't.limit':'Limit reached — 12 photos maximum','t.added':'Added {n} — 12 photos maximum',
@@ -975,6 +982,8 @@ const I18N={
   'look.Original':'Original','look.Vivid':'Kräftig','look.Soft':'Sanft','look.Mono':'S/W','look.Noir':'Noir',
   'look.Sepia':'Sepia','look.Warm':'Warm','look.Cool':'Kühl','look.Faded':'Verblasst',
   'st.start':'Füge Fotos hinzu','st.photo':'Foto','st.photos':'Fotos','st.frame':'Rahmen','st.frames':'Rahmen','st.text':'Text',
+  't.fmtPortrait':'Leinwand auf Hochformat 4:5 gesetzt – überwiegend hochkante Fotos','t.fmtLandscape':'Leinwand auf Querformat gesetzt',
+  'f.focus':'Bildausschnitt (vertikal)','btn.autoFocus':'Auto-Fokus','t.focus':'Fokus neu berechnet',
   'ui.dblReset':'Doppelklick setzt zurück','ui.options':'Varianten','ui.empty':'Leer','ui.noText':'(leer)','ui.yourText':'Dein Text','ui.remove':'Entfernen',
   'ui.applyLayout':'Dieses Layout anwenden',
   't.limit':'Grenze erreicht — maximal 12 Fotos','t.added':'{n} hinzugefügt — maximal 12 Fotos',
@@ -1093,13 +1102,42 @@ const LAYOUTS=[
 const FALLBACK_LAYOUT=LAYOUTS.findIndex(l=>l.n==='any');
 /* Ausrichtung der Leinwand: 'p' hochkant, 'l' quer, 's' quadratisch */
 const canvasOrient=()=>state.ratio<0.95?'p':state.ratio>1.05?'l':'s';
+/* ---- v1.4: Layouts nach echten Bildformaten bewerten ----
+   Slot-Seitenverhältnis = (Breite% × Leinwandverhältnis) / Höhe%.
+   Fotos und Slots werden je nach Seitenverhältnis sortiert und der Reihe nach
+   gepaart — breite Fotos landen so in breiten Slots. Die Kosten sind die
+   mittlere logarithmische Abweichung (log, damit 2:1 und 1:2 gleich zählen). */
+const slotAR=r=>(r.w*state.ratio)/r.h;
+const photoAR=p=>p.width/p.height;
+
+function matchPhotosToSlots(rects,photos){
+  const slots=rects.map((r,i)=>({i,ar:slotAR(r)})).sort((a,b)=>b.ar-a.ar);
+  const pics =photos.map((p,i)=>({i,ar:photoAR(p)})).sort((a,b)=>b.ar-a.ar);
+  const pairs=[]; let cost=0;
+  for(let k=0;k<Math.min(slots.length,pics.length);k++){
+    pairs.push({slot:slots[k].i,photo:pics[k].i});
+    cost+=Math.abs(Math.log(pics[k].ar/slots[k].ar));
+  }
+  return {pairs,cost:pairs.length?cost/pairs.length:99};
+}
+function layoutCost(idx,n){
+  try{ return matchPhotosToSlots(LAYOUTS[idx].build(n),state.photos).cost }
+  catch{ return 99 }
+}
+
 const candidates=n=>{
   const hits=LAYOUTS.map((l,i)=>({l,i})).filter(o=>o.l.n!=='any'&&o.l.n.includes(n));
   if(!hits.length) return [FALLBACK_LAYOUT];
   const want=canvasOrient();
-  if(want==='s') return hits.map(o=>o.i);
-  /* passende Ausrichtung zuerst, neutrale danach, gegenläufige zuletzt */
   const rank=o=>o.l.o===want?0:!o.l.o?1:2;
+  if(state.photos.length===n){
+    /* echte Fotos da → nach Passgenauigkeit sortieren,
+       Ausrichtung nur noch als Gleichstand-Entscheider */
+    return hits.map(o=>({o,c:layoutCost(o.i,n)}))
+               .sort((a,b)=>a.c-b.c||rank(a.o)-rank(b.o)||a.o.i-b.o.i)
+               .map(x=>x.o.i);
+  }
+  if(want==='s') return hits.map(o=>o.i);
   return hits.sort((a,b)=>rank(a)-rank(b)||a.i-b.i).map(o=>o.i);
 };
 const buildLayout=idx=>LAYOUTS[idx].build(Math.max(1,state.photos.length));
@@ -1154,7 +1192,59 @@ const updateHistoryBtns=()=>{
 };
 
 /* ---------------- photos ---------------- */
-const newFrameProps=id=>({photoId:id,ox:0,oy:0,zoom:1,rotate:0,mode:'fill',brightness:100,contrast:100,saturation:100,sepia:0,blur:0});
+const newFrameProps=id=>{
+  const p=state.photos.find(x=>x.id===id);
+  return {photoId:id,ox:0,oy:0,zoom:1,rotate:0,mode:'fill',
+    fx:p?.fx??0.5, fy:p?.fy??0.5,          // Fokuspunkt 0..1 (Bildausschnitt)
+    brightness:100,contrast:100,saturation:100,sepia:0,blur:0};
+};
+
+/* ---- v1.4: Fokuspunkt bestimmen ----
+   Wenn der Browser eine Gesichtserkennung mitbringt, nutzen wir sie.
+   Sonst greift eine Faustregel: bei Hochformaten sitzt das Motiv fast immer
+   im oberen Drittel, deshalb wird dort verankert statt in der Mitte. */
+let faceDetector=null;
+try{ if('FaceDetector' in window) faceDetector=new FaceDetector({fastMode:true,maxDetectedFaces:8}) }catch{}
+
+async function detectFocus(img,w,h){
+  if(faceDetector){
+    try{
+      const faces=await faceDetector.detect(img);
+      if(faces&&faces.length){
+        let cx=0,cy=0,top=1,bottom=0;
+        faces.forEach(f=>{
+          const b=f.boundingBox;
+          cx+=(b.x+b.width/2)/w; cy+=(b.y+b.height/2)/h;
+          top=Math.min(top,b.y/h); bottom=Math.max(bottom,(b.y+b.height)/h);
+        });
+        cx/=faces.length; cy/=faces.length;
+        /* etwas Luft über den Köpfen lassen, wirkt natürlicher als exakt mittig */
+        const fy=clamp(cy-(bottom-top)*0.15,0.08,0.92);
+        return {fx:clamp(cx,0.08,0.92), fy};
+      }
+    }catch{}
+  }
+  return {fx:0.5, fy:h>w*1.15 ? 0.38 : 0.5};
+}
+
+/* Leinwandformat einmalig an die Fotos anpassen – nur solange der
+   Nutzer das Format nicht selbst gewaehlt hat. */
+function suggestFormat(){
+  if(state.formatTouched||!state.photos.length) return;
+  const port=state.photos.filter(p=>p.height>p.width*1.15).length;
+  const land=state.photos.filter(p=>p.width>p.height*1.15).length;
+  const share=port/state.photos.length;
+  let target=null;
+  if(share>=0.7) target=0.8;                 // ueberwiegend hochkant -> 4:5
+  else if(land/state.photos.length>=0.7) target=1.414;
+  if(target&&Math.abs(target-state.ratio)>0.01){
+    state.ratio=target;
+    const sel=$('#formatSelect');
+    const m=[...sel.options].find(o=>Math.abs(+o.value-target)<0.01);
+    if(m) sel.value=m.value;
+    toast(T(target<1?'t.fmtPortrait':'t.fmtLandscape'));
+  }
+}
 
 async function addFiles(files){
   const room=MAX_PHOTOS-state.photos.length;
@@ -1165,13 +1255,16 @@ async function addFiles(files){
     const url=URL.createObjectURL(file);
     const img=new Image(); img.src=url;
     try{ await img.decode() }catch{ URL.revokeObjectURL(url); continue }
+    const w=img.naturalWidth, h=img.naturalHeight;
+    const focus=await detectFocus(img,w,h);
     state.photos.push({
       id:(crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random())),
-      name:file.name||'Pasted image', url, width:img.naturalWidth, height:img.naturalHeight
+      name:file.name||'Pasted image', url, width:w, height:h, fx:focus.fx, fy:focus.fy
     });
   }
   if(list.length>room) toast(T('t.added',{n:room}));
-  autoLayout(false); renderThumbs(); renderLayouts(); render(); pushHistory();
+  suggestFormat();
+  autoLayout(false); renderThumbs(); renderLayouts(); render(); syncAll(); pushHistory();
 }
 
 function removePhoto(id){
@@ -1227,6 +1320,7 @@ function applyLayout(idx,save=true){
     const o=old.get(p.id);
     return Object.assign(base, o?{
       photoId:p.id,ox:o.ox||0,oy:o.oy||0,zoom:o.zoom||1,rotate:o.rotate||0,mode:o.mode||'fill',
+      fx:o.fx??p.fx??0.5, fy:o.fy??p.fy??0.5,
       brightness:o.brightness??100,contrast:o.contrast??100,saturation:o.saturation??100,
       sepia:o.sepia??0,blur:o.blur??0
     }:newFrameProps(p.id));
@@ -1239,18 +1333,16 @@ function applyLayout(idx,save=true){
 function autoLayout(save=true){
   const n=state.photos.length;
   if(!n){ state.frames=[]; state.selFrame=null; render(); return }
-  const cand=candidates(n);          // bereits nach Leinwand-Ausrichtung sortiert
-  let idx=cand[0];
-  const port=canvasOrient()==='p';
-  if(n===2){
-    const land=state.photos.filter(p=>p.width>=p.height).length;
-    /* hochkantige Leinwand: nie nebeneinander splitten */
-    idx = port ? (land===2 ? 2 : 24) : (land===2 ? 2 : 1);
-  }else if(n===3){
-    const land=state.photos.filter(p=>p.width/p.height>1.2).length;
-    idx = port ? (land>=2 ? 7 : 5) : (land>=2 ? 5 : 4);
+  const cand=candidates(n);      // bereits nach Passgenauigkeit sortiert
+  const idx=cand[0];
+  /* Fotos so umsortieren, dass jedes im passendsten Slot landet */
+  const rects=LAYOUTS[idx].build(n);
+  const {pairs}=matchPhotosToSlots(rects,state.photos);
+  if(pairs.length===n){
+    const sorted=new Array(n);
+    pairs.forEach(({slot,photo})=>{ sorted[slot]=state.photos[photo] });
+    if(sorted.every(Boolean)) state.photos=sorted;
   }
-  if(!cand.includes(idx)) idx=cand[0];
   applyLayout(idx,save);
 }
 function renderLayouts(){
@@ -1360,8 +1452,12 @@ function placeImg(img,el,f,p){
   else{ if(ir>fr){h=fh;w=fh*ir}else{w=fw;h=fw/ir} }
   w*=f.zoom||1; h*=f.zoom||1;
   img.style.width=w+'px'; img.style.height=h+'px';
-  img.style.left=`calc(50% + ${f.ox||0}px)`;
-  img.style.top=`calc(50% + ${f.oy||0}px)`;
+  /* Fokuspunkt: verschiebt den sichtbaren Ausschnitt innerhalb des Ueberstands */
+  const fx=f.fx??0.5, fy=f.fy??0.5;
+  const shiftX=(0.5-fx)*Math.max(0,w-fw);
+  const shiftY=(0.5-fy)*Math.max(0,h-fh);
+  img.style.left=`calc(50% + ${(f.ox||0)+shiftX}px)`;
+  img.style.top=`calc(50% + ${(f.oy||0)+shiftY}px)`;
   img.style.transform=`translate(-50%,-50%) rotate(${f.rotate||0}deg)`;
   img.style.filter=filterStr(f);
 }
@@ -1462,6 +1558,7 @@ function syncAll(){
   if(f&&f.photoId){
     setSeg('modeSeg',f.mode||'fill');
     setRange('#zoomRange','#zoomVal',Math.round((f.zoom||1)*100),'%');
+    setRange('#focusRange','#focusVal',Math.round((f.fy??0.5)*100),'%');
     setRange('#rotateRange','#rotateVal',f.rotate||0,'°');
     setRange('#brightnessRange','#brightnessVal',f.brightness??100,'%');
     setRange('#contrastRange','#contrastVal',f.contrast??100,'%');
@@ -1575,7 +1672,10 @@ async function renderCanvas(){
     if(f.mode==='fit'){ if(ir>fr){iw=fw;ih=fw/ir}else{ih=fh;iw=fh*ir} }
     else{ if(ir>fr){ih=fh;iw=fh*ir}else{iw=fw;ih=fw/ir} }
     iw*=f.zoom||1; ih*=f.zoom||1;
-    ctx.translate(x+fw/2+(f.ox||0)*sx, y+fh/2+(f.oy||0)*sy);
+    const cfx=f.fx??0.5, cfy=f.fy??0.5;
+    const cShiftX=(0.5-cfx)*Math.max(0,iw-fw);
+    const cShiftY=(0.5-cfy)*Math.max(0,ih-fh);
+    ctx.translate(x+fw/2+(f.ox||0)*sx+cShiftX, y+fh/2+(f.oy||0)*sy+cShiftY);
     ctx.rotate((f.rotate||0)*Math.PI/180);
     ctx.filter=`brightness(${f.brightness??100}%) contrast(${f.contrast??100}%) saturate(${f.saturation??100}%) sepia(${f.sepia??0}%) blur(${(f.blur||0)*sx}px)`;
     ctx.drawImage(img,-iw/2,-ih/2,iw,ih);
@@ -1654,9 +1754,9 @@ async function saveProject(){
   const photos=[];
   for(const p of state.photos){
     const blob=await (await fetch(p.url)).blob();
-    photos.push({id:p.id,name:p.name,width:p.width,height:p.height,data:await blobToDataURL(blob)});
+    photos.push({id:p.id,name:p.name,width:p.width,height:p.height,fx:p.fx??0.5,fy:p.fy??0.5,data:await blobToDataURL(blob)});
   }
-  const data={app:'Smart Collage',version:'1.3',saved:new Date().toISOString(),
+  const data={app:'Smart Collage',version:'1.4',saved:new Date().toISOString(),
     photos, frames:state.frames, texts:state.texts,
     canvas:{gap:state.gap,radius:state.radius,margin:state.margin,border:state.border,
       borderColor:state.borderColor,shadow:state.shadow,bg:state.bg,ratio:state.ratio,layoutIndex:state.layoutIndex}};
@@ -1676,7 +1776,7 @@ async function loadProject(file){
     state.photos=[];
     for(const p of data.photos){
       const blob=await (await fetch(p.data)).blob();
-      state.photos.push({id:p.id,name:p.name,width:p.width,height:p.height,url:URL.createObjectURL(blob)});
+      state.photos.push({id:p.id,name:p.name,width:p.width,height:p.height,fx:p.fx??0.5,fy:p.fy??0.5,url:URL.createObjectURL(blob)});
     }
     Object.assign(state,data.canvas||{});
     state.frames=data.frames||[];
@@ -1771,8 +1871,9 @@ $('#clearBtn').onclick=()=>{
   renderThumbs(); renderLayouts(); render(); syncAll(); pushHistory();
 };
 
-$('#formatSelect').onchange=e=>{state.ratio=+e.target.value;renderLayouts();render();pushHistory()};
+$('#formatSelect').onchange=e=>{state.ratio=+e.target.value;state.formatTouched=true;renderLayouts();render();pushHistory()};
 $('#flipRatioBtn').onclick=()=>{
+  state.formatTouched=true;
   state.ratio=+(1/state.ratio).toFixed(4);
   const sel=$('#formatSelect');
   const match=[...sel.options].find(o=>Math.abs(+o.value-state.ratio)<0.01);
@@ -1801,10 +1902,24 @@ $$('#modeSeg button').forEach(b=>b.onclick=()=>{
   const f=selFrame(); if(!f) return;
   f.mode=b.dataset.v; f.zoom=1; f.ox=f.oy=0; setSeg('modeSeg',f.mode); render(); syncAll(); pushHistory();
 });
+bindRange('#focusRange','#focusVal','%',v=>{
+  const f=selFrame(); if(!f) return;
+  f.fy=v/100; render(); debounceHistory();
+});
+$('#autoFocusBtn').onclick=async()=>{
+  const f=selFrame(); if(!f||!f.photoId) return;
+  const p=state.photos.find(x=>x.id===f.photoId); if(!p) return;
+  const img=new Image(); img.src=p.url;
+  try{ await img.decode() }catch{ return }
+  const focus=await detectFocus(img,p.width,p.height);
+  Object.assign(p,focus); Object.assign(f,focus,{ox:0,oy:0});
+  render(); syncAll(); pushHistory(); toast(T('t.focus'));
+};
 $('#centerBtn').onclick=()=>{const f=selFrame();if(f){f.ox=f.oy=0;render();pushHistory()}};
 $('#resetPhotoBtn').onclick=()=>{
   const f=selFrame(); if(!f) return;
-  Object.assign(f,{ox:0,oy:0,zoom:1,rotate:0,mode:'fill',brightness:100,contrast:100,saturation:100,sepia:0,blur:0});
+  const rp=state.photos.find(x=>x.id===f.photoId);
+  Object.assign(f,{ox:0,oy:0,zoom:1,rotate:0,mode:'fill',fx:rp?.fx??0.5,fy:rp?.fy??0.5,brightness:100,contrast:100,saturation:100,sepia:0,blur:0});
   render(); syncAll(); pushHistory();
 };
 $('#swapBtn').onclick=()=>{
