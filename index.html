@@ -99,6 +99,7 @@
     .card:nth-child(4) { animation-delay: 0.45s; }
     .card:nth-child(5) { animation-delay: 0.55s; }
     .card:nth-child(6) { animation-delay: 0.65s; }
+    .card:nth-child(7) { animation-delay: 0.75s; }
 
     .card.active-project {
       --c-theme: var(--primary);
@@ -137,7 +138,7 @@
     .footer { 
       margin-top: 60px; text-align: center; color: var(--muted); 
       font-size: 0.85rem; padding-bottom: 20px;
-      opacity: 0; animation: fadeUpCard 0.6s var(--transition-smooth) forwards; animation-delay: 0.75s;
+      opacity: 0; animation: fadeUpCard 0.6s var(--transition-smooth) forwards; animation-delay: 0.85s;
     }
 
     @media (min-width: 768px) {
@@ -209,6 +210,22 @@
         </div>
         <div class="card-actions">
           <a class="btn-card" href="etiketten-tool/index.html">Tool öffnen</a>
+        </div>
+      </article>
+
+      <!-- NEU: Iconset Studio, alphabetisch einsortiert -->
+      <article class="card active-project">
+        <div class="icon-wrap">
+          <img src="./private/iconset-studio/android-chrome-192x192.png" alt="Iconset Studio Icon" onerror="this.src='./placeholder-icon.png'">
+        </div>
+        <h2>Iconset Studio</h2>
+        <p>Aus einem Bild ein komplettes Icon-Set erzeugen — alle gängigen Größen für Favicon, Homescreen und Web-App, direkt im Browser und ohne Upload.</p>
+        <div class="meta-row">
+          <div class="meta">Icons · Web</div>
+          <div class="language">DE / EN</div>
+        </div>
+        <div class="card-actions">
+          <a class="btn-card" href="private/iconset-studio/index.html">Tool öffnen</a>
         </div>
       </article>
 
