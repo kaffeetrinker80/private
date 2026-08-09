@@ -11,13 +11,23 @@
   --line:#26323c; --line2:#33424f;
   --text:#e6edf3; --muted:#93a4b3; --muted2:#6b7c8c;
   --accent:#2dd4bf; --accent-ink:#04211d; --accent-soft:rgba(45,212,191,.12);
-  --warn:#f0b429; --danger:#f2777a; --ok:#5ecf8f;
+  --code-bg:#0b1015; --code-text:#c9d6e2;
+  --warn:#f0b429; --ok:#5ecf8f;
   --font:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
+html[data-theme="light"]{
+  --bg:#eef2f6; --panel:#ffffff; --panel2:#f4f7fa; --panel3:#e6ecf2;
+  --line:#dce4ec; --line2:#c6d2de;
+  --text:#16212c; --muted:#55677a; --muted2:#7d8fa1;
+  --accent:#0d9488; --accent-ink:#ffffff; --accent-soft:rgba(13,148,136,.10);
+  --code-bg:#f7f9fb; --code-text:#22303d;
+  --warn:#b0790a; --ok:#2f8f5b;
+}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;
+  transition:background .2s,color .2s}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:none;padding:0}
 ::-webkit-scrollbar{width:10px;height:10px}
@@ -26,135 +36,140 @@ button{cursor:pointer;background:none;border:none;padding:0}
 
 header{
   position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;
-  padding:12px 20px;background:rgba(21,28,34,.92);backdrop-filter:blur(10px);
+  padding:12px 18px;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line)
 }
-.mark{
-  width:32px;height:32px;border-radius:9px;flex:none;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--accent),#3b82f6);color:#04211d
-}
+.mark{width:32px;height:32px;border-radius:9px;flex:none;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--accent),#3b82f6);color:var(--accent-ink)}
 .mark svg{width:18px;height:18px}
 .htitle{font-size:15px;font-weight:650;display:flex;align-items:center;gap:9px}
-.pill{
-  font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:99px;
-  background:var(--accent-soft);color:var(--accent);border:1px solid rgba(45,212,191,.25)
-}
+.pill{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:99px;
+  background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
 .hsub{font-size:11.5px;color:var(--muted2);margin-top:1px}
+.hspace{flex:1}
+.hbtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);
+  display:grid;place-items:center;transition:.16s;font-size:12px;font-weight:700;color:var(--muted)}
+.hbtn:hover{background:var(--panel3);color:var(--text)}
+.hbtn svg{width:16px;height:16px}
 
-.wrap{max-width:1160px;margin:0 auto;padding:22px 20px 90px}
-.grid{display:grid;gap:18px;grid-template-columns:1fr}
-@media(min-width:900px){.grid{grid-template-columns:minmax(0,380px) minmax(0,1fr)}}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 18px 80px}
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:920px){.grid{grid-template-columns:minmax(0,382px) minmax(0,1fr)}}
 
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-.card+.card{margin-top:16px}
-.eyebrow{
-  font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted2);
-  margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px
-}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px}
+.card+.card{margin-top:15px}
+.eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted2);
+  margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none}
+.eyebrow .chev{width:14px;height:14px;transition:transform .2s;color:var(--muted2)}
+.sect.collapsed .chev{transform:rotate(-90deg)}
+.sect.collapsed>.eyebrow{margin-bottom:0}
+.sect.collapsed>*:not(.eyebrow){display:none!important}
 .hint{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}
 .hint b{color:var(--text);font-weight:600}
 
-.drop{
-  border:1.5px dashed rgba(45,212,191,.4);border-radius:12px;padding:22px 14px;text-align:center;
-  background:var(--accent-soft);cursor:pointer;transition:.18s;width:100%
-}
-.drop:hover,.drop.drag{border-color:var(--accent);background:rgba(45,212,191,.18)}
+.drop{border:1.5px dashed color-mix(in srgb,var(--accent) 42%,transparent);border-radius:12px;padding:20px 14px;
+  text-align:center;background:var(--accent-soft);cursor:pointer;transition:.18s;width:100%}
+.drop:hover,.drop.drag{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
 .drop svg{width:22px;height:22px;color:var(--accent);margin-bottom:6px}
 .drop b{display:block;font-size:13.5px}
 .drop span{display:block;font-size:11.5px;color:var(--muted);margin-top:4px}
 
-.field{display:block;margin-bottom:13px}
+.field{display:block;margin-bottom:12px}
+.field:last-child{margin-bottom:0}
 .field-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;font-size:12.5px}
 .val{font-size:11.5px;color:var(--accent);font-weight:650;font-family:var(--mono)}
-input[type=text]{
-  width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:9px;
-  background:var(--panel2)
-}
+input[type=text],select{width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:9px;
+  background:var(--panel2)}
+select{appearance:none;padding-right:30px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d8fa1' stroke-width='2.5' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center;background-size:15px}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:32px;background:transparent;cursor:pointer}
 input[type=range]::-webkit-slider-runnable-track{height:5px;background:var(--panel3);border-radius:99px;border:1px solid var(--line)}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);
-  margin-top:-8px;border:2px solid var(--panel)
-}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--accent);margin-top:-8px;border:2px solid var(--panel)}
 input[type=range]::-moz-range-track{height:5px;background:var(--panel3);border-radius:99px;border:1px solid var(--line)}
 input[type=range]::-moz-range-thumb{width:20px;height:20px;border:2px solid var(--panel);border-radius:50%;background:var(--accent)}
 .colorrow{display:flex;gap:8px;align-items:center}
-input[type=color]{
-  width:44px;height:36px;padding:2px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);
-  cursor:pointer;flex:none
-}
+input[type=color]{width:44px;height:36px;padding:2px;border:1px solid var(--line);border-radius:9px;
+  background:var(--panel2);cursor:pointer;flex:none}
 input[type=color]::-webkit-color-swatch-wrapper{padding:0}
 input[type=color]::-webkit-color-swatch{border:none;border-radius:6px}
 .hex{font-family:var(--mono);font-size:12.5px}
 
-.btn{
-  height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:550;transition:.16s
-}
+.check{display:flex;align-items:flex-start;gap:9px;padding:7px 0;cursor:pointer;font-size:12.5px;line-height:1.45}
+.check input{appearance:none;width:18px;height:18px;flex:none;margin-top:1px;border:1.5px solid var(--line2);
+  border-radius:5px;background:var(--panel2);position:relative;cursor:pointer;transition:.15s}
+.check input:checked{background:var(--accent);border-color:var(--accent)}
+.check input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:5px;height:10px;
+  border:solid var(--accent-ink);border-width:0 2.2px 2.2px 0;transform:rotate(45deg)}
+.check span small{display:block;color:var(--muted2);font-size:11px;margin-top:2px}
+
+.btn{height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:550;transition:.16s}
 .btn:hover{background:var(--panel3)}
 .btn svg{width:15px;height:15px;flex:none}
 .btn.primary{background:var(--accent);border-color:transparent;color:var(--accent-ink);font-weight:650}
-.btn.primary:hover{background:#5ee0d0}
+.btn.primary:hover{filter:brightness(1.08)}
 .btn.wide{width:100%}
 .btn[disabled]{opacity:.35;pointer-events:none}
 .btn.sm{height:30px;padding:0 10px;font-size:12px;border-radius:8px}
 
 .swatches{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.sw{
-  width:30px;height:30px;border-radius:8px;border:1px solid var(--line2);cursor:pointer;transition:.14s;
-  position:relative
-}
+.sw{width:30px;height:30px;border-radius:8px;border:1px solid var(--line2);cursor:pointer;transition:.14s}
 .sw:hover{transform:translateY(-2px)}
-.sw.on{box-shadow:0 0 0 2px var(--accent)}
 
-/* Vorschauen */
-.previews{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.previews{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
 .pv{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-.pv canvas{display:block;margin:0 auto 8px;border-radius:6px;image-rendering:auto}
-.pv .lbl{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.pv canvas{display:block;margin:0 auto 8px}
+.pv.round canvas{border-radius:50%}
+.pv .lbl{font-size:11px;color:var(--muted);font-family:var(--mono);word-break:break-all}
 .pv .note{font-size:10.5px;color:var(--muted2);margin-top:3px}
-.round canvas{border-radius:50%}
 
-.phone{
-  border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:#fff;max-width:300px
-}
-.statusbar{
-  display:flex;align-items:center;justify-content:space-between;padding:7px 12px;font-size:11px;font-weight:600
-}
-.urlbar{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:11.5px}
+.phone{border:1px solid var(--line2);border-radius:14px;overflow:hidden;max-width:290px;background:#fff}
+.statusbar{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;font-size:11px;font-weight:600}
+.urlbar{padding:8px 12px;font-size:11.5px}
 .pagebody{padding:16px 12px 22px;font-size:12px}
-.splash{display:grid;place-items:center;gap:10px;padding:26px 12px;text-align:center}
+.splash{display:grid;place-items:center;gap:10px;padding:24px 12px;text-align:center}
 .splash .nm{font-size:13px;font-weight:600}
 
-.warn{
-  display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border-radius:10px;font-size:12.2px;
-  line-height:1.5;margin-top:10px
-}
-.warn.ok{background:rgba(94,207,143,.10);border:1px solid rgba(94,207,143,.28);color:#a9e6c4}
-.warn.bad{background:rgba(240,180,41,.10);border:1px solid rgba(240,180,41,.30);color:#f2d492}
+.warn{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border-radius:10px;font-size:12.2px;
+  line-height:1.5;margin-top:10px}
+.warn.ok{background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 34%,transparent)}
+.warn.bad{background:color-mix(in srgb,var(--warn) 12%,transparent);border:1px solid color-mix(in srgb,var(--warn) 36%,transparent)}
 .warn svg{width:15px;height:15px;flex:none;margin-top:1px}
 
-pre{
-  margin:0;background:#0b1015;border:1px solid var(--line);border-radius:10px;padding:12px;
-  font-family:var(--mono);font-size:11.5px;line-height:1.65;overflow-x:auto;color:#c9d6e2;white-space:pre
-}
+pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:12px;
+  font-family:var(--mono);font-size:11.5px;line-height:1.65;overflow-x:auto;color:var(--code-text);white-space:pre}
 .code-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.code-head .eyebrow{margin:0;cursor:default}
 .filelist{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{
-  font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:99px;
-  background:var(--panel3);border:1px solid var(--line2);color:var(--muted)
-}
-.empty{color:var(--muted2);font-size:12.5px;text-align:center;padding:26px 10px}
+.chip{font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:99px;background:var(--panel3);
+  border:1px solid var(--line2);color:var(--muted)}
+.empty{color:var(--muted2);font-size:12.5px;text-align:center;padding:24px 10px}
 
-.toast{
-  position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:none;
+  place-items:center;padding:18px;z-index:300}
+.overlay.open{display:grid}
+.modal{width:min(620px,100%);max-height:84vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);
+  border-radius:16px;padding:20px}
+.modal h2{margin:0 0 4px;font-size:17px}
+.modal .sub{color:var(--muted2);font-size:12px;margin-bottom:16px}
+.modal h4{margin:16px 0 6px;font-size:13px;color:var(--accent)}
+.modal p,.modal li{font-size:12.8px;line-height:1.65;color:var(--muted);margin:5px 0}
+.modal b{color:var(--text)}
+.modal ul{margin:5px 0;padding-left:18px}
+.modal code{font-family:var(--mono);font-size:11.5px;background:var(--panel3);padding:1px 5px;border-radius:5px;color:var(--text)}
+.modal-x{position:sticky;top:0;float:right;width:30px;height:30px;border-radius:8px;background:var(--panel3);
+  display:grid;place-items:center}
+.modal-x svg{width:15px;height:15px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
   background:var(--panel3);border:1px solid var(--line2);border-radius:11px;padding:10px 15px;font-size:13px;
-  display:flex;align-items:center;gap:8px;transition:.22s;z-index:200
-}
+  display:flex;align-items:center;gap:8px;transition:.22s;z-index:400}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast svg{width:15px;height:15px;color:var(--accent)}
 
-footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:22px 12px 30px}
+footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 28px}
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
 </style>
 </head>
@@ -167,88 +182,177 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:22px 12px 
     </svg>
   </div>
   <div>
-    <div class="htitle">Icon Set Studio <span class="pill">v1.0</span></div>
-    <div class="hsub">Favicons, Manifest und Head-Snippet aus einem Symbol</div>
+    <div class="htitle">Icon Set Studio <span class="pill">v1.1</span></div>
+    <div class="hsub" data-i18n="app.sub">Favicons, Manifest und Head-Snippet aus einem Symbol</div>
   </div>
+  <div class="hspace"></div>
+  <button class="hbtn" id="themeBtn" data-i18n-title="btn.theme" title="Hell / Dunkel">
+    <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
+  </button>
+  <button class="hbtn" id="langBtn" title="Sprache / Language">EN</button>
+  <button class="hbtn" id="helpBtn" data-i18n-title="btn.help" title="Hilfe">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="9"/><path d="M9.2 9a3 3 0 0 1 5.6 1c0 2-2.8 2.5-2.8 4"/><circle cx="12" cy="17.5" r=".9" fill="currentColor"/>
+    </svg>
+  </button>
 </header>
 
 <div class="wrap">
 <div class="grid">
 
-  <!-- ---------------- Steuerung ---------------- -->
+  <!-- ============ Steuerung ============ -->
   <div>
-    <div class="card">
-      <h3 class="eyebrow">Symbol</h3>
+    <div class="card sect">
+      <h3 class="eyebrow"><span data-i18n="h.symbol">Symbol</span></h3>
       <button class="drop" id="drop">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
         </svg>
-        <b>Symbol wählen</b>
-        <span>PNG, SVG oder JPG — quadratisch ist ideal</span>
+        <b data-i18n="drop.title">Symbol wählen</b>
+        <span data-i18n="drop.sub">PNG, SVG oder JPG — quadratisch ist ideal</span>
       </button>
       <input type="file" id="file" accept="image/*" hidden>
-      <p class="hint" id="srcInfo">Am besten mindestens 512×512 px. SVG wird verlustfrei hochskaliert.</p>
+      <p class="hint" id="srcInfo" data-i18n="src.none">Am besten mindestens 512×512 px. SVG wird verlustfrei hochskaliert.</p>
     </div>
 
-    <div class="card">
-      <h3 class="eyebrow">Projekt</h3>
+    <div class="card sect">
+      <h3 class="eyebrow"><span data-i18n="h.project">Projekt</span></h3>
       <label class="field">
-        <div class="field-head"><span>Name</span></div>
+        <div class="field-head"><span data-i18n="f.name">Name</span></div>
         <input type="text" id="appName" value="RC Ordner-Einteilung" spellcheck="false">
       </label>
       <label class="field">
-        <div class="field-head"><span>Kurzname</span><output class="val" id="shortLen">7 / 12</output></div>
+        <div class="field-head"><span data-i18n="f.short">Kurzname</span><output class="val" id="shortLen">7 / 12</output></div>
         <input type="text" id="shortName" value="RC Plan" spellcheck="false">
+      </label>
+      <label class="field">
+        <div class="field-head"><span data-i18n="f.desc">Beschreibung</span></div>
+        <input type="text" id="appDesc" value="" spellcheck="false" data-i18n-ph="ph.desc" placeholder="Kurz, ein Satz — landet im Manifest und in der Link-Vorschau">
+      </label>
+      <label class="field">
+        <div class="field-head"><span data-i18n="f.url">Adresse der Seite</span></div>
+        <input type="text" id="siteUrl" value="https://kaffeetrinker80.github.io/" spellcheck="false">
+        <p class="hint" data-i18n="hint.url">Wird nur für die Link-Vorschau gebraucht — die muss absolut sein.</p>
       </label>
     </div>
 
-    <div class="card">
-      <h3 class="eyebrow">Farben</h3>
-
+    <div class="card sect">
+      <h3 class="eyebrow"><span data-i18n="h.colors">Farben</span></h3>
       <label class="field">
-        <div class="field-head"><span>theme_color — Farbe deines Headers</span></div>
+        <div class="field-head"><span data-i18n="f.theme">theme_color — Farbe deines Headers</span></div>
         <div class="colorrow">
           <input type="color" id="themeColor" value="#172f4d">
           <input type="text" class="hex" id="themeHex" value="#172f4d" spellcheck="false">
         </div>
         <div class="swatches" id="themeSw"></div>
       </label>
-
+      <label class="check">
+        <input type="checkbox" id="optDarkTheme">
+        <span><span data-i18n="opt.darkTheme">Eigene theme_color für den Dunkelmodus</span><small data-i18n="opt.darkTheme.s">Ergänzt zwei meta-Zeilen mit prefers-color-scheme</small></span>
+      </label>
+      <label class="field" id="darkThemeField" hidden>
+        <div class="field-head"><span data-i18n="f.themeDark">theme_color im Dunkelmodus</span></div>
+        <div class="colorrow">
+          <input type="color" id="themeDark" value="#12151a">
+          <input type="text" class="hex" id="themeDarkHex" value="#12151a" spellcheck="false">
+        </div>
+      </label>
       <label class="field">
-        <div class="field-head"><span>background_color — dein Seitenhintergrund</span></div>
+        <div class="field-head"><span data-i18n="f.bg">background_color — dein Seitenhintergrund</span></div>
         <div class="colorrow">
           <input type="color" id="bgColor" value="#f3f6fa">
           <input type="text" class="hex" id="bgHex" value="#f3f6fa" spellcheck="false">
         </div>
         <div class="swatches" id="bgSw"></div>
       </label>
-
       <div id="lumWarn"></div>
     </div>
 
-    <div class="card">
-      <h3 class="eyebrow">Icon-Fläche</h3>
+    <div class="card sect">
+      <h3 class="eyebrow"><span data-i18n="h.shape">Icon-Fläche</span></h3>
       <label class="field">
-        <div class="field-head"><span>Hintergrund hinter dem Symbol</span></div>
+        <div class="field-head"><span data-i18n="f.padColor">Hintergrund hinter dem Symbol</span></div>
         <div class="colorrow">
           <input type="color" id="padColor" value="#172f4d">
           <input type="text" class="hex" id="padHex" value="#172f4d" spellcheck="false">
         </div>
-        <p class="hint">Wird für <b>apple-touch-icon</b> und das <b>maskable</b> Icon gebraucht — beide dürfen nicht transparent sein.</p>
+        <p class="hint" data-i18n="hint.padColor">Nötig für <b>apple-touch-icon</b> und das <b>maskable</b> Icon — beide dürfen nicht transparent sein.</p>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="optOpaque">
+        <span><span data-i18n="opt.opaque">Auch die übrigen PNGs deckend füllen</span><small data-i18n="opt.opaque.s">Sonst bleiben sie transparent</small></span>
       </label>
       <label class="field">
-        <div class="field-head"><span>Rand im normalen Icon</span><output class="val" id="padVal">8 %</output></div>
+        <div class="field-head"><span data-i18n="f.pad">Rand im normalen Icon</span><output class="val" id="padVal">8 %</output></div>
         <input type="range" id="padRange" min="0" max="25" value="8">
       </label>
       <label class="field">
-        <div class="field-head"><span>Rand im maskable Icon</span><output class="val" id="maskVal">22 %</output></div>
+        <div class="field-head"><span data-i18n="f.mask">Rand im maskable Icon</span><output class="val" id="maskVal">22 %</output></div>
         <input type="range" id="maskRange" min="10" max="35" value="22">
-        <p class="hint">Android beschneidet maskable Icons kreisförmig. Unter 20 % wird es an den Ecken knapp.</p>
+        <p class="hint" data-i18n="hint.mask">Android beschneidet maskable Icons kreisförmig. Unter 20 % wird es an den Ecken knapp.</p>
       </label>
       <label class="field">
-        <div class="field-head"><span>Eckenradius der PNGs</span><output class="val" id="radVal">0 %</output></div>
+        <div class="field-head"><span data-i18n="f.radius">Eckenradius der PNGs</span><output class="val" id="radVal">0 %</output></div>
         <input type="range" id="radRange" min="0" max="50" value="0">
-        <p class="hint">Meist bei 0 lassen — Betriebssysteme runden selbst ab.</p>
+        <p class="hint" data-i18n="hint.radius">Meist bei 0 lassen — Betriebssysteme runden selbst ab.</p>
+      </label>
+    </div>
+
+    <div class="card sect">
+      <h3 class="eyebrow"><span data-i18n="h.manifest">Manifest-Verhalten</span></h3>
+      <label class="field">
+        <div class="field-head"><span data-i18n="f.display">Anzeigemodus</span></div>
+        <select id="displayMode">
+          <option value="standalone" data-i18n="disp.standalone">standalone — wie eine eigene App</option>
+          <option value="minimal-ui" data-i18n="disp.minimal">minimal-ui — mit kleiner Browserleiste</option>
+          <option value="fullscreen" data-i18n="disp.full">fullscreen — ohne Systemleisten</option>
+          <option value="browser" data-i18n="disp.browser">browser — normaler Tab</option>
+        </select>
+      </label>
+      <label class="field">
+        <div class="field-head"><span data-i18n="f.orient">Ausrichtung</span></div>
+        <select id="orientMode">
+          <option value="any" data-i18n="or.any">any — dreht mit dem Gerät</option>
+          <option value="portrait" data-i18n="or.portrait">portrait — nur hochkant</option>
+          <option value="landscape" data-i18n="or.landscape">landscape — nur quer</option>
+        </select>
+      </label>
+      <label class="field">
+        <div class="field-head"><span data-i18n="f.paths">Pfade</span></div>
+        <select id="pathMode">
+          <option value="rel" data-i18n="path.rel">relativ — Icons liegen neben der index.html</option>
+          <option value="root" data-i18n="path.root">ab Domain-Wurzel — Icons liegen im Root</option>
+        </select>
+        <p class="hint" id="pathHint"></p>
+      </label>
+      <label class="field" id="scopeField">
+        <div class="field-head"><span data-i18n="f.scope">Unterordner</span></div>
+        <input type="text" id="scopePath" value="/" spellcheck="false" placeholder="/theocratic/">
+        <p class="hint" data-i18n="hint.scope">Nur bei Wurzelpfaden nötig: der Ordner, in dem das Tool liegt.</p>
+      </label>
+    </div>
+
+    <div class="card sect">
+      <h3 class="eyebrow"><span data-i18n="h.extras">Zusätzliche Dateien</span></h3>
+      <label class="check">
+        <input type="checkbox" id="optSvg" checked>
+        <span><span data-i18n="opt.svg">favicon.svg</span><small data-i18n="opt.svg.s">Scharf in jeder Größe — nur möglich, wenn du ein SVG hochlädst</small></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="optOg" checked>
+        <span><span data-i18n="opt.og">og-image.png (1200×630)</span><small data-i18n="opt.og.s">Vorschaubild beim Teilen per WhatsApp, Telegram, Signal</small></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="optApple">
+        <span><span data-i18n="opt.apple">Weitere Apple-Größen (152, 167)</span><small data-i18n="opt.apple.s">Für ältere iPads — heute selten nötig</small></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="optTile">
+        <span><span data-i18n="opt.tile">mstile + browserconfig.xml</span><small data-i18n="opt.tile.s">Windows-Kacheln, nur für alte Systeme</small></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="optReadme" checked>
+        <span><span data-i18n="opt.readme">EINBAU.txt</span><small data-i18n="opt.readme.s">Kurzanleitung mit im Paket</small></span>
       </label>
     </div>
 
@@ -257,30 +361,30 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:22px 12px 
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
         </svg>
-        Icon-Set als ZIP laden
+        <span data-i18n="btn.zip">Icon-Set als ZIP laden</span>
       </button>
       <div class="filelist" id="fileList"></div>
     </div>
   </div>
 
-  <!-- ---------------- Vorschau + Ausgabe ---------------- -->
+  <!-- ============ Vorschau + Ausgabe ============ -->
   <div>
     <div class="card">
-      <h3 class="eyebrow">Vorschau</h3>
-      <div id="pvEmpty" class="empty">Noch kein Symbol geladen.</div>
+      <h3 class="eyebrow" style="cursor:default"><span data-i18n="h.preview">Vorschau</span></h3>
+      <div id="pvEmpty" class="empty" data-i18n="pv.empty">Noch kein Symbol geladen.</div>
       <div class="previews" id="previews" hidden></div>
     </div>
 
     <div class="card">
-      <h3 class="eyebrow">So wirken die Farben</h3>
+      <h3 class="eyebrow" style="cursor:default"><span data-i18n="h.colorPv">So wirken die Farben</span></h3>
       <div class="previews">
         <div>
-          <div class="phone" id="browserPv">
+          <div class="phone">
             <div class="statusbar" id="statusBar"><span>9:41</span><span>▮▮▮</span></div>
             <div class="urlbar" id="urlBar"><span id="urlText">kaffeetrinker80.github.io</span></div>
-            <div class="pagebody" id="pageBody">Seiteninhalt</div>
+            <div class="pagebody" id="pageBody" data-i18n="pv.page">Seiteninhalt</div>
           </div>
-          <p class="hint">Browserleiste auf Android</p>
+          <p class="hint" data-i18n="pv.browser">Browserleiste auf Android</p>
         </div>
         <div>
           <div class="phone">
@@ -289,23 +393,23 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:22px 12px 
               <div class="nm" id="splashName">RC Ordner-Einteilung</div>
             </div>
           </div>
-          <p class="hint">Startbildschirm der installierten App</p>
+          <p class="hint" data-i18n="pv.splash">Startbildschirm der installierten App</p>
         </div>
       </div>
     </div>
 
     <div class="card">
       <div class="code-head">
-        <h3 class="eyebrow" style="margin:0">site.webmanifest</h3>
-        <button class="btn sm" data-copy="manifestOut">Kopieren</button>
+        <h3 class="eyebrow">site.webmanifest</h3>
+        <button class="btn sm" data-copy="manifestOut" data-i18n="btn.copy">Kopieren</button>
       </div>
       <pre id="manifestOut"></pre>
     </div>
 
     <div class="card">
       <div class="code-head">
-        <h3 class="eyebrow" style="margin:0">Head-Snippet</h3>
-        <button class="btn sm" data-copy="headOut">Kopieren</button>
+        <h3 class="eyebrow"><span data-i18n="h.head">Head-Snippet</span></h3>
+        <button class="btn sm" data-copy="headOut" data-i18n="btn.copy">Kopieren</button>
       </div>
       <pre id="headOut"></pre>
     </div>
@@ -313,24 +417,162 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:22px 12px 
 </div>
 </div>
 
+<!-- ============ Hilfe ============ -->
+<div class="overlay" id="helpOverlay">
+  <div class="modal">
+    <button class="modal-x" id="helpClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <h2 data-i18n="help.title">Kurzanleitung</h2>
+    <div class="sub" data-i18n="help.sub">In vier Schritten zum fertigen Icon-Set</div>
+    <div id="helpBody"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
-<footer>Made with Love © – Icon Set Studio V 1.0</footer>
+<footer>Made with Love © – Icon Set Studio V 1.1</footer>
 
 <script>
 (()=>{
 "use strict";
-const $=s=>document.querySelector(s);
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 
-/* ============ Grundzustand ============ */
-const SIZES={fav16:16,fav32:32,fav48:48,apple:180,and192:192,and512:512,mask512:512};
-let src=null;                 // geladenes Bild
-let files={};                 // name -> Uint8Array
-const state={
-  theme:'#172f4d', bg:'#f3f6fa', pad:'#172f4d',
-  padPct:8, maskPct:22, radPct:0
+/* ================= Sprachen ================= */
+const I18N={
+de:{
+ 'app.sub':'Favicons, Manifest und Head-Snippet aus einem Symbol',
+ 'btn.theme':'Hell / Dunkel','btn.help':'Hilfe','btn.copy':'Kopieren','btn.zip':'Icon-Set als ZIP laden',
+ 'h.symbol':'Symbol','drop.title':'Symbol wählen','drop.sub':'PNG, SVG oder JPG — quadratisch ist ideal',
+ 'src.none':'Am besten mindestens 512×512 px. SVG wird verlustfrei hochskaliert.',
+ 'h.project':'Projekt','f.name':'Name','f.short':'Kurzname','f.desc':'Beschreibung',
+ 'ph.desc':'Kurz, ein Satz — landet im Manifest und in der Link-Vorschau',
+ 'f.url':'Adresse der Seite','hint.url':'Wird nur für die Link-Vorschau gebraucht — die muss absolut sein.',
+ 'h.colors':'Farben','f.theme':'theme_color — Farbe deines Headers',
+ 'opt.darkTheme':'Eigene theme_color für den Dunkelmodus','opt.darkTheme.s':'Ergänzt zwei meta-Zeilen mit prefers-color-scheme',
+ 'f.themeDark':'theme_color im Dunkelmodus','f.bg':'background_color — dein Seitenhintergrund',
+ 'h.shape':'Icon-Fläche','f.padColor':'Hintergrund hinter dem Symbol',
+ 'hint.padColor':'Nötig für <b>apple-touch-icon</b> und das <b>maskable</b> Icon — beide dürfen nicht transparent sein.',
+ 'opt.opaque':'Auch die übrigen PNGs deckend füllen','opt.opaque.s':'Sonst bleiben sie transparent',
+ 'f.pad':'Rand im normalen Icon','f.mask':'Rand im maskable Icon',
+ 'hint.mask':'Android beschneidet maskable Icons kreisförmig. Unter 20 % wird es an den Ecken knapp.',
+ 'f.radius':'Eckenradius der PNGs','hint.radius':'Meist bei 0 lassen — Betriebssysteme runden selbst ab.',
+ 'h.manifest':'Manifest-Verhalten','f.display':'Anzeigemodus',
+ 'disp.standalone':'standalone — wie eine eigene App','disp.minimal':'minimal-ui — mit kleiner Browserleiste',
+ 'disp.full':'fullscreen — ohne Systemleisten','disp.browser':'browser — normaler Tab',
+ 'f.orient':'Ausrichtung','or.any':'any — dreht mit dem Gerät','or.portrait':'portrait — nur hochkant','or.landscape':'landscape — nur quer',
+ 'f.paths':'Pfade','path.rel':'relativ — Icons liegen neben der index.html','path.root':'ab Domain-Wurzel — Icons liegen im Root',
+ 'hint.pathRel':'Empfohlen. Der Ordner bleibt in sich geschlossen und lässt sich kopieren.',
+ 'hint.pathRoot':'Nur sinnvoll, wenn alle Tools sich ein Icon-Set im Root teilen.',
+ 'f.scope':'Unterordner','hint.scope':'Nur bei Wurzelpfaden nötig: der Ordner, in dem das Tool liegt.',
+ 'h.extras':'Zusätzliche Dateien',
+ 'opt.svg':'favicon.svg','opt.svg.s':'Scharf in jeder Größe — nur möglich, wenn du ein SVG hochlädst',
+ 'opt.og':'og-image.png (1200×630)','opt.og.s':'Vorschaubild beim Teilen per WhatsApp, Telegram, Signal',
+ 'opt.apple':'Weitere Apple-Größen (152, 167)','opt.apple.s':'Für ältere iPads — heute selten nötig',
+ 'opt.tile':'mstile + browserconfig.xml','opt.tile.s':'Windows-Kacheln, nur für alte Systeme',
+ 'opt.readme':'EINBAU.txt','opt.readme.s':'Kurzanleitung mit im Paket',
+ 'h.preview':'Vorschau','pv.empty':'Noch kein Symbol geladen.','h.colorPv':'So wirken die Farben',
+ 'pv.page':'Seiteninhalt','pv.browser':'Browserleiste auf Android','pv.splash':'Startbildschirm der installierten App',
+ 'h.head':'Head-Snippet',
+ 'note.tab':'Browser-Tab','note.ios':'iOS Homescreen','note.android':'Android / PWA','note.mask':'Android maskable','note.og':'Link-Vorschau',
+ 't.loaded':'Symbol geladen','t.copied':'Kopiert','t.copyFail':'Kopieren nicht möglich — bitte manuell markieren',
+ 't.zip':'ZIP erstellt','t.badFile':'Bitte eine Bilddatei wählen','t.readFail':'Datei konnte nicht gelesen werden',
+ 't.badHex':'Kein gültiger Hex-Wert','t.needSvg':'favicon.svg braucht eine SVG-Datei als Quelle',
+ 'lum.ok':'Helligkeit {p} % — Android zeichnet die Statusleiste {m}, das ist eindeutig.',
+ 'lum.light':'hell','lum.dark':'dunkel',
+ 'lum.mid':'Die theme_color liegt im mittleren Helligkeitsbereich. Android entscheidet dort unzuverlässig, ob die Symbole der Statusleiste schwarz oder weiß werden — nimm einen klar dunkleren oder helleren Ton.',
+ 'lum.flat':'theme_color und background_color sind fast identisch. Erlaubt, aber der Startbildschirm wirkt dadurch flächig.',
+ 'src.info':'{name} — {w}×{h} px','src.nonsquare':' · nicht quadratisch, wird mittig eingepasst',
+ 'src.small':' · unter 512 px, das große Icon wird weich','src.svg':' · SVG, skaliert verlustfrei',
+ 'help.title':'Kurzanleitung','help.sub':'In vier Schritten zum fertigen Icon-Set'
+},
+en:{
+ 'app.sub':'Favicons, manifest and head snippet from one symbol',
+ 'btn.theme':'Light / dark','btn.help':'Help','btn.copy':'Copy','btn.zip':'Download icon set as ZIP',
+ 'h.symbol':'Symbol','drop.title':'Choose symbol','drop.sub':'PNG, SVG or JPG — square works best',
+ 'src.none':'At least 512×512 px is ideal. SVG scales without loss.',
+ 'h.project':'Project','f.name':'Name','f.short':'Short name','f.desc':'Description',
+ 'ph.desc':'One short sentence — used in the manifest and link preview',
+ 'f.url':'Site address','hint.url':'Only needed for the link preview, which requires an absolute URL.',
+ 'h.colors':'Colours','f.theme':'theme_color — your header colour',
+ 'opt.darkTheme':'Separate theme_color for dark mode','opt.darkTheme.s':'Adds two meta lines using prefers-color-scheme',
+ 'f.themeDark':'theme_color in dark mode','f.bg':'background_color — your page background',
+ 'h.shape':'Icon surface','f.padColor':'Background behind the symbol',
+ 'hint.padColor':'Required for <b>apple-touch-icon</b> and the <b>maskable</b> icon — neither may be transparent.',
+ 'opt.opaque':'Fill the other PNGs opaquely too','opt.opaque.s':'Otherwise they stay transparent',
+ 'f.pad':'Padding in the normal icon','f.mask':'Padding in the maskable icon',
+ 'hint.mask':'Android crops maskable icons to a circle. Below 20 % the corners get tight.',
+ 'f.radius':'Corner radius of the PNGs','hint.radius':'Usually leave at 0 — operating systems round the corners themselves.',
+ 'h.manifest':'Manifest behaviour','f.display':'Display mode',
+ 'disp.standalone':'standalone — like its own app','disp.minimal':'minimal-ui — with a slim browser bar',
+ 'disp.full':'fullscreen — no system bars','disp.browser':'browser — a normal tab',
+ 'f.orient':'Orientation','or.any':'any — follows the device','or.portrait':'portrait only','or.landscape':'landscape only',
+ 'f.paths':'Paths','path.rel':'relative — icons sit next to index.html','path.root':'from domain root — icons sit in the root',
+ 'hint.pathRel':'Recommended. The folder stays self-contained and can be copied.',
+ 'hint.pathRoot':'Only useful when all tools share one icon set in the root.',
+ 'f.scope':'Subfolder','hint.scope':'Only needed with root paths: the folder the tool lives in.',
+ 'h.extras':'Extra files',
+ 'opt.svg':'favicon.svg','opt.svg.s':'Sharp at any size — only possible if you upload an SVG',
+ 'opt.og':'og-image.png (1200×630)','opt.og.s':'Preview image when sharing via WhatsApp, Telegram, Signal',
+ 'opt.apple':'Extra Apple sizes (152, 167)','opt.apple.s':'For older iPads — rarely needed today',
+ 'opt.tile':'mstile + browserconfig.xml','opt.tile.s':'Windows tiles, for old systems only',
+ 'opt.readme':'SETUP.txt','opt.readme.s':'Short instructions included in the package',
+ 'h.preview':'Preview','pv.empty':'No symbol loaded yet.','h.colorPv':'How the colours land',
+ 'pv.page':'Page content','pv.browser':'Browser bar on Android','pv.splash':'Launch screen of the installed app',
+ 'h.head':'Head snippet',
+ 'note.tab':'Browser tab','note.ios':'iOS home screen','note.android':'Android / PWA','note.mask':'Android maskable','note.og':'Link preview',
+ 't.loaded':'Symbol loaded','t.copied':'Copied','t.copyFail':'Copying failed — please select manually',
+ 't.zip':'ZIP created','t.badFile':'Please choose an image file','t.readFail':'The file could not be read',
+ 't.badHex':'Not a valid hex value','t.needSvg':'favicon.svg needs an SVG file as its source',
+ 'lum.ok':'Brightness {p} % — Android draws the status bar {m}, which is unambiguous.',
+ 'lum.light':'light','lum.dark':'dark',
+ 'lum.mid':'The theme_color sits in the mid brightness range. Android decides unreliably there whether status bar symbols go black or white — pick a clearly darker or lighter tone.',
+ 'lum.flat':'theme_color and background_color are almost identical. Allowed, but it makes the launch screen look flat.',
+ 'src.info':'{name} — {w}×{h} px','src.nonsquare':' · not square, will be centred',
+ 'src.small':' · under 512 px, the large icon will look soft','src.svg':' · SVG, scales without loss',
+ 'help.title':'Quick guide','help.sub':'Four steps to a finished icon set'
+}};
+let lang='de';
+const T=(k,v)=>{
+  let s=I18N[lang][k]??I18N.de[k]??k;
+  if(v) for(const [a,b] of Object.entries(v)) s=s.replace('{'+a+'}',b);
+  return s;
 };
+const HELP={
+de:`<h4>1 · Symbol wählen</h4>
+<p>Ein quadratisches Bild ab 512×512 px, am besten ein SVG. Was hier keinen Rand hat, bekommt ihn gleich über die Regler — zeichne dein Symbol also ruhig randlos.</p>
+<h4>2 · Farben festlegen</h4>
+<p><b>theme_color</b> ist die Hintergrundfarbe deines <code>&lt;header&gt;</code>. Sie färbt die Browserleiste auf Android und die Titelleiste der installierten App. Passt sie nicht, siehst du eine Farbkante über deinem Header.</p>
+<p><b>background_color</b> ist der Hintergrund deines <code>&lt;body&gt;</code>. Sie erscheint im Startbildschirm, bevor dein CSS geladen ist — steht hier etwas anderes, blitzt beim Start die falsche Farbe auf.</p>
+<p>Beide Werte liest du aus deinem eigenen CSS ab, nicht aus dem Logo. Die Farbfelder unter den Wählern sind nur Vorschläge aus deinem Symbol.</p>
+<h4>3 · Ränder prüfen</h4>
+<p>Das <b>maskable</b> Icon wird auf Android kreisförmig beschnitten. Die runde Vorschau zeigt, was übrig bleibt — bei 22 % Rand ist man sicher.</p>
+<p>Das <b>apple-touch-icon</b> wird immer deckend gefüllt, weil iOS Transparenz sonst schwarz ausmalt.</p>
+<h4>4 · Einbauen</h4>
+<p>ZIP entpacken, alle Dateien in den Ordner deiner <code>index.html</code> legen, Head-Snippet in den <code>&lt;head&gt;</code> kopieren. Fertig.</p>
+<p><b>Wichtig:</b> Die <code>theme-color</code> im HTML und die <code>theme_color</code> im Manifest müssen denselben Wert haben — sonst sieht die installierte App anders aus als im Browser. Das Tool hält beide automatisch gleich.</p>
+<h4>Tastatur</h4>
+<ul><li><code>?</code> — diese Hilfe</li><li><code>L</code> — Sprache wechseln</li><li><code>D</code> — hell / dunkel</li><li><code>Esc</code> — Dialog schließen</li></ul>`,
+en:`<h4>1 · Choose a symbol</h4>
+<p>A square image from 512×512 px, ideally an SVG. Padding is added by the sliders, so draw your symbol edge to edge.</p>
+<h4>2 · Set the colours</h4>
+<p><b>theme_color</b> is the background of your <code>&lt;header&gt;</code>. It tints the browser bar on Android and the title bar of the installed app. Get it wrong and you see a colour seam above your header.</p>
+<p><b>background_color</b> is your <code>&lt;body&gt;</code> background. It shows on the launch screen before your CSS loads — a mismatch means the wrong colour flashes at startup.</p>
+<p>Read both from your own CSS, not from the logo. The swatches below the pickers are only suggestions taken from your symbol.</p>
+<h4>3 · Check the padding</h4>
+<p>The <b>maskable</b> icon gets cropped to a circle on Android. The round preview shows what survives — 22 % padding is safe.</p>
+<p>The <b>apple-touch-icon</b> is always filled opaquely, because iOS paints transparency black.</p>
+<h4>4 · Install</h4>
+<p>Unzip, drop every file into the folder holding your <code>index.html</code>, paste the head snippet into <code>&lt;head&gt;</code>. Done.</p>
+<p><b>Important:</b> the <code>theme-color</code> in HTML and the <code>theme_color</code> in the manifest must match — otherwise the installed app looks different from the browser. This tool keeps them in sync.</p>
+<h4>Keyboard</h4>
+<ul><li><code>?</code> — this help</li><li><code>L</code> — switch language</li><li><code>D</code> — light / dark</li><li><code>Esc</code> — close dialog</li></ul>`};
 
-/* ============ Kleinkram ============ */
+/* ================= Zustand ================= */
+let src=null, srcIsSvg=false, srcSvgText=null, srcName='';
+let files={}, lastDefs=null;
+const state={theme:'#172f4d',themeDark:'#12151a',bg:'#f3f6fa',pad:'#172f4d',padPct:8,maskPct:22,radPct:0};
+
+/* ================= Kleinkram ================= */
 function toast(msg){
   const t=$('#toast');
   t.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span></span>';
@@ -345,375 +587,503 @@ const clean=h=>{
   return /^#[0-9a-f]{6}$/i.test(h)?h.toLowerCase():null;
 };
 const rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
-/* relative Leuchtdichte nach WCAG — entscheidet, ob Android helle oder dunkle Symbole zeichnet */
 function luminance(hex){
-  const [r,g,b]=rgb(hex).map(v=>{
-    v/=255; return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);
-  });
+  const [r,g,b]=rgb(hex).map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)});
   return 0.2126*r+0.7152*g+0.0722*b;
 }
 const contrast=(a,b)=>{
   const l1=luminance(a),l2=luminance(b);
   return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);
 };
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-/* ============ Zeichnen ============ */
+/* ================= Zeichnen ================= */
 function roundRect(ctx,x,y,w,h,r){
   r=Math.min(r,w/2,h/2);
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
 }
-/* size = Kantenlänge, padPct = Rand in %, bgFill = Farbe oder null für transparent */
 function drawIcon(size,padPct,bgFill,radPct){
   const c=document.createElement('canvas'); c.width=c.height=size;
-  const ctx=c.getContext('2d');
-  ctx.imageSmoothingQuality='high';
+  const ctx=c.getContext('2d'); ctx.imageSmoothingQuality='high';
   const r=(radPct/100)*size;
   if(bgFill){
     ctx.fillStyle=bgFill;
-    if(r>0){ roundRect(ctx,0,0,size,size,r); ctx.fill() } else ctx.fillRect(0,0,size,size);
-  }else if(r>0){
-    roundRect(ctx,0,0,size,size,r); ctx.clip();
-  }
+    if(r>0){roundRect(ctx,0,0,size,size,r);ctx.fill()} else ctx.fillRect(0,0,size,size);
+  }else if(r>0){ roundRect(ctx,0,0,size,size,r); ctx.clip() }
   if(src){
     const inner=size*(1-2*padPct/100);
     const s=Math.min(inner/src.width,inner/src.height);
-    const w=src.width*s, h=src.height*s;
-    ctx.drawImage(src,(size-w)/2,(size-h)/2,w,h);
+    ctx.drawImage(src,(size-src.width*s)/2,(size-src.height*s)/2,src.width*s,src.height*s);
   }
   return c;
 }
-const canvasBytes=c=>new Promise(res=>{
-  c.toBlob(async b=>res(new Uint8Array(await b.arrayBuffer())),'image/png');
-});
+/* Link-Vorschau: Symbol mittig, Name darunter, Farbe automatisch nach Kontrast */
+function drawOg(){
+  const W=1200,H=630;
+  const c=document.createElement('canvas'); c.width=W; c.height=H;
+  const ctx=c.getContext('2d'); ctx.imageSmoothingQuality='high';
+  ctx.fillStyle=state.pad; ctx.fillRect(0,0,W,H);
+  const light=luminance(state.pad)>0.5;
+  if(src){
+    const box=250;
+    const s=Math.min(box/src.width,box/src.height);
+    ctx.drawImage(src,(W-src.width*s)/2,215-src.height*s/2,src.width*s,src.height*s);
+  }
+  ctx.fillStyle=light?'#16212c':'#ffffff';
+  ctx.textAlign='center';
+  ctx.font='600 56px Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText($('#appName').value||'Tool',W/2,430,W-120);
+  const d=$('#appDesc').value.trim();
+  if(d){
+    ctx.fillStyle=light?'rgba(22,33,44,.62)':'rgba(255,255,255,.72)';
+    ctx.font='400 28px Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillText(d,W/2,486,W-160);
+  }
+  return c;
+}
+const canvasBytes=c=>new Promise(res=>c.toBlob(async b=>res(new Uint8Array(await b.arrayBuffer())),'image/png'));
 
-/* ============ ICO-Container ============
-   Windows akzeptiert seit Vista PNG-Daten direkt in der ICO-Hülle.
-   Aufbau: 6 Byte Kopf, je 16 Byte Verzeichniseintrag, dann die PNG-Blöcke. */
-function buildIco(entries){           // [{size, bytes}]
+/* ================= ICO ================= */
+function buildIco(entries){
   const head=6, dir=16*entries.length;
   let offset=head+dir;
-  const total=offset+entries.reduce((a,e)=>a+e.bytes.length,0);
-  const buf=new Uint8Array(total), dv=new DataView(buf.buffer);
-  dv.setUint16(0,0,true);             // reserviert
-  dv.setUint16(2,1,true);             // Typ 1 = Icon
-  dv.setUint16(4,entries.length,true);
+  const buf=new Uint8Array(offset+entries.reduce((a,e)=>a+e.bytes.length,0));
+  const dv=new DataView(buf.buffer);
+  dv.setUint16(0,0,true); dv.setUint16(2,1,true); dv.setUint16(4,entries.length,true);
   entries.forEach((e,i)=>{
     const p=head+i*16;
-    buf[p]  =e.size>=256?0:e.size;    // 0 bedeutet 256
-    buf[p+1]=e.size>=256?0:e.size;
-    buf[p+2]=0;                       // Farbpalette
-    buf[p+3]=0;                       // reserviert
-    dv.setUint16(p+4,1,true);         // Farbebenen
-    dv.setUint16(p+6,32,true);        // Bits pro Pixel
-    dv.setUint32(p+8,e.bytes.length,true);
-    dv.setUint32(p+12,offset,true);
-    buf.set(e.bytes,offset);
-    offset+=e.bytes.length;
+    buf[p]=e.size>=256?0:e.size; buf[p+1]=e.size>=256?0:e.size;
+    dv.setUint16(p+4,1,true); dv.setUint16(p+6,32,true);
+    dv.setUint32(p+8,e.bytes.length,true); dv.setUint32(p+12,offset,true);
+    buf.set(e.bytes,offset); offset+=e.bytes.length;
   });
   return buf;
 }
 
-/* ============ ZIP ohne Fremdbibliothek ============
-   Speichermethode 0 (unkomprimiert) — PNGs sind ohnehin komprimiert. */
+/* ================= ZIP ================= */
 const CRC_TABLE=(()=>{
   const t=new Uint32Array(256);
-  for(let n=0;n<256;n++){
-    let c=n;
-    for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1;
-    t[n]=c>>>0;
-  }
+  for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}
   return t;
 })();
-function crc32(bytes){
-  let c=0xFFFFFFFF;
-  for(let i=0;i<bytes.length;i++) c=CRC_TABLE[(c^bytes[i])&0xFF]^(c>>>8);
-  return (c^0xFFFFFFFF)>>>0;
-}
-function buildZip(entries){           // [{name, bytes}]
-  const enc=new TextEncoder();
-  const locals=[], centrals=[];
+function crc32(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC_TABLE[(c^b[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function buildZip(entries){
+  const enc=new TextEncoder(), locals=[], centrals=[];
   let offset=0;
   for(const e of entries){
     const name=enc.encode(e.name), data=e.bytes, crc=crc32(data);
-    const lh=new Uint8Array(30+name.length);
-    const ldv=new DataView(lh.buffer);
-    ldv.setUint32(0,0x04034b50,true);
-    ldv.setUint16(4,20,true);         // Version
-    ldv.setUint16(6,0,true);          // Flags
-    ldv.setUint16(8,0,true);          // Methode 0 = gespeichert
-    ldv.setUint16(10,0,true);         // Zeit
-    ldv.setUint16(12,0x2821,true);    // Datum (fester Platzhalter)
-    ldv.setUint32(14,crc,true);
-    ldv.setUint32(18,data.length,true);
-    ldv.setUint32(22,data.length,true);
+    const lh=new Uint8Array(30+name.length), ldv=new DataView(lh.buffer);
+    ldv.setUint32(0,0x04034b50,true); ldv.setUint16(4,20,true);
+    ldv.setUint16(8,0,true); ldv.setUint16(12,0x2821,true);
+    ldv.setUint32(14,crc,true); ldv.setUint32(18,data.length,true); ldv.setUint32(22,data.length,true);
     ldv.setUint16(26,name.length,true);
-    ldv.setUint16(28,0,true);
-    lh.set(name,30);
-    locals.push(lh,data);
-
-    const ch=new Uint8Array(46+name.length);
-    const cdv=new DataView(ch.buffer);
-    cdv.setUint32(0,0x02014b50,true);
-    cdv.setUint16(4,20,true);
-    cdv.setUint16(6,20,true);
-    cdv.setUint16(8,0,true);
-    cdv.setUint16(10,0,true);
-    cdv.setUint16(12,0,true);
-    cdv.setUint16(14,0x2821,true);
-    cdv.setUint32(16,crc,true);
-    cdv.setUint32(20,data.length,true);
-    cdv.setUint32(24,data.length,true);
-    cdv.setUint16(28,name.length,true);
-    cdv.setUint32(42,offset,true);
-    ch.set(name,46);
-    centrals.push(ch);
+    lh.set(name,30); locals.push(lh,data);
+    const ch=new Uint8Array(46+name.length), cdv=new DataView(ch.buffer);
+    cdv.setUint32(0,0x02014b50,true); cdv.setUint16(4,20,true); cdv.setUint16(6,20,true);
+    cdv.setUint16(10,0,true); cdv.setUint16(14,0x2821,true);
+    cdv.setUint32(16,crc,true); cdv.setUint32(20,data.length,true); cdv.setUint32(24,data.length,true);
+    cdv.setUint16(28,name.length,true); cdv.setUint32(42,offset,true);
+    ch.set(name,46); centrals.push(ch);
     offset+=lh.length+data.length;
   }
   const cdSize=centrals.reduce((a,c)=>a+c.length,0);
-  const end=new Uint8Array(22);
-  const edv=new DataView(end.buffer);
+  const end=new Uint8Array(22), edv=new DataView(end.buffer);
   edv.setUint32(0,0x06054b50,true);
-  edv.setUint16(8,entries.length,true);
-  edv.setUint16(10,entries.length,true);
-  edv.setUint32(12,cdSize,true);
-  edv.setUint32(16,offset,true);
-
+  edv.setUint16(8,entries.length,true); edv.setUint16(10,entries.length,true);
+  edv.setUint32(12,cdSize,true); edv.setUint32(16,offset,true);
   const all=[...locals,...centrals,end];
-  const total=all.reduce((a,p)=>a+p.length,0);
-  const out=new Uint8Array(total);
-  let o=0;
-  for(const p of all){ out.set(p,o); o+=p.length }
+  const out=new Uint8Array(all.reduce((a,p)=>a+p.length,0));
+  let o=0; for(const p of all){out.set(p,o);o+=p.length}
   return out;
 }
 
-/* ============ Farben aus dem Symbol ziehen ============ */
+/* ================= Farben aus dem Symbol ================= */
 function extractColors(img){
   const n=48;
   const c=document.createElement('canvas'); c.width=c.height=n;
   const ctx=c.getContext('2d',{willReadFrequently:true});
   ctx.drawImage(img,0,0,n,n);
-  const d=ctx.getImageData(0,0,n,n).data;
+  let d;
+  try{ d=ctx.getImageData(0,0,n,n).data }catch{ return [] }
   const buckets=new Map();
   for(let i=0;i<d.length;i+=4){
-    if(d[i+3]<128) continue;                       // transparente Pixel überspringen
+    if(d[i+3]<128) continue;
     const key=[d[i],d[i+1],d[i+2]].map(v=>Math.round(v/24)*24).join(',');
     const b=buckets.get(key)||{n:0,r:0,g:0,b:0};
-    b.n++; b.r+=d[i]; b.g+=d[i+1]; b.b+=d[i+2];
-    buckets.set(key,b);
+    b.n++; b.r+=d[i]; b.g+=d[i+1]; b.b+=d[i+2]; buckets.set(key,b);
   }
-  return [...buckets.values()]
-    .sort((a,b)=>b.n-a.n).slice(0,8)
+  return [...buckets.values()].sort((a,b)=>b.n-a.n).slice(0,8)
     .map(b=>'#'+[b.r,b.g,b.b].map(v=>Math.round(v/b.n).toString(16).padStart(2,'0')).join(''));
 }
-function fillSwatches(el,colors,onPick){
+function fillSwatches(el,colors,pick){
   el.innerHTML='';
   colors.forEach(c=>{
     const b=document.createElement('button');
-    b.className='sw'; b.style.background=c; b.title=c;
-    b.onclick=()=>onPick(c);
+    b.className='sw'; b.style.background=c; b.title=c; b.type='button';
+    b.onclick=e=>{e.preventDefault();pick(c)};
     el.appendChild(b);
   });
 }
 
-/* ============ Ausgabe erzeugen ============ */
+/* ================= Pfade ================= */
+const isRoot=()=>$('#pathMode').value==='root';
+function scopePath(){
+  let s=$('#scopePath').value.trim()||'/';
+  if(!s.startsWith('/')) s='/'+s;
+  if(!s.endsWith('/')) s+='/';
+  return s;
+}
+const iconHref=n=>isRoot()?'/'+n:n;
+
+/* ================= Ausgabe ================= */
 async function build(){
   if(!src) return;
   const {padPct,maskPct,radPct,pad}=state;
+  const plainBg=$('#optOpaque').checked?pad:null;
 
   const defs=[
-    {name:'favicon-16x16.png',      c:drawIcon(16, padPct, null, radPct)},
-    {name:'favicon-32x32.png',      c:drawIcon(32, padPct, null, radPct)},
-    {name:'apple-touch-icon.png',   c:drawIcon(180,padPct, pad,  radPct)},
-    {name:'android-chrome-192x192.png', c:drawIcon(192,padPct,null,radPct)},
-    {name:'android-chrome-512x512.png', c:drawIcon(512,padPct,null,radPct)},
-    {name:'android-chrome-512x512-maskable.png', c:drawIcon(512,maskPct,pad,0)}
+    {name:'favicon-16x16.png',c:drawIcon(16,padPct,plainBg,radPct)},
+    {name:'favicon-32x32.png',c:drawIcon(32,padPct,plainBg,radPct)},
+    {name:'apple-touch-icon.png',c:drawIcon(180,padPct,pad,radPct)},
+    {name:'android-chrome-192x192.png',c:drawIcon(192,padPct,plainBg,radPct)},
+    {name:'android-chrome-512x512.png',c:drawIcon(512,padPct,plainBg,radPct)},
+    {name:'android-chrome-512x512-maskable.png',c:drawIcon(512,maskPct,pad,0)}
   ];
+  if($('#optApple').checked){
+    defs.push({name:'apple-touch-icon-152x152.png',c:drawIcon(152,padPct,pad,radPct)});
+    defs.push({name:'apple-touch-icon-167x167.png',c:drawIcon(167,padPct,pad,radPct)});
+  }
+  if($('#optTile').checked) defs.push({name:'mstile-150x150.png',c:drawIcon(150,maskPct,pad,0)});
+  let ogCanvas=null;
+  if($('#optOg').checked){ ogCanvas=drawOg(); defs.push({name:'og-image.png',c:ogCanvas}) }
+
   files={};
   for(const d of defs) files[d.name]=await canvasBytes(d.c);
 
-  /* favicon.ico bündelt 16, 32 und 48 px */
   const ico=[];
-  for(const s of [16,32,48]) ico.push({size:s,bytes:await canvasBytes(drawIcon(s,padPct,null,radPct))});
+  for(const s of [16,32,48]) ico.push({size:s,bytes:await canvasBytes(drawIcon(s,padPct,plainBg,radPct))});
   files['favicon.ico']=buildIco(ico);
 
-  files['site.webmanifest']=new TextEncoder().encode(manifestText());
+  const enc=new TextEncoder();
+  if($('#optSvg').checked&&srcIsSvg&&srcSvgText) files['favicon.svg']=enc.encode(srcSvgText);
+  if($('#optTile').checked) files['browserconfig.xml']=enc.encode(browserConfigText());
+  files['site.webmanifest']=enc.encode(manifestText());
+  if($('#optReadme').checked) files[lang==='de'?'EINBAU.txt':'SETUP.txt']=enc.encode(readmeText());
 
-  renderPreviews(defs);
+  lastDefs=defs;
+  renderPreviews(defs,ogCanvas);
   renderFileList();
   $('#zipBtn').disabled=false;
 }
 
-function renderPreviews(defs){
+function renderPreviews(defs,og){
   const box=$('#previews');
-  box.hidden=false; $('#pvEmpty').hidden=true;
-  box.innerHTML='';
+  box.hidden=false; $('#pvEmpty').hidden=true; box.innerHTML='';
+  const get=n=>defs.find(d=>d.name===n);
   const show=[
-    {d:defs[1],px:32, note:'Browser-Tab'},
-    {d:defs[2],px:90, note:'iOS Homescreen'},
-    {d:defs[4],px:90, note:'Android / PWA'},
-    {d:defs[5],px:90, note:'Android maskable', round:true}
+    {d:get('favicon-32x32.png'),px:32,note:T('note.tab')},
+    {d:get('apple-touch-icon.png'),px:88,note:T('note.ios')},
+    {d:get('android-chrome-512x512.png'),px:88,note:T('note.android')},
+    {d:get('android-chrome-512x512-maskable.png'),px:88,note:T('note.mask'),round:true}
   ];
+  if(og) show.push({d:{name:'og-image.png',c:og},px:150,h:79,note:T('note.og')});
   show.forEach(s=>{
+    if(!s.d) return;
     const el=document.createElement('div');
     el.className='pv'+(s.round?' round':'');
     const c=document.createElement('canvas');
-    c.width=c.height=s.px;
-    c.style.width=s.px+'px'; c.style.height=s.px+'px';
-    const ctx=c.getContext('2d');
-    ctx.imageSmoothingQuality='high';
-    ctx.drawImage(s.d.c,0,0,s.px,s.px);
+    const h=s.h||s.px;
+    c.width=s.px; c.height=h;
+    c.style.width=s.px+'px'; c.style.height=h+'px';
+    const ctx=c.getContext('2d'); ctx.imageSmoothingQuality='high';
+    ctx.drawImage(s.d.c,0,0,s.px,h);
     el.appendChild(c);
     el.insertAdjacentHTML('beforeend',
-      `<div class="lbl">${s.d.name.replace('android-chrome-','').replace('.png','')}</div>
-       <div class="note">${s.note}</div>`);
+      `<div class="lbl">${s.d.name}</div><div class="note">${s.note}</div>`);
     box.appendChild(el);
   });
-  /* Splash-Vorschau */
   const sc=$('#splashIcon').getContext('2d');
-  sc.clearRect(0,0,72,72);
-  sc.imageSmoothingQuality='high';
-  sc.drawImage(defs[4].c,0,0,72,72);
+  sc.clearRect(0,0,72,72); sc.imageSmoothingQuality='high';
+  const big=get('android-chrome-512x512.png');
+  if(big) sc.drawImage(big.c,0,0,72,72);
 }
-
 function renderFileList(){
-  $('#fileList').innerHTML=Object.keys(files)
-    .map(n=>`<span class="chip">${n}</span>`).join('');
+  $('#fileList').innerHTML=Object.keys(files).map(n=>`<span class="chip">${n}</span>`).join('');
 }
 
 function manifestText(){
+  const root=isRoot(), sp=scopePath();
   const m={
     name:$('#appName').value||'Tool',
-    short_name:$('#shortName').value||'Tool',
-    id:'./',
-    start_url:'./',
-    scope:'./',
-    display:'standalone',
-    background_color:state.bg,
-    theme_color:state.theme,
-    icons:[
-      {src:'android-chrome-192x192.png',sizes:'192x192',type:'image/png',purpose:'any'},
-      {src:'android-chrome-512x512.png',sizes:'512x512',type:'image/png',purpose:'any'},
-      {src:'android-chrome-512x512-maskable.png',sizes:'512x512',type:'image/png',purpose:'maskable'}
-    ]
+    short_name:$('#shortName').value||'Tool'
   };
+  const desc=$('#appDesc').value.trim();
+  if(desc) m.description=desc;
+  m.id=root?sp:'./';
+  m.start_url=root?sp:'./';
+  m.scope=root?sp:'./';
+  m.display=$('#displayMode').value;
+  m.orientation=$('#orientMode').value;
+  m.background_color=state.bg;
+  m.theme_color=state.theme;
+  m.icons=[
+    {src:iconHref('android-chrome-192x192.png'),sizes:'192x192',type:'image/png',purpose:'any'},
+    {src:iconHref('android-chrome-512x512.png'),sizes:'512x512',type:'image/png',purpose:'any'},
+    {src:iconHref('android-chrome-512x512-maskable.png'),sizes:'512x512',type:'image/png',purpose:'maskable'}
+  ];
   return JSON.stringify(m,null,2);
 }
+function browserConfigText(){
+  return `<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square150x150logo src="${iconHref('mstile-150x150.png')}"/>
+      <TileColor>${state.pad}</TileColor>
+    </tile>
+  </msapplication>
+</browserconfig>`;
+}
 function headText(){
-  return `<!-- Icons + Manifest -->
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="${state.theme}">`;
+  const L=[];
+  L.push('<!-- Icons + Manifest -->');
+  if($('#optSvg').checked&&srcIsSvg) L.push(`<link rel="icon" type="image/svg+xml" href="${iconHref('favicon.svg')}">`);
+  L.push(`<link rel="apple-touch-icon" sizes="180x180" href="${iconHref('apple-touch-icon.png')}">`);
+  if($('#optApple').checked){
+    L.push(`<link rel="apple-touch-icon" sizes="152x152" href="${iconHref('apple-touch-icon-152x152.png')}">`);
+    L.push(`<link rel="apple-touch-icon" sizes="167x167" href="${iconHref('apple-touch-icon-167x167.png')}">`);
+  }
+  L.push(`<link rel="icon" type="image/png" sizes="32x32" href="${iconHref('favicon-32x32.png')}">`);
+  L.push(`<link rel="icon" type="image/png" sizes="16x16" href="${iconHref('favicon-16x16.png')}">`);
+  L.push(`<link rel="icon" href="${iconHref('favicon.ico')}" sizes="any">`);
+  L.push(`<link rel="manifest" href="${iconHref('site.webmanifest')}">`);
+  if($('#optDarkTheme').checked){
+    L.push(`<meta name="theme-color" content="${state.theme}" media="(prefers-color-scheme: light)">`);
+    L.push(`<meta name="theme-color" content="${state.themeDark}" media="(prefers-color-scheme: dark)">`);
+  }else{
+    L.push(`<meta name="theme-color" content="${state.theme}">`);
+  }
+  const name=$('#appName').value||'Tool', short=$('#shortName').value||name;
+  L.push(`<meta name="apple-mobile-web-app-title" content="${esc(short)}">`);
+  L.push(`<meta name="application-name" content="${esc(name)}">`);
+  if($('#optTile').checked) L.push(`<meta name="msapplication-config" content="${iconHref('browserconfig.xml')}">`);
+
+  if($('#optOg').checked){
+    let base=$('#siteUrl').value.trim();
+    if(base&&!base.endsWith('/')) base+='/';
+    const desc=$('#appDesc').value.trim();
+    L.push('');
+    L.push('<!-- Link-Vorschau -->');
+    L.push(`<meta property="og:type" content="website">`);
+    L.push(`<meta property="og:title" content="${esc(name)}">`);
+    if(desc) L.push(`<meta property="og:description" content="${esc(desc)}">`);
+    if(base) L.push(`<meta property="og:url" content="${esc(base)}">`);
+    L.push(`<meta property="og:image" content="${esc(base)}og-image.png">`);
+    L.push(`<meta name="twitter:card" content="summary_large_image">`);
+  }
+  return L.join('\n');
+}
+function readmeText(){
+  const names=Object.keys(files).filter(n=>!/\.txt$/.test(n));
+  const de=`ICON-SET — ${$('#appName').value}
+Erzeugt mit Icon Set Studio v1.1
+
+EINBAU
+1. Alle Dateien aus diesem Archiv in den Ordner legen, in dem deine index.html liegt.
+   ${isRoot()?'Achtung: Du hast Wurzelpfade gewaehlt — die Icons gehoeren in den Domain-Root.':''}
+2. Das Head-Snippet (siehe unten) in den <head> deiner Seite kopieren.
+3. Fertig. Zum Pruefen: Seite neu laden, dann in den Entwicklertools
+   unter "Application > Manifest" nachsehen.
+
+FARBEN
+theme_color      ${state.theme}   (Farbe deines <header>)
+background_color ${state.bg}   (Farbe deines <body>)
+Beide Werte muessen mit deinem CSS uebereinstimmen, sonst gibt es
+eine Farbkante ueber dem Header bzw. ein Farbblitzen beim App-Start.
+
+DATEIEN
+${names.map(n=>'  '+n).join('\n')}
+
+HEAD-SNIPPET
+${headText()}
+`;
+  const en=`ICON SET — ${$('#appName').value}
+Generated with Icon Set Studio v1.1
+
+SETUP
+1. Put every file from this archive into the folder holding your index.html.
+   ${isRoot()?'Note: you chose root paths — the icons belong in the domain root.':''}
+2. Copy the head snippet (below) into the <head> of your page.
+3. Done. To verify, reload and check "Application > Manifest" in devtools.
+
+COLOURS
+theme_color      ${state.theme}   (colour of your <header>)
+background_color ${state.bg}   (colour of your <body>)
+Both must match your CSS, otherwise you get a colour seam above the
+header or a colour flash when the app starts.
+
+FILES
+${names.map(n=>'  '+n).join('\n')}
+
+HEAD SNIPPET
+${headText()}
+`;
+  return lang==='de'?de:en;
 }
 
-/* ============ Farbprüfung ============ */
+/* ================= Prüfungen ================= */
 function checkColors(){
-  const L=luminance(state.theme);
-  const box=$('#lumWarn');
-  const icon=ok=>ok
+  const L=luminance(state.theme), box=$('#lumWarn');
+  const ic=ok=>ok
     ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".9" fill="currentColor"/><circle cx="12" cy="12" r="9"/></svg>';
-
   const msgs=[];
-  if(L>0.32&&L<0.62){
-    msgs.push({ok:false,t:'Die theme_color liegt im mittleren Helligkeitsbereich. Android entscheidet dort unzuverlässig, ob die Symbole der Statusleiste schwarz oder weiß werden — nimm einen klar dunkleren oder helleren Ton.'});
-  }else{
-    msgs.push({ok:true,t:`Helligkeit ${(L*100).toFixed(0)} % — Android zeichnet die Statusleiste ${L<0.5?'hell':'dunkel'}, das ist eindeutig.`});
-  }
-  const cr=contrast(state.bg,state.theme);
-  if(cr<1.3) msgs.push({ok:false,t:'theme_color und background_color sind fast identisch. Erlaubt, aber der Startbildschirm wirkt dadurch flächig.'});
-
-  box.innerHTML=msgs.map(m=>
-    `<div class="warn ${m.ok?'ok':'bad'}">${icon(m.ok)}<div>${m.t}</div></div>`).join('');
+  if(L>0.32&&L<0.62) msgs.push({ok:false,t:T('lum.mid')});
+  else msgs.push({ok:true,t:T('lum.ok',{p:(L*100).toFixed(0),m:T(L<0.5?'lum.light':'lum.dark')})});
+  if(contrast(state.bg,state.theme)<1.3) msgs.push({ok:false,t:T('lum.flat')});
+  box.innerHTML=msgs.map(m=>`<div class="warn ${m.ok?'ok':'bad'}">${ic(m.ok)}<div>${m.t}</div></div>`).join('');
 }
-
-/* ============ Live-Vorschau der Farben ============ */
 function paintPreviews(){
-  const t=state.theme, b=state.bg;
-  const light=luminance(t)>0.5;
-  $('#statusBar').style.background=t;
-  $('#statusBar').style.color=light?'#000':'#fff';
-  $('#urlBar').style.background=t;
-  $('#urlBar').style.color=light?'rgba(0,0,0,.75)':'rgba(255,255,255,.85)';
-  $('#pageBody').style.background=b;
-  $('#pageBody').style.color=luminance(b)>0.5?'#1b2733':'#e6edf3';
+  const t=state.theme,b=state.bg,light=luminance(t)>0.5;
+  $('#statusBar').style.background=t; $('#statusBar').style.color=light?'#000':'#fff';
+  $('#urlBar').style.background=t; $('#urlBar').style.color=light?'rgba(0,0,0,.75)':'rgba(255,255,255,.85)';
+  $('#pageBody').style.background=b; $('#pageBody').style.color=luminance(b)>0.5?'#1b2733':'#e6edf3';
   $('#splashPv').style.background=b;
   $('#splashName').style.color=luminance(b)>0.5?'#1b2733':'#e6edf3';
   $('#splashName').textContent=$('#appName').value||'Tool';
+  try{ $('#urlText').textContent=new URL($('#siteUrl').value).host }catch{}
 }
-
-/* ============ Ausgabe aktualisieren ============ */
 function refreshText(){
   $('#manifestOut').textContent=manifestText();
   $('#headOut').textContent=headText();
   const sn=$('#shortName').value;
   $('#shortLen').textContent=`${sn.length} / 12`;
   $('#shortLen').style.color=sn.length>12?'var(--warn)':'var(--accent)';
-  paintPreviews();
-  checkColors();
+  $('#pathHint').textContent=T(isRoot()?'hint.pathRoot':'hint.pathRel');
+  $('#scopeField').hidden=!isRoot();
+  $('#darkThemeField').hidden=!$('#optDarkTheme').checked;
+  paintPreviews(); checkColors();
 }
 
-/* ============ Datei laden ============ */
+/* ================= Laden ================= */
 function loadFile(file){
-  if(!file||!file.type.startsWith('image/')){toast('Bitte eine Bilddatei wählen');return}
-  const url=URL.createObjectURL(file);
-  const img=new Image();
-  img.onload=async()=>{
-    /* SVG ohne feste Größe: auf 512 normieren */
-    if(!img.naturalWidth||!img.naturalHeight){toast('Datei konnte nicht gelesen werden');return}
-    src=img;
-    $('#srcInfo').innerHTML=`<b>${file.name}</b> — ${img.naturalWidth}×${img.naturalHeight} px`
-      +(Math.abs(img.naturalWidth-img.naturalHeight)>2?' · nicht quadratisch, wird mittig eingepasst':'')
-      +(Math.min(img.naturalWidth,img.naturalHeight)<512&&!/svg/.test(file.type)?' · unter 512 px, das 512er Icon wird weich':'');
-    const cols=extractColors(img);
-    fillSwatches($('#themeSw'),cols,c=>{setColor('theme',c)});
-    fillSwatches($('#bgSw'),cols,c=>{setColor('bg',c)});
-    await build();
-    refreshText();
-    toast('Symbol geladen');
+  if(!file||!file.type.startsWith('image/')){toast(T('t.badFile'));return}
+  srcIsSvg=/svg/i.test(file.type)||/\.svg$/i.test(file.name);
+  srcName=file.name;
+  const finish=url=>{
+    const img=new Image();
+    img.onload=async()=>{
+      if(!img.naturalWidth||!img.naturalHeight){toast(T('t.readFail'));return}
+      src=img;
+      let info=T('src.info',{name:file.name,w:img.naturalWidth,h:img.naturalHeight});
+      if(Math.abs(img.naturalWidth-img.naturalHeight)>2) info+=T('src.nonsquare');
+      if(srcIsSvg) info+=T('src.svg');
+      else if(Math.min(img.naturalWidth,img.naturalHeight)<512) info+=T('src.small');
+      $('#srcInfo').textContent=info;
+      const cols=extractColors(img);
+      fillSwatches($('#themeSw'),cols,c=>setColor('theme',c));
+      fillSwatches($('#bgSw'),cols,c=>setColor('bg',c));
+      await build(); refreshText(); toast(T('t.loaded'));
+    };
+    img.onerror=()=>toast(T('t.readFail'));
+    img.src=url;
   };
-  img.onerror=()=>toast('Datei konnte nicht gelesen werden');
-  img.src=url;
+  if(srcIsSvg){
+    const r=new FileReader();
+    r.onload=()=>{
+      srcSvgText=r.result;
+      /* SVG ohne feste Groesse haette Breite 0 — deshalb notfalls setzen */
+      if(!/\swidth\s*=/.test(srcSvgText)||!/\sheight\s*=/.test(srcSvgText)){
+        srcSvgText=srcSvgText.replace(/<svg\b/i,'<svg width="512" height="512"');
+      }
+      finish('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(srcSvgText));
+    };
+    r.onerror=()=>toast(T('t.readFail'));
+    r.readAsText(file);
+  }else{
+    srcSvgText=null;
+    finish(URL.createObjectURL(file));
+  }
 }
-
 function setColor(which,hex){
   const h=clean(hex); if(!h) return;
   state[which]=h;
-  const map={theme:['#themeColor','#themeHex'],bg:['#bgColor','#bgHex'],pad:['#padColor','#padHex']};
+  const map={theme:['#themeColor','#themeHex'],themeDark:['#themeDark','#themeDarkHex'],
+             bg:['#bgColor','#bgHex'],pad:['#padColor','#padHex']};
   $(map[which][0]).value=h; $(map[which][1]).value=h;
   refreshText();
   if(which==='pad') build();
 }
 
-/* ============ Ereignisse ============ */
+/* ================= Sprache / Theme ================= */
+function applyLang(l){
+  lang=(l==='en')?'en':'de';
+  try{localStorage.setItem('ics-lang',lang)}catch{}
+  document.documentElement.lang=lang;
+  $$('[data-i18n]').forEach(e=>{
+    const v=T(e.dataset.i18n);
+    if(/<[a-z]/i.test(v)) e.innerHTML=v; else e.textContent=v;
+  });
+  $$('[data-i18n-ph]').forEach(e=>e.placeholder=T(e.dataset.i18nPh));
+  $$('[data-i18n-title]').forEach(e=>{e.title=T(e.dataset.i18nTitle);e.setAttribute('aria-label',e.title)});
+  $('#langBtn').textContent=lang==='de'?'EN':'DE';
+  $('#helpBody').innerHTML=HELP[lang];
+  ensureChevrons();
+  refreshText();
+  if(src) build();
+}
+const SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const MOON='<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+function applyTheme(t){
+  document.documentElement.dataset.theme=t;
+  try{localStorage.setItem('ics-theme',t)}catch{}
+  $('#themeIcon').innerHTML=t==='light'?MOON:SUN;
+}
+
+/* ================= Einklappbare Sektionen ================= */
+const CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+function ensureChevrons(){
+  $$('.card.sect > .eyebrow').forEach(h=>{ if(!h.querySelector('.chev')) h.insertAdjacentHTML('beforeend',CHEV) });
+}
+function initSections(){
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem('ics-collapsed')||'{}')}catch{}
+  $$('.card.sect').forEach((sect,i)=>{
+    const head=sect.querySelector(':scope > .eyebrow');
+    if(!head) return;
+    if(saved[i]) sect.classList.add('collapsed');
+    const toggle=()=>{
+      sect.classList.toggle('collapsed');
+      saved[i]=sect.classList.contains('collapsed');
+      try{localStorage.setItem('ics-collapsed',JSON.stringify(saved))}catch{}
+    };
+    head.setAttribute('role','button'); head.tabIndex=0;
+    head.addEventListener('click',toggle);
+    head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+  });
+  ensureChevrons();
+}
+
+/* ================= Ereignisse ================= */
 $('#drop').onclick=()=>$('#file').click();
-$('#file').onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]) };
-['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{
-  e.preventDefault(); $('#drop').classList.add('drag');
-}));
+$('#file').onchange=e=>{if(e.target.files[0])loadFile(e.target.files[0])};
+['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.add('drag')}));
 ['dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{
   e.preventDefault();
   if(ev==='drop'&&e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
   $('#drop').classList.remove('drag');
 }));
 
-[['theme','#themeColor','#themeHex'],['bg','#bgColor','#bgHex'],['pad','#padColor','#padHex']]
-.forEach(([k,picker,hex])=>{
+[['theme','#themeColor','#themeHex'],['themeDark','#themeDark','#themeDarkHex'],
+ ['bg','#bgColor','#bgHex'],['pad','#padColor','#padHex']].forEach(([k,picker,hex])=>{
   $(picker).oninput=e=>setColor(k,e.target.value);
   $(hex).onchange=e=>{
     const h=clean(e.target.value);
-    if(h) setColor(k,h); else { e.target.value=state[k]; toast('Kein gültiger Hex-Wert') }
+    if(h) setColor(k,h); else {e.target.value=state[k];toast(T('t.badHex'))}
   };
 });
-
 [['#padRange','#padVal','padPct'],['#maskRange','#maskVal','maskPct'],['#radRange','#radVal','radPct']]
 .forEach(([r,o,key])=>{
   $(r).oninput=e=>{
@@ -722,31 +1092,56 @@ $('#file').onchange=e=>{ if(e.target.files[0]) loadFile(e.target.files[0]) };
     clearTimeout($(r)._t); $(r)._t=setTimeout(build,120);
   };
 });
+['#appName','#shortName','#appDesc','#siteUrl'].forEach(s=>$(s).oninput=()=>{
+  refreshText();
+  clearTimeout($(s)._t); $(s)._t=setTimeout(()=>{if(src&&$('#optOg').checked)build()},300);
+});
+['#displayMode','#orientMode','#pathMode','#scopePath'].forEach(s=>$(s).onchange=refreshText);
+['#optOg','#optApple','#optTile','#optOpaque','#optReadme'].forEach(s=>$(s).onchange=()=>{refreshText();build()});
+$('#optSvg').onchange=e=>{
+  if(e.target.checked&&!srcIsSvg&&src) toast(T('t.needSvg'));
+  refreshText(); build();
+};
+$('#optDarkTheme').onchange=refreshText;
 
-['#appName','#shortName'].forEach(s=>$(s).oninput=refreshText);
-
-document.querySelectorAll('[data-copy]').forEach(b=>{
-  b.onclick=async()=>{
-    try{
-      await navigator.clipboard.writeText($('#'+b.dataset.copy).textContent);
-      toast('Kopiert');
-    }catch{ toast('Kopieren nicht möglich — bitte manuell markieren') }
-  };
+$$('[data-copy]').forEach(b=>b.onclick=async()=>{
+  try{ await navigator.clipboard.writeText($('#'+b.dataset.copy).textContent); toast(T('t.copied')) }
+  catch{ toast(T('t.copyFail')) }
 });
 
 $('#zipBtn').onclick=()=>{
-  const entries=Object.entries(files).map(([name,bytes])=>({name,bytes}));
-  const zip=buildZip(entries);
-  const blob=new Blob([zip],{type:'application/zip'});
+  const zip=buildZip(Object.entries(files).map(([name,bytes])=>({name,bytes})));
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=($('#shortName').value||'icons').replace(/[^\w\-]+/g,'-').toLowerCase()+'-iconset.zip';
+  a.href=URL.createObjectURL(new Blob([zip],{type:'application/zip'}));
+  a.download=(($('#shortName').value||'icons').replace(/[^\w\-]+/g,'-').toLowerCase())+'-iconset.zip';
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  toast('ZIP erstellt');
+  toast(T('t.zip'));
 };
 
-refreshText();
+$('#langBtn').onclick=()=>applyLang(lang==='de'?'en':'de');
+$('#themeBtn').onclick=()=>applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
+$('#helpBtn').onclick=()=>$('#helpOverlay').classList.add('open');
+$('#helpClose').onclick=()=>$('#helpOverlay').classList.remove('open');
+$('#helpOverlay').onclick=e=>{if(e.target.id==='helpOverlay')$('#helpOverlay').classList.remove('open')};
+
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,select,textarea')) return;
+  if(e.key==='Escape') $('#helpOverlay').classList.remove('open');
+  if(e.key==='?') $('#helpOverlay').classList.toggle('open');
+  if(e.key==='l'||e.key==='L') applyLang(lang==='de'?'en':'de');
+  if(e.key==='d'||e.key==='D') applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
+});
+
+/* ================= Start ================= */
+let startTheme='dark';
+try{ startTheme=localStorage.getItem('ics-theme')
+  || (matchMedia('(prefers-color-scheme: light)').matches?'light':'dark') }catch{}
+applyTheme(startTheme);
+let startLang=(navigator.language||'de').toLowerCase().startsWith('de')?'de':'en';
+try{ startLang=localStorage.getItem('ics-lang')||startLang }catch{}
+initSections();
+applyLang(startLang);
 })();
 </script>
 </body>
