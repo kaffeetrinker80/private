@@ -40,6 +40,7 @@
     body::after { background: #6ea8ff; bottom: 10%; right: -150px; }
 
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUpCard { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes shine { to { background-position: 200% center; } }
     @keyframes starPulse {
       0% { transform: scale(1); opacity: 0.7; }
@@ -49,8 +50,6 @@
 
     .animate-in { animation: fadeInUp 0.6s var(--transition-smooth) forwards; opacity: 0; }
     .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
 
     .container { max-width: 1120px; margin: 0 auto; padding: 20px 20px 40px; position: relative; }
 
@@ -90,8 +89,17 @@
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 20px; padding: 28px 24px; display: flex; flex-direction: column;
       transition: var(--transition-smooth); height: 100%;
+      opacity: 0; animation: fadeUpCard 0.6s var(--transition-smooth) forwards;
     }
     
+    /* Cascading Animation Delays for Cards */
+    .card:nth-child(1) { animation-delay: 0.15s; }
+    .card:nth-child(2) { animation-delay: 0.25s; }
+    .card:nth-child(3) { animation-delay: 0.35s; }
+    .card:nth-child(4) { animation-delay: 0.45s; }
+    .card:nth-child(5) { animation-delay: 0.55s; }
+    .card:nth-child(6) { animation-delay: 0.65s; }
+
     .card.active-project {
       --c-theme: var(--primary);
       --c-soft: rgba(197, 168, 255, 0.1);
@@ -104,7 +112,11 @@
       width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; 
       margin-bottom: 20px; background: var(--c-soft); overflow: hidden;
     }
-    .icon-wrap img { width: 40px; height: 40px; object-fit: contain; }
+    .icon-wrap img { 
+      width: 40px; height: 40px; object-fit: contain; 
+      transition: transform var(--transition-smooth);
+    }
+    .card:hover .icon-wrap img { transform: scale(1.15); }
 
     .card h2 { font-size: 1.4rem; color: #fff; margin: 0 0 10px; }
     .card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; flex-grow: 1; }
@@ -122,7 +134,11 @@
     }
     .active-project .btn-card:hover { background: var(--c-theme); color: #1a1025; }
 
-    .footer { margin-top: 60px; text-align: center; color: var(--muted); font-size: 0.85rem; padding-bottom: 20px; }
+    .footer { 
+      margin-top: 60px; text-align: center; color: var(--muted); 
+      font-size: 0.85rem; padding-bottom: 20px;
+      opacity: 0; animation: fadeUpCard 0.6s var(--transition-smooth) forwards; animation-delay: 0.75s;
+    }
 
     @media (min-width: 768px) {
       .hero h1 { font-size: 4rem; }
@@ -149,7 +165,7 @@
       </p>
     </section>
 
-    <section class="grid animate-in delay-2">
+    <section class="grid">
 
       <article class="card active-project">
         <div class="icon-wrap">
@@ -211,6 +227,22 @@
         </div>
       </article>
       
+      <!-- NEU: Smart Collage, korrekt alphabetisch einsortiert -->
+      <article class="card active-project">
+        <div class="icon-wrap">
+          <img src="./smart-collage/android-chrome-192x192.png" alt="Smart Collage Icon" onerror="this.src='./placeholder-icon.png'">
+        </div>
+        <h2>Smart Collage</h2>
+        <p>Photo Layout Studio. Create. Arrange. Export. No uploads. No ads.</p>
+        <div class="meta-row">
+          <div class="meta">Fotos · Layout</div>
+          <div class="language">DE / EN</div>
+        </div>
+        <div class="card-actions">
+          <a class="btn-card" href="smart-collage/index.html">Tool öffnen</a>
+        </div>
+      </article>
+
       <article class="card active-project">
         <div class="icon-wrap">
           <img src="./talkscroll/android-chrome-192x192.png" alt="Talkscroll Icon" onerror="this.src='./placeholder-icon.png'">
@@ -228,7 +260,7 @@
 
     </section>
 
-    <footer class="footer animate-in delay-3">
+    <footer class="footer">
       <p>Made with Love © · kaffeetrinker80</p>
     </footer>
   </div>
