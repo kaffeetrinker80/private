@@ -308,6 +308,7 @@ select{
 .swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-top:7px}
 .sw{aspect-ratio:1;border-radius:7px;border:1px solid var(--line);transition:.14s}
 .sw:hover{transform:scale(1.1);border-color:var(--accent)}
+.sw.on{box-shadow:0 0 0 2px var(--accent),0 0 0 3px var(--panel);border-color:transparent}
 .hint{font-size:11.5px;color:var(--muted);line-height:1.5}
 .empty-panel{padding:26px 14px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.6}
 .empty-panel svg{width:26px;height:26px;color:var(--muted2);margin-bottom:8px}
@@ -445,7 +446,7 @@ body.focus .exit-focus{display:inline-flex}
         </svg>
       </div>
       <div>
-        <div class="brand-title">Smart Collage <span class="pill">v1.4.1</span></div>
+        <div class="brand-title">Smart Collage <span class="pill">v1.4.2</span></div>
         <div class="brand-sub" data-i18n="brand.sub">Photo Layout Studio · everything stays on your device</div>
       </div>
     </div>
@@ -511,7 +512,7 @@ body.focus .exit-focus{display:inline-flex}
         </div>
         <div class="layouts" id="layouts"></div>
       </div>
-      <div class="foot">Made with Love © – Smart Collage V 1.4.1</div>
+      <div class="foot">Made with Love © – Smart Collage V 1.4.2</div>
     </aside>
 
     <!-- ============ CENTER ============ -->
@@ -551,7 +552,7 @@ body.focus .exit-focus{display:inline-flex}
           </div>
         </div>
       </div>
-      <div class="workfoot">Made with Love © – Smart Collage V 1.4.1</div>
+      <div class="workfoot">Made with Love © – Smart Collage V 1.4.2</div>
     </section>
 
     <!-- ============ RIGHT ============ -->
@@ -809,7 +810,7 @@ body.focus .exit-focus{display:inline-flex}
           </div>
           <input type="file" id="projectInput" accept=".json,application/json" hidden>
         </div>
-        <div class="foot">Made with Love © – Smart Collage V 1.4.1</div>
+        <div class="foot">Made with Love © – Smart Collage V 1.4.2</div>
       </div>
     </aside>
   </main>
@@ -1044,7 +1045,17 @@ const LOOKS={
   Cool:{brightness:101,contrast:108,saturation:86,sepia:0},
   Faded:{brightness:110,contrast:84,saturation:76,sepia:10}
 };
-const BG_SWATCHES=['#ffffff','#f5f2ec','#e9e4da','#111827','#0b1220','#1f2937','#0f766e','#134e4a','#7f1d1d','#831843','#1e3a8a','#3f3f46','#fef3c7','#dbeafe','#dcfce7','#fae8ff'];
+const BG_SWATCHES=[
+  /* Neutrale Leiter: Weiss -> Schwarz in gleichmaessigen Stufen */
+  '#ffffff','#e9edf1','#c3ccd5','#7d8a97','#3b444e','#10151a',
+  /* je Farbfamilie eine helle, eine mittlere und eine tiefe Stufe */
+  '#f4e3c8','#d9a86b','#96602e',   /* Sand / Terrakotta */
+  '#f7d3de','#cf7d97','#8d3352',   /* Rose / Beere      */
+  '#d8ebd4','#7aa87f','#35603f',   /* Gruen             */
+  '#cbe9e6','#5fa9a3','#14615c',   /* Tuerkis           */
+  '#d3e0f6','#6f92c4','#27497f',   /* Blau              */
+  '#e3d6f3','#9a7ac0','#4f3572'    /* Pflaume           */
+];
 
 const state={
   photos:[], frames:[], texts:[],
@@ -1374,6 +1385,7 @@ function renderLayouts(){
 /* ---------------- render ---------------- */
 function render(){
   stage.style.setProperty('--ar',String(state.ratio));
+  markSwatch();
   stage.style.background=state.bg;
   const m=state.margin;
   plate.style.cssText=`position:absolute;left:${m}px;top:${m}px;right:${m}px;bottom:${m}px`;
@@ -1762,7 +1774,7 @@ async function saveProject(){
     const blob=await (await fetch(p.url)).blob();
     photos.push({id:p.id,name:p.name,width:p.width,height:p.height,fx:p.fx??0.5,fy:p.fy??0.5,data:await blobToDataURL(blob)});
   }
-  const data={app:'Smart Collage',version:'1.4.1',saved:new Date().toISOString(),
+  const data={app:'Smart Collage',version:'1.4.2',saved:new Date().toISOString(),
     photos, frames:state.frames, texts:state.texts,
     canvas:{gap:state.gap,radius:state.radius,margin:state.margin,border:state.border,
       borderColor:state.borderColor,shadow:state.shadow,bg:state.bg,ratio:state.ratio,layoutIndex:state.layoutIndex}};
@@ -1800,9 +1812,16 @@ function buildSwatches(){
   BG_SWATCHES.forEach(c=>{
     const b=document.createElement('button');
     b.className='sw'; b.style.background=c; b.title=c;
-    b.onclick=()=>{state.bg=c;$('#bgColor').value=c;render();pushHistory()};
+    b.dataset.color=c; b.setAttribute('aria-label',c);
+    b.onclick=()=>{state.bg=c;$('#bgColor').value=c;markSwatch();render();pushHistory()};
     wrap.appendChild(b);
   });
+  markSwatch();
+}
+/* aktive Hintergrundfarbe hervorheben */
+function markSwatch(){
+  $$('#bgSwatches .sw').forEach(b=>
+    b.classList.toggle('on',(b.dataset.color||'').toLowerCase()===(state.bg||'').toLowerCase()));
 }
 async function matchBackground(){
   if(!state.photos.length){toast(T('t.needPhotos'));return}
