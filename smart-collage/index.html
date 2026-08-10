@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Icons + Manifest -->
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="manifest" href="site.webmanifest">
-
-<meta name="theme-color" content="#172f4d"><!-- pro Seite an die Header-Farbe anpassen -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Smart Collage · Photo Layout Studio</title>
@@ -205,13 +197,19 @@ main{display:grid;grid-template-columns:272px minmax(0,1fr) 306px;min-height:0}
 .dot.on{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .stage-wrap{
   flex:1;min-height:0;overflow:auto;padding:26px;display:grid;place-items:center;
+  container-type:size;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
   background-size:26px 26px
 }
 .stage{
   position:relative;background:#fff;box-shadow:var(--stage-shadow);
-  width:min(100%,1100px);aspect-ratio:1.414/1;overflow:hidden;touch-action:none;
-  transition:aspect-ratio .2s ease
+  aspect-ratio:var(--ar,1.414);overflow:hidden;touch-action:none;
+  transition:aspect-ratio .2s ease;
+  /* Rueckfalloption fuer Browser ohne Container-Einheiten */
+  width:min(100%,1100px);
+  /* die Leinwand passt sich sowohl der Breite als auch der Hoehe an,
+     damit hochkante Formate nicht aus dem Fenster wachsen */
+  width:min(100cqw, 1100px, calc(100cqh * var(--ar,1.414)));
 }
 #plate{position:absolute;overflow:visible}
 .empty{
@@ -447,7 +445,7 @@ body.focus .exit-focus{display:inline-flex}
         </svg>
       </div>
       <div>
-        <div class="brand-title">Smart Collage <span class="pill">v1.4</span></div>
+        <div class="brand-title">Smart Collage <span class="pill">v1.4.1</span></div>
         <div class="brand-sub" data-i18n="brand.sub">Photo Layout Studio · everything stays on your device</div>
       </div>
     </div>
@@ -513,7 +511,7 @@ body.focus .exit-focus{display:inline-flex}
         </div>
         <div class="layouts" id="layouts"></div>
       </div>
-      <div class="foot">Made with Love © – Smart Collage V 1.4</div>
+      <div class="foot">Made with Love © – Smart Collage V 1.4.1</div>
     </aside>
 
     <!-- ============ CENTER ============ -->
@@ -553,7 +551,7 @@ body.focus .exit-focus{display:inline-flex}
           </div>
         </div>
       </div>
-      <div class="workfoot">Made with Love © – Smart Collage V 1.4</div>
+      <div class="workfoot">Made with Love © – Smart Collage V 1.4.1</div>
     </section>
 
     <!-- ============ RIGHT ============ -->
@@ -811,7 +809,7 @@ body.focus .exit-focus{display:inline-flex}
           </div>
           <input type="file" id="projectInput" accept=".json,application/json" hidden>
         </div>
-        <div class="foot">Made with Love © – Smart Collage V 1.4</div>
+        <div class="foot">Made with Love © – Smart Collage V 1.4.1</div>
       </div>
     </aside>
   </main>
@@ -1375,7 +1373,7 @@ function renderLayouts(){
 
 /* ---------------- render ---------------- */
 function render(){
-  stage.style.aspectRatio=`${state.ratio} / 1`;
+  stage.style.setProperty('--ar',String(state.ratio));
   stage.style.background=state.bg;
   const m=state.margin;
   plate.style.cssText=`position:absolute;left:${m}px;top:${m}px;right:${m}px;bottom:${m}px`;
@@ -1764,7 +1762,7 @@ async function saveProject(){
     const blob=await (await fetch(p.url)).blob();
     photos.push({id:p.id,name:p.name,width:p.width,height:p.height,fx:p.fx??0.5,fy:p.fy??0.5,data:await blobToDataURL(blob)});
   }
-  const data={app:'Smart Collage',version:'1.4',saved:new Date().toISOString(),
+  const data={app:'Smart Collage',version:'1.4.1',saved:new Date().toISOString(),
     photos, frames:state.frames, texts:state.texts,
     canvas:{gap:state.gap,radius:state.radius,margin:state.margin,border:state.border,
       borderColor:state.borderColor,shadow:state.shadow,bg:state.bg,ratio:state.ratio,layoutIndex:state.layoutIndex}};
