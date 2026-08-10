@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- Icons + Manifest -->
+<!-- Icons + Manifest -->
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -178,6 +178,28 @@ pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radiu
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast svg{width:15px;height:15px;color:var(--accent)}
 
+
+/* ---------- Reiter in der linken Spalte ---------- */
+.export-card{
+  border-color:color-mix(in srgb,var(--accent) 34%,var(--line));
+  background:linear-gradient(180deg,var(--accent-soft),transparent 65%),var(--panel)
+}
+.tabbar{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:15px 0 13px;padding:4px;
+  background:var(--panel2);border:1px solid var(--line);border-radius:11px
+}
+.tab{
+  height:32px;border-radius:8px;font-size:12.5px;font-weight:550;color:var(--muted);
+  transition:.15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px
+}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--panel);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.tab .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);
+  margin-left:5px;vertical-align:middle}
+.panel{display:none}
+.panel.active{display:block;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.panel .card:first-child{margin-top:0}
 footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 28px}
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
 </style>
@@ -191,7 +213,7 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
     </svg>
   </div>
   <div>
-    <div class="htitle">Icon Set Studio <span class="pill">v1.1</span></div>
+    <div class="htitle">Icon Set Studio <span class="pill">v1.2</span></div>
     <div class="hsub" data-i18n="app.sub">Favicons, Manifest und Head-Snippet aus einem Symbol</div>
   </div>
   <div class="hspace"></div>
@@ -211,6 +233,27 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
 
   <!-- ============ Steuerung ============ -->
   <div>
+    <div class="card export-card">
+      <button class="btn primary wide" id="zipBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
+        </svg>
+        <span data-i18n="btn.zip">Icon-Set als ZIP laden</span>
+      </button>
+      <label class="field" style="margin-top:11px">
+        <div class="field-head"><span data-i18n="f.zipName">Dateiname</span>
+          <output class="val" id="zipCount">0</output></div>
+        <input type="text" id="zipName" spellcheck="false" data-i18n-ph="ph.zipName" placeholder="wird aus dem Kurznamen gebildet">
+      </label>
+      <div class="filelist" id="fileList"></div>
+    </div>
+    <div class="tabbar" id="tabbar">
+      <button class="tab active" data-tab="symbol" data-i18n="tab.symbol">Symbol</button>
+      <button class="tab" data-tab="colors" data-i18n="tab.colors">Farben</button>
+      <button class="tab" data-tab="shape" data-i18n="tab.shape">Form</button>
+      <button class="tab" data-tab="out" data-i18n="tab.out">Ausgabe</button>
+    </div>
+    <div class="panel active" data-panel="symbol">
     <div class="card sect">
       <h3 class="eyebrow"><span data-i18n="h.symbol">Symbol</span></h3>
       <button class="drop" id="drop">
@@ -223,7 +266,6 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
       <input type="file" id="file" accept="image/*" hidden>
       <p class="hint" id="srcInfo" data-i18n="src.none">Am besten mindestens 512×512 px. SVG wird verlustfrei hochskaliert.</p>
     </div>
-
     <div class="card sect">
       <h3 class="eyebrow"><span data-i18n="h.project">Projekt</span></h3>
       <label class="field">
@@ -244,7 +286,8 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
         <p class="hint" data-i18n="hint.url">Wird nur für die Link-Vorschau gebraucht — die muss absolut sein.</p>
       </label>
     </div>
-
+    </div>
+    <div class="panel" data-panel="colors">
     <div class="card sect">
       <h3 class="eyebrow"><span data-i18n="h.colors">Farben</span></h3>
       <label class="field">
@@ -276,7 +319,8 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
       </label>
       <div id="lumWarn"></div>
     </div>
-
+    </div>
+    <div class="panel" data-panel="shape">
     <div class="card sect">
       <h3 class="eyebrow"><span data-i18n="h.shape">Icon-Fläche</span></h3>
       <label class="field">
@@ -306,7 +350,8 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
         <p class="hint" data-i18n="hint.radius">Meist bei 0 lassen — Betriebssysteme runden selbst ab.</p>
       </label>
     </div>
-
+    </div>
+    <div class="panel" data-panel="out">
     <div class="card sect">
       <h3 class="eyebrow"><span data-i18n="h.manifest">Manifest-Verhalten</span></h3>
       <label class="field">
@@ -340,7 +385,6 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
         <p class="hint" data-i18n="hint.scope">Nur bei Wurzelpfaden nötig: der Ordner, in dem das Tool liegt.</p>
       </label>
     </div>
-
     <div class="card sect">
       <h3 class="eyebrow"><span data-i18n="h.extras">Zusätzliche Dateien</span></h3>
       <label class="check">
@@ -364,15 +408,6 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
         <span><span data-i18n="opt.readme">EINBAU.txt</span><small data-i18n="opt.readme.s">Kurzanleitung mit im Paket</small></span>
       </label>
     </div>
-
-    <div class="card">
-      <button class="btn primary wide" id="zipBtn" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
-        </svg>
-        <span data-i18n="btn.zip">Icon-Set als ZIP laden</span>
-      </button>
-      <div class="filelist" id="fileList"></div>
     </div>
   </div>
 
@@ -439,7 +474,7 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>Made with Love © – Icon Set Studio V 1.1</footer>
+<footer>Made with Love © – Icon Set Studio V 1.2</footer>
 
 <script>
 (()=>{
@@ -450,6 +485,9 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const I18N={
 de:{
  'app.sub':'Favicons, Manifest und Head-Snippet aus einem Symbol',
+ 'tab.symbol':'Symbol','tab.colors':'Farben','tab.shape':'Form','tab.out':'Ausgabe',
+ 'f.zipName':'Dateiname','ph.zipName':'wird aus dem Kurznamen gebildet',
+ 'zip.count':'{n} Dateien','t.zipNamed':'{f} erstellt',
  'btn.theme':'Hell / Dunkel','btn.help':'Hilfe','btn.copy':'Kopieren','btn.zip':'Icon-Set als ZIP laden',
  'h.symbol':'Symbol','drop.title':'Symbol wählen','drop.sub':'PNG, SVG oder JPG — quadratisch ist ideal',
  'src.none':'Am besten mindestens 512×512 px. SVG wird verlustfrei hochskaliert.',
@@ -496,6 +534,9 @@ de:{
 },
 en:{
  'app.sub':'Favicons, manifest and head snippet from one symbol',
+ 'tab.symbol':'Symbol','tab.colors':'Colours','tab.shape':'Shape','tab.out':'Output',
+ 'f.zipName':'File name','ph.zipName':'derived from the short name',
+ 'zip.count':'{n} files','t.zipNamed':'{f} created',
  'btn.theme':'Light / dark','btn.help':'Help','btn.copy':'Copy','btn.zip':'Download icon set as ZIP',
  'h.symbol':'Symbol','drop.title':'Choose symbol','drop.sub':'PNG, SVG or JPG — square works best',
  'src.none':'At least 512×512 px is ideal. SVG scales without loss.',
@@ -820,6 +861,8 @@ function renderPreviews(defs,og){
 }
 function renderFileList(){
   $('#fileList').innerHTML=Object.keys(files).map(n=>`<span class="chip">${n}</span>`).join('');
+  const n=Object.keys(files).length;
+  $('#zipCount').textContent=n?T('zip.count',{n}):'0';
 }
 
 function manifestText(){
@@ -897,7 +940,7 @@ function headText(){
 function readmeText(){
   const names=Object.keys(files).filter(n=>!/\.txt$/.test(n));
   const de=`ICON-SET — ${$('#appName').value}
-Erzeugt mit Icon Set Studio v1.1
+Erzeugt mit Icon Set Studio v1.2
 
 EINBAU
 1. Alle Dateien aus diesem Archiv in den Ordner legen, in dem deine index.html liegt.
@@ -919,7 +962,7 @@ HEAD-SNIPPET
 ${headText()}
 `;
   const en=`ICON SET — ${$('#appName').value}
-Generated with Icon Set Studio v1.1
+Generated with Icon Set Studio v1.2
 
 SETUP
 1. Put every file from this archive into the folder holding your index.html.
@@ -971,6 +1014,7 @@ function refreshText(){
   $('#shortLen').textContent=`${sn.length} / 12`;
   $('#shortLen').style.color=sn.length>12?'var(--warn)':'var(--accent)';
   $('#pathHint').textContent=T(isRoot()?'hint.pathRoot':'hint.pathRel');
+  $('#zipName').placeholder=zipFileName().replace(/\.zip$/,'');
   $('#scopeField').hidden=!isRoot();
   $('#darkThemeField').hidden=!$('#optDarkTheme').checked;
   paintPreviews(); checkColors();
@@ -1118,14 +1162,28 @@ $$('[data-copy]').forEach(b=>b.onclick=async()=>{
   catch{ toast(T('t.copyFail')) }
 });
 
+/* Dateinamen bilden: Umlaute ausschreiben statt sie zu verstuemmeln */
+function slug(v){
+  let t=(v||'').trim().toLowerCase()
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss');
+  t=t.normalize('NFD').replace(/[\u0300-\u036f]/g,'');   // restliche Akzente entfernen
+  t=t.replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  return t;
+}
+function zipFileName(){
+  const custom=slug($('#zipName').value);
+  if(custom) return custom+'.zip';
+  const base=slug($('#shortName').value)||slug($('#appName').value)||'icons';
+  return base+'-iconset.zip';
+}
 $('#zipBtn').onclick=()=>{
   const zip=buildZip(Object.entries(files).map(([name,bytes])=>({name,bytes})));
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([zip],{type:'application/zip'}));
-  a.download=(($('#shortName').value||'icons').replace(/[^\w\-]+/g,'-').toLowerCase())+'-iconset.zip';
+  a.download=zipFileName();
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  toast(T('t.zip'));
+  toast(T('t.zipNamed',{f:a.download}));
 };
 
 $('#langBtn').onclick=()=>applyLang(lang==='de'?'en':'de');
@@ -1142,7 +1200,16 @@ document.addEventListener('keydown',e=>{
   if(e.key==='d'||e.key==='D') applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
 });
 
-/* ================= Start ================= */
+
+/* ---------- Reiter ---------- */
+function showTab(id){
+  $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  $$('.panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===id));
+  try{localStorage.setItem('ics-tab',id)}catch{}
+}
+$$('.tab').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
+
+/* ---------- Start ---------- */
 let startTheme='dark';
 try{ startTheme=localStorage.getItem('ics-theme')
   || (matchMedia('(prefers-color-scheme: light)').matches?'light':'dark') }catch{}
@@ -1151,6 +1218,9 @@ let startLang=(navigator.language||'de').toLowerCase().startsWith('de')?'de':'en
 try{ startLang=localStorage.getItem('ics-lang')||startLang }catch{}
 initSections();
 applyLang(startLang);
+let startTab='symbol';
+try{ startTab=localStorage.getItem('ics-tab')||'symbol' }catch{}
+if($(`.tab[data-tab="${startTab}"]`)) showTab(startTab);
 })();
 </script>
 </body>
