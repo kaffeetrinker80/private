@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.6.4</title>
+<title>ContactHub Pro V1.6.5</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -489,6 +489,37 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 [data-theme=dark] .messageFoldBody{background:#1e293b;}
 @media(max-width:820px){.messageMiniGrid,.messageActions{grid-template-columns:1fr}.messageActions .wide{grid-column:auto}}
 
+
+/* ── V1.6.5 Quick Message launcher + searchable Help ─────────── */
+.quickMsgCardBtn{background:#ecfdf5!important;color:#15803d!important;border-color:#bbf7d0!important;}
+.quickMsgCardBtn:hover{background:#dcfce7!important;}
+[data-theme=dark] .quickMsgCardBtn{background:#143b2a!important;color:#86efac!important;border-color:#23623f!important;}
+.helpLauncher{font-weight:900!important;min-width:34px;}
+.helpShell{display:grid;grid-template-columns:minmax(180px,.34fr) minmax(0,1fr);gap:12px;min-height:430px;}
+.helpSidebar{display:grid;align-content:start;gap:7px;border-right:1px solid var(--line);padding-right:12px;}
+.helpSearch{grid-column:1/-1;margin-bottom:2px;}
+.helpTopicBtn{width:100%;text-align:left;justify-content:flex-start;border-radius:11px!important;padding:8px 9px!important;background:#f8fafc!important;border:1px solid var(--line)!important;color:#334155!important;}
+.helpTopicBtn.active{background:#e8f0ff!important;border-color:#93b4ff!important;color:#1d4ed8!important;}
+.helpContent{min-width:0;overflow:auto;max-height:58vh;padding-right:3px;}
+.helpArticle{display:grid;gap:10px;}
+.helpArticle h3{margin:0;font-size:19px;letter-spacing:-.02em;}
+.helpArticle h4{margin:5px 0 0;font-size:13px;}
+.helpArticle p,.helpArticle li{font-size:13px;line-height:1.5;color:#475569;}
+.helpArticle ul{margin:0;padding-left:20px;display:grid;gap:4px;}
+.helpTip{border:1px solid #cfe1f7;background:#f8fbff;border-radius:13px;padding:9px 10px;font-size:12px;line-height:1.45;color:#35506f;}
+.helpKeys{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px;}
+.helpKeys span{font-family:var(--mono);font-size:11px;padding:4px 7px;border-radius:8px;background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;}
+.helpNoResult{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px;}
+.quickModalContact{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #cfe1f7;background:#f8fbff;border-radius:14px;padding:9px 10px;}
+.quickModalContact b{display:block;font-size:14px;}.quickModalContact small{color:var(--muted);}
+[data-theme=dark] .helpSidebar{border-color:#2d3f55;}
+[data-theme=dark] .helpTopicBtn{background:#1a2438!important;border-color:#2d3f55!important;color:#cbd5e1!important;}
+[data-theme=dark] .helpTopicBtn.active{background:#1e3a5f!important;border-color:#3b82f6!important;color:#93c5fd!important;}
+[data-theme=dark] .helpArticle p,[data-theme=dark] .helpArticle li{color:#a9bdd2;}
+[data-theme=dark] .helpTip,[data-theme=dark] .quickModalContact{background:#1a2e4a;border-color:#2d4e75;color:#a9c7e8;}
+[data-theme=dark] .helpKeys span{background:#1a2438;border-color:#2d3f55;color:#a9bdd2;}
+@media(max-width:760px){.helpShell{grid-template-columns:1fr;}.helpSidebar{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:9px;grid-template-columns:1fr 1fr;}.helpSearch{grid-column:1/-1;}.helpContent{max-height:none;}}
+
 </style>
 </head>
 <body>
@@ -497,7 +528,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.6.4</span></h1>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.6.5</span></h1>
         <p class="sub">Contacts · Congregations · Teams · Quick contact actions</p>
       </div>
     </div>
@@ -507,6 +538,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
       <button class="ghost" id="btnImportJson">Import JSON</button>
       <button class="green" id="btnImportCsv">Import Outlook CSV</button>
       <button class="primary" id="btnExportCsv">📤 Export</button>
+      <button class="ghost helpLauncher" id="btnHelp" title="Help / Hilfe (F1)">?</button>
       <button class="themeToggle" id="btnTheme">🌙 Dark</button>
       <button class="ghost" id="btnLanguage" title="Switch language: DE / EN">DE / EN</button>
     </div>
@@ -591,7 +623,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.6.4', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.6.5', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedContactIds:new Set(),sortBy:'lastName',autosaveTimer:null,uiLang:'en',selectedCongId:null};
 
 /* ── V1.5.5: Complete DE / EN interface toggle ───────────────────── */
@@ -655,7 +687,7 @@ const UI_DE = {
   "Insert contact": "Kontakt einfügen",
     "Modal": "Dialog",
   "Close": "Schließen",
-  "Made with love © – ContactHub Pro V1.6.4 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.4 · Kontakt- und Datenverwaltung",
+  "Made with love © – ContactHub Pro V1.6.5 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.5 · Kontakt- und Datenverwaltung",
   "No contacts found.": "Keine Kontakte gefunden.",
   "Create contact": "Kontakt erstellen",
   "Edit": "Bearbeiten",
@@ -1094,8 +1126,8 @@ Object.assign(UI_DE,{
   "Email addresses copied.": "E-Mail-Adressen kopiert.",
   "Mobile numbers copied.": "Mobilnummern kopiert.",
   "Data copied.": "Daten kopiert.",
-  "ContactHub Pro V1.6.4 · Contact hub + data editor": "ContactHub Pro V1.6.4 · Kontakt- und Datenverwaltung",
-  "Made with love © – ContactHub Pro V1.6.4 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.4 · Kontakt- und Datenverwaltung",
+  "ContactHub Pro V1.6.5 · Contact hub + data editor": "ContactHub Pro V1.6.5 · Kontakt- und Datenverwaltung",
+  "Made with love © – ContactHub Pro V1.6.5 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.5 · Kontakt- und Datenverwaltung",
   "Copy available contact data": "Vorhandene Kontaktdaten kopieren"
 });
 const I18N_TEXT_ORIGINAL = new WeakMap();
@@ -1531,6 +1563,7 @@ function renderContacts(){
       </div>
       <div class="smallBtns" style="justify-content:flex-end;align-items:center;gap:2px">
         <button class="mini icon ghost" title="Edit" data-focus="${c.id}">✎</button>
+        <button class="mini icon quickMsgCardBtn" title="Quick message" data-quickmsg="${c.id}">✉</button>
         <button class="mini icon ghost" title="Copy available contact data" data-copycard="${c.id}">⧉</button>
         <button class="mini icon ghost" title="Save as vCard" data-vcf="${c.id}">📇</button>
         <button class="starBtn ${c.favorite?'on':''}" data-star="${c.id}" title="${c.favorite?'Remove favorite':'Set favorite'}">${c.favorite?'★':'☆'}</button>
@@ -1545,6 +1578,7 @@ function renderContacts(){
   el.querySelectorAll('.cardItem').forEach(x=>x.onclick=()=>{state.selectedContactId=x.dataset.id;renderContacts();renderDetailsPanel();});
   el.querySelectorAll('[data-check]').forEach(x=>{const upd=()=>{x.checked?state.selectedContactIds.add(x.dataset.check):state.selectedContactIds.delete(x.dataset.check);updateSelectionHint();};x.onclick=e=>e.stopPropagation();x.onchange=upd;x.oninput=upd;});
   el.querySelectorAll('[data-focus]').forEach(x=>x.onclick=e=>{e.stopPropagation();state.selectedContactId=x.dataset.focus;renderContacts();renderDetailsPanel();setTimeout(()=>$('#d_firstName')?.focus(),0);});
+  el.querySelectorAll('[data-quickmsg]').forEach(x=>x.onclick=e=>{e.stopPropagation();openQuickMessageModal(x.dataset.quickmsg);});
   el.querySelectorAll('[data-copy]').forEach(x=>x.onclick=e=>{e.stopPropagation();copyText(x.dataset.copy)});
   el.querySelectorAll('[data-copycard]').forEach(x=>x.onclick=e=>{e.stopPropagation();const c=state.data.contacts.find(c=>c.id===x.dataset.copycard);if(c)copyText(contactCardText(c,'full'));});
   el.querySelectorAll('[data-star]').forEach(x=>x.onclick=e=>{e.stopPropagation();const c=state.data.contacts.find(c=>c.id===x.dataset.star);if(c){c.favorite=!c.favorite;saveSoon();renderContacts();renderDetailsPanel();toast(c.favorite?'⭐ Favorite set.':'Favorite removed.');}});
@@ -1741,6 +1775,109 @@ function bindQuickMessage(c){
   $('#qm_mail').onclick=()=>{quickMessageSaveDraft();const r=quickMessageResolved(c);if(!r.email)return toast('No email address');if(!r.text.trim())return toast('Mini message is empty.');window.location.href=`mailto:${encodeURIComponent(r.email)}?subject=${encodeURIComponent(r.subject)}&body=${encodeURIComponent(r.text)}`;};
   $('#qm_reset').onclick=()=>{if(!confirm('Reset text?'))return;$('#qm_subject').value='';$('#qm_text').value='';quickMessageSaveDraft();toast('Mini message reset.');};
 }
+
+function modalQuickMessageHtml(c){
+  return `<div class="stack">
+    <div class="quickModalContact"><div><b>${esc(contactName(c))}</b><small>${esc(c.congregation||c.organization||'')}</small></div><span class="channelPill">✉ Quick</span></div>
+    <div class="messageMiniGrid">
+      <div><label>Email subject</label><input id="mqm_subject" value="${esc(state.data.settings.quickMessageSubject||'')}"></div>
+      <div><label>Who am I? / Signature name</label><input id="mqm_sender" value="${esc(state.data.settings.senderName||'')}"></div>
+    </div>
+    <div><label>Message</label><textarea id="mqm_text" style="min-height:180px" placeholder="Write a short reusable message…">${esc(state.data.settings.quickMessageText||'')}</textarea></div>
+    <div class="messagePlaceholderBar">
+      <button type="button" class="ghost" data-mqm-placeholder="{{firstName}}">{{firstName}}</button>
+      <button type="button" class="ghost" data-mqm-placeholder="{{name}}">{{name}}</button>
+      <button type="button" class="ghost" data-mqm-placeholder="{{congregation}}">{{congregation}}</button>
+      <button type="button" class="ghost" data-mqm-placeholder="{{email}}">{{email}}</button>
+      <button type="button" class="ghost" data-mqm-placeholder="{{mobile}}">{{mobile}}</button>
+      <button type="button" class="ghost" data-mqm-placeholder="{{senderName}}">{{senderName}}</button>
+    </div>
+    <div class="messageActions">
+      <button class="ghost wide" id="mqm_copy">⧉ Copy message</button>
+      <button class="green" id="mqm_wa">WhatsApp</button>
+      <button class="primary" id="mqm_mail">Email</button>
+      <button class="ghost" id="mqm_reset">Reset</button>
+    </div>
+  </div>`;
+}
+function modalQuickMessageSaveDraft(){
+  if(!state.data.settings)state.data.settings={};
+  state.data.settings.quickMessageSubject=$('#mqm_subject')?.value||'';
+  state.data.settings.quickMessageText=$('#mqm_text')?.value||'';
+  state.data.settings.senderName=$('#mqm_sender')?.value||'';
+  saveSoon();
+}
+function modalQuickMessageResolved(c){
+  const emails=(c.emails||[]).map(e=>e.value).filter(Boolean),mobiles=(c.mobiles||[]).map(m=>m.value).filter(Boolean);
+  const map={
+    '{{firstName}}':c.firstName||firstWord(contactName(c)),
+    '{{name}}':contactName(c),
+    '{{congregation}}':c.congregation||'',
+    '{{email}}':emails[0]||'',
+    '{{mobile}}':mobiles[0]||'',
+    '{{senderName}}':$('#mqm_sender')?.value||state.data.settings.senderName||''
+  };
+  let text=$('#mqm_text')?.value||'',subject=$('#mqm_subject')?.value||'';
+  Object.entries(map).forEach(([k,v])=>{text=text.split(k).join(v);subject=subject.split(k).join(v);});
+  return{text,subject,email:emails[0]||'',mobile:mobiles[0]||''};
+}
+function bindModalQuickMessage(c){
+  ['mqm_subject','mqm_sender','mqm_text'].forEach(id=>$('#'+id)?.addEventListener('input',modalQuickMessageSaveDraft));
+  document.querySelectorAll('[data-mqm-placeholder]').forEach(b=>b.addEventListener('click',()=>{
+    const ta=$('#mqm_text');if(!ta)return;const token=b.dataset.mqmPlaceholder,a=ta.selectionStart??ta.value.length,z=ta.selectionEnd??a;
+    ta.value=ta.value.slice(0,a)+token+ta.value.slice(z);ta.focus();ta.selectionStart=ta.selectionEnd=a+token.length;modalQuickMessageSaveDraft();
+  }));
+  $('#mqm_copy').onclick=()=>{modalQuickMessageSaveDraft();const r=modalQuickMessageResolved(c);if(!r.text.trim())return toast('Mini message is empty.');copyText(r.text).then(()=>toast('Message copied.'));};
+  $('#mqm_wa').onclick=()=>{modalQuickMessageSaveDraft();const r=modalQuickMessageResolved(c);if(!r.mobile)return toast('No mobile number');if(!r.text.trim())return toast('Mini message is empty.');window.open(`https://wa.me/${digitsOnly(r.mobile)}?text=${encodeURIComponent(r.text)}`,'_blank','noopener');};
+  $('#mqm_mail').onclick=()=>{modalQuickMessageSaveDraft();const r=modalQuickMessageResolved(c);if(!r.email)return toast('No email address');if(!r.text.trim())return toast('Mini message is empty.');window.location.href=`mailto:${encodeURIComponent(r.email)}?subject=${encodeURIComponent(r.subject)}&body=${encodeURIComponent(r.text)}`;};
+  $('#mqm_reset').onclick=()=>{if(!confirm('Reset text?'))return;$('#mqm_subject').value='';$('#mqm_text').value='';modalQuickMessageSaveDraft();toast('Mini message reset.');};
+}
+function openQuickMessageModal(contactId){
+  const c=state.data.contacts.find(x=>x.id===contactId);if(!c)return;
+  state.selectedContactId=c.id;
+  showModal(`✉ Quick message · ${contactName(c)}`,modalQuickMessageHtml(c),`<button class="ghost" id="mqm_close">Close</button>`);
+  bindModalQuickMessage(c);
+  $('#mqm_close').onclick=()=>{modalQuickMessageSaveDraft();closeModal();renderDetailsPanel();};
+  setTimeout(()=>$('#mqm_text')?.focus(),0);
+}
+
+const HELP_TOPICS={
+  start:{icon:'🚀',de:{title:'Schnellstart',keywords:'start workflow suche person kontakt',html:`<p>ContactHub Pro ist als schneller Daten-Hub gedacht: Kontakt finden, Daten pflegen und direkt weiterverwenden.</p><ul><li><b>Suchen:</b> Name, Versammlung, Aufgabe, Tag, Team, E-Mail oder Mobilnummer.</li><li><b>Kontakt öffnen:</b> Auf die Person klicken; rechts erscheinen alle Stammdaten.</li><li><b>Schnellaktion:</b> ✉ öffnet Quick Message direkt aus der Personenkachel.</li><li><b>Mehrere Kontakte:</b> Checkboxen verwenden und anschließend Bulk-Aktionen, Kopieren oder CSV-Export nutzen.</li></ul><div class="helpTip"><b>Tipp:</b> Favoriten ★ stehen in der Trefferliste automatisch weiter oben.</div>`},en:{title:'Quick start',keywords:'start workflow search person contact',html:`<p>ContactHub Pro is designed as a fast data hub: find a contact, maintain the data, and use it immediately.</p><ul><li><b>Search:</b> name, congregation, role, tag, team, email or mobile.</li><li><b>Open a contact:</b> click the person; all master data appears on the right.</li><li><b>Quick action:</b> ✉ opens Quick Message directly from the contact card.</li><li><b>Multiple contacts:</b> use checkboxes, then bulk actions, copy or CSV export.</li></ul><div class="helpTip"><b>Tip:</b> Favorites ★ are automatically ranked higher in the result list.</div>`}},
+  search:{icon:'🔎',de:{title:'Suche & Filter',keywords:'suche filter rolle tag team versammlung favorit',html:`<p>Die Suche durchsucht praktisch alle relevanten Kontaktdaten gleichzeitig. Filter können zusätzlich kombiniert werden.</p><ul><li><b>Freitext:</b> Name, Versammlung, Organisation, Rollen, Teams, Tags, E-Mail und Mobilnummer.</li><li><b>Filter:</b> Versammlungsaufgabe, Tag, Kongress-/Assembly-Team, Favorit und Versammlung.</li><li><b>Sortierung:</b> Nach Vor- oder Nachname; Favoriten bleiben bevorzugt.</li><li><b>Sichtbare auswählen:</b> markiert exakt die aktuell gefilterte Ergebnismenge.</li></ul>`},en:{title:'Search & filters',keywords:'search filter role tag team congregation favorite',html:`<p>The search scans nearly all relevant contact data at once. Filters can be combined.</p><ul><li><b>Free text:</b> name, congregation, organisation, roles, teams, tags, email and mobile.</li><li><b>Filters:</b> congregation role, tag, Assembly / Convention team, favorite and congregation.</li><li><b>Sorting:</b> first or last name; favorites remain prioritized.</li><li><b>Select visible:</b> selects exactly the currently filtered result set.</li></ul>`}},
+  contacts:{icon:'👤',de:{title:'Kontakte bearbeiten',keywords:'kontakt bearbeiten speichern email mobil rollen teams tags notizen vcard',html:`<p>Die rechte Seite ist der vollständige Kontakteditor.</p><ul><li>Mehrere E-Mail-Adressen und Mobilnummern jeweils zeilenweise speichern.</li><li>Versammlung, Rollen, Teams und Tags per Auswahl zuordnen.</li><li>Neue Rollen/Teams/Tags können direkt ergänzt werden.</li><li>Kontakt kopieren, E-Mails/Mobilnummern separat kopieren oder vCard erzeugen.</li><li><b>Speichern</b> übernimmt Änderungen; <b>Zurücksetzen</b> verwirft nur noch nicht gespeicherte Änderungen.</li></ul><div class="helpTip">Mobilnummern wie 0179… werden beim Speichern für Deutschland normalisiert.</div>`},en:{title:'Edit contacts',keywords:'contact edit save email mobile roles teams tags notes vcard',html:`<p>The right side is the full contact editor.</p><ul><li>Store multiple email addresses and mobile numbers, one per line.</li><li>Assign congregation, roles, teams and tags by selection.</li><li>New roles/teams/tags can be added directly.</li><li>Copy a contact, copy email/mobile separately, or create a vCard.</li><li><b>Save</b> commits changes; <b>Reset</b> discards only unsaved edits.</li></ul><div class="helpTip">German mobile numbers such as 0179… are normalized when saved.</div>`}},
+  message:{icon:'✉',de:{title:'Quick Message',keywords:'quick message whatsapp email nachricht platzhalter betreff absender',html:`<p>Quick Message ist bewusst schlank und für wiederkehrende kurze Nachrichten gedacht.</p><ul><li>✉ direkt in der Personenkachel öffnet das kleine Nachrichtenfenster.</li><li>Betreff, Nachricht und Absendername werden lokal als dein wiederverwendbarer Entwurf gespeichert.</li><li>Platzhalter werden beim Senden/Kopieren mit dem gewählten Kontakt ersetzt.</li><li><b>{{firstName}}</b>, <b>{{name}}</b>, <b>{{congregation}}</b>, <b>{{email}}</b>, <b>{{mobile}}</b>, <b>{{senderName}}</b>.</li><li>WhatsApp nutzt die erste hinterlegte Mobilnummer, E-Mail die erste hinterlegte Adresse.</li></ul><div class="helpTip">Der Quick-Message-Entwurf ist Bestandteil des vollständigen JSON-Backups.</div>`},en:{title:'Quick Message',keywords:'quick message whatsapp email placeholders subject sender',html:`<p>Quick Message is intentionally lightweight and intended for recurring short messages.</p><ul><li>✉ directly on the contact card opens the compact message window.</li><li>Subject, message and sender name are saved locally as your reusable draft.</li><li>Placeholders are resolved using the selected contact when sending/copying.</li><li><b>{{firstName}}</b>, <b>{{name}}</b>, <b>{{congregation}}</b>, <b>{{email}}</b>, <b>{{mobile}}</b>, <b>{{senderName}}</b>.</li><li>WhatsApp uses the first mobile number; Email uses the first stored email address.</li></ul><div class="helpTip">The Quick Message draft is included in the full JSON backup.</div>`}},
+  bulk:{icon:'☑',de:{title:'Mehrfachaktionen',keywords:'bulk mehrfach auswählen markiert rollen tags löschen csv zusammenführen merge',html:`<p>Checkboxen markieren Kontakte unabhängig davon, welcher Kontakt rechts geöffnet ist.</p><ul><li><b>Bulk edit:</b> mehrere Kontakte gemeinsam ändern.</li><li><b>Rolle / Team / Tag:</b> Zuweisungen gesammelt hinzufügen bzw. ersetzen.</li><li><b>CSV:</b> nur die ausgewählten Kontakte exportieren.</li><li><b>Merge:</b> doppelte Kontakte gezielt zusammenführen.</li><li><b>Löschen:</b> ausgewählte Kontakte gesammelt entfernen.</li></ul><div class="helpTip">Mit Filtern + „Sichtbare auswählen“ lassen sich sehr schnell sinnvolle Gruppen bilden.</div>`},en:{title:'Bulk actions',keywords:'bulk select selected roles tags delete csv merge',html:`<p>Checkboxes select contacts independently from the contact currently open on the right.</p><ul><li><b>Bulk edit:</b> change multiple contacts together.</li><li><b>Role / Team / Tag:</b> add or replace assignments in bulk.</li><li><b>CSV:</b> export only selected contacts.</li><li><b>Merge:</b> deliberately combine duplicate contacts.</li><li><b>Delete:</b> remove selected contacts together.</li></ul><div class="helpTip">Filters + “Select visible” make it very fast to create useful groups.</div>`}},
+  congregations:{icon:'🏛',de:{title:'Versammlungen & Stammdaten',keywords:'versammlung congregation stammdaten rollen teams tags master data',html:`<p>Versammlungsdaten und globale Auswahllisten werden getrennt von einzelnen Kontakten gepflegt.</p><ul><li><b>Versammlungen:</b> Namen und versammlungsspezifische Kontaktdaten verwalten.</li><li><b>Stammdaten:</b> zentrale Listen für Rollen, Teams, Versammlungen und Tags.</li><li>Neue Stammdaten stehen anschließend in Filtern und Kontakteditoren zur Verfügung.</li></ul>`},en:{title:'Congregations & master data',keywords:'congregation master data roles teams tags',html:`<p>Congregation data and global selection lists are maintained separately from individual contacts.</p><ul><li><b>Congregations:</b> manage names and congregation-specific contact data.</li><li><b>Master data:</b> central lists for roles, teams, congregations and tags.</li><li>New master data becomes available in filters and contact editors.</li></ul>`}},
+  import:{icon:'⬆',de:{title:'Import',keywords:'import outlook csv json backup merge outlook kategorien firma',html:`<p>Es gibt zwei unterschiedliche Importwege.</p><ul><li><b>JSON:</b> stellt einen ContactHub-Datenbestand/Backup wieder her.</li><li><b>Outlook CSV:</b> analysiert exportierte Outlook-Kontakte und bietet Optionen für bestehende Kontakte, Company/Versammlung und Kategorien.</li><li>Beim Outlook-Import können fehlende Daten ergänzt oder bestehende Treffer übersprungen werden.</li></ul><div class="helpTip"><b>Vor größeren Importen:</b> vorher über Export → Full backup (JSON) eine Sicherung erstellen.</div>`},en:{title:'Import',keywords:'import outlook csv json backup merge categories company',html:`<p>There are two different import paths.</p><ul><li><b>JSON:</b> restores a ContactHub dataset/backup.</li><li><b>Outlook CSV:</b> analyses exported Outlook contacts and offers options for existing contacts, Company/congregation and categories.</li><li>During Outlook import, missing data can be merged or matching contacts skipped.</li></ul><div class="helpTip"><b>Before larger imports:</b> create Export → Full backup (JSON).</div>`}},
+  export:{icon:'📤',de:{title:'Export & Sicherung',keywords:'export backup sicherung csv json tag versammlung ausgewählt',html:`<p>Der zentrale Export-Dialog bündelt Listenexport und Sicherung.</p><ul><li>Alle Kontakte als CSV.</li><li>Kontakte nach Tag oder Versammlung.</li><li>Nur Versammlungsliste oder Versammlung + Kontakte.</li><li>Ausgewählte Kontakte.</li><li><b>Full backup (JSON):</b> vollständiger wiederherstellbarer Datenbestand inklusive Einstellungen.</li></ul><div class="helpTip">Für echte Datensicherung immer den JSON-Full-Backup verwenden; CSV ist primär für Listen und Weiterverarbeitung gedacht.</div>`},en:{title:'Export & backup',keywords:'export backup csv json tag congregation selected',html:`<p>The central export dialog combines list export and backup.</p><ul><li>All contacts as CSV.</li><li>Contacts by tag or congregation.</li><li>Congregation list only or congregation + contacts.</li><li>Selected contacts.</li><li><b>Full backup (JSON):</b> complete restorable dataset including settings.</li></ul><div class="helpTip">For a real backup, always use the JSON full backup; CSV is mainly for lists and further processing.</div>`}},
+  storage:{icon:'💾',de:{title:'Lokale Speicherung & Sicherheit',keywords:'lokal gespeichert browser localstorage löschen daten backup sicherheit',html:`<p>Die App arbeitet lokal im Browser. Änderungen werden automatisch im lokalen Browser-Speicher abgelegt.</p><ul><li><b>Saved locally</b> zeigt an, dass der aktuelle Stand lokal gespeichert ist.</li><li><b>Start empty</b> startet bewusst mit einem leeren Datenbestand.</li><li><b>Clear local data</b> löscht den lokalen Bestand dieses Browsers.</li><li>Browserdaten sind kein Ersatz für eine externe Sicherung.</li></ul><div class="helpTip">Regelmäßig Export → Full backup (JSON) herunterladen, besonders vor Browserwechsel, Gerätewechsel oder größeren Importen.</div>`},en:{title:'Local storage & safety',keywords:'local saved browser localstorage delete data backup safety',html:`<p>The app works locally in your browser. Changes are automatically stored in local browser storage.</p><ul><li><b>Saved locally</b> indicates that the current state is stored locally.</li><li><b>Start empty</b> deliberately starts with an empty dataset.</li><li><b>Clear local data</b> deletes this browser's local dataset.</li><li>Browser storage is not a substitute for an external backup.</li></ul><div class="helpTip">Regularly download Export → Full backup (JSON), especially before changing browser/device or large imports.</div>`}},
+  shortcuts:{icon:'⌨',de:{title:'Bedienungstipps',keywords:'shortcut tastatur tipp schnell bedienung',html:`<p>Ein paar kleine Dinge machen den Hub deutlich schneller:</p><ul><li>Suche + Filter kombinieren statt lange Listen zu scrollen.</li><li>✉ an der Person für Nachrichten, ✎ für Bearbeitung, ⧉ zum direkten Kopieren.</li><li>Favoriten ★ für häufig benötigte Personen.</li><li>„Sichtbare auswählen“ nach einem Filter für Gruppenaktionen.</li><li>vCard nutzen, wenn ein Kontakt in ein Adressbuch übernommen werden soll.</li></ul><div class="helpKeys"><span>✉ Quick Message</span><span>✎ Edit</span><span>⧉ Copy</span><span>📇 vCard</span><span>★ Favorite</span></div>`},en:{title:'Usage tips',keywords:'shortcut keyboard tip fast usage',html:`<p>A few small habits make the hub much faster:</p><ul><li>Combine search + filters instead of scrolling long lists.</li><li>✉ on a person for messages, ✎ for editing, ⧉ for direct copy.</li><li>Favorites ★ for frequently used people.</li><li>Use “Select visible” after filtering for group actions.</li><li>Use vCard when a contact should be added to an address book.</li></ul><div class="helpKeys"><span>✉ Quick Message</span><span>✎ Edit</span><span>⧉ Copy</span><span>📇 vCard</span><span>★ Favorite</span></div>`}}
+};
+function openHelp(initialTopic='start'){
+  const lang=state.uiLang==='de'?'de':'en';
+  const topics=Object.entries(HELP_TOPICS);
+  showModal(lang==='de'?'? Hilfe & Bedienung':'? Help & usage',`<div class="helpShell">
+    <div class="helpSearch"><input id="helpSearch" placeholder="${lang==='de'?'Hilfe durchsuchen…':'Search help…'}"></div>
+    <div class="helpSidebar" id="helpSidebar">${topics.map(([key,v])=>`<button class="helpTopicBtn" data-help-topic="${key}">${v.icon} ${esc(v[lang].title)}</button>`).join('')}</div>
+    <div class="helpContent" id="helpContent"></div>
+  </div>`,`<button class="ghost" id="helpClose">${lang==='de'?'Schließen':'Close'}</button>`);
+  let active=initialTopic;
+  const render=(query='')=>{
+    const q=query.trim().toLowerCase();
+    const matches=topics.filter(([k,v])=>!q||[v[lang].title,v[lang].keywords,v[lang].html.replace(/<[^>]*>/g,' ')].join(' ').toLowerCase().includes(q));
+    document.querySelectorAll('[data-help-topic]').forEach(b=>{b.style.display=matches.some(([k])=>k===b.dataset.helpTopic)?'':'none';b.classList.toggle('active',b.dataset.helpTopic===active);});
+    if(q && !matches.some(([k])=>k===active))active=matches[0]?.[0]||'';
+    document.querySelectorAll('[data-help-topic]').forEach(b=>b.classList.toggle('active',b.dataset.helpTopic===active));
+    const topic=active&&HELP_TOPICS[active];
+    $('#helpContent').innerHTML=topic?`<article class="helpArticle"><h3>${topic.icon} ${esc(topic[lang].title)}</h3>${topic[lang].html}</article>`:`<div class="helpNoResult">${lang==='de'?'Keine passende Hilfe gefunden.':'No matching help topic found.'}</div>`;
+  };
+  document.querySelectorAll('[data-help-topic]').forEach(b=>b.onclick=()=>{active=b.dataset.helpTopic;render($('#helpSearch').value);});
+  $('#helpSearch').oninput=e=>render(e.target.value);
+  $('#helpClose').onclick=closeModal;
+  render();
+  setTimeout(()=>$('#helpSearch')?.focus(),0);
+}
+
 function showModal(title,body,foot=''){$('#modalTitle').textContent=tr(title);$('#modalBody').innerHTML=body;$('#modalFoot').innerHTML=foot;translateDom($('#modalOverlay'));$('#modalOverlay').classList.add('show')}
 function closeModal(){$('#modalOverlay').classList.remove('show')}
 
@@ -1748,6 +1885,8 @@ function bind(){
   $('#btnCloseModal').onclick=closeModal;
   $('#modalOverlay').onclick=e=>{if(e.target.id==='modalOverlay')closeModal()};
   if($('#btnLanguage'))$('#btnLanguage').addEventListener('click',()=>{state.uiLang=state.uiLang==='de'?'en':'de';applyLang();saveSoon();});
+  if($('#btnHelp'))$('#btnHelp').onclick=()=>openHelp();
+  document.addEventListener('keydown',e=>{if(e.key==='F1'){e.preventDefault();openHelp();}});
   $('#btnNewContact').onclick=createNewContactInPanel;
   $('#btnNewContactDetail').onclick=createNewContactInPanel;
   $('#btnMasterData').onclick=openMasterData;
@@ -2122,10 +2261,10 @@ function openMasterData(){
   };
 }
 
-window.ContactHubPro={openMasterData,openBulkEditModal,openCongEditor,openSmartExport,createNewContactInPanel};
+window.ContactHubPro={openMasterData,openBulkEditModal,openCongEditor,openSmartExport,createNewContactInPanel,openQuickMessageModal,openHelp};
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.6.4 · Contact hub + data editor</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.6.5 · Contact hub + data editor</footer>
 </body>
 </html>
