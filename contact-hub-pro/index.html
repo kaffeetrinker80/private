@@ -13,19 +13,20 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.6.5</title>
+<title>ContactHub Pro V1.6.6</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
   --bg:#f4f7fb;--card:#fff;--card2:#f8fafc;--text:#172033;--muted:#64748b;--line:#dbe4ef;
-  --accent:#2563eb;--accent2:#1d4ed8;--soft:#e8f0ff;--green:#15803d;--greenSoft:#dcfce7;
+  --accent:#0e7490;--accent2:#0b5f76;--soft:#e2f3f8;--green:#15803d;--greenSoft:#dcfce7;
   --warn:#b45309;--warnSoft:#fef3c7;--danger:#b91c1c;--dangerSoft:#fee2e2;
-  --shadow:0 10px 28px rgba(15,23,42,.075);--r:18px;--r2:12px;
+  --shadow:0 10px 28px rgba(15,42,52,.075);--r:18px;--r2:12px;
+  --accentSoft:#e2f3f8;--accentLine:#a9d7e5;--accentInk:#0b5f76;
   --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
   --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:var(--sans);background:linear-gradient(135deg,#edf4ff,#f7fafc 45%,#f4f7fb);color:var(--text)}
+body{margin:0;font-family:var(--sans);background:linear-gradient(135deg,#e9f4f8,#f7fafc 45%,#f2f7f9);color:var(--text)}
 button,input,select,textarea{font:inherit}
 button{
   border:1px solid transparent;border-radius:999px;padding:7px 11px;cursor:pointer;font-weight:760;
@@ -44,19 +45,19 @@ input,select,textarea{
   width:100%;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;
   padding:8px 9px;outline:none;transition:.14s ease;font-size:13px;
 }
-input:focus,select:focus,textarea:focus{border-color:#93b4ff;box-shadow:0 0 0 3px rgba(37,99,235,.11)}
+input:focus,select:focus,textarea:focus{border-color:#6fb9cf;box-shadow:0 0 0 3px rgba(14,116,144,.13)}
 textarea{min-height:108px;resize:vertical;line-height:1.43}
 label{display:block;font-size:11px;font-weight:850;color:#475569;margin:0 0 4px;text-transform:uppercase;letter-spacing:.03em}
 .app{max-width:1840px;margin:0 auto;padding:16px}
 .topbar{
   position:sticky;top:0;z-index:30;margin:-16px -16px 14px;padding:13px 16px;
-  backdrop-filter:blur(15px);background:rgba(244,247,251,.9);border-bottom:1px solid rgba(219,228,239,.9)
+  backdrop-filter:blur(15px);background:rgba(242,247,249,.92);border-bottom:1px solid rgba(200,222,231,.95);box-shadow:0 1px 0 rgba(14,116,144,.06)
 }
 .header{max-width:1840px;margin:0 auto;display:grid;grid-template-columns:minmax(320px,1fr) auto;gap:14px;align-items:center}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
 .logo{
   width:44px;height:44px;border-radius:15px;display:grid;place-items:center;color:#fff;font-size:22px;font-weight:900;
-  background:radial-gradient(circle at 28% 22%,#93c5fd,#2563eb 44%,#172033 100%);box-shadow:var(--shadow);flex:0 0 auto;
+  background:radial-gradient(circle at 28% 22%,#7fd4e8,#0e7490 46%,#0f2b38 100%);box-shadow:0 6px 18px rgba(14,116,144,.28);flex:0 0 auto;
 }
 h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 .sub{margin:4px 0 0;color:var(--muted);font-size:13px}
@@ -77,7 +78,7 @@ h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 .hint{font-size:12px;color:var(--muted);line-height:1.35}
 .list{display:grid;gap:7px;max-height:52vh;overflow:auto;padding-right:2px}
 .cardItem{border:1px solid var(--line);background:#fff;border-radius:14px;padding:9px;transition:.13s ease;display:grid;gap:6px;cursor:pointer;user-select:none}
-.cardItem:hover{border-color:#adc4fb;background:#fbfdff}.cardItem.active{border-color:#2563eb;background:#eef4ff;box-shadow:0 0 0 3px rgba(37,99,235,.07)}
+.cardItem:hover{border-color:#9fcfdf;background:#fbfeff}.cardItem.active{border-color:#0e7490;background:#eaf6fa;box-shadow:0 0 0 3px rgba(14,116,144,.09)}
 .cardTop{display:grid;grid-template-columns:auto 1fr auto auto;gap:6px;align-items:start}
 .check{width:17px;height:17px;margin:1px 0 0;accent-color:var(--accent)}
 .cardName{font-weight:920;line-height:1.15;cursor:pointer}.cardMeta{font-size:12px;color:var(--muted);line-height:1.3}.smallBtns{display:flex;gap:5px;flex-wrap:wrap}
@@ -91,7 +92,7 @@ h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 .previewBox{background:#f8fbff;color:#172033;border-radius:18px;padding:14px;min-height:330px;white-space:pre-wrap;line-height:1.52;border:1px solid #d7e4f2;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
 .subjectBox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-weight:800;color:#334155;min-height:52px;word-break:break-word;line-height:1.35}
 .previewActions{display:flex;gap:7px;flex-wrap:wrap}.placeholderGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.placeholder{font-family:var(--mono);font-size:11px;font-weight:850;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:9px;padding:6px 7px;color:#334155;cursor:pointer;user-select:none}.placeholder:hover{background:#e8f0ff;color:#1d4ed8}
+.placeholder{font-family:var(--mono);font-size:11px;font-weight:850;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:9px;padding:6px 7px;color:#334155;cursor:pointer;user-select:none}.placeholder:hover{background:#e2f3f8;color:#0b5f76}
 .waBtn{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border-color:rgba(255,255,255,.18);display:inline-flex;align-items:center;gap:7px}
 .waIcon{width:17px;height:17px;border-radius:50%;background:#fff;color:#16a34a;display:inline-grid;place-items:center;font-size:11px;font-weight:950;line-height:1}
 .recipientBox{display:grid;gap:6px;background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:10px;font-size:13px}
@@ -148,7 +149,7 @@ h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 .waBtnIcon svg{flex:0 0 auto;}
 
 /* Compose hint */
-.composeHint{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #cfe1f7;background:linear-gradient(135deg,#f8fbff,#eef6ff);border-radius:16px;padding:10px 12px;color:#35506f;font-size:13px;line-height:1.35}
+.composeHint{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--accentLine);background:linear-gradient(135deg,#f7fcfe,#e9f5f9);border-radius:16px;padding:10px 12px;color:#35506f;font-size:13px;line-height:1.35}
 .composeHint b{font-size:13px;color:#172033}
 .composeHint span{color:#64748b}
 .templateListHeader{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -157,7 +158,7 @@ h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 .pickRows{display:grid;gap:5px;margin-top:4px;}
 .pickRow{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0;cursor:pointer;transition:.13s;font-size:12.5px;}
 .pickRow:hover{background:#dcfce7;transform:translateX(2px);}
-.pickRow.active{outline:2px solid rgba(37,99,235,.28);border-color:#2563eb;background:#eaf2ff}
+.pickRow.active{outline:2px solid rgba(14,116,144,.3);border-color:#0e7490;background:#eaf6fa}
 .pickRow.email-row{background:#eff6ff;border-color:#bfdbfe;}
 .pickRow.email-row:hover{background:#dbeafe;}
 .pickRow.email-row.active{background:#dbeafe}
@@ -166,7 +167,7 @@ h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 .pickRow .openNow{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#64748b}
 .pickIcon{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;flex:0 0 auto;font-weight:900;font-size:12px;}
 .pickIcon.wa{background:var(--wa);color:#fff;}
-.pickIcon.em{background:#2563eb;color:#fff;}
+.pickIcon.em{background:#0e7490;color:#fff;}
 .pickIcon.mis{background:#e2e8f0;color:#94a3b8;}
 .pickVal{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;color:var(--text);}
 .pickLbl{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#15803d;white-space:nowrap;}
@@ -176,7 +177,7 @@ h1{margin:0;font-size:23px;letter-spacing:-.035em;line-height:1.03}
 /* Channel pill */
 .channelPill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;background:#eef3f8;color:#475569}
 .channelPill.wa{background:#dcfce7;color:#15803d}
-.channelPill.mail{background:#eff6ff;color:#1d4ed8}
+.channelPill.mail{background:#e2f3f8;color:#0b5f76}
 
 /* Char counter */
 .charCounter{font-size:11px;color:var(--muted);font-weight:800;}
@@ -229,7 +230,7 @@ kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px
 [data-theme=dark]{
   --bg:#0f172a;--card:#1e293b;--card2:#1a2438;
   --text:#e2e8f0;--muted:#94a3b8;--line:#2d3f55;
-  --accent:#3b82f6;--soft:#1e3a5f;
+  --accent:#22a2bd;--soft:#123a46;--accentSoft:#123a46;--accentLine:#1f556a;--accentInk:#9fdcec;
   --green:#22c55e;--greenSoft:#14532d;
   --warn:#f59e0b;--warnSoft:#422006;
   --danger:#f87171;--dangerSoft:#450a0a;
@@ -240,7 +241,7 @@ kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px
 
 /* Inputs & forms */
 [data-theme=dark] input,[data-theme=dark] select,[data-theme=dark] textarea{background:#1e293b;color:#e2e8f0;border-color:#2d3f55;}
-[data-theme=dark] input:focus,[data-theme=dark] select:focus,[data-theme=dark] textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.18);}
+[data-theme=dark] input:focus,[data-theme=dark] select:focus,[data-theme=dark] textarea:focus{border-color:#22a2bd;box-shadow:0 0 0 3px rgba(34,162,189,.18);}
 [data-theme=dark] label{color:#8fa8c0;}
 
 /* Buttons */
@@ -266,26 +267,26 @@ kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px
 /* Card items */
 [data-theme=dark] .cardItem{background:#1e293b;border-color:#2d3f55;}
 [data-theme=dark] .cardItem:hover{background:#263348;border-color:#4a6080;}
-[data-theme=dark] .cardItem.active{background:#1a2e4a;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.14);}
+[data-theme=dark] .cardItem.active{background:#10303c;border-color:#22a2bd;box-shadow:0 0 0 3px rgba(34,162,189,.14);}
 
 /* Tabs */
 [data-theme=dark] .tab{background:#1a2438;color:#94a3b8;}
-[data-theme=dark] .tab.active{background:#3b82f6;color:#fff;}
+[data-theme=dark] .tab.active{background:#22a2bd;color:#fff;}
 
 /* Line actions */
 [data-theme=dark] .lineAction{background:#1a2438;border-color:#2d3f55;color:#94a3b8;}
 
 /* Chips */
 [data-theme=dark] .chip{background:#1a2438;color:#94a3b8;}
-[data-theme=dark] .chip.blue{background:#1e3a5f;color:#93c5fd;}
+[data-theme=dark] .chip.blue{background:#123a46;color:#9fdcec;}
 [data-theme=dark] .chip.green{background:#14532d;color:#86efac;}
 [data-theme=dark] .chip.warn{background:#422006;color:#fcd34d;}
 [data-theme=dark] .chip.danger{background:#450a0a;color:#fca5a5;}
 
 /* Placeholders */
 [data-theme=dark] .placeholder{background:#1a2438;border-color:#2d3f55;color:#c0d4ea;}
-[data-theme=dark] .placeholder:hover{background:#1e3a5f;color:#93c5fd;}
-[data-theme=dark] .placeholder code{color:#93c5fd;}
+[data-theme=dark] .placeholder:hover{background:#123a46;color:#9fdcec;}
+[data-theme=dark] .placeholder code{color:#9fdcec;}
 
 /* Recipient & compose */
 [data-theme=dark] .recipientBox{background:#1a2438;border-color:#2d3f55;}
@@ -301,10 +302,10 @@ kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px
 /* Pick rows */
 [data-theme=dark] .pickRow{background:#1a3d2b;border-color:#1e5c3a;}
 [data-theme=dark] .pickRow:hover{background:#1e5438;}
-[data-theme=dark] .pickRow.active{background:#1a3d2b;border-color:#3b82f6;outline-color:rgba(59,130,246,.3);}
-[data-theme=dark] .pickRow.email-row{background:#1e3a5f;border-color:#2563eb;}
+[data-theme=dark] .pickRow.active{background:#1a3d2b;border-color:#22a2bd;outline-color:rgba(34,162,189,.3);}
+[data-theme=dark] .pickRow.email-row{background:#123a46;border-color:#2563eb;}
 [data-theme=dark] .pickRow.email-row:hover{background:#1d3461;}
-[data-theme=dark] .pickRow.email-row.active{background:#1e3a5f;border-color:#3b82f6;}
+[data-theme=dark] .pickRow.email-row.active{background:#123a46;border-color:#22a2bd;}
 [data-theme=dark] .pickRow.missing{background:#292524;border-color:#57534e;color:#9ca3af;}
 [data-theme=dark] .pickIcon.mis{background:#374151;color:#9ca3af;}
 
@@ -340,10 +341,10 @@ kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px
 .ctxLabel{font-size:9px;font-weight:900;color:#475569;text-transform:uppercase;letter-spacing:.04em;line-height:1.2;}
 .ctxCount{font-size:10px;color:#94a3b8;font-weight:700;}
 .ctxCard.active .ctxLabel{color:#1d4ed8;}
-.ctxCard.active .ctxCount{color:#3b82f6;}
+.ctxCard.active .ctxCount{color:#22a2bd;}
 [data-theme=dark] .ctxCard{background:#1a2438;border-color:#2d3f55;}
 [data-theme=dark] .ctxCard:hover{background:#1e3050;}
-[data-theme=dark] .ctxCard.active{background:#1e3a5f;border-color:#3b82f6;}
+[data-theme=dark] .ctxCard.active{background:#123a46;border-color:#22a2bd;}
 [data-theme=dark] .ctxLabel{color:#7a98b4;}
 /* Template list: group label */
 .tmplGroupLabel{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;padding:4px 2px 2px;margin-top:4px;}
@@ -360,7 +361,7 @@ kbd{font-size:10px;background:#f1f5f9;border:1px solid #dbe4ef;border-radius:5px
 .jwEmailBadge{display:inline-flex;align-items:center;gap:4px;background:#e0f2fe;color:#0369a1;border-radius:999px;font-size:11px;font-weight:850;padding:2px 7px;}
 [data-theme=dark] .congCard{background:#1e2a3a;border-color:#2d3f55;}
 [data-theme=dark] .congCard:hover{border-color:#3b5d8f;background:#1e3550;}
-[data-theme=dark] .congCard.active{background:#1e3a5f;}
+[data-theme=dark] .congCard.active{background:#123a46;}
 [data-theme=dark] .jwEmailBadge{background:#0c3047;color:#7dd3fc;}
 
 textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hidden;line-height:1.5;transition:height .1s ease;}
@@ -368,8 +369,8 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 #contactSearch{font-size:14px;padding:10px 14px;border-width:2px;border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,99,235,.10),var(--shadow);background:#fff;font-weight:600;}
 #contactSearch:focus{border-color:var(--accent);box-shadow:0 0 0 5px rgba(37,99,235,.18),var(--shadow);background:#f8fbff;}
 #contactSearch::placeholder{color:#93a8cc;font-weight:500;}
-[data-theme='dark'] #contactSearch{background:#1e293b;border-color:var(--accent);box-shadow:0 0 0 4px rgba(59,130,246,.18);color:#e2e8f0;}
-[data-theme='dark'] #contactSearch:focus{box-shadow:0 0 0 5px rgba(59,130,246,.28);}
+[data-theme='dark'] #contactSearch{background:#1e293b;border-color:var(--accent);box-shadow:0 0 0 4px rgba(34,162,189,.18);color:#e2e8f0;}
+[data-theme='dark'] #contactSearch:focus{box-shadow:0 0 0 5px rgba(34,162,189,.28);}
 [data-theme='dark'] #contactSearch::placeholder{color:#4a6080;}
 
 
@@ -406,10 +407,10 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 .quickWhoAmIGrid .tinyHelp{font-size:11px;color:var(--muted);line-height:1.3;}
 .quickPlaceholderBar{display:flex;gap:6px;flex-wrap:wrap;}
 .quickPlaceholderBar button{font-family:var(--mono);font-size:11px;font-weight:850;background:#f1f5f9;border:1px solid #e2e8f0;color:#334155;padding:5px 7px;border-radius:999px;}
-.quickPlaceholderBar button:hover{background:#e8f0ff;color:#1d4ed8;}
+.quickPlaceholderBar button:hover{background:#e2f3f8;color:#0b5f76;}
 .greenSoftBtn{background:var(--green)!important;color:#fff!important;border-color:transparent!important;}
 [data-theme=dark] .quickPlaceholderBar button{background:#1a2438;border-color:#2d3f55;color:#c0d4ea;}
-[data-theme=dark] .quickPlaceholderBar button:hover{background:#1e3a5f;color:#93c5fd;}
+[data-theme=dark] .quickPlaceholderBar button:hover{background:#123a46;color:#9fdcec;}
 [data-theme=dark] .toolsMenu summary{background:#1e293b;border-color:#2d3f55;color:#94a3b8;}
 [data-theme=dark] .toolsMenuBody{background:#1e293b;border-color:#2d3f55;}
 
@@ -423,7 +424,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 .detailsPanel .panelHead h2::before{content:'✎ ';}
 .detailsPanel .panelBody{padding:13px;}
 .detailEmpty{border:1px dashed #cbd5e1;border-radius:16px;padding:28px 18px;text-align:center;color:var(--muted);background:#f8fafc;line-height:1.5;}
-.detailIdentity{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 11px;border:1px solid #cfe1f7;background:linear-gradient(135deg,#f8fbff,#eef6ff);border-radius:16px;}
+.detailIdentity{display:flex;align-items:center;justify-content:space-between;gap:11px;padding:12px 13px;border:1px solid var(--accentLine);background:linear-gradient(135deg,#f6fcfd,#e6f4f9);border-radius:16px;}
 .detailIdentity b{font-size:16px;line-height:1.2;display:block;}
 .detailIdentity small{display:block;margin-top:3px;color:var(--muted);font-weight:750;line-height:1.35;}
 .detailCopyGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
@@ -441,7 +442,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 .contactDataLine .dataType{font-size:10px;font-weight:950;color:#64748b;letter-spacing:.05em;text-transform:uppercase;}
 .contactDataLine span:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
 [data-theme=dark] .detailEmpty,[data-theme=dark] .detailSection,[data-theme=dark] .contactDataLine{background:#1a2438;border-color:#2d3f55;color:#cbd5e1;}
-[data-theme=dark] .detailIdentity{background:linear-gradient(135deg,#1a2e4a,#1e3a5f);border-color:#2d4e75;}
+[data-theme=dark] .detailIdentity{background:linear-gradient(135deg,#10303c,#123a46);border-color:#1f556a;}
 [data-theme=dark] .detailSectionTitle,[data-theme=dark] .contactDataLine .dataType{color:#7a98b4;}
 
 /* ── V1.6.3: fixed contact filter bar / independently scrollable list ── */
@@ -499,26 +500,138 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 .helpSidebar{display:grid;align-content:start;gap:7px;border-right:1px solid var(--line);padding-right:12px;}
 .helpSearch{grid-column:1/-1;margin-bottom:2px;}
 .helpTopicBtn{width:100%;text-align:left;justify-content:flex-start;border-radius:11px!important;padding:8px 9px!important;background:#f8fafc!important;border:1px solid var(--line)!important;color:#334155!important;}
-.helpTopicBtn.active{background:#e8f0ff!important;border-color:#93b4ff!important;color:#1d4ed8!important;}
+.helpTopicBtn.active{background:var(--accentSoft)!important;border-color:var(--accentLine)!important;color:var(--accentInk)!important;}
 .helpContent{min-width:0;overflow:auto;max-height:58vh;padding-right:3px;}
 .helpArticle{display:grid;gap:10px;}
 .helpArticle h3{margin:0;font-size:19px;letter-spacing:-.02em;}
 .helpArticle h4{margin:5px 0 0;font-size:13px;}
 .helpArticle p,.helpArticle li{font-size:13px;line-height:1.5;color:#475569;}
 .helpArticle ul{margin:0;padding-left:20px;display:grid;gap:4px;}
-.helpTip{border:1px solid #cfe1f7;background:#f8fbff;border-radius:13px;padding:9px 10px;font-size:12px;line-height:1.45;color:#35506f;}
+.helpTip{border:1px solid var(--accentLine);border-left:4px solid var(--accent);background:#f4fbfd;border-radius:13px;padding:10px 12px;font-size:12.5px;line-height:1.5;color:#0f4a5c;}
 .helpKeys{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px;}
 .helpKeys span{font-family:var(--mono);font-size:11px;padding:4px 7px;border-radius:8px;background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;}
 .helpNoResult{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px;}
-.quickModalContact{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #cfe1f7;background:#f8fbff;border-radius:14px;padding:9px 10px;}
+.quickModalContact{display:flex;align-items:center;justify-content:space-between;gap:11px;border:1px solid var(--accentLine);background:linear-gradient(135deg,#f6fcfd,#e6f4f9);border-radius:16px;padding:11px 12px;}
 .quickModalContact b{display:block;font-size:14px;}.quickModalContact small{color:var(--muted);}
 [data-theme=dark] .helpSidebar{border-color:#2d3f55;}
 [data-theme=dark] .helpTopicBtn{background:#1a2438!important;border-color:#2d3f55!important;color:#cbd5e1!important;}
-[data-theme=dark] .helpTopicBtn.active{background:#1e3a5f!important;border-color:#3b82f6!important;color:#93c5fd!important;}
+[data-theme=dark] .helpTopicBtn.active{background:#123a46!important;border-color:#22a2bd!important;color:#9fdcec!important;}
 [data-theme=dark] .helpArticle p,[data-theme=dark] .helpArticle li{color:#a9bdd2;}
-[data-theme=dark] .helpTip,[data-theme=dark] .quickModalContact{background:#1a2e4a;border-color:#2d4e75;color:#a9c7e8;}
+[data-theme=dark] .helpTip,[data-theme=dark] .quickModalContact{background:#10303c;border-color:#1f556a;color:#a9c7e8;}
 [data-theme=dark] .helpKeys span{background:#1a2438;border-color:#2d3f55;color:#a9bdd2;}
 @media(max-width:760px){.helpShell{grid-template-columns:1fr;}.helpSidebar{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:9px;grid-template-columns:1fr 1fr;}.helpSearch{grid-column:1/-1;}.helpContent{max-height:none;}}
+
+/* ═══════ V1.6.6 — Visual refresh ═══════════════════════════════ */
+
+/* Header */
+.topbar{padding:11px 16px}
+.brand h1{font-size:21px}
+.verBadge{display:inline-block;vertical-align:3px;margin-left:7px;font-size:10.5px;font-weight:900;letter-spacing:.06em;
+  color:var(--accentInk);background:var(--accentSoft);border:1px solid var(--accentLine);border-radius:999px;padding:2px 8px}
+.brand .sub{font-size:12px;margin-top:3px}
+.toolbar{gap:6px}
+.toolbarSep{width:1px;align-self:stretch;margin:2px 3px;background:var(--line);border-radius:1px}
+.toolbar button{font-size:12.5px}
+#btnExportCsv{box-shadow:0 3px 10px rgba(14,116,144,.22)}
+
+/* Quiet workflow strip (formerly dominant "Ablauf" card) */
+.note.utilityNote{
+  background:transparent;border:0;border-bottom:1px dashed var(--line);border-radius:0;box-shadow:none;
+  padding:2px 2px 9px;margin:0 2px 12px;align-items:center;
+}
+.note.utilityNote span{font-size:11.5px;color:#8090a3;opacity:.95}
+.note.utilityNote strong{font-weight:850;color:#64748b}
+.note.utilityNote .mini.danger{background:transparent;color:#94a3b8;font-weight:750;font-size:11px;padding:3px 7px}
+.note.utilityNote .mini.danger:hover{background:var(--dangerSoft);color:var(--danger)}
+[data-theme=dark] .note.utilityNote{background:transparent;border-bottom-color:#2d3f55}
+[data-theme=dark] .note.utilityNote span{color:#7c8ea3}
+
+/* Contacts panel — filter zone clearly separated from the list */
+.filterCard{
+  border:1px solid var(--line);background:linear-gradient(180deg,#f9fbfd,#f3f7fa);
+  border-radius:16px;padding:10px 11px 11px;display:grid;gap:8px;
+}
+.filterCardHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:1px}
+.filterCardHead b{font-size:10.5px;font-weight:950;text-transform:uppercase;letter-spacing:.09em;color:#7b8ea1}
+.filterCardHead .miniLink{background:transparent!important;border:0!important;box-shadow:none!important;
+  color:var(--accentInk)!important;font-size:11px;font-weight:850;padding:2px 5px!important}
+.filterCardHead .miniLink:hover{text-decoration:underline}
+.filterCard select,.filterCard input{background:#fff}
+.contactFilterArea{gap:9px}
+.listDivider{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:2px 2px 0;font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;
+}
+.listDivider .selHint{font-size:11px;font-weight:800;letter-spacing:0;text-transform:none;color:var(--muted)}
+[data-theme=dark] .filterCard{background:linear-gradient(180deg,#1b2536,#18202f);border-color:#2d3f55}
+[data-theme=dark] .filterCard select,[data-theme=dark] .filterCard input{background:#1e293b}
+[data-theme=dark] .filterCardHead b,[data-theme=dark] .listDivider{color:#7a98b4}
+
+/* Modals */
+.modal{border-radius:24px;box-shadow:0 34px 90px rgba(9,32,42,.32)}
+.modalHead{
+  padding:16px 19px;background:linear-gradient(135deg,#f4fbfd,#e9f4f8);border-bottom:1px solid var(--accentLine);
+}
+.modalHead h3{font-size:18px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
+.modalBody{padding:19px}
+.modalFoot{background:#f8fafc;padding:14px 19px}
+[data-theme=dark] .modalHead{background:linear-gradient(135deg,#12303b,#16273a);border-bottom-color:#1f556a}
+[data-theme=dark] .modalFoot{background:#18202f}
+
+/* Help modal */
+.helpShell{gap:16px}
+.helpSidebar{gap:5px;padding-right:14px}
+.helpTopicBtn{font-size:12.5px;font-weight:800!important;transition:.13s}
+.helpTopicBtn:hover{border-color:var(--accentLine)!important;background:#f2fafc!important}
+.helpSearch input{border-radius:999px;padding:9px 13px}
+.helpContent{padding-right:6px}
+.helpArticle h3{padding-bottom:9px;border-bottom:1px solid var(--line);font-size:18px}
+.helpArticle h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--accentInk)}
+.helpArticle p,.helpArticle li{font-size:13px;line-height:1.55}
+.helpArticle li::marker{color:var(--accent)}
+.helpKeys span{background:var(--accentSoft);border-color:var(--accentLine);color:var(--accentInk);font-weight:700}
+[data-theme=dark] .helpTopicBtn:hover{background:#16303c!important}
+
+/* Quick message modal */
+.qmAvatar{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:0 0 auto;
+  font-weight:900;font-size:15px;color:#fff;background:linear-gradient(135deg,#3ba7c4,#0e7490);letter-spacing:.02em}
+.quickModalContact .qmWho{display:flex;align-items:center;gap:11px;min-width:0}
+.quickModalContact b{font-size:15px;letter-spacing:-.01em}
+.qmBlock{border:1px solid var(--line);background:var(--card2);border-radius:16px;padding:12px;display:grid;gap:9px}
+.qmBlockTitle{margin:0;font-size:10.5px;font-weight:950;text-transform:uppercase;letter-spacing:.09em;color:#7b8ea1}
+.messagePlaceholderBar button{border-radius:999px}
+.messageActions button{font-weight:850}
+[data-theme=dark] .qmBlock{background:#1a2438;border-color:#2d3f55}
+[data-theme=dark] .qmBlockTitle{color:#7a98b4}
+
+/* Details panel — welcome splash */
+.welcomeSplash{display:grid;gap:13px}
+.welcomeHero{
+  border:1px solid var(--accentLine);border-radius:20px;padding:18px 17px;
+  background:linear-gradient(140deg,#f4fbfd,#e4f2f7 70%,#dcedf4);
+}
+.welcomeHero .wIcon{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:22px;color:#fff;
+  background:radial-gradient(circle at 30% 24%,#7fd4e8,#0e7490 60%,#0f2b38);box-shadow:0 6px 18px rgba(14,116,144,.25);margin-bottom:11px}
+.welcomeHero h3{margin:0 0 5px;font-size:19px;letter-spacing:-.025em}
+.welcomeHero p{margin:0;font-size:13px;line-height:1.5;color:#3d5f6d}
+.welcomeStats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.welcomeStat{border:1px solid var(--line);background:var(--card2);border-radius:14px;padding:9px 10px;text-align:center}
+.welcomeStat b{display:block;font-size:19px;letter-spacing:-.03em;line-height:1.2}
+.welcomeStat span{font-size:10.5px;font-weight:850;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.welcomeList{display:grid;gap:7px}
+.welcomeItem{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;
+  border:1px solid var(--line);background:var(--card2);border-radius:14px;padding:10px 11px}
+.welcomeItem .wBadge{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font-size:13px;
+  background:var(--accentSoft);color:var(--accentInk);border:1px solid var(--accentLine)}
+.welcomeItem b{display:block;font-size:12.5px;margin-bottom:2px}
+.welcomeItem small{font-size:11.5px;line-height:1.45;color:var(--muted)}
+.welcomeActions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.welcomeActions .wide{grid-column:1/-1}
+.welcomeFoot{font-size:11px;color:var(--muted);text-align:center;line-height:1.45}
+[data-theme=dark] .welcomeHero{background:linear-gradient(140deg,#12303b,#132a3a 70%,#16273a);border-color:#1f556a}
+[data-theme=dark] .welcomeHero p{color:#a9c7e8}
+[data-theme=dark] .welcomeStat,[data-theme=dark] .welcomeItem{background:#1a2438;border-color:#2d3f55}
+@media(max-width:820px){.welcomeStats,.welcomeActions{grid-template-columns:1fr 1fr}.welcomeActions .wide{grid-column:1/-1}}
 
 </style>
 </head>
@@ -528,7 +641,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.6.5</span></h1>
+        <h1>ContactHub Pro <span class="verBadge">V1.6.6</span></h1>
         <p class="sub">Contacts · Congregations · Teams · Quick contact actions</p>
       </div>
     </div>
@@ -538,6 +651,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
       <button class="ghost" id="btnImportJson">Import JSON</button>
       <button class="green" id="btnImportCsv">Import Outlook CSV</button>
       <button class="primary" id="btnExportCsv">📤 Export</button>
+      <span class="toolbarSep"></span>
       <button class="ghost helpLauncher" id="btnHelp" title="Help / Hilfe (F1)">?</button>
       <button class="themeToggle" id="btnTheme">🌙 Dark</button>
       <button class="ghost" id="btnLanguage" title="Switch language: DE / EN">DE / EN</button>
@@ -569,6 +683,11 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
       </div>
       <div class="panelBody contactPanelBody">
         <div class="contactFilterArea">
+          <div class="filterCard">
+            <div class="filterCardHead">
+              <b>Search &amp; filter</b>
+              <button class="mini miniLink" id="btnResetFilters">Reset filters</button>
+            </div>
           <div class="contactSearchRow">
             <input id="contactSearch" placeholder="Search name, congregation, role, tag, email, mobile..." />
           </div>
@@ -581,8 +700,9 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
             <select id="contactTeamFilter"><option value="">All Assembly / Convention teams</option></select>
           </div>
           <div class="contactFilterGrid">
-            <select id="contactFavFilter"><option value="">⭐ All contacts</option><option value="fav">⭐ Favorites only</option><option value="nofav">☆ Non-favorites only</option></select>
+            <select id="contactFavFilter" title="Favorites filter"><option value="">All contacts</option><option value="fav">★ Favorites only</option><option value="nofav">☆ Non-favorites only</option></select>
             <select id="contactCongFilter"><option value="">All congregations</option></select>
+          </div>
           </div>
           <div>
             <select id="contactBulkAction"><option value="">Bulk actions...</option><option value="bulkEdit">Bulk edit selected...</option><option value="role">Add / replace congregation role</option><option value="setTeam">🏷 Assign Assembly / Convention team</option><option value="tag">Add tag</option><option value="delete">Delete selected</option></select>
@@ -595,8 +715,8 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
             <button class="mini ghost" id="btnBulkEditSelected">Bulk edit selected</button>
             <button class="mini danger" id="btnBulkDeleteSelected">Delete selected</button>
           </div>
-          <div class="hint" id="selectionHint">0 selected. Use role search/filter, then select contacts for copy/export.</div>
         </div>
+        <div class="listDivider"><span>Contact list</span><span class="selHint" id="selectionHint">0 selected. Use role search/filter, then select contacts for copy/export.</span></div>
         <div class="list" id="contactList"></div>
       </div>
     </section>
@@ -623,12 +743,37 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.6.5', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.6.6', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedContactIds:new Set(),sortBy:'lastName',autosaveTimer:null,uiLang:'en',selectedCongId:null};
 
 /* ── V1.5.5: Complete DE / EN interface toggle ───────────────────── */
 const UI_DE = {
   "Contacts · Congregations · Teams · Quick contact actions": "Kontakte · Versammlungen · Teams · Schnelle Kontaktaktionen",
+  /* ── V1.6.6 ── */
+  "Search & filter": "Suchen & Filtern",
+  "Reset filters": "Filter zurücksetzen",
+  "Filters reset.": "Filter zurückgesetzt.",
+  "Favorites filter": "Favoriten-Filter",
+  "★ Favorites only": "★ Nur Favoriten",
+  "Overview": "Übersicht",
+  "Welcome to ContactHub Pro": "Willkommen im ContactHub Pro",
+  "No data yet. Create a first contact or import your Outlook CSV / a JSON backup to get started.": "Noch keine Daten vorhanden. Lege einen ersten Kontakt an oder importiere eine Outlook-CSV bzw. eine JSON-Sicherung.",
+  "Pick a contact on the left to view and edit all of its data right here.": "Wähle links einen Kontakt aus, um hier alle Daten zu sehen und zu bearbeiten.",
+  "Favorites": "Favoriten",
+  "Find quickly": "Schnell finden",
+  "Search and filters work together: name, congregation, role, team, tag or favorites.": "Suche und Filter greifen ineinander: Name, Versammlung, Aufgabe, Team, Tag oder Favoriten.",
+  "Edit in place": "Direkt bearbeiten",
+  "All details of the selected contact appear in this panel and are saved locally.": "Alle Daten des gewählten Kontakts erscheinen in diesem Bereich und werden lokal gespeichert.",
+  "Write one reusable text with placeholders and open it in WhatsApp or email.": "Einen wiederverwendbaren Text mit Platzhaltern schreiben und in WhatsApp oder E-Mail öffnen.",
+  "Copy & export": "Kopieren & Exportieren",
+  "Copy lists, export CSV per team or tag, and keep a full JSON backup.": "Listen kopieren, CSV nach Team oder Tag exportieren und eine vollständige JSON-Sicherung behalten.",
+  "🔍 Search contacts": "🔍 Kontakte suchen",
+  "🏛 Congregations": "🏛 Versammlungen",
+  "⬆ Import Outlook CSV": "⬆ Outlook-CSV importieren",
+  "📤 Export & backup": "📤 Export & Sicherung",
+  "? Open help": "? Hilfe öffnen",
+  "All data stays in this browser. Create a JSON backup regularly.": "Alle Daten bleiben in diesem Browser. Bitte regelmäßig eine JSON-Sicherung anlegen.",
+  "Placeholders": "Platzhalter",
   "Saved locally": "Lokal gespeichert",
   "Start empty": "Leer starten",
   "Import JSON": "JSON importieren",
@@ -1512,8 +1657,9 @@ function init(){const saved=localStorage.getItem(STORAGE_KEY);try{state.data=sav
 const savedLanguage=state.data.settings?.i18nReady===true?state.data.settings.uiLanguage:'de';
 state.uiLang=['de','en'].includes(savedLanguage)?savedLanguage:'de';
 state.data.settings.uiLanguage=state.uiLang;state.data.settings.i18nReady=true;
-selectFirst();bind();startLanguageObserver();applyLang();saveStatus('Saved locally','ok')}
-function selectFirst(){state.selectedContactId=state.data.contacts[0]?.id||null;}// select first contact on startup
+state.selectedContactId=null;/* v1.6.6: start with welcome splash instead of a preselected contact */
+bind();startLanguageObserver();applyLang();saveStatus('Saved locally','ok')}
+function selectFirst(){state.selectedContactId=null;}// v1.6.6: after import/restore show the welcome splash instead of a random contact
 function saveSoon(){saveStatus('Saving...','warn');clearTimeout(state.autosaveTimer);state.autosaveTimer=setTimeout(saveNow,350)}
 function saveNow(){ensureUniqueContactIds(state.data.contacts);state.data.updatedAt=new Date().toISOString();state.data.settings.uiLanguage=state.uiLang;state.data.settings.i18nReady=true;localStorage.setItem(STORAGE_KEY,JSON.stringify(state.data));saveStatus(`Saved locally · ${nowNice()}`,'ok')}
 function saveStatus(t,mode){const localized=state.uiLang==='de'?String(t).replace(/^Saved locally(?= ·|$)/,'Lokal gespeichert').replace(/^Saving\.\.\.$/,'Speichere...'):t;$('#saveStatus').innerHTML=`<span class="dot" style="background:${mode==='warn'?'#f59e0b':mode==='danger'?'#ef4444':'#15803d'}"></span> ${esc(localized)}`}
@@ -1602,7 +1748,7 @@ function selectedContactIds(){
 }
 function selectedContacts(){const ids=selectedContactIds();return state.data.contacts.filter(c=>ids.includes(c.id));}
 function updateSelectionHint(){const ids=selectedContactIds();const el=$('#selectionHint');if(el)el.textContent=`${ids.length} selected. Use role search/filter, then select contacts for copy/export.`;}
-function quickDeleteContact(id){const c=state.data.contacts.find(x=>x.id===id);if(!c)return;if(confirm(`Delete contact: ${contactName(c)}?`)){state.data.contacts=state.data.contacts.filter(x=>x.id!==id);state.selectedContactIds.delete(id);if(state.selectedContactId===id)state.selectedContactId=state.data.contacts[0]?.id||null;saveSoon();renderAll();toast('Contact deleted.')}}
+function quickDeleteContact(id){const c=state.data.contacts.find(x=>x.id===id);if(!c)return;if(confirm(`Delete contact: ${contactName(c)}?`)){state.data.contacts=state.data.contacts.filter(x=>x.id!==id);state.selectedContactIds.delete(id);if(state.selectedContactId===id)state.selectedContactId=null;saveSoon();renderAll();toast('Contact deleted.')}}
 
 function createNewContactInPanel(){
   const c=normalizeContactShape({id:uid('c'),source:'local',active:true});
@@ -1649,14 +1795,54 @@ function saveDetailsPanel(){
   syncCongregationDropdowns();
   saveSoon();renderAll();toast('Contact saved.');
 }
+
+function welcomeSplashHtml(){
+  const nc=state.data.contacts.length;
+  const ncg=(state.data.congregations||[]).length;
+  const nfav=state.data.contacts.filter(x=>x.favorite).length;
+  const empty=nc===0;
+  return `<div class="welcomeSplash">
+    <div class="welcomeHero">
+      <div class="wIcon">✉</div>
+      <h3>Welcome to ContactHub Pro</h3>
+      <p>${empty?'No data yet. Create a first contact or import your Outlook CSV / a JSON backup to get started.':'Pick a contact on the left to view and edit all of its data right here.'}</p>
+    </div>
+    <div class="welcomeStats">
+      <div class="welcomeStat"><b>${nc}</b><span>Contacts</span></div>
+      <div class="welcomeStat"><b>${ncg}</b><span>Congregations</span></div>
+      <div class="welcomeStat"><b>${nfav}</b><span>Favorites</span></div>
+    </div>
+    <div class="welcomeList">
+      <div class="welcomeItem"><span class="wBadge">🔍</span><div><b>Find quickly</b><small>Search and filters work together: name, congregation, role, team, tag or favorites.</small></div></div>
+      <div class="welcomeItem"><span class="wBadge">✎</span><div><b>Edit in place</b><small>All details of the selected contact appear in this panel and are saved locally.</small></div></div>
+      <div class="welcomeItem"><span class="wBadge">✉</span><div><b>Quick message</b><small>Write one reusable text with placeholders and open it in WhatsApp or email.</small></div></div>
+      <div class="welcomeItem"><span class="wBadge">⧉</span><div><b>Copy &amp; export</b><small>Copy lists, export CSV per team or tag, and keep a full JSON backup.</small></div></div>
+    </div>
+    <div class="welcomeActions">
+      <button class="primary wide" id="detailCreateFirst">+ Contact</button>
+      <button class="ghost" id="welcomeFocusSearch">🔍 Search contacts</button>
+      <button class="ghost" id="welcomeCongs">🏛 Congregations</button>
+      <button class="ghost" id="welcomeImport">⬆ Import Outlook CSV</button>
+      <button class="ghost" id="welcomeExport">📤 Export &amp; backup</button>
+      <button class="ghost wide" id="welcomeHelp">? Open help</button>
+    </div>
+    <p class="welcomeFoot">All data stays in this browser. Create a JSON backup regularly.</p>
+  </div>`;
+}
+
 function renderDetailsPanel(){
   const host=$('#detailsBody'),c=selectedDetailContact();
   const meta=$('#detailMeta');
   if(!host)return;
   if(!c){
-    if(meta)meta.textContent='Select a contact';
-    host.innerHTML='<div class="detailEmpty"><b>Contact data</b><br>Select a contact on the left to view and edit its data.<br><br><button class="primary mini" id="detailCreateFirst">+ Contact</button></div>';
+    if(meta)meta.textContent='Overview';
+    host.innerHTML=welcomeSplashHtml();
     $('#detailCreateFirst')?.addEventListener('click',createNewContactInPanel);
+    $('#welcomeHelp')?.addEventListener('click',()=>openHelp());
+    $('#welcomeImport')?.addEventListener('click',()=>$('#csvInput').click());
+    $('#welcomeExport')?.addEventListener('click',openSmartExport);
+    $('#welcomeCongs')?.addEventListener('click',openCongregationsModal);
+    $('#welcomeFocusSearch')?.addEventListener('click',()=>$('#contactSearch')?.focus());
     return;
   }
   const roles=[...new Set([...allRoles(),...contactRoles(c)])];
@@ -1778,12 +1964,20 @@ function bindQuickMessage(c){
 
 function modalQuickMessageHtml(c){
   return `<div class="stack">
-    <div class="quickModalContact"><div><b>${esc(contactName(c))}</b><small>${esc(c.congregation||c.organization||'')}</small></div><span class="channelPill">✉ Quick</span></div>
-    <div class="messageMiniGrid">
-      <div><label>Email subject</label><input id="mqm_subject" value="${esc(state.data.settings.quickMessageSubject||'')}"></div>
-      <div><label>Who am I? / Signature name</label><input id="mqm_sender" value="${esc(state.data.settings.senderName||'')}"></div>
+    <div class="quickModalContact">
+      <div class="qmWho"><span class="qmAvatar">${esc(contactInitials(c))}</span><div><b>${esc(contactName(c))}</b><small>${esc(c.congregation||c.organization||'')}</small></div></div>
+      <span class="channelPill mail">✉ Quick</span>
     </div>
-    <div><label>Message</label><textarea id="mqm_text" style="min-height:180px" placeholder="Write a short reusable message…">${esc(state.data.settings.quickMessageText||'')}</textarea></div>
+    <div class="qmBlock">
+      <p class="qmBlockTitle">Message</p>
+      <div class="messageMiniGrid">
+        <div><label>Email subject</label><input id="mqm_subject" value="${esc(state.data.settings.quickMessageSubject||'')}"></div>
+        <div><label>Who am I? / Signature name</label><input id="mqm_sender" value="${esc(state.data.settings.senderName||'')}"></div>
+      </div>
+      <div><label>Message</label><textarea id="mqm_text" style="min-height:180px" placeholder="Write a short reusable message…">${esc(state.data.settings.quickMessageText||'')}</textarea></div>
+    </div>
+    <div class="qmBlock">
+      <p class="qmBlockTitle">Placeholders</p>
     <div class="messagePlaceholderBar">
       <button type="button" class="ghost" data-mqm-placeholder="{{firstName}}">{{firstName}}</button>
       <button type="button" class="ghost" data-mqm-placeholder="{{name}}">{{name}}</button>
@@ -1791,6 +1985,7 @@ function modalQuickMessageHtml(c){
       <button type="button" class="ghost" data-mqm-placeholder="{{email}}">{{email}}</button>
       <button type="button" class="ghost" data-mqm-placeholder="{{mobile}}">{{mobile}}</button>
       <button type="button" class="ghost" data-mqm-placeholder="{{senderName}}">{{senderName}}</button>
+    </div>
     </div>
     <div class="messageActions">
       <button class="ghost wide" id="mqm_copy">⧉ Copy message</button>
@@ -1903,6 +2098,11 @@ function bind(){
   ['contactSearch','contactTagFilter','contactRoleFilter','contactTeamFilter','contactFavFilter','contactCongFilter'].forEach(id=>{
     const el=$('#'+id);if(el){el.addEventListener('input',()=>{renderContacts();updateSelectionHint();});el.addEventListener('change',()=>{renderContacts();updateSelectionHint();});}
   });
+  if($('#btnResetFilters'))$('#btnResetFilters').onclick=()=>{
+    ['contactSearch'].forEach(id=>{const el=$('#'+id);if(el)el.value='';});
+    ['contactTagFilter','contactRoleFilter','contactTeamFilter','contactFavFilter','contactCongFilter'].forEach(id=>{const el=$('#'+id);if(el)el.value='';});
+    renderContacts();updateSelectionHint();toast('Filters reset.');
+  };
   $('#contactBulkAction').onchange=e=>{const v=e.target.value;e.target.value='';if(v==='bulkEdit')openBulkEditModal();if(v==='delete')bulkDelete();if(v==='tag')bulkTag();if(v==='role')bulkSetRoles();if(v==='setTeam')bulkSetTeam();};
   $('#btnStartEmpty').onclick=()=>{if(confirm('Start empty? Current local data will be replaced.')){state.data=emptyData();state.selectedContactId=null;state.selectedContactIds.clear();saveNow();renderAll();toast('Started empty.')}};
   $('#btnClearLocal').onclick=()=>{if(confirm('Clear local data in this browser?')){localStorage.removeItem(STORAGE_KEY);state.data=emptyData();state.selectedContactId=null;state.selectedContactIds.clear();renderAll();saveStatus('Local data cleared','danger');toast('Local data cleared.')}};
@@ -1912,7 +2112,7 @@ function bind(){
   $('#btnImportCsv').onclick=()=>$('#csvInput').click();
   $('#csvInput').onchange=importCsvFile;
 }
-function bulkDelete(){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const names=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean).slice(0,12).map(c=>'• '+contactName(c)).join('\n');const more=ids.length>12?`\n… and ${ids.length-12} more`:'';if(confirm(`Delete ${ids.length} selected contact(s)?\n\n${names}${more}\n\nThis cannot be undone.`)){state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id));state.selectedContactIds.clear();state.selectedContactId=state.data.contacts[0]?.id||null;saveSoon();renderAll();toast(`${ids.length} contact(s) deleted.`)}}
+function bulkDelete(){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const names=ids.map(id=>state.data.contacts.find(c=>c.id===id)).filter(Boolean).slice(0,12).map(c=>'• '+contactName(c)).join('\n');const more=ids.length>12?`\n… and ${ids.length-12} more`:'';if(confirm(`Delete ${ids.length} selected contact(s)?\n\n${names}${more}\n\nThis cannot be undone.`)){state.data.contacts=state.data.contacts.filter(c=>!ids.includes(c.id));state.selectedContactIds.clear();if(ids.includes(state.selectedContactId))state.selectedContactId=null;saveSoon();renderAll();toast(`${ids.length} contact(s) deleted.`)}}
 function bulkTag(){const ids=selectedContactIds();if(!ids.length)return toast('No contacts selected.');const tag=prompt('Add tag:');if(!tag)return;state.data.contacts.filter(c=>ids.includes(c.id)).forEach(c=>c.tags=[...new Set([...(c.tags||[]),tag.trim()])]);saveSoon();renderAll();toast('Tag added.')}
 function allTags(){const mt=state.data.settings&&state.data.settings.masterTags;if(Array.isArray(mt)&&mt.length)return[...new Set(mt.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));return[...new Set(state.data.contacts.flatMap(c=>c.tags||[]).filter(Boolean))].sort((a,b)=>a.localeCompare(b));}
 function bulkSetRoles(){
@@ -2168,6 +2368,7 @@ function formatPhone(s){s=String(s).replace(/[^+\d]/g,'');if(s.startsWith('+49')
 function isLikelyMobile(v){const d=digitsOnly(v);return/^(4915|4916|4917)/.test(d)||/^01[567]/.test(d)}
 function digitsOnly(s){return String(s||'').replace(/\D/g,'')}
 function norm(s){return String(s||'').toLowerCase().replace(/[\s_\-.]/g,'').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')}
+function contactInitials(c){const n=contactName(c).replace(/[(),]/g,' ').trim().split(/\s+/).filter(Boolean);const a=(n[0]||'?')[0]||'?';const b=n.length>1?(n[n.length-1][0]||''):'';return (a+b).toUpperCase();}
 function contactName(c){return buildName(c?.firstName,c?.lastName,c?.displayName)||'(No name)'}
 function contactDisplayName(c){if(state&&state.sortBy==='lastName'&&c.lastName&&c.firstName)return c.lastName+', '+c.firstName;return contactName(c);}
 function buildName(f,l,fb){return[f,l].filter(Boolean).join(' ').trim()||fb||''}
