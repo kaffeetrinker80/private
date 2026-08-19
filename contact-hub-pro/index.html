@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#172f4d">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ContactHub Pro V1.6.3</title>
+<title>ContactHub Pro V1.6.4</title>
 <meta name="theme-color" content="#172033" />
 <style>
 :root{
@@ -468,6 +468,27 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 @media(max-width:1280px){.grid{grid-template-columns:1fr!important;}.detailsPanel{grid-column:1;}.contactsPanel .list{max-height:none;}.panel{position:relative;top:0;max-height:none;}.panel .panelBody{max-height:none;}}
 @media(max-width:820px){.detailCopyGrid,.detailActions{grid-template-columns:1fr;}.detailCopyGrid .wide,.detailActions .wide{grid-column:auto;}.detailIdentity{flex-direction:column;}.rolePickGrid{grid-template-columns:1fr 1fr;}}
 
+
+.localSaveStatus{background:transparent!important;border-color:transparent!important;box-shadow:none!important;padding:5px 6px!important;color:var(--muted)!important;font-weight:750!important;}
+.localSaveStatus .dot{width:7px;height:7px;opacity:.8;}
+[data-theme=dark] .localSaveStatus{background:transparent!important;border-color:transparent!important;}
+.messageFold{border:1px solid var(--line);border-radius:16px;background:#fbfdff;overflow:hidden;}
+.messageFold>summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:850;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#334155;}
+.messageFold>summary::-webkit-details-marker{display:none;}
+.messageFold>summary::after{content:'＋';font-size:16px;color:var(--muted);font-weight:700;}
+.messageFold[open]>summary::after{content:'−';}
+.messageFoldBody{border-top:1px solid var(--line);padding:11px;display:grid;gap:9px;background:#fff;}
+.messageMiniGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.messageFold textarea{min-height:120px;resize:vertical;}
+.messagePlaceholderBar{display:flex;gap:5px;flex-wrap:wrap;}
+.messagePlaceholderBar button{padding:4px 7px;font-size:11px;font-family:var(--mono);font-weight:800;}
+.messageActions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.messageActions .wide{grid-column:1/-1;}
+[data-theme=dark] .messageFold{background:#1a2438;}
+[data-theme=dark] .messageFold>summary{color:#cbd5e1;}
+[data-theme=dark] .messageFoldBody{background:#1e293b;}
+@media(max-width:820px){.messageMiniGrid,.messageActions{grid-template-columns:1fr}.messageActions .wide{grid-column:auto}}
+
 </style>
 </head>
 <body>
@@ -476,19 +497,18 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
     <div class="brand">
       <div class="logo">✉</div>
       <div>
-        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.6.3</span></h1>
+        <h1>ContactHub Pro <span style="color:#64748b;font-size:16px">V1.6.4</span></h1>
         <p class="sub">Contacts · Congregations · Teams · Quick contact actions</p>
       </div>
     </div>
     <div class="toolbar">
-      <span class="status" id="saveStatus"><span class="dot"></span> Saved locally</span>
+      <span class="status localSaveStatus" id="saveStatus"><span class="dot"></span> Saved locally</span>
       <button class="ghost" id="btnStartEmpty">Start empty</button>
       <button class="ghost" id="btnImportJson">Import JSON</button>
       <button class="green" id="btnImportCsv">Import Outlook CSV</button>
+      <button class="primary" id="btnExportCsv">📤 Export</button>
       <button class="themeToggle" id="btnTheme">🌙 Dark</button>
       <button class="ghost" id="btnLanguage" title="Switch language: DE / EN">DE / EN</button>
-      <button class="primary" id="btnExportJson">Export backup</button>
-      <button class="ghost" id="btnExportCsv">📤 Export</button>
     </div>
   </div>
 </div>
@@ -513,7 +533,6 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
           <button class="green mini greenSoftBtn" id="btnCongregations">🏛 Congregations</button>
           <button class="mini ghost" id="btnMasterData">⚙️ Master data</button>
           <button class="mini ghost" id="btnMergeSelected">Merge</button>
-          <button class="mini ghost" id="btnCaptainExport">📤 Captain Export</button>
         </div>
       </div>
       <div class="panelBody contactPanelBody">
@@ -572,7 +591,7 @@ textarea.autoRows{min-height:36px!important;height:36px;resize:none;overflow:hid
 <script>
 (() => {
 'use strict';
-const APP_VERSION='1.6.3', STORAGE_KEY='contacthub_pro_v110_data';
+const APP_VERSION='1.6.4', STORAGE_KEY='contacthub_pro_v110_data';
 const state={data:null,selectedContactId:null,selectedContactIds:new Set(),sortBy:'lastName',autosaveTimer:null,uiLang:'en',selectedCongId:null};
 
 /* ── V1.5.5: Complete DE / EN interface toggle ───────────────────── */
@@ -596,7 +615,6 @@ const UI_DE = {
   "Congregations": "Versammlungen",
   "Master data": "Stammdaten",
   "Merge": "Zusammenführen",
-  "Captain Export": "Export für Teamleiter",
   "Search name, congregation, role, tag, email, mobile...": "Name, Versammlung, Aufgabe, Tag, E-Mail, Mobilnummer suchen ...",
   "All congregation roles": "Alle Versammlungsaufgaben",
   "All tags": "Alle Tags",
@@ -637,7 +655,7 @@ const UI_DE = {
   "Insert contact": "Kontakt einfügen",
     "Modal": "Dialog",
   "Close": "Schließen",
-  "Made with love © – ContactHub Pro V1.6.3 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.3 · Kontakt- und Datenverwaltung",
+  "Made with love © – ContactHub Pro V1.6.4 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.4 · Kontakt- und Datenverwaltung",
   "No contacts found.": "Keine Kontakte gefunden.",
   "Create contact": "Kontakt erstellen",
   "Edit": "Bearbeiten",
@@ -692,6 +710,13 @@ const UI_DE = {
   "all mobiles": "alle Mobilnummern",
   "your name": "dein Name",
   "Mini message is empty.": "Kurze Nachricht ist leer.",
+  "Quick message": "Kurze Nachricht",
+  "optional": "optional",
+  "Copy message": "Nachricht kopieren",
+  "Message copied.": "Nachricht kopiert.",
+  "Reset": "Zurücksetzen",
+  "Reset text?": "Text zurücksetzen?",
+  "Write a short reusable message…": "Kurze wiederverwendbare Nachricht schreiben…",
   "Congregation · Email only": "Versammlung · nur E-Mail",
   "No WhatsApp (congregation)": "Kein WhatsApp (Versammlung)",
   "Copy JW email": "JW-E-Mail kopieren",
@@ -1021,7 +1046,6 @@ Object.assign(UI_DE, {
   "+ Contact": "+ Kontakt",
   "🏛 Congregations": "🏛 Versammlungen",
   "⚙️ Master data": "⚙️ Stammdaten",
-  "📤 Captain Export": "📤 Export für Teamleiter",
   "↕ Last name": "↕ Nachname",
   "↕ First name": "↕ Vorname",
   "Select a contact and write a mini message.": "Kontakt auswählen und eine kurze Nachricht schreiben.",
@@ -1070,8 +1094,8 @@ Object.assign(UI_DE,{
   "Email addresses copied.": "E-Mail-Adressen kopiert.",
   "Mobile numbers copied.": "Mobilnummern kopiert.",
   "Data copied.": "Daten kopiert.",
-  "ContactHub Pro V1.6.3 · Contact hub + data editor": "ContactHub Pro V1.6.3 · Kontakt- und Datenverwaltung",
-  "Made with love © – ContactHub Pro V1.6.3 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.3 · Kontakt- und Datenverwaltung",
+  "ContactHub Pro V1.6.4 · Contact hub + data editor": "ContactHub Pro V1.6.4 · Kontakt- und Datenverwaltung",
+  "Made with love © – ContactHub Pro V1.6.4 · Contact hub + data editor": "Mit Liebe gemacht © – ContactHub Pro V1.6.4 · Kontakt- und Datenverwaltung",
   "Copy available contact data": "Vorhandene Kontaktdaten kopieren"
 });
 const I18N_TEXT_ORIGINAL = new WeakMap();
@@ -1641,6 +1665,30 @@ function renderDetailsPanel(){
       <div><label>New tags (comma-separated)</label><input id="d_customTags" placeholder="e.g. PTC, Volunteer, Import"></div>
       <div><label>Notes</label><textarea id="d_notes">${esc(c.notes)}</textarea></div>
     </div>
+    <details class="messageFold" id="detailMessageFold">
+      <summary>✉ Quick message <span class="hint" style="margin-left:auto">optional</span></summary>
+      <div class="messageFoldBody">
+        <div class="messageMiniGrid">
+          <div><label>Email subject</label><input id="qm_subject" value="${esc(state.data.settings.quickMessageSubject||'')}"></div>
+          <div><label>Who am I? / Signature name</label><input id="qm_sender" value="${esc(state.data.settings.senderName||'')}"></div>
+        </div>
+        <div><label>Message</label><textarea id="qm_text" placeholder="Write a short reusable message…">${esc(state.data.settings.quickMessageText||'')}</textarea></div>
+        <div class="messagePlaceholderBar">
+          <button type="button" class="ghost" data-qm-placeholder="{{firstName}}">{{firstName}}</button>
+          <button type="button" class="ghost" data-qm-placeholder="{{name}}">{{name}}</button>
+          <button type="button" class="ghost" data-qm-placeholder="{{congregation}}">{{congregation}}</button>
+          <button type="button" class="ghost" data-qm-placeholder="{{email}}">{{email}}</button>
+          <button type="button" class="ghost" data-qm-placeholder="{{mobile}}">{{mobile}}</button>
+          <button type="button" class="ghost" data-qm-placeholder="{{senderName}}">{{senderName}}</button>
+        </div>
+        <div class="messageActions">
+          <button class="ghost wide" id="qm_copy">⧉ Copy message</button>
+          <button class="green" id="qm_wa">WhatsApp</button>
+          <button class="primary" id="qm_mail">Email</button>
+          <button class="ghost" id="qm_reset">Reset</button>
+        </div>
+      </div>
+    </details>
     <div class="detailActions">
       <button class="primary wide" id="btnDetailSave">Save changes</button>
       <button class="ghost" id="btnDetailReset">Reset unsaved changes</button>
@@ -1656,8 +1704,43 @@ function renderDetailsPanel(){
   $('#btnDetailCopy').onclick=()=>copyText(detailCopyText(readDetailsDraft())).then(()=>toast('Data copied.'));
   $('#btnDetailCopyEmails').onclick=()=>{const values=(readDetailsDraft().emails||[]).map(e=>e.value);if(!values.length)return toast('No email addresses stored.');copyText(values.join('\n')).then(()=>toast('Email addresses copied.'));};
   $('#btnDetailCopyMobiles').onclick=()=>{const values=(readDetailsDraft().mobiles||[]).map(m=>m.value);if(!values.length)return toast('No mobile numbers stored.');copyText(values.join('\n')).then(()=>toast('Mobile numbers copied.'));};
+  bindQuickMessage(c);
 }
 
+function quickMessageSaveDraft(){
+  if(!state.data.settings)state.data.settings={};
+  state.data.settings.quickMessageSubject=$('#qm_subject')?.value||'';
+  state.data.settings.quickMessageText=$('#qm_text')?.value||'';
+  state.data.settings.senderName=$('#qm_sender')?.value||'';
+  saveSoon();
+}
+function quickMessageResolved(c){
+  const emails=(c.emails||[]).map(e=>e.value).filter(Boolean),mobiles=(c.mobiles||[]).map(m=>m.value).filter(Boolean);
+  const map={
+    '{{firstName}}':c.firstName||firstWord(contactName(c)),
+    '{{name}}':contactName(c),
+    '{{congregation}}':c.congregation||'',
+    '{{email}}':emails[0]||'',
+    '{{mobile}}':mobiles[0]||'',
+    '{{senderName}}':$('#qm_sender')?.value||state.data.settings.senderName||''
+  };
+  let text=$('#qm_text')?.value||'',subject=$('#qm_subject')?.value||'';
+  Object.entries(map).forEach(([k,v])=>{text=text.split(k).join(v);subject=subject.split(k).join(v);});
+  return{text,subject,email:emails[0]||'',mobile:mobiles[0]||''};
+}
+function insertQuickPlaceholder(token){
+  const ta=$('#qm_text');if(!ta)return;
+  const a=ta.selectionStart??ta.value.length,b=ta.selectionEnd??a;
+  ta.value=ta.value.slice(0,a)+token+ta.value.slice(b);ta.focus();ta.selectionStart=ta.selectionEnd=a+token.length;quickMessageSaveDraft();
+}
+function bindQuickMessage(c){
+  ['qm_subject','qm_sender','qm_text'].forEach(id=>$('#'+id)?.addEventListener('input',quickMessageSaveDraft));
+  document.querySelectorAll('[data-qm-placeholder]').forEach(b=>b.addEventListener('click',()=>insertQuickPlaceholder(b.dataset.qmPlaceholder)));
+  $('#qm_copy').onclick=()=>{quickMessageSaveDraft();const r=quickMessageResolved(c);if(!r.text.trim())return toast('Mini message is empty.');copyText(r.text).then(()=>toast('Message copied.'));};
+  $('#qm_wa').onclick=()=>{quickMessageSaveDraft();const r=quickMessageResolved(c);if(!r.mobile)return toast('No mobile number');if(!r.text.trim())return toast('Mini message is empty.');const phone=digitsOnly(r.mobile);window.open(`https://wa.me/${phone}?text=${encodeURIComponent(r.text)}`,'_blank','noopener');};
+  $('#qm_mail').onclick=()=>{quickMessageSaveDraft();const r=quickMessageResolved(c);if(!r.email)return toast('No email address');if(!r.text.trim())return toast('Mini message is empty.');window.location.href=`mailto:${encodeURIComponent(r.email)}?subject=${encodeURIComponent(r.subject)}&body=${encodeURIComponent(r.text)}`;};
+  $('#qm_reset').onclick=()=>{if(!confirm('Reset text?'))return;$('#qm_subject').value='';$('#qm_text').value='';quickMessageSaveDraft();toast('Mini message reset.');};
+}
 function showModal(title,body,foot=''){$('#modalTitle').textContent=tr(title);$('#modalBody').innerHTML=body;$('#modalFoot').innerHTML=foot;translateDom($('#modalOverlay'));$('#modalOverlay').classList.add('show')}
 function closeModal(){$('#modalOverlay').classList.remove('show')}
 
@@ -1671,7 +1754,6 @@ function bind(){
   $('#btnMergeSelected').onclick=mergeSelectedContacts;
   $('#btnSelectVisible').onclick=selectVisibleContacts;
   $('#btnClearSelection').onclick=clearContactSelection;
-  if($('#btnCaptainExport'))$('#btnCaptainExport').onclick=openCaptainExport;
   $('#btnCopyContactList').onclick=openContactListModal;
   $('#btnExportSelectedCsv').onclick=exportSelectedContactsCsv;
   if($('#btnBulkEditSelected'))$('#btnBulkEditSelected').onclick=openBulkEditModal;
@@ -1687,7 +1769,7 @@ function bind(){
   $('#btnClearLocal').onclick=()=>{if(confirm('Clear local data in this browser?')){localStorage.removeItem(STORAGE_KEY);state.data=emptyData();state.selectedContactId=null;state.selectedContactIds.clear();renderAll();saveStatus('Local data cleared','danger');toast('Local data cleared.')}};
   $('#btnImportJson').onclick=()=>$('#jsonInput').click();
   $('#jsonInput').onchange=importJsonFile;
-  $('#btnExportJson').onclick=exportJson;
+  $('#btnExportCsv').onclick=openSmartExport;
   $('#btnImportCsv').onclick=()=>$('#csvInput').click();
   $('#csvInput').onchange=importCsvFile;
 }
@@ -2039,21 +2121,11 @@ function openMasterData(){
     closeModal();saveSoon();renderAll();toast('Master data saved.');
   };
 }
-function openCaptainExport(){
-  const teams=allTeams(),tags=allTags();
-  showModal('📤 Captain Export',`<div class="stack"><p class="hint">Export a focused contact list for a team captain. The export contains contacts and congregation data only — no message templates.</p><div class="row"><div><label>Assembly / Convention team</label><select id="ce_team"><option value="">All Assembly / Convention teams</option>${teams.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select></div><div><label>Tag</label><select id="ce_tag"><option value="">All tags</option>${tags.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select></div></div><div><label>Status</label><select id="ce_active"><option value="">Active &amp; inactive</option><option value="active" selected>Active only</option><option value="inactive">Inactive only</option></select></div><div class="hint" id="ce_preview"></div></div>`,`<button class="ghost" id="ceCancel">Cancel</button><button class="ghost" id="ceCsv">⬇ Export CSV</button><button class="primary" id="ceJson">⬇ Export JSON</button>`);
-  const filtered=()=>{const team=$('#ce_team').value,tag=$('#ce_tag').value,status=$('#ce_active').value;return state.data.contacts.filter(c=>(!team||contactTeams(c).includes(team))&&(!tag||(c.tags||[]).includes(tag))&&(!status||(status==='active'?c.active!==false:c.active===false)));};
-  const update=()=>{$('#ce_preview').textContent=`${filtered().length} contact(s) will be exported.`;};
-  ['ce_team','ce_tag','ce_active'].forEach(id=>$('#'+id).addEventListener('change',update));update();
-  $('#ceCancel').onclick=closeModal;
-  $('#ceJson').onclick=()=>{const list=filtered();if(!list.length)return toast('No contacts match the selected filter.');const payload={schemaVersion:1,appName:'ContactHub Pro',appVersion:APP_VERSION,exportedAt:new Date().toISOString(),captainExport:true,settings:{...state.data.settings},contacts:list,congregations:state.data.congregations||[]};downloadFile(`captain_export_${stamp()}.json`,JSON.stringify(payload,null,2),'application/json;charset=utf-8');closeModal();toast(`Exported ${list.length} contact(s).`);};
-  $('#ceCsv').onclick=()=>{const list=filtered();if(!list.length)return toast('No contacts match the selected filter.');const headers=['First Name','Last Name','Congregation','Team','Roles','Email','Mobile','Tags','Notes'];const rows=list.map(c=>({'First Name':c.firstName||'','Last Name':c.lastName||'','Congregation':c.congregation||'','Team':contactTeams(c).join('; '),'Roles':contactRoles(c).join('; '),'Email':(c.emails||[]).map(e=>e.value).join('; '),'Mobile':(c.mobiles||[]).map(m=>m.value).join('; '),'Tags':(c.tags||[]).join('; '),'Notes':c.notes||''}));downloadFile(`captain_export_${stamp()}.csv`,'\uFEFF'+toCsv(headers,rows),'text/csv;charset=utf-8');closeModal();toast(`Exported ${list.length} contact(s).`);};
-}
 
-window.ContactHubPro={openMasterData,openCaptainExport,openBulkEditModal,openCongEditor,openSmartExport,createNewContactInPanel};
+window.ContactHubPro={openMasterData,openBulkEditModal,openCongEditor,openSmartExport,createNewContactInPanel};
 init();
 })();
 </script>
-<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.6.3 · Contact hub + data editor</footer>
+<footer style="text-align:center;color:#64748b;font-size:12px;padding:18px">Made with love © – ContactHub Pro V1.6.4 · Contact hub + data editor</footer>
 </body>
 </html>
