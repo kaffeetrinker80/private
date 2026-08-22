@@ -137,6 +137,22 @@ main{flex:1;display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:16px;
 .artbox .ph{text-align:center;color:var(--mut);font-size:12.5px;line-height:1.6;padding:12px}
 .artinfo{font-family:var(--mono);font-size:11.5px;color:var(--mut);margin-top:8px;text-align:center}
 .artinfo.warn{color:var(--warn)}
+/* Mini-Player */
+.player{margin-top:12px;background:var(--deep);border:1px solid var(--line);border-radius:11px;padding:10px 11px}
+.prow{display:flex;align-items:center;gap:9px}
+.pbtn{width:36px;height:36px;flex:none;border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:14px;
+  background:linear-gradient(135deg,var(--mag),var(--cyan));display:flex;align-items:center;justify-content:center;transition:.14s}
+.pbtn:hover{filter:brightness(1.15);transform:scale(1.05)}
+.pbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.ptime{font-family:var(--mono);font-size:11.5px;color:var(--mut);flex:none;min-width:82px;text-align:right}
+.seek{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:var(--line);cursor:pointer}
+.seek::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--mag);
+  box-shadow:0 0 8px -1px var(--mag);cursor:pointer}
+.seek::-moz-range-thumb{width:13px;height:13px;border:none;border-radius:50%;background:var(--mag)}
+.pnote{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:7px;text-align:center}
+.row.playing .strip{background:linear-gradient(180deg,var(--lime),var(--cyan));box-shadow:0 0 7px var(--lime)}
+.chip.new{color:var(--lime);border-color:var(--lime);background:rgba(198,255,79,.1)}
+.dur{color:var(--mut)}
 .artbtns{display:flex;gap:6px;margin-top:8px}
 .artbtns .btn{flex:1;justify-content:center}
 
@@ -194,7 +210,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.1.1</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.2</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
   <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
@@ -216,7 +232,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
     <div class="ptitle"><span class="dot"></span> Dateien <span class="spacer"></span><span id="count" style="font-family:var(--mono)">0</span></div>
     <div class="toolbar">
       <input class="search" id="search" placeholder="filtern…">
-      <button class="btn sm" id="btnReload" title="Ordner neu einlesen">↻</button>
+      <button class="btn sm cy" id="btnReload" title="Ordner neu einlesen — neue Dateien werden markiert">↻ neu laden</button>
     </div>
     <div id="list"><div class="empty">Noch kein Ordner geöffnet.<br>Oben auf <b>Ordner öffnen</b> klicken und deinen Arbeitsordner wählen.</div></div>
   </section>
@@ -242,6 +258,16 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
             <button class="btn sm danger" id="btnArtDel" disabled>entfernen</button>
           </div>
           <input type="file" id="artFile" accept="image/*" hidden>
+
+          <div class="player">
+            <div class="prow">
+              <button class="pbtn" id="btnPlay" title="Abspielen (Leertaste)">▶</button>
+              <input type="range" class="seek" id="seek" value="0" min="0" max="1000" step="1">
+              <span class="ptime" id="ptime">0:00 / 0:00</span>
+            </div>
+            <div class="pnote" id="pnote">Wiedergabe pausiert beim Speichern</div>
+          </div>
+          <audio id="audio" preload="none"></audio>
         </div>
 
         <!-- Felder -->
@@ -278,6 +304,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
           <div class="f"><label>Dateiname-Muster</label><input id="pattern" list="patterns" spellcheck="false"></div>
           <button class="btn sm" id="btnPatSave" title="Muster in die Liste aufnehmen">Muster merken</button>
           <button class="btn sm cy" id="btnFromName" title="Interpret/Titel aus dem Dateinamen lesen">Tag aus Dateiname</button>
+          <button class="btn sm" id="btnClean" title="Typische Download-Reste aus Interpret und Titel entfernen">Aufräumen</button>
         </div>
         <div class="tokens" id="tokens"></div>
         <div class="preview" id="preview"></div>
@@ -306,7 +333,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.1.1</footer>
+<footer>Made with Love © — ID3 Studio v1.2</footer>
 <div id="toast"></div>
 
 <datalist id="genres"></datalist>
@@ -318,7 +345,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.1.1
+   ID3 Studio v1.2
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -593,6 +620,49 @@ function buildTag(tags,pic){
 }
 
 /* ============================================================
+   MPEG-Audio-Header: Dauer und Bitrate
+   ============================================================ */
+const BR_V1L3=[0,32,40,48,56,64,80,96,112,128,160,192,224,256,320,0];
+const BR_V2L3=[0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,0];
+const SR=[[11025,12000,8000],[0,0,0],[22050,24000,16000],[44100,48000,32000]];
+function audioInfo(bytes,start,fileSize){
+  // Sync-Wort suchen (max. 8 KB ab Audiobeginn)
+  const end=Math.min(bytes.length-4,start+8192);
+  for(let i=start;i<end;i++){
+    if(bytes[i]!==0xFF||(bytes[i+1]&0xE0)!==0xE0) continue;
+    const verBits=(bytes[i+1]>>3)&3, layer=(bytes[i+1]>>1)&3;
+    if(verBits===1||layer!==1) continue;               // nur Layer III
+    const brIdx=(bytes[i+2]>>4)&15, srIdx=(bytes[i+2]>>2)&3;
+    if(brIdx===0||brIdx===15||srIdx===3) continue;
+    const mpeg1=verBits===3;
+    const bitrate=(mpeg1?BR_V1L3:BR_V2L3)[brIdx];
+    const rate=SR[verBits][srIdx];
+    if(!bitrate||!rate) continue;
+    const spf=mpeg1?1152:576;
+    const mode=(bytes[i+3]>>6)&3;
+    // Xing/Info-Kopf für variable Bitrate
+    const off=i+4+(mpeg1?(mode===3?17:32):(mode===3?9:17));
+    let frames=0;
+    if(off+12<bytes.length){
+      const tag=String.fromCharCode(bytes[off],bytes[off+1],bytes[off+2],bytes[off+3]);
+      if(tag==="Xing"||tag==="Info"){
+        const flags=be32(bytes,off+4);
+        if(flags&1) frames=be32(bytes,off+8);
+      }
+    }
+    const dur=frames? frames*spf/rate : (fileSize-start)/(bitrate*125);
+    return {dur:Math.round(dur),kbps:bitrate,vbr:!!frames,rate};
+  }
+  return null;
+}
+function fmtTime(sec){
+  if(!isFinite(sec)||sec<0) return "0:00";
+  sec=Math.round(sec);
+  const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;
+  return h? `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}` : `${m}:${String(s).padStart(2,"0")}`;
+}
+
+/* ============================================================
    Datei-Zugriff
    ============================================================ */
 const SUPPORTED = typeof window.showDirectoryPicker==="function";
@@ -604,30 +674,48 @@ async function readTagOnly(fh){
   let need=10;
   if(head.length===10&&head[0]===0x49&&head[1]===0x44&&head[2]===0x33) need=10+syncsafe(head,6);
   need=Math.min(need,Math.min(file.size,16*1024*1024));
-  const buf=await file.slice(0,Math.max(need,10)).arrayBuffer();
-  return {parsed:parseID3(buf),size:file.size};
+  const buf=await file.slice(0,Math.min(file.size,Math.max(need,10)+10240)).arrayBuffer();
+  const parsed=parseID3(buf);
+  let info=null;
+  try{ info=audioInfo(new Uint8Array(buf),parsed.tagSize,file.size); }catch(e){}
+  return {parsed,size:file.size,info,mtime:file.lastModified};
 }
 
-async function openFolder(handle){
-  dirHandle=handle; files=[]; current=null;
+async function openFolder(handle,{rescan=false}={}){
+  const keepName=rescan&&current?current.name:null;
+  const known=new Map(files.map(f=>[f.name,f]));   // bisheriger Stand
+  const wasFirst=!rescan;
+  dirHandle=handle;
+  if(wasFirst){ files=[]; current=null; stopAudio(); }
   $("folderName").textContent=handle.name;
-  listEl.innerHTML='<div class="empty">lese ein…</div>';
-  showEditor(false);
+  if(wasFirst) listEl.innerHTML='<div class="empty">lese ein…</div>';
   const names=[];
   for await(const e of handle.values()){
     if(e.kind==="file"&&/\.mp3$/i.test(e.name)) names.push(e);
   }
   names.sort((a,b)=>a.name.localeCompare(b.name,"de"));
-  let errs=0;
+  const next=[]; let errs=0, fresh=0;
   for(const fh of names){
+    const prev=known.get(fh.name);
+    if(prev&&isDirty(prev)){ next.push(prev); continue; }   // ungespeicherte Arbeit nicht überschreiben
     try{
-      const {parsed,size}=await readTagOnly(fh);
-      files.push({handle:fh,name:fh.name,size,orig:{...parsed.tags},tags:{...parsed.tags},
-        origPic:parsed.pic,pic:parsed.pic,picDirty:false,version:parsed.version});
+      const {parsed,size,info,mtime}=await readTagOnly(fh);
+      const rec={handle:fh,name:fh.name,size,info,mtime,orig:{...parsed.tags},tags:{...parsed.tags},
+        origPic:parsed.pic,pic:parsed.pic,picDirty:false,version:parsed.version,
+        isNew:rescan&&!prev};
+      if(rec.isNew) fresh++;
+      next.push(rec);
     }catch(err){ errs++; log(`konnte ${fh.name} nicht lesen: ${err.message}`,"err"); }
   }
-  render();
-  log(`Ordner „${handle.name}“: ${files.length} MP3${files.length===1?"":"s"} eingelesen${errs?`, ${errs} Fehler`:""}`,"ok");
+  const gone=rescan? [...known.keys()].filter(n=>!names.some(e=>e.name===n)) : [];
+  files=next;
+  current = keepName? (files.find(f=>f.name===keepName)||null) : current;
+  if(current) select(current); else render();
+  if(rescan){
+    log(`neu geladen: ${files.length} Datei(en)`+(fresh?`, ${fresh} neu`:", nichts Neues")+(gone.length?`, ${gone.length} verschwunden`:""),fresh?"ok":"info");
+    if(fresh) toast(`${fresh} neue Datei(en)`,"ok");
+  }else
+    log(`Ordner „${handle.name}“: ${files.length} MP3${files.length===1?"":"s"} eingelesen${errs?`, ${errs} Fehler`:""}`,"ok");
   try{ await saveHandle(handle); $("btnLast").style.display="none"; }catch(e){}
 }
 
@@ -664,14 +752,17 @@ function render(){
     r.className="row"+(f===current?" sel":"")+(isDirty(f)?" dirty":"");
     const a=f.tags.TPE1||"", t=f.tags.TIT2||"";
     const l1=(a||t)?`${a}${a&&t?" – ":""}${t}`:"(ohne Tag)";
+    if(f===playing) r.classList.add("playing");
     r.innerHTML=`<span class="strip"></span><div class="meta">
-        <div class="l1"></div><div class="l2"></div></div>
+        <div class="l1"></div><div class="l2"><span class="dur"></span><span class="fn"></span></div></div>
       <div class="flags">
+        ${f.isNew?'<span class="chip new">NEU</span>':""}
         <span class="chip ${a&&t?"on":"no"}">TAG</span>
         <span class="chip ${f.pic?"on":""}">IMG</span>
       </div>`;
     r.querySelector(".l1").textContent=l1;
-    r.querySelector(".l2").textContent=f.name;
+    r.querySelector(".dur").textContent=f.info?`${fmtTime(f.info.dur)} · ${f.info.kbps}${f.info.vbr?"~":""} · `:"";
+    r.querySelector(".fn").textContent=f.name;
     r.onclick=()=>select(f);
     listEl.appendChild(r);
   }
@@ -686,8 +777,10 @@ const F={TPE1:"fArtist",TIT2:"fTitle",TALB:"fAlbum",TCON:"fGenre",TYER:"fYear",T
 function showEditor(on){ $("edMain").style.display=on?"":"none"; $("edEmpty").style.display=on?"none":""; }
 
 function select(f){
+  if(playing&&playing!==f) stopAudio();
   current=f;
-  $("edTitle").textContent=f.name;
+  $("edTitle").textContent=f.name+(f.info?`   ·   ${fmtTime(f.info.dur)} · ${f.info.kbps} kbps${f.info.vbr?" (VBR)":""}`:"");
+  $("btnPlay").disabled=false;
   for(const [k,id] of Object.entries(F)) $(id).value=f.tags[k]||"";
   drawArt();
   showEditor(true); updatePreview(); render();
@@ -749,6 +842,40 @@ $("btnArtDel").onclick=()=>{ if(!current)return; current.pic=null; current.picDi
 $("btnSquare").onclick=async()=>{ if(current&&current.pic) await setCoverFromBlob(new Blob([current.pic.data],{type:current.pic.mime})); };
 
 /* ============================================================
+   Mini-Player
+   ============================================================ */
+let playing=null, audioURL=null;
+const au=$("audio");
+function stopAudio(){
+  au.pause(); au.removeAttribute("src"); au.load();
+  if(audioURL){URL.revokeObjectURL(audioURL);audioURL=null;}
+  playing=null; $("btnPlay").textContent="▶"; $("seek").value=0; $("ptime").textContent="0:00 / 0:00";
+}
+async function togglePlay(){
+  if(!current) return;
+  if(playing===current&&!au.paused){ au.pause(); $("btnPlay").textContent="▶"; return; }
+  if(playing===current&&au.paused){ await au.play(); $("btnPlay").textContent="❚❚"; return; }
+  stopAudio();
+  try{
+    const file=await current.handle.getFile();
+    audioURL=URL.createObjectURL(file);
+    au.src=audioURL; playing=current;
+    await au.play();
+    $("btnPlay").textContent="❚❚"; render();
+  }catch(e){ log("Wiedergabe nicht möglich: "+e.message,"err"); stopAudio(); }
+}
+$("btnPlay").onclick=togglePlay;
+au.addEventListener("timeupdate",()=>{
+  const d=au.duration||(playing&&playing.info?playing.info.dur:0);
+  if(d) $("seek").value=Math.round(au.currentTime/d*1000);
+  $("ptime").textContent=`${fmtTime(au.currentTime)} / ${fmtTime(d)}`;
+});
+au.addEventListener("ended",()=>{ $("btnPlay").textContent="▶"; });
+$("seek").addEventListener("input",e=>{
+  const d=au.duration; if(d) au.currentTime=e.target.value/1000*d;
+});
+
+/* ============================================================
    Dateiname
    ============================================================ */
 function sanitize(s){
@@ -791,6 +918,37 @@ $("btnFromName").onclick=()=>{
 };
 
 /* ============================================================
+   Aufräumen: typische Download-Reste entfernen
+   ============================================================ */
+const JUNK=/\s*[\(\[\{]\s*(official\s*(music\s*)?(video|audio|visualizer|hd|4k)?|official|lyrics?|lyric\s*video|audio|visualizer|hd|hq|4k|full\s*hd|free\s*download|free\s*dl|download|out\s*now|explicit|clean|radio\s*edit\s*hq|copyright\s*free|no\s*copyright|320\s*kbps|mp3)\s*[\)\]\}]/gi;
+function cleanStr(v){
+  if(!v) return "";
+  let o=v;
+  o=o.replace(/_/g," ");
+  o=o.replace(JUNK,"");
+  o=o.replace(/\s*[\(\[]\s*[\)\]]\s*/g," ");           // leere Klammern
+  o=o.replace(/^\s*\d{1,3}\s*[-._)\]]\s+/,"");           // führende Tracknummer
+  o=o.replace(/\b(?:feat|ft|featuring)\b\.?/gi,"feat.");
+  o=o.replace(/\s*[-–—]\s*/g," - ");
+  o=o.replace(/\s{2,}/g," ").trim();
+  o=o.replace(/[\s\-–—.,;:]+$/,"").trim();
+  return o;
+}
+$("btnClean").onclick=()=>{
+  if(!current) return;
+  const before={a:$("fArtist").value,t:$("fTitle").value,al:$("fAlbum").value};
+  const after={a:cleanStr(before.a),t:cleanStr(before.t),al:cleanStr(before.al)};
+  const ch=[];
+  if(after.a!==before.a){ $("fArtist").value=after.a; ch.push(`Interpret: „${before.a}“ → „${after.a}“`); }
+  if(after.t!==before.t){ $("fTitle").value=after.t;  ch.push(`Titel: „${before.t}“ → „${after.t}“`); }
+  if(after.al!==before.al){ $("fAlbum").value=after.al; ch.push(`Album: „${before.al}“ → „${after.al}“`); }
+  if(!ch.length){ toast("Nichts zu bereinigen"); return; }
+  readFields(); updatePreview(); render();
+  ch.forEach(c=>log("aufgeräumt · "+c,"info"));
+  toast(`${ch.length} Feld(er) bereinigt — noch speichern`);
+};
+
+/* ============================================================
    Speichern
    ============================================================ */
 async function ensurePerm(h){
@@ -799,6 +957,7 @@ async function ensurePerm(h){
   return await h.requestPermission(opt)==="granted";
 }
 async function saveFile(f){
+  if(playing===f) stopAudio();
   if(!await ensurePerm(dirHandle)) throw new Error("Schreibrechte verweigert");
   const file=await f.handle.getFile();
   const buf=new Uint8Array(await file.arrayBuffer());
@@ -848,6 +1007,7 @@ $("btnRevert").onclick=()=>{
    Umbenennen
    ============================================================ */
 async function renameFile(f){
+  if(playing===f) stopAudio();
   const nn=buildName(f);
   if(!nn) throw new Error("Muster ergibt keinen Namen");
   if(nn===f.name) return null;
@@ -908,7 +1068,7 @@ $("btnLast").onclick=async()=>{
   if(await ensurePerm(h)) await openFolder(h);
   else { log("Zugriff auf den letzten Ordner wurde abgelehnt","warn"); toast("Zugriff abgelehnt","err"); }
 };
-$("btnReload").onclick=()=>{ if(dirHandle) openFolder(dirHandle); };
+$("btnReload").onclick=()=>{ if(dirHandle) openFolder(dirHandle,{rescan:true}); };
 $("search").addEventListener("input",e=>{filter=e.target.value;render();});
 $("btnTheme").onclick=()=>{
   CFG.theme=CFG.theme==="light"?"dark":"light"; saveCfg(); applyCfg();
@@ -936,6 +1096,20 @@ $("btnLogCopy").onclick=()=>{
 };
 document.addEventListener("keydown",e=>{
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){ e.preventDefault(); $("btnSave").click(); }
+  const inField=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if(inField) return;
+  if(e.key===" "&&current){ e.preventDefault(); togglePlay(); }
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+    const q=filter.toLowerCase();
+    const vis=files.filter(f=>!q||f.name.toLowerCase().includes(q)||
+      (f.tags.TPE1||"").toLowerCase().includes(q)||(f.tags.TIT2||"").toLowerCase().includes(q));
+    if(!vis.length) return;
+    e.preventDefault();
+    const i=vis.indexOf(current);
+    const n=e.key==="ArrowDown"? Math.min(vis.length-1,i+1) : Math.max(0,i<0?0:i-1);
+    select(vis[n]);
+    const row=listEl.children[n]; if(row) row.scrollIntoView({block:"nearest"});
+  }
 });
 window.addEventListener("beforeunload",e=>{ if(files.some(isDirty)){e.preventDefault();e.returnValue="";} });
 
