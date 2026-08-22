@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ID3 Studio</title>
+
 <!-- Icons + Manifest -->
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#172f4d">
+<meta name="theme-color" content="#0A0812" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EAE5F8" media="(prefers-color-scheme: light)">
 <meta name="apple-mobile-web-app-title" content="ID3 Tag">
 <meta name="application-name" content="ID3 Studio">
-
+<meta name="description" content="Edit your mp3 tags on the fly">
 <!-- Link-Vorschau -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="ID3 Studio">
 <meta property="og:description" content="Edit your mp3 tags on the fly">
-<meta property="og:url" content="https://kaffeetrinker80.github.io/private/id3-studio/index.html/">
-<meta property="og:image" content="https://kaffeetrinker80.github.io/private/id3-studio/index.html/og-image.png">
+<meta property="og:url" content="https://kaffeetrinker80.github.io/private/id3-studio/">
+<meta property="og:image" content="https://kaffeetrinker80.github.io/private/id3-studio/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ID3 Studio</title>
 <style>
 :root{
   --deep:#0A0812; --bg:#191331; --panel:#221B3F; --panel2:#2B2350; --line:#3E3369;
@@ -117,6 +119,13 @@ main{flex:1;display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:16px;
 .row.sel .strip{background:linear-gradient(180deg,var(--mag),var(--cyan))}
 .row .meta{min-width:0;flex:1}
 .row .l1{font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .l1 span.tt,.row .l2 span.tt{display:inline-block;will-change:transform}
+.row .l1.marq,.row .l2.marq{text-overflow:clip;
+  -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent 100%);mask-image:linear-gradient(90deg,#000 88%,transparent 100%)}
+.row:hover .l1.marq span.tt,.row.sel .l1.marq span.tt,
+.row:hover .l2.marq span.tt,.row.sel .l2.marq span.tt{
+  animation:marq var(--dur,9s) ease-in-out infinite alternate}
+@keyframes marq{0%,16%{transform:translateX(0)}84%,100%{transform:translateX(calc(-1 * var(--shift,0px)))}}
 .row .l2{font-family:var(--mono);font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .row.dirty .l1::after{content:"●";color:var(--warn);margin-left:6px;font-size:10px;vertical-align:middle}
 .row .flags{display:flex;gap:3px;flex:none}
@@ -210,7 +219,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.2</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.2.1</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
   <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
@@ -333,7 +342,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.2</footer>
+<footer>Made with Love © — ID3 Studio v1.2.1</footer>
 <div id="toast"></div>
 
 <datalist id="genres"></datalist>
@@ -345,7 +354,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.2
+   ID3 Studio v1.2.1
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -754,19 +763,44 @@ function render(){
     const l1=(a||t)?`${a}${a&&t?" – ":""}${t}`:"(ohne Tag)";
     if(f===playing) r.classList.add("playing");
     r.innerHTML=`<span class="strip"></span><div class="meta">
-        <div class="l1"></div><div class="l2"><span class="dur"></span><span class="fn"></span></div></div>
+        <div class="l1"><span class="tt"></span></div>
+        <div class="l2"><span class="tt"><span class="dur"></span><span class="fn"></span></span></div></div>
       <div class="flags">
         ${f.isNew?'<span class="chip new">NEU</span>':""}
         <span class="chip ${a&&t?"on":"no"}">TAG</span>
         <span class="chip ${f.pic?"on":""}">IMG</span>
       </div>`;
-    r.querySelector(".l1").textContent=l1;
+    r.querySelector(".l1 .tt").textContent=l1;
     r.querySelector(".dur").textContent=f.info?`${fmtTime(f.info.dur)} · ${f.info.kbps}${f.info.vbr?"~":""} · `:"";
     r.querySelector(".fn").textContent=f.name;
     r.onclick=()=>select(f);
     listEl.appendChild(r);
   }
+  measureMarquee();
 }
+
+/* Laufschrift nur dort, wo der Text wirklich nicht passt.
+   Gemessen wird die echte Rendergröße im Browser — unabhängig von Gerät und Fenstergröße. */
+let marqRaf;
+function measureMarquee(){
+  cancelAnimationFrame(marqRaf);
+  marqRaf=requestAnimationFrame(()=>{
+    for(const box of listEl.querySelectorAll(".l1,.l2")){
+      const tt=box.firstElementChild; if(!tt) continue;
+      const over=Math.round(tt.scrollWidth-box.clientWidth);
+      if(over>6){
+        box.classList.add("marq");
+        box.style.setProperty("--shift",over+"px");
+        // ca. 45 px/s plus Lesepausen an beiden Enden
+        box.style.setProperty("--dur",Math.min(26,Math.max(4,over/45+2.5)).toFixed(1)+"s");
+      }else{
+        box.classList.remove("marq");
+        box.style.removeProperty("--shift"); box.style.removeProperty("--dur");
+      }
+    }
+  });
+}
+if(window.ResizeObserver) new ResizeObserver(()=>measureMarquee()).observe(listEl);
 
 /* ============================================================
    Editor
