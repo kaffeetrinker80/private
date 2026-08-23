@@ -219,7 +219,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.2.1</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.3</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
   <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
@@ -342,7 +342,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.2.1</footer>
+<footer>Made with Love © — ID3 Studio v1.3</footer>
 <div id="toast"></div>
 
 <datalist id="genres"></datalist>
@@ -354,7 +354,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.2.1
+   ID3 Studio v1.3
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -485,13 +485,35 @@ const listEl=$("list");
 /* ============================================================
    Log & Toast
    ============================================================ */
-function log(msg,type="info"){
-  const t=new Date().toLocaleTimeString("de-DE");
+let LOGBUF=[], logTimer;
+function logRow(t,msg,type){
   const d=document.createElement("div");
   d.className="le "+type;
   d.innerHTML=`<span class="t">${t}</span><span class="m"></span>`;
   d.querySelector(".m").textContent=msg;
   const b=$("logBody"); b.appendChild(d); b.scrollTop=b.scrollHeight;
+}
+function log(msg,type="info"){
+  const t=new Date().toLocaleTimeString("de-DE");
+  logRow(t,msg,type);
+  LOGBUF.push([t,msg,type]);
+  if(LOGBUF.length>300) LOGBUF=LOGBUF.slice(-300);
+  clearTimeout(logTimer);
+  logTimer=setTimeout(()=>store.set("id3.log",JSON.stringify(LOGBUF)),600);
+}
+function restoreLog(){
+  try{
+    const raw=store.get("id3.log",null); if(!raw) return;
+    LOGBUF=JSON.parse(raw)||[];
+    for(const [t,m,ty] of LOGBUF) logRow(t,m,ty);
+    if(LOGBUF.length){
+      const sep=document.createElement("div");
+      sep.className="le info"; sep.style.opacity=".6"; sep.style.borderTop="1px dashed var(--line)";
+      sep.style.margin="6px 0 2px"; sep.style.paddingTop="5px";
+      sep.innerHTML='<span class="m">— vorherige Sitzung —</span>';
+      $("logBody").appendChild(sep);
+    }
+  }catch(e){}
 }
 let toastTimer;
 function toast(msg,type=""){
@@ -813,6 +835,7 @@ function showEditor(on){ $("edMain").style.display=on?"":"none"; $("edEmpty").st
 function select(f){
   if(playing&&playing!==f) stopAudio();
   current=f;
+  store.set("id3.lastFile",f.name);
   $("edTitle").textContent=f.name+(f.info?`   ·   ${fmtTime(f.info.dur)} · ${f.info.kbps} kbps${f.info.vbr?" (VBR)":""}`:"");
   $("btnPlay").disabled=false;
   for(const [k,id] of Object.entries(F)) $(id).value=f.tags[k]||"";
@@ -1099,8 +1122,13 @@ $("btnOpen").onclick=async()=>{
 };
 $("btnLast").onclick=async()=>{
   const h=await loadHandle(); if(!h) return;
-  if(await ensurePerm(h)) await openFolder(h);
-  else { log("Zugriff auf den letzten Ordner wurde abgelehnt","warn"); toast("Zugriff abgelehnt","err"); }
+  if(await ensurePerm(h)){
+    await openFolder(h);
+    $("btnLast").style.display="none";
+    const last=store.get("id3.lastFile",null);
+    const f=last&&files.find(x=>x.name===last);
+    if(f) select(f);
+  }else{ log("Zugriff auf den letzten Ordner wurde abgelehnt","warn"); toast("Zugriff abgelehnt","err"); }
 };
 $("btnReload").onclick=()=>{ if(dirHandle) openFolder(dirHandle,{rescan:true}); };
 $("search").addEventListener("input",e=>{filter=e.target.value;render();});
@@ -1123,7 +1151,7 @@ $("btnSync").oncontextmenu=e=>{
     syncHandle=null; saveKV("sync",null); syncLabel("☁ Sync"); log("Sync-Ordner getrennt","warn");
   }
 };
-$("btnLogClear").onclick=()=>{$("logBody").innerHTML="";};
+$("btnLogClear").onclick=()=>{$("logBody").innerHTML="";LOGBUF=[];store.set("id3.log","[]");};
 $("btnLogCopy").onclick=()=>{
   const txt=[...$("logBody").children].map(d=>d.textContent.replace(/^(\d{2}:\d{2}:\d{2})/,"$1  ")).join("\n");
   navigator.clipboard.writeText(txt).then(()=>toast("Protokoll kopiert","ok"),()=>toast("Kopieren nicht möglich","err"));
@@ -1158,6 +1186,7 @@ function applyCfg(){
 }
 function init(){
   loadCfg();
+  restoreLog();
   $("genres").innerHTML=GENRES.map(g=>`<option value="${g}">`).join("");
   applyCfg();
   if(store.get("id3.logCollapsed","0")==="1"){ $("logPanel").classList.add("collapsed"); $("btnLogToggle").textContent="▸"; }
@@ -1175,7 +1204,21 @@ function init(){
     log("Browser unterstützt die File System Access API nicht — bitte Chrome oder Edge (Desktop) verwenden","err");
   }else{
     if(location.protocol==="file:") $("bnFile").classList.add("show");
-    loadHandle().then(h=>{ if(h) $("btnLast").style.display=""; });
+    loadHandle().then(async h=>{
+      if(!h) return;
+      const st=await h.queryPermission({mode:"readwrite"});
+      if(st==="granted"){
+        await openFolder(h);
+        const last=store.get("id3.lastFile",null);
+        const f=last&&files.find(x=>x.name===last);
+        if(f) select(f);
+      }else{
+        $("btnLast").style.display="";
+        $("btnLast").textContent="↩ "+h.name;
+        $("btnLast").title="Zuletzt genutzten Ordner erneut freigeben";
+        log(`Ordner „${h.name}“ gemerkt — ein Klick auf „${h.name}“ oben rechts gibt ihn wieder frei`,"info");
+      }
+    });
     loadKV("sync").then(async h=>{
       if(!h) return;
       syncHandle=h;
