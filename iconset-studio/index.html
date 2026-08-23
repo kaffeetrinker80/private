@@ -7,8 +7,8 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#333333">
-<meta name="apple-mobile-web-app-title" content="Icon-Set">
+<meta name="theme-color" content="#181428">
+<meta name="apple-mobile-web-app-title" content="Icon Set">
 <meta name="application-name" content="Icon Set Studio">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -16,24 +16,31 @@
 <meta name="description" content="Favicon-Set, Manifest und Head-Snippet aus einem Symbol erzeugen — komplett im Browser.">
 <style>
 :root{
-  --bg:#0f1418; --panel:#151c22; --panel2:#1b242c; --panel3:#222d36;
-  --line:#26323c; --line2:#33424f;
-  --text:#e6edf3; --muted:#93a4b3; --muted2:#6b7c8c;
-  --accent:#2dd4bf; --accent-ink:#04211d; --accent-soft:rgba(45,212,191,.12);
-  --code-bg:#0b1015; --code-text:#c9d6e2;
-  --warn:#f0b429; --ok:#5ecf8f;
+  --bg:#1b1732; --panel:#252041; --panel2:#2e284e; --panel3:#3a3261;
+  --line:#443a70; --line2:#564a86;
+  --text:#f3f1fc; --muted:#bcb4e0; --muted2:#948bbd;
+  --accent:#e2ff4d; --accent-ink:#1b2000; --accent-soft:rgba(226,255,77,.13);
+  --accent2:#ff4fa3; --accent2-soft:rgba(255,79,163,.14);
+  --accent3:#4fe0ff;
+  --code-bg:#151129; --code-text:#dbd5f3;
+  --warn:#ffb020; --ok:#3fe0a0;
+  --glow:0 0 0 1px rgba(226,255,77,.22), 0 6px 24px -8px rgba(226,255,77,.28);
   --font:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
 }
 html[data-theme="light"]{
-  --bg:#eef2f6; --panel:#ffffff; --panel2:#f4f7fa; --panel3:#e6ecf2;
-  --line:#dce4ec; --line2:#c6d2de;
-  --text:#16212c; --muted:#55677a; --muted2:#7d8fa1;
-  --accent:#0d9488; --accent-ink:#ffffff; --accent-soft:rgba(13,148,136,.10);
-  --code-bg:#f7f9fb; --code-text:#22303d;
-  --warn:#b0790a; --ok:#2f8f5b;
+  --bg:#f2f0fa; --panel:#ffffff; --panel2:#f6f4fd; --panel3:#e9e5f7;
+  --line:#ddd7f0; --line2:#c6bce4;
+  --text:#191430; --muted:#5b5280; --muted2:#847ba8;
+  --accent:#6a2ff0; --accent-ink:#ffffff; --accent-soft:rgba(106,47,240,.10);
+  --accent2:#d6006e; --accent2-soft:rgba(214,0,110,.10);
+  --accent3:#0090b4;
+  --code-bg:#faf8ff; --code-text:#2a2350;
+  --warn:#a8690a; --ok:#1c8f63;
+  --glow:0 0 0 1px rgba(106,47,240,.18), 0 6px 20px -10px rgba(106,47,240,.4);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;
   transition:background .2s,color .2s}
@@ -48,12 +55,21 @@ header{
   padding:12px 18px;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line)
 }
-.mark{width:32px;height:32px;border-radius:9px;flex:none;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--accent),#3b82f6);color:var(--accent-ink)}
-.mark svg{width:18px;height:18px}
-.htitle{font-size:15px;font-weight:650;display:flex;align-items:center;gap:9px}
-.pill{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:99px;
-  background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.mark{width:34px;height:34px;border-radius:10px;flex:none;position:relative;overflow:hidden;
+  background:linear-gradient(150deg,var(--accent),var(--accent2));box-shadow:var(--glow)}
+.mark span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.mark .m-core{width:9px;height:9px;border-radius:3px;background:var(--accent-ink)}
+.mark .m-ring{width:9px;height:9px;border-radius:3px;border:1.6px solid var(--accent-ink);
+  animation:spread 2.6s cubic-bezier(.4,0,.2,1) infinite}
+.mark .m-ring.r2{animation-delay:1.3s}
+@keyframes spread{
+  0%{width:9px;height:9px;border-radius:3px;opacity:.95}
+  70%{opacity:.35}
+  100%{width:30px;height:30px;border-radius:50%;opacity:0}}
+.htitle{font-size:15px;font-weight:750;letter-spacing:.02em;display:flex;align-items:center;gap:9px}
+.pill{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 8px;
+  border-radius:99px;background:var(--accent2-soft);color:var(--accent2);
+  border:1px solid color-mix(in srgb,var(--accent2) 34%,transparent)}
 .hsub{font-size:11.5px;color:var(--muted2);margin-top:1px}
 .hspace{flex:1}
 .hbtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);
@@ -62,14 +78,17 @@ header{
 .hbtn svg{width:16px;height:16px}
 
 .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 80px}
-.grid{display:grid;gap:16px;grid-template-columns:1fr}
+.grid{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
 @media(min-width:920px){.grid{grid-template-columns:minmax(0,382px) minmax(0,1fr)}}
 
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px}
 .card+.card{margin-top:15px}
-.eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted2);
+.eyebrow{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);
   margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none}
 .eyebrow .chev{width:14px;height:14px;transition:transform .2s;color:var(--muted2)}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;
+  margin-right:8px;box-shadow:0 0 0 3px var(--accent-soft)}
+.eyebrow>span:first-of-type{flex:1}
 .sect.collapsed .chev{transform:rotate(-90deg)}
 .sect.collapsed>.eyebrow{margin-bottom:0}
 .sect.collapsed>*:not(.eyebrow){display:none!important}
@@ -117,8 +136,12 @@ input[type=color]::-webkit-color-swatch{border:none;border-radius:6px}
   display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:550;transition:.16s}
 .btn:hover{background:var(--panel3)}
 .btn svg{width:15px;height:15px;flex:none}
-.btn.primary{background:var(--accent);border-color:transparent;color:var(--accent-ink);font-weight:650}
-.btn.primary:hover{filter:brightness(1.08)}
+.btn.primary{background:var(--accent);border-color:transparent;color:var(--accent-ink);font-weight:700;
+  box-shadow:var(--glow)}
+.btn.primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn.pink{background:var(--accent2);border-color:transparent;color:#fff;font-weight:700}
+.btn.pink:hover{filter:brightness(1.07)}
+.btn.ghost{border-style:dashed}
 .btn.wide{width:100%}
 .btn[disabled]{opacity:.35;pointer-events:none}
 .btn.sm{height:30px;padding:0 10px;font-size:12px;border-radius:8px}
@@ -193,7 +216,7 @@ pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radiu
   transition:.15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px
 }
 .tab:hover{color:var(--text)}
-.tab.active{background:var(--panel);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.tab.active{background:var(--panel);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.25),inset 0 0 0 1px color-mix(in srgb,var(--accent) 26%,transparent)}
 .tab .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);
   margin-left:5px;vertical-align:middle}
 .panel{display:none}
@@ -202,18 +225,97 @@ pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radiu
 .panel .card:first-child{margin-top:0}
 footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 28px}
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+
+/* ---------- Farb-Assistent ---------- */
+.cwiz{border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:13px;padding:13px;
+  background:linear-gradient(150deg,var(--accent-soft),transparent 70%),var(--panel2);margin-bottom:14px}
+.cwiz .schema{width:100%;height:auto;display:block;margin:2px 0 10px;border-radius:9px}
+.cwiz .schema .beam{animation:beam 3.4s ease-in-out infinite}
+.cwiz .schema .beam2{animation:beam 3.4s ease-in-out infinite;animation-delay:1.7s}
+@keyframes beam{0%,42%{opacity:0}8%,34%{opacity:1}100%{opacity:0}}
+.slot{display:flex;gap:11px;align-items:flex-start;padding:11px;border-radius:11px;background:var(--panel2);
+  border:1px solid var(--line);margin-bottom:10px;transition:.18s}
+.slot.hot{border-color:var(--accent);box-shadow:var(--glow)}
+.slot .num{width:22px;height:22px;flex:none;border-radius:7px;display:grid;place-items:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;background:var(--accent);color:var(--accent-ink)}
+.slot.two .num{background:var(--accent2);color:#fff}
+.slot .body{flex:1;min-width:0}
+.slot .ttl{font-size:13px;font-weight:650;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.slot .say code{font-family:var(--mono);font-size:11px;background:var(--panel3);padding:1px 5px;
+  border-radius:5px;color:var(--text)}
+.slot .ttl code{font-family:var(--mono);font-size:11px;background:var(--panel3);padding:1px 6px;border-radius:5px;
+  color:var(--accent)}
+.slot.two .ttl code{color:var(--accent2)}
+.slot .say{font-size:11.8px;color:var(--muted);line-height:1.5;margin:3px 0 8px}
+.picker-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+
+.wizbody{display:grid;gap:14px}
+.dropwide{border:1.5px dashed color-mix(in srgb,var(--accent) 42%,transparent);border-radius:12px;
+  padding:26px 14px;text-align:center;background:var(--accent-soft);cursor:pointer;transition:.18s;width:100%}
+.dropwide:hover,.dropwide.drag{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.dropwide b{display:block;font-size:13.5px}
+.dropwide span{display:block;font-size:11.5px;color:var(--muted);margin-top:4px}
+.shotwrap{position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--line2);background:var(--panel3);
+  line-height:0}
+.shotwrap canvas{width:100%;height:auto;display:block;cursor:crosshair}
+.shotwrap.armed canvas{cursor:copy}
+.loupe{position:absolute;width:96px;height:96px;border-radius:50%;pointer-events:none;display:none;
+  border:2px solid var(--accent);box-shadow:0 6px 20px rgba(0,0,0,.45);overflow:hidden;z-index:5}
+.loupe.on{display:block}
+.loupe canvas{width:96px;height:96px;image-rendering:pixelated}
+.loupe .cross{position:absolute;inset:0;pointer-events:none}
+.loupe .cross::before,.loupe .cross::after{content:"";position:absolute;background:rgba(255,255,255,.9)}
+.loupe .cross::before{left:50%;top:0;bottom:0;width:1px;transform:translateX(-.5px)}
+.loupe .cross::after{top:50%;left:0;right:0;height:1px;transform:translateY(-.5px)}
+.armbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.armbar .live{font-family:var(--mono);font-size:12px;padding:0 10px;height:30px;display:inline-flex;
+  align-items:center;gap:7px;border-radius:8px;background:var(--panel3);border:1px solid var(--line2)}
+.armbar .live i{width:14px;height:14px;border-radius:4px;border:1px solid var(--line2);display:block}
+.guess{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.gcard{border:1px solid var(--line);border-radius:11px;padding:11px;background:var(--panel2);
+  animation:pop .28s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+.gcard .sw2{height:44px;border-radius:8px;border:1px solid var(--line2);margin-bottom:8px}
+.gcard .k{font-family:var(--mono);font-size:11px;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase}
+.gcard .v{font-family:var(--mono);font-size:13px;font-weight:650;margin:2px 0 8px}
+textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-radius:10px;background:var(--code-bg);
+  color:var(--code-text);font-family:var(--mono);font-size:11.5px;padding:10px;resize:vertical}
+.varlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:7px;margin-top:10px}
+.varchip{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:9px;background:var(--panel2);
+  border:1px solid var(--line);text-align:left;transition:.15s;width:100%}
+.varchip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.varchip i{width:20px;height:20px;border-radius:6px;border:1px solid var(--line2);flex:none}
+.varchip .n{font-family:var(--mono);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.varchip .h{font-family:var(--mono);font-size:10px;color:var(--muted2)}
+.varchip.hit{border-color:var(--accent2);background:var(--accent2-soft)}
+.varchip .grow{flex:1;min-width:0}
+.mini{width:24px;height:24px;border-radius:7px;font-family:var(--mono);font-size:11px;font-weight:700;
+  border:1px solid var(--line2);background:var(--panel3);flex:none;color:var(--muted);transition:.14s}
+.mini.one:hover{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.mini.two:hover{background:var(--accent2);color:#fff;border-color:transparent}
+.gcard .row{display:flex;gap:7px}
+.gcard.one{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.gcard.two{border-color:color-mix(in srgb,var(--accent2) 55%,var(--line))}
+.btn[disabled]{opacity:.3;filter:grayscale(.6)}
+.wizsteps{display:flex;gap:6px;padding:4px;background:var(--panel2);border:1px solid var(--line);border-radius:11px}
+.wizsteps button{flex:1;height:32px;border-radius:8px;font-size:12.5px;font-weight:550;color:var(--muted);transition:.15s}
+.wizsteps button.active{background:var(--panel);color:var(--accent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 26%,transparent)}
+.wizpane{display:none}.wizpane.active{display:block;animation:fadeIn .2s ease}
+.modal.wide{width:min(820px,100%)}
+.assignrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;margin-top:10px}
+.pv canvas{transition:transform .2s}
+.pv:hover canvas{transform:scale(1.04)}
+.flash{animation:flash .5s ease}
+@keyframes flash{0%{box-shadow:0 0 0 0 var(--accent)}100%{box-shadow:0 0 0 12px transparent}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="mark">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="3.4"/>
-    </svg>
-  </div>
+  <div class="mark" aria-hidden="true"><span class="m-ring"></span><span class="m-ring r2"></span><span class="m-core"></span></div>
   <div>
-    <div class="htitle">Icon Set Studio <span class="pill">v1.2</span></div>
+    <div class="htitle">Icon Set Studio <span class="pill">v1.3</span></div>
     <div class="hsub" data-i18n="app.sub">Favicons, Manifest und Head-Snippet aus einem Symbol</div>
   </div>
   <div class="hspace"></div>
@@ -270,11 +372,11 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
       <h3 class="eyebrow"><span data-i18n="h.project">Projekt</span></h3>
       <label class="field">
         <div class="field-head"><span data-i18n="f.name">Name</span></div>
-        <input type="text" id="appName" value="RC Ordner-Einteilung" spellcheck="false">
+        <input type="text" id="appName" value="Mein Tool" spellcheck="false">
       </label>
       <label class="field">
         <div class="field-head"><span data-i18n="f.short">Kurzname</span><output class="val" id="shortLen">7 / 12</output></div>
-        <input type="text" id="shortName" value="RC Plan" spellcheck="false">
+        <input type="text" id="shortName" value="Tool" spellcheck="false">
       </label>
       <label class="field">
         <div class="field-head"><span data-i18n="f.desc">Beschreibung</span></div>
@@ -282,41 +384,94 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
       </label>
       <label class="field">
         <div class="field-head"><span data-i18n="f.url">Adresse der Seite</span></div>
-        <input type="text" id="siteUrl" value="https://kaffeetrinker80.github.io/" spellcheck="false">
+        <input type="text" id="siteUrl" value="https://example.com/" spellcheck="false">
         <p class="hint" data-i18n="hint.url">Wird nur für die Link-Vorschau gebraucht — die muss absolut sein.</p>
       </label>
     </div>
     </div>
     <div class="panel" data-panel="colors">
-    <div class="card sect">
-      <h3 class="eyebrow"><span data-i18n="h.colors">Farben</span></h3>
-      <label class="field">
-        <div class="field-head"><span data-i18n="f.theme">theme_color — Farbe deines Headers</span></div>
-        <div class="colorrow">
-          <input type="color" id="themeColor" value="#172f4d">
-          <input type="text" class="hex" id="themeHex" value="#172f4d" spellcheck="false">
+    <div class="card">
+      <h3 class="eyebrow" style="cursor:default"><span data-i18n="h.where">Wo landen die Farben?</span></h3>
+      <div class="cwiz">
+        <svg class="schema" viewBox="0 0 400 168" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+          <defs><clipPath id="phoneClip"><rect x="14" y="10" width="196" height="148" rx="12"/></clipPath></defs>
+          <g clip-path="url(#phoneClip)">
+            <rect id="schemaTheme" x="14" y="10" width="196" height="40" fill="#172f4d"/>
+            <rect id="schemaBg" x="14" y="50" width="196" height="108" fill="#f3f6fa"/>
+            <rect id="schemaBar1" x="28" y="24" width="86" height="7" rx="3.5" fill="#ffffff" opacity=".55"/>
+            <rect id="schemaBar2" x="176" y="24" width="20" height="7" rx="3.5" fill="#ffffff" opacity=".35"/>
+            <rect id="schemaLn1" x="28" y="68" width="150" height="8" rx="4" fill="#000" opacity=".16"/>
+            <rect id="schemaLn2" x="28" y="86" width="112" height="8" rx="4" fill="#000" opacity=".12"/>
+            <rect id="schemaLn3" x="28" y="110" width="168" height="30" rx="7" fill="#000" opacity=".08"/>
+          </g>
+          <rect x="14" y="10" width="196" height="148" rx="12" fill="none" stroke="currentColor" opacity=".28"/>
+          <g class="beam" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="4 4">
+            <path d="M242 30 H 214" fill="none"/>
+          </g>
+          <g class="beam2" stroke="var(--accent2)" stroke-width="1.4" stroke-dasharray="4 4">
+            <path d="M242 104 H 214" fill="none"/>
+          </g>
+          <g>
+            <circle cx="254" cy="30" r="11" fill="var(--accent)"/>
+            <text x="254" y="34.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent-ink)" font-family="monospace">1</text>
+            <text x="272" y="27" font-size="10.5" font-weight="700" fill="currentColor" font-family="monospace">theme_color</text>
+            <text x="272" y="40" font-size="9.5" fill="currentColor" opacity=".6" data-i18n-svg="schema.1">dein &lt;header&gt;</text>
+          </g>
+          <g>
+            <circle cx="254" cy="104" r="11" fill="var(--accent2)"/>
+            <text x="254" y="108.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="monospace">2</text>
+            <text x="272" y="101" font-size="10.5" font-weight="700" fill="currentColor" font-family="monospace">background_color</text>
+            <text x="272" y="114" font-size="9.5" fill="currentColor" opacity=".6" data-i18n-svg="schema.2">dein &lt;body&gt;</text>
+          </g>
+        </svg>
+        <p class="hint" data-i18n="hint.where">Die Vorschau zeigt live, wo deine beiden Werte landen: <b>1</b> färbt die Browserleiste über deinem Header, <b>2</b> ist der Startbildschirm, bevor dein CSS geladen ist. Beide liest du aus <b>deinem eigenen Tool</b> ab — nicht aus dem Logo.</p>
+        <div class="picker-actions">
+          <button class="btn primary" id="wizBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 4l5 5M4.5 19.5l1-4L16 5l3 3L8.5 18.5z"/>
+            </svg>
+            <span data-i18n="btn.wiz">Farben abgreifen</span>
+          </button>
+          <button class="btn" id="wizBtn2" data-i18n="btn.wizCss">Aus CSS lesen</button>
         </div>
-        <div class="swatches" id="themeSw"></div>
-      </label>
-      <label class="check">
-        <input type="checkbox" id="optDarkTheme">
-        <span><span data-i18n="opt.darkTheme">Eigene theme_color für den Dunkelmodus</span><small data-i18n="opt.darkTheme.s">Ergänzt zwei meta-Zeilen mit prefers-color-scheme</small></span>
-      </label>
-      <label class="field" id="darkThemeField" hidden>
-        <div class="field-head"><span data-i18n="f.themeDark">theme_color im Dunkelmodus</span></div>
-        <div class="colorrow">
-          <input type="color" id="themeDark" value="#12151a">
-          <input type="text" class="hex" id="themeDarkHex" value="#12151a" spellcheck="false">
+      </div>
+
+      <div class="slot" id="slotTheme">
+        <div class="num">1</div>
+        <div class="body">
+          <div class="ttl"><span data-i18n="f.themeShort">Header-Farbe</span> <code>theme_color</code></div>
+          <div class="say" data-i18n="say.theme">Die Hintergrundfarbe deiner Kopfzeile. Im CSS meist <code>--panel</code> oder das <code>background</code> von <code>header</code>.</div>
+          <div class="colorrow">
+            <input type="color" id="themeColor" value="#172f4d">
+            <input type="text" class="hex" id="themeHex" value="#172f4d" spellcheck="false">
+          </div>
+          <div class="swatches" id="themeSw"></div>
+          <label class="check">
+            <input type="checkbox" id="optDarkTheme">
+            <span><span data-i18n="opt.darkTheme">Eigene theme_color für den Dunkelmodus</span><small data-i18n="opt.darkTheme.s">Ergänzt zwei meta-Zeilen mit prefers-color-scheme</small></span>
+          </label>
+          <label class="field" id="darkThemeField" hidden>
+            <div class="field-head"><span data-i18n="f.themeDark">theme_color im Dunkelmodus</span></div>
+            <div class="colorrow">
+              <input type="color" id="themeDark" value="#12151a">
+              <input type="text" class="hex" id="themeDarkHex" value="#12151a" spellcheck="false">
+            </div>
+          </label>
         </div>
-      </label>
-      <label class="field">
-        <div class="field-head"><span data-i18n="f.bg">background_color — dein Seitenhintergrund</span></div>
-        <div class="colorrow">
-          <input type="color" id="bgColor" value="#f3f6fa">
-          <input type="text" class="hex" id="bgHex" value="#f3f6fa" spellcheck="false">
+      </div>
+
+      <div class="slot two" id="slotBg">
+        <div class="num">2</div>
+        <div class="body">
+          <div class="ttl"><span data-i18n="f.bgShort">Seitenhintergrund</span> <code>background_color</code></div>
+          <div class="say" data-i18n="say.bg">Die Farbe deines Seitenkörpers. Im CSS meist <code>--bg</code> oder das <code>background</code> von <code>body</code>.</div>
+          <div class="colorrow">
+            <input type="color" id="bgColor" value="#f3f6fa">
+            <input type="text" class="hex" id="bgHex" value="#f3f6fa" spellcheck="false">
+          </div>
+          <div class="swatches" id="bgSw"></div>
         </div>
-        <div class="swatches" id="bgSw"></div>
-      </label>
+      </div>
       <div id="lumWarn"></div>
     </div>
     </div>
@@ -381,7 +536,7 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
       </label>
       <label class="field" id="scopeField">
         <div class="field-head"><span data-i18n="f.scope">Unterordner</span></div>
-        <input type="text" id="scopePath" value="/" spellcheck="false" placeholder="/theocratic/">
+        <input type="text" id="scopePath" value="/" spellcheck="false" placeholder="/mein-tool/">
         <p class="hint" data-i18n="hint.scope">Nur bei Wurzelpfaden nötig: der Ordner, in dem das Tool liegt.</p>
       </label>
     </div>
@@ -425,7 +580,7 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
         <div>
           <div class="phone">
             <div class="statusbar" id="statusBar"><span>9:41</span><span>▮▮▮</span></div>
-            <div class="urlbar" id="urlBar"><span id="urlText">kaffeetrinker80.github.io</span></div>
+            <div class="urlbar" id="urlBar"><span id="urlText">example.com</span></div>
             <div class="pagebody" id="pageBody" data-i18n="pv.page">Seiteninhalt</div>
           </div>
           <p class="hint" data-i18n="pv.browser">Browserleiste auf Android</p>
@@ -434,7 +589,7 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
           <div class="phone">
             <div class="splash" id="splashPv">
               <canvas id="splashIcon" width="72" height="72"></canvas>
-              <div class="nm" id="splashName">RC Ordner-Einteilung</div>
+              <div class="nm" id="splashName">Mein Tool</div>
             </div>
           </div>
           <p class="hint" data-i18n="pv.splash">Startbildschirm der installierten App</p>
@@ -444,7 +599,7 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
 
     <div class="card">
       <div class="code-head">
-        <h3 class="eyebrow">site.webmanifest</h3>
+        <h3 class="eyebrow"><span>site.webmanifest</span></h3>
         <button class="btn sm" data-copy="manifestOut" data-i18n="btn.copy">Kopieren</button>
       </div>
       <pre id="manifestOut"></pre>
@@ -473,8 +628,57 @@ footer{text-align:center;color:var(--muted2);font-size:11.5px;padding:20px 12px 
   </div>
 </div>
 
+<!-- ============ Farb-Assistent ============ -->
+<div class="overlay" id="wizOverlay">
+  <div class="modal wide">
+    <button class="modal-x" id="wizClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <h2 data-i18n="wiz.title">Farben abgreifen</h2>
+    <div class="sub" data-i18n="wiz.sub">Aus einem Screenshot deines Tools oder direkt aus seinem CSS</div>
+    <div class="wizsteps">
+      <button class="active" data-wiz="shot" data-i18n="wiz.tabShot">Screenshot</button>
+      <button data-wiz="css" data-i18n="wiz.tabCss">CSS einfügen</button>
+    </div>
+
+    <div class="wizpane active" data-wizpane="shot" style="margin-top:14px">
+      <div class="wizbody">
+        <button class="dropwide" id="wizDrop">
+          <b data-i18n="wiz.drop">Screenshot ablegen oder wählen</b>
+          <span data-i18n="wiz.dropSub">Ein Bildschirmfoto deines fertigen Tools — PNG oder JPG</span>
+        </button>
+        <input type="file" id="wizFile" accept="image/*" hidden>
+        <div id="wizStage" hidden>
+          <div class="guess" id="wizGuess"></div>
+          <div class="shotwrap" id="shotWrap" style="margin-top:12px">
+            <canvas id="shotCv"></canvas>
+            <div class="loupe" id="loupe"><canvas id="loupeCv" width="96" height="96"></canvas><div class="cross"></div></div>
+          </div>
+          <div class="armbar">
+            <button class="btn" id="arm1"><span data-i18n="wiz.arm1">1 · Header-Farbe picken</span></button>
+            <button class="btn" id="arm2"><span data-i18n="wiz.arm2">2 · Hintergrund picken</span></button>
+            <span class="live" id="liveHex"><i id="liveSw"></i><span>—</span></span>
+            <button class="btn sm" id="wizReset" data-i18n="wiz.other">Anderes Bild</button>
+          </div>
+          <p class="hint" id="wizHint" data-i18n="wiz.hint">Auf einen Knopf tippen, dann in das Bild klicken. Die Lupe zeigt das genaue Pixel.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wizpane" data-wizpane="css" style="margin-top:14px">
+      <p class="hint" style="margin-top:0" data-i18n="wiz.cssHint">Die komplette HTML-Datei deines Tools oder nur den <code>:root</code>-Block hier einfügen. Das Tool sammelt alle Farbwerte und markiert die wahrscheinlichsten Kandidaten.</p>
+      <textarea class="css-in" id="cssIn" spellcheck="false" data-i18n-ph="wiz.cssPh" placeholder=":root{ --bg:#0f1418; --panel:#151c22; ... }"></textarea>
+      <div class="picker-actions">
+        <button class="btn primary" id="cssScan" data-i18n="wiz.scan">Farben suchen</button>
+        <button class="btn sm" id="cssClear" data-i18n="wiz.clear">Leeren</button>
+      </div>
+      <div id="varOut"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
-<footer>Made with Love © – Icon Set Studio V 1.2</footer>
+<footer>Made with Love © – Icon Set Studio V 1.3</footer>
 
 <script>
 (()=>{
@@ -495,6 +699,26 @@ de:{
  'ph.desc':'Kurz, ein Satz — landet im Manifest und in der Link-Vorschau',
  'f.url':'Adresse der Seite','hint.url':'Wird nur für die Link-Vorschau gebraucht — die muss absolut sein.',
  'h.colors':'Farben','f.theme':'theme_color — Farbe deines Headers',
+ 'h.where':'Wo landen die Farben?',
+ 'schema.1':'deine Kopfzeile','schema.2':'deine Seitenfläche',
+ 'hint.where':'Die Vorschau zeigt live, wo deine beiden Werte landen: <b>1</b> färbt die Browserleiste über deinem Header, <b>2</b> ist der Startbildschirm, bevor dein CSS geladen ist. Beide liest du aus <b>deinem eigenen Tool</b> ab — nicht aus dem Logo.',
+ 'btn.wiz':'Farben abgreifen','btn.wizCss':'Aus CSS lesen',
+ 'f.themeShort':'Header-Farbe','f.bgShort':'Seitenhintergrund',
+ 'say.theme':'Die Hintergrundfarbe deiner Kopfzeile. In deinem CSS meist <code>--panel</code> oder das <code>background</code> von <code>header</code>.',
+ 'say.bg':'Die Farbe deines Seitenkörpers. In deinem CSS meist <code>--bg</code> oder das <code>background</code> von <code>body</code>.',
+ 'wiz.title':'Farben abgreifen','wiz.sub':'Aus einem Screenshot deines Tools oder direkt aus seinem CSS',
+ 'wiz.tabShot':'Screenshot','wiz.tabCss':'CSS einfügen',
+ 'wiz.drop':'Screenshot ablegen oder wählen','wiz.dropSub':'Ein Bildschirmfoto deines fertigen Tools — PNG oder JPG',
+ 'wiz.arm1':'1 · Header-Farbe picken','wiz.arm2':'2 · Hintergrund picken','wiz.other':'Anderes Bild',
+ 'wiz.hint':'Auf einen Knopf tippen, dann in das Bild klicken. Die Lupe zeigt das genaue Pixel.',
+ 'wiz.cssHint':'Die komplette HTML-Datei deines Tools oder nur den <code>:root</code>-Block hier einfügen. Das Tool sammelt alle Farbwerte und markiert die wahrscheinlichsten Kandidaten.',
+ 'wiz.cssPh':':root{ --bg:#0f1418; --panel:#151c22; … }',
+ 'wiz.scan':'Farben suchen','wiz.clear':'Leeren','wiz.none':'Keine Farbwerte gefunden — steht im eingefügten Text wirklich CSS?',
+ 'wiz.propose':'Vorschlag','wiz.takeBoth':'Beide übernehmen','wiz.tookBoth':'Beide Farben übernommen',
+ 'g.head':'Oberste Zeile','g.edge':'Seitenränder','g.area':'Größte Fläche',
+ 'g.tip1':'meist 1','g.tip2':'meist 2',
+ 'g.as1':'als 1','g.as2':'als 2',
+ 't.setTheme':'theme_color = {h}','t.setBg':'background_color = {h}',
  'opt.darkTheme':'Eigene theme_color für den Dunkelmodus','opt.darkTheme.s':'Ergänzt zwei meta-Zeilen mit prefers-color-scheme',
  'f.themeDark':'theme_color im Dunkelmodus','f.bg':'background_color — dein Seitenhintergrund',
  'h.shape':'Icon-Fläche','f.padColor':'Hintergrund hinter dem Symbol',
@@ -544,6 +768,26 @@ en:{
  'ph.desc':'One short sentence — used in the manifest and link preview',
  'f.url':'Site address','hint.url':'Only needed for the link preview, which requires an absolute URL.',
  'h.colors':'Colours','f.theme':'theme_color — your header colour',
+ 'h.where':'Where do the colours land?',
+ 'schema.1':'your header bar','schema.2':'your page surface',
+ 'hint.where':'The preview shows live where your two values land: <b>1</b> tints the browser bar above your header, <b>2</b> is the launch screen shown before your CSS loads. Read both from <b>your own tool</b> — not from the logo.',
+ 'btn.wiz':'Grab colours','btn.wizCss':'Read from CSS',
+ 'f.themeShort':'Header colour','f.bgShort':'Page background',
+ 'say.theme':'The background of your header bar. In your CSS usually <code>--panel</code> or the <code>background</code> of <code>header</code>.',
+ 'say.bg':'The colour of your page body. In your CSS usually <code>--bg</code> or the <code>background</code> of <code>body</code>.',
+ 'wiz.title':'Grab colours','wiz.sub':'From a screenshot of your tool, or straight from its CSS',
+ 'wiz.tabShot':'Screenshot','wiz.tabCss':'Paste CSS',
+ 'wiz.drop':'Drop or choose a screenshot','wiz.dropSub':'A screen capture of your finished tool — PNG or JPG',
+ 'wiz.arm1':'1 · Pick header colour','wiz.arm2':'2 · Pick background','wiz.other':'Other image',
+ 'wiz.hint':'Tap a button, then click into the image. The loupe shows the exact pixel.',
+ 'wiz.cssHint':'Paste the whole HTML file of your tool, or just its <code>:root</code> block. The tool collects every colour value and marks the likely candidates.',
+ 'wiz.cssPh':':root{ --bg:#0f1418; --panel:#151c22; … }',
+ 'wiz.scan':'Find colours','wiz.clear':'Clear','wiz.none':'No colour values found — is the pasted text really CSS?',
+ 'wiz.propose':'Suggestion','wiz.takeBoth':'Use both','wiz.tookBoth':'Both colours applied',
+ 'g.head':'Top row','g.edge':'Page edges','g.area':'Largest area',
+ 'g.tip1':'usually 1','g.tip2':'usually 2',
+ 'g.as1':'as 1','g.as2':'as 2',
+ 't.setTheme':'theme_color = {h}','t.setBg':'background_color = {h}',
  'opt.darkTheme':'Separate theme_color for dark mode','opt.darkTheme.s':'Adds two meta lines using prefers-color-scheme',
  'f.themeDark':'theme_color in dark mode','f.bg':'background_color — your page background',
  'h.shape':'Icon surface','f.padColor':'Background behind the symbol',
@@ -591,9 +835,15 @@ const HELP={
 de:`<h4>1 · Symbol wählen</h4>
 <p>Ein quadratisches Bild ab 512×512 px, am besten ein SVG. Was hier keinen Rand hat, bekommt ihn gleich über die Regler — zeichne dein Symbol also ruhig randlos.</p>
 <h4>2 · Farben festlegen</h4>
-<p><b>theme_color</b> ist die Hintergrundfarbe deines <code>&lt;header&gt;</code>. Sie färbt die Browserleiste auf Android und die Titelleiste der installierten App. Passt sie nicht, siehst du eine Farbkante über deinem Header.</p>
-<p><b>background_color</b> ist der Hintergrund deines <code>&lt;body&gt;</code>. Sie erscheint im Startbildschirm, bevor dein CSS geladen ist — steht hier etwas anderes, blitzt beim Start die falsche Farbe auf.</p>
-<p>Beide Werte liest du aus deinem eigenen CSS ab, nicht aus dem Logo. Die Farbfelder unter den Wählern sind nur Vorschläge aus deinem Symbol.</p>
+<p>Es sind genau zwei Werte, und beide gehören zu <b>deinem Tool</b>, nicht zu deinem Logo:</p>
+<p><b>1 · theme_color</b> ist die Hintergrundfarbe deines <code>&lt;header&gt;</code>. Sie färbt die Browserleiste auf Android und die Titelleiste der installierten App. Passt sie nicht, siehst du eine Farbkante über deinem Header.</p>
+<p><b>2 · background_color</b> ist der Hintergrund deines <code>&lt;body&gt;</code>. Sie erscheint im Startbildschirm, bevor dein CSS geladen ist — steht hier etwas anderes, blitzt beim Start die falsche Farbe auf.</p>
+<p>Im Reiter <b>Farben</b> zeigt die kleine Grafik live, wo die beiden Werte landen. Über <b>Farben abgreifen</b> holst du sie dir direkt:</p>
+<ul>
+<li><b>Screenshot:</b> Bildschirmfoto deines Tools ablegen. Das Tool schlägt sofort die Farbe der obersten Zeile (das ist fast immer die Header-Farbe) und die der Seitenränder (das ist fast immer der Hintergrund) vor. Mit der Lupe kannst du jedes einzelne Pixel selbst treffen.</li>
+<li><b>CSS einfügen:</b> die HTML-Datei deines Tools hineinkopieren. Alle Farbvariablen werden aufgelistet, <code>--panel</code> und <code>--bg</code> sind vormarkiert.</li>
+</ul>
+<p>Die Farbfelder unter den Wählern sind etwas anderes: das sind nur Vorschläge aus deinem Symbol.</p>
 <h4>3 · Ränder prüfen</h4>
 <p>Das <b>maskable</b> Icon wird auf Android kreisförmig beschnitten. Die runde Vorschau zeigt, was übrig bleibt — bei 22 % Rand ist man sicher.</p>
 <p>Das <b>apple-touch-icon</b> wird immer deckend gefüllt, weil iOS Transparenz sonst schwarz ausmalt.</p>
@@ -601,13 +851,19 @@ de:`<h4>1 · Symbol wählen</h4>
 <p>ZIP entpacken, alle Dateien in den Ordner deiner <code>index.html</code> legen, Head-Snippet in den <code>&lt;head&gt;</code> kopieren. Fertig.</p>
 <p><b>Wichtig:</b> Die <code>theme-color</code> im HTML und die <code>theme_color</code> im Manifest müssen denselben Wert haben — sonst sieht die installierte App anders aus als im Browser. Das Tool hält beide automatisch gleich.</p>
 <h4>Tastatur</h4>
-<ul><li><code>?</code> — diese Hilfe</li><li><code>L</code> — Sprache wechseln</li><li><code>D</code> — hell / dunkel</li><li><code>Esc</code> — Dialog schließen</li></ul>`,
+<ul><li><code>?</code> — diese Hilfe</li><li><code>F</code> — Farben abgreifen</li><li><code>L</code> — Sprache wechseln</li><li><code>D</code> — hell / dunkel</li><li><code>Esc</code> — Dialog schließen</li></ul>`,
 en:`<h4>1 · Choose a symbol</h4>
 <p>A square image from 512×512 px, ideally an SVG. Padding is added by the sliders, so draw your symbol edge to edge.</p>
 <h4>2 · Set the colours</h4>
-<p><b>theme_color</b> is the background of your <code>&lt;header&gt;</code>. It tints the browser bar on Android and the title bar of the installed app. Get it wrong and you see a colour seam above your header.</p>
-<p><b>background_color</b> is your <code>&lt;body&gt;</code> background. It shows on the launch screen before your CSS loads — a mismatch means the wrong colour flashes at startup.</p>
-<p>Read both from your own CSS, not from the logo. The swatches below the pickers are only suggestions taken from your symbol.</p>
+<p>There are exactly two values, and both belong to <b>your tool</b>, not to your logo:</p>
+<p><b>1 · theme_color</b> is the background of your <code>&lt;header&gt;</code>. It tints the browser bar on Android and the title bar of the installed app. Get it wrong and you see a colour seam above your header.</p>
+<p><b>2 · background_color</b> is your <code>&lt;body&gt;</code> background. It shows on the launch screen before your CSS loads — a mismatch means the wrong colour flashes at startup.</p>
+<p>In the <b>Colours</b> tab the small diagram shows live where both values land. <b>Grab colours</b> fetches them for you:</p>
+<ul>
+<li><b>Screenshot:</b> drop a screen capture of your tool. It immediately suggests the colour of the top row (almost always the header) and of the page edges (almost always the background). The loupe lets you hit any single pixel yourself.</li>
+<li><b>Paste CSS:</b> paste your tool’s HTML file. Every colour variable is listed, with <code>--panel</code> and <code>--bg</code> pre-marked.</li>
+</ul>
+<p>The swatches below the pickers are something else: they are only suggestions taken from your symbol.</p>
 <h4>3 · Check the padding</h4>
 <p>The <b>maskable</b> icon gets cropped to a circle on Android. The round preview shows what survives — 22 % padding is safe.</p>
 <p>The <b>apple-touch-icon</b> is always filled opaquely, because iOS paints transparency black.</p>
@@ -615,7 +871,7 @@ en:`<h4>1 · Choose a symbol</h4>
 <p>Unzip, drop every file into the folder holding your <code>index.html</code>, paste the head snippet into <code>&lt;head&gt;</code>. Done.</p>
 <p><b>Important:</b> the <code>theme-color</code> in HTML and the <code>theme_color</code> in the manifest must match — otherwise the installed app looks different from the browser. This tool keeps them in sync.</p>
 <h4>Keyboard</h4>
-<ul><li><code>?</code> — this help</li><li><code>L</code> — switch language</li><li><code>D</code> — light / dark</li><li><code>Esc</code> — close dialog</li></ul>`};
+<ul><li><code>?</code> — this help</li><li><code>F</code> — grab colours</li><li><code>L</code> — switch language</li><li><code>D</code> — light / dark</li><li><code>Esc</code> — close dialog</li></ul>`};
 
 /* ================= Zustand ================= */
 let src=null, srcIsSvg=false, srcSvgText=null, srcName='';
@@ -940,7 +1196,7 @@ function headText(){
 function readmeText(){
   const names=Object.keys(files).filter(n=>!/\.txt$/.test(n));
   const de=`ICON-SET — ${$('#appName').value}
-Erzeugt mit Icon Set Studio v1.2
+Erzeugt mit Icon Set Studio v1.3
 
 EINBAU
 1. Alle Dateien aus diesem Archiv in den Ordner legen, in dem deine index.html liegt.
@@ -962,7 +1218,7 @@ HEAD-SNIPPET
 ${headText()}
 `;
   const en=`ICON SET — ${$('#appName').value}
-Generated with Icon Set Studio v1.2
+Generated with Icon Set Studio v1.3
 
 SETUP
 1. Put every file from this archive into the folder holding your index.html.
@@ -1003,6 +1259,13 @@ function paintPreviews(){
   $('#urlBar').style.background=t; $('#urlBar').style.color=light?'rgba(0,0,0,.75)':'rgba(255,255,255,.85)';
   $('#pageBody').style.background=b; $('#pageBody').style.color=luminance(b)>0.5?'#1b2733':'#e6edf3';
   $('#splashPv').style.background=b;
+  const st=$('#schemaTheme'), sb=$('#schemaBg');
+  if(st){
+    st.setAttribute('fill',t); sb.setAttribute('fill',b);
+    const onTheme=light?'#000000':'#ffffff', onBg=luminance(b)>0.5?'#000000':'#ffffff';
+    $('#schemaBar1').setAttribute('fill',onTheme); $('#schemaBar2').setAttribute('fill',onTheme);
+    ['#schemaLn1','#schemaLn2','#schemaLn3'].forEach(id=>$(id).setAttribute('fill',onBg));
+  }
   $('#splashName').style.color=luminance(b)>0.5?'#1b2733':'#e6edf3';
   $('#splashName').textContent=$('#appName').value||'Tool';
   try{ $('#urlText').textContent=new URL($('#siteUrl').value).host }catch{}
@@ -1070,6 +1333,220 @@ function setColor(which,hex){
   if(which==='pad') build();
 }
 
+
+/* ================= Farb-Assistent ================= */
+let shotImg=null, shotCtx=null, armed=null, lastPick=null;
+
+function showWiz(id){
+  $$('.wizsteps button').forEach(b=>b.classList.toggle('active',b.dataset.wiz===id));
+  $$('.wizpane').forEach(p=>p.classList.toggle('active',p.dataset.wizpane===id));
+}
+function openWiz(tab){ showWiz(tab); $('#wizOverlay').classList.add('open') }
+function closeWiz(){ $('#wizOverlay').classList.remove('open'); armed=null; syncArm() }
+
+function syncArm(){
+  $('#arm1').classList.toggle('primary',armed===1);
+  $('#arm2').classList.toggle('pink',armed===2);
+  $('#shotWrap').classList.toggle('armed',!!armed);
+  $('#slotTheme').classList.toggle('hot',armed===1);
+  $('#slotBg').classList.toggle('hot',armed===2);
+}
+function assign(which,hex){
+  setColor(which,hex);
+  const slot=$(which==='bg'?'#slotBg':'#slotTheme');
+  slot.classList.remove('flash'); void slot.offsetWidth; slot.classList.add('flash');
+  toast(T(which==='bg'?'t.setBg':'t.setTheme',{h:hex}));
+}
+function liveShow(hex){
+  lastPick=hex;
+  $('#liveHex').innerHTML='<i></i><span></span><button class="mini one" title="1">1</button><button class="mini two" title="2">2</button>';
+  $('#liveHex i').style.background=hex;
+  $('#liveHex span').textContent=hex;
+  $('#liveHex .one').onclick=()=>assign('theme',hex);
+  $('#liveHex .two').onclick=()=>assign('bg',hex);
+}
+
+/* --- Screenshot laden --- */
+function loadShot(file){
+  if(!file||!file.type.startsWith('image/')){toast(T('t.badFile'));return}
+  const img=new Image();
+  img.onload=()=>{
+    const cap=1400, sc=Math.min(1,cap/img.naturalWidth);
+    const cv=$('#shotCv');
+    cv.width=Math.round(img.naturalWidth*sc); cv.height=Math.round(img.naturalHeight*sc);
+    shotCtx=cv.getContext('2d',{willReadFrequently:true});
+    shotCtx.drawImage(img,0,0,cv.width,cv.height);
+    shotImg=cv;
+    $('#wizDrop').hidden=true; $('#wizStage').hidden=false;
+    guessFromShot();
+  };
+  img.onerror=()=>toast(T('t.readFail'));
+  img.src=URL.createObjectURL(file);
+}
+function pixHex(x,y){
+  const d=shotCtx.getImageData(x,y,1,1).data;
+  return '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function dominant(pred){
+  const w=shotImg.width,h=shotImg.height;
+  const d=shotCtx.getImageData(0,0,w,h).data;
+  const step=Math.max(1,Math.round(Math.sqrt(w*h/40000)));
+  const b=new Map();
+  for(let y=0;y<h;y+=step)for(let x=0;x<w;x+=step){
+    if(!pred(x,y,w,h)) continue;
+    const i=(y*w+x)*4;
+    if(d[i+3]<200) continue;
+    const k=[d[i],d[i+1],d[i+2]].map(v=>v>>3).join(',');
+    const o=b.get(k)||{n:0,r:0,g:0,bl:0};
+    o.n++; o.r+=d[i]; o.g+=d[i+1]; o.bl+=d[i+2]; b.set(k,o);
+  }
+  const best=[...b.values()].sort((a,c)=>c.n-a.n)[0];
+  if(!best) return null;
+  return '#'+[best.r,best.g,best.bl].map(v=>Math.round(v/best.n).toString(16).padStart(2,'0')).join('');
+}
+function guessFromShot(){
+  const g=[
+    {k:'g.head',c:dominant((x,y,w,h)=>y>h*0.004&&y<h*0.05),cls:' one',tip:'g.tip1'},
+    {k:'g.edge',c:dominant((x,y,w,h)=>(x<w*0.025||x>w*0.975)&&y>h*0.2&&y<h*0.96),cls:' two',tip:'g.tip2'},
+    {k:'g.area',c:dominant((x,y,w,h)=>y>h*0.12),cls:'',tip:''}
+  ].filter(o=>o.c);
+  $('#wizGuess').innerHTML=g.map(o=>`
+    <div class="gcard${o.cls}">
+      <div class="sw2" style="background:${o.c}"></div>
+      <div class="k">${T(o.k)}${o.tip?' · '+T(o.tip):''}</div>
+      <div class="v">${o.c}</div>
+      <div class="row">
+        <button class="btn sm" data-set="theme" data-hex="${o.c}">${T('g.as1')}</button>
+        <button class="btn sm" data-set="bg" data-hex="${o.c}">${T('g.as2')}</button>
+      </div>
+    </div>`).join('');
+  $$('#wizGuess [data-set]').forEach(b=>b.onclick=()=>assign(b.dataset.set,b.dataset.hex));
+}
+
+/* --- Lupe + Klick --- */
+function shotXY(e){
+  const cv=$('#shotCv'), r=cv.getBoundingClientRect();
+  const p=e.touches?e.touches[0]:e;
+  const x=Math.round((p.clientX-r.left)*(cv.width/r.width));
+  const y=Math.round((p.clientY-r.top)*(cv.height/r.height));
+  return {x:Math.max(0,Math.min(cv.width-1,x)),y:Math.max(0,Math.min(cv.height-1,y)),r,p};
+}
+function moveLoupe(e){
+  if(!shotCtx) return;
+  const {x,y,r,p}=shotXY(e);
+  const lo=$('#loupe'), lc=$('#loupeCv').getContext('2d');
+  lc.imageSmoothingEnabled=false;
+  lc.clearRect(0,0,96,96);
+  lc.drawImage(shotImg,x-8,y-8,16,16,0,0,96,96);
+  lo.classList.add('on');
+  lo.style.left=(p.clientX-r.left-48)+'px';
+  const ty=p.clientY-r.top;
+  lo.style.top=(ty<118? ty+22 : ty-110)+'px';
+  const hex=pixHex(x,y);
+  $('#liveSw')&&($('#liveSw').style.background=hex);
+  if(!lastPick){ $('#liveHex i').style.background=hex; $('#liveHex span').textContent=hex }
+}
+$('#shotCv').addEventListener('mousemove',moveLoupe);
+$('#shotCv').addEventListener('mouseleave',()=>$('#loupe').classList.remove('on'));
+$('#shotCv').addEventListener('touchmove',e=>{e.preventDefault();moveLoupe(e)},{passive:false});
+function pickAt(e){
+  if(!shotCtx) return;
+  const {x,y}=shotXY(e);
+  const hex=pixHex(x,y);
+  if(armed){ assign(armed===1?'theme':'bg',hex); armed=null; syncArm() }
+  liveShow(hex);
+}
+$('#shotCv').addEventListener('click',pickAt);
+$('#shotCv').addEventListener('touchend',e=>{if(e.changedTouches[0]){pickAt({clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY})}});
+
+$('#arm1').onclick=()=>{armed=armed===1?null:1;syncArm()};
+$('#arm2').onclick=()=>{armed=armed===2?null:2;syncArm()};
+$('#wizReset').onclick=()=>{$('#wizStage').hidden=true;$('#wizDrop').hidden=false;shotImg=null;shotCtx=null;lastPick=null;armed=null;syncArm()};
+$('#wizDrop').onclick=()=>$('#wizFile').click();
+$('#wizFile').onchange=e=>{if(e.target.files[0])loadShot(e.target.files[0])};
+['dragenter','dragover'].forEach(ev=>$('#wizOverlay').addEventListener(ev,e=>{
+  e.preventDefault();e.stopPropagation();$('#wizDrop').classList.add('drag')}));
+$('#wizOverlay').addEventListener('drop',e=>{
+  e.preventDefault();e.stopPropagation();$('#wizDrop').classList.remove('drag');
+  if(e.dataTransfer.files[0]) loadShot(e.dataTransfer.files[0]);
+});
+
+/* --- CSS lesen --- */
+const toHex=v=>{
+  v=v.trim();
+  if(v.startsWith('#')) return clean(v);
+  const m=v.match(/^rgba?\(([^)]+)\)/i);
+  if(!m) return null;
+  const p=m[1].split(/[,\s\/]+/).filter(Boolean).map(Number);
+  if(p.length<3||p.some(isNaN)) return null;
+  return '#'+p.slice(0,3).map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+};
+function scanCss(txt){
+  const found=[], seen=new Set();
+  const add=(name,hex,kind)=>{
+    if(!hex) return;
+    const key=name+hex; if(seen.has(key)) return; seen.add(key);
+    found.push({name,hex,kind});
+  };
+  let m;
+  const meta=/name=["']theme-color["'][^>]*content=["']([^"']+)["']/gi;
+  while((m=meta.exec(txt))) add('meta theme-color',toHex(m[1]),'theme');
+  const root=txt.match(/:root\s*\{([^}]*)\}/i);
+  const scope=root?root[1]:txt;
+  const re=/--([a-z0-9_-]+)\s*:\s*(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\))/gi;
+  while((m=re.exec(scope))){
+    const n=m[1].toLowerCase();
+    let kind=null;
+    if(/^(bg|background|body|page|canvas)$/.test(n)||/(^|-)bg$/.test(n)) kind='bg';
+    if(/panel|header|head|surface|card|topbar|nav/.test(n)) kind=kind||'theme';
+    add('--'+m[1],toHex(m[2]),kind);
+  }
+  ['header','body'].forEach(sel=>{
+    const r=new RegExp('(^|[,{}\\s])'+sel+'\\s*\\{([^}]*)\\}','i');
+    const b=txt.match(r);
+    if(b){
+      const c=b[2].match(/background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\))/i);
+      if(c) add(sel+' { background }',toHex(c[1]),sel==='body'?'bg':'theme');
+    }
+  });
+  return found;
+}
+function renderVars(list){
+  const box=$('#varOut');
+  if(!list.length){ box.innerHTML=`<p class="hint">${T('wiz.none')}</p>`; return }
+  const t=list.find(o=>o.kind==='theme'), b=list.find(o=>o.kind==='bg');
+  let head='';
+  if(t||b){
+    head=`<div class="gcard" style="margin-top:12px">
+      <div class="k">${T('wiz.propose')}</div>
+      <div class="assignrow">
+        ${t?`<span><b>1</b> theme_color → <code>${t.name}</code> <b style="color:${t.hex}">${t.hex}</b></span>`:''}
+        ${b?`<span>· <b>2</b> background_color → <code>${b.name}</code> <b style="color:${b.hex}">${b.hex}</b></span>`:''}
+      </div>
+      <div class="row" style="margin-top:9px">
+        <button class="btn sm primary" id="takeBoth">${T('wiz.takeBoth')}</button>
+      </div>
+    </div>`;
+  }
+  box.innerHTML=head+`<div class="varlist">`+list.map((o,i)=>`
+    <div class="varchip${o.kind?' hit':''}">
+      <i style="background:${o.hex}"></i>
+      <span class="grow"><span class="n">${o.name}</span><br><span class="h">${o.hex}</span></span>
+      <button class="mini one" data-set="theme" data-hex="${o.hex}" title="theme_color">1</button>
+      <button class="mini two" data-set="bg" data-hex="${o.hex}" title="background_color">2</button>
+    </div>`).join('')+`</div>`;
+  $$('#varOut [data-set]').forEach(btn=>btn.onclick=()=>assign(btn.dataset.set,btn.dataset.hex));
+  const tb=$('#takeBoth');
+  if(tb) tb.onclick=()=>{ if(t)setColor('theme',t.hex); if(b)setColor('bg',b.hex); toast(T('wiz.tookBoth')) };
+}
+$('#cssScan').onclick=()=>renderVars(scanCss($('#cssIn').value));
+$('#cssClear').onclick=()=>{$('#cssIn').value='';$('#varOut').innerHTML=''};
+$('#wizBtn').onclick=()=>openWiz('shot');
+$('#wizBtn2').onclick=()=>openWiz('css');
+$('#wizClose').onclick=closeWiz;
+$('#wizOverlay').addEventListener('click',e=>{if(e.target.id==='wizOverlay')closeWiz()});
+$$('.wizsteps button').forEach(b=>b.onclick=()=>showWiz(b.dataset.wiz));
+
 /* ================= Sprache / Theme ================= */
 function applyLang(l){
   lang=(l==='en')?'en':'de';
@@ -1079,6 +1556,7 @@ function applyLang(l){
     const v=T(e.dataset.i18n);
     if(/<[a-z]/i.test(v)) e.innerHTML=v; else e.textContent=v;
   });
+  $$('[data-i18n-svg]').forEach(e=>e.textContent=T(e.dataset.i18nSvg));
   $$('[data-i18n-ph]').forEach(e=>e.placeholder=T(e.dataset.i18nPh));
   $$('[data-i18n-title]').forEach(e=>{e.title=T(e.dataset.i18nTitle);e.setAttribute('aria-label',e.title)});
   $('#langBtn').textContent=lang==='de'?'EN':'DE';
@@ -1194,7 +1672,8 @@ $('#helpOverlay').onclick=e=>{if(e.target.id==='helpOverlay')$('#helpOverlay').c
 
 document.addEventListener('keydown',e=>{
   if(e.target.matches('input,select,textarea')) return;
-  if(e.key==='Escape') $('#helpOverlay').classList.remove('open');
+  if(e.key==='Escape'){ $('#helpOverlay').classList.remove('open'); closeWiz() }
+  if(e.key==='f'||e.key==='F') openWiz('shot');
   if(e.key==='?') $('#helpOverlay').classList.toggle('open');
   if(e.key==='l'||e.key==='L') applyLang(lang==='de'?'en':'de');
   if(e.key==='d'||e.key==='D') applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
@@ -1211,8 +1690,7 @@ $$('.tab').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
 
 /* ---------- Start ---------- */
 let startTheme='dark';
-try{ startTheme=localStorage.getItem('ics-theme')
-  || (matchMedia('(prefers-color-scheme: light)').matches?'light':'dark') }catch{}
+try{ startTheme=localStorage.getItem('ics-theme')||'dark' }catch{}
 applyTheme(startTheme);
 let startLang=(navigator.language||'de').toLowerCase().startsWith('de')?'de':'en';
 try{ startLang=localStorage.getItem('ics-lang')||startLang }catch{}
