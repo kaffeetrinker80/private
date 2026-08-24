@@ -128,6 +128,19 @@
   .led.err  { background: var(--red); box-shadow: 0 0 10px var(--red); }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 
+  /* Ruhe-Lauflicht: nur LEDs ohne echten Status */
+  .led:not(.lit):not(.busy):not(.err) {
+    animation: chase 2.4s ease-in-out infinite;
+  }
+  .led-strip .led:nth-child(1) { animation-delay: 0s; }
+  .led-strip .led:nth-child(2) { animation-delay: .28s; }
+  .led-strip .led:nth-child(3) { animation-delay: .56s; }
+  @keyframes chase {
+    0%, 26%, 100% { background: #232b2c; box-shadow: inset 0 1px 2px #000; }
+    7%  { background: var(--accent); box-shadow: 0 0 9px var(--accent), 0 0 2px var(--accent); }
+    16% { background: #2c3839; box-shadow: inset 0 1px 2px #000; }
+  }
+
   .eyebrow {
     display: block; font-size: 12px; font-weight: 700; letter-spacing: 3.5px;
     color: var(--accent); margin-bottom: 3px; text-shadow: 0 0 14px var(--accent-soft);
@@ -479,7 +492,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .led.busy { animation: none; }
+    .led.busy, .led { animation: none; }
     * { transition-duration: 0.01ms !important; }
   }
 
@@ -540,7 +553,7 @@
     <footer>
       <span class="mono" style="font-size:11.5px;color:var(--dim)" id="footStat">bereit</span>
       <div class="signature">
-        <span>Made with Love © — Audio Patchbay v2.1</span>
+        <span>Made with Love © — Audio Patchbay v2.1.1</span>
         <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
       </div>
     </footer>
@@ -744,7 +757,7 @@
 // FFmpeg.wasm (Konvertierung) + Transformers.js/Whisper (Transkription)
 // ===========================================================================
 
-const APP_VERSION = '2.1';
+const APP_VERSION = '2.1.1';
 const SETTINGS_KEY = 'patchbay.settings.v2';
 const SETTINGS_FILE = 'patchbay-settings.json';
 const ENGINE_CACHE = 'patchbay-engine-v1';
