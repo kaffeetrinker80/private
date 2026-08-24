@@ -359,6 +359,35 @@
       font-size: .74rem;
       line-height: 1.28;
     }
+    /* ---------- Cloud sync (local sync folder, e.g. OneDrive) ---------- */
+    .sync-stack { display: grid; gap: 8px; }
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      border-radius: 12px;
+      padding: 8px 11px;
+      min-height: 38px;
+      font-size: .84rem;
+      font-weight: 700;
+    }
+    .sync-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      flex: 0 0 auto; background: #7d8b9c;
+    }
+    .sync-dot.is-on { background: #58d99b; box-shadow: 0 0 0 3px rgba(88,217,155,.16); }
+    .sync-dot.is-warn { background: #ffc46b; box-shadow: 0 0 0 3px rgba(255,196,107,.16); }
+    .sync-dot.is-busy { animation: syncPulse 1s ease-in-out infinite; }
+    @keyframes syncPulse { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+    .sync-status-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sync-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .sync-actions .btn { min-height: 36px; }
+    .sync-actions .full { grid-column: 1 / -1; }
+    .sync-toggles { display: grid; gap: 5px; }
+    .sync-meta { margin: 0; color: var(--muted); font-size: .74rem; line-height: 1.28; }
+
     .btn:disabled { opacity: .52; cursor: not-allowed; transform: none; }
     .btn:disabled:hover { transform: none; background: var(--panel-2); border-color: var(--border); }
 
@@ -419,6 +448,12 @@
       border-color: #a6bacd;
     }
     .light-mode .profile-meta { color: #314b66; }
+    .light-mode .sync-meta { color: #314b66; }
+    .light-mode .sync-status {
+      background: #e5edf5;
+      color: #122c47;
+      border-color: #a6bacd;
+    }
     .light-mode .language-switch {
       background: #e5edf5;
       border-color: #a6bacd;
@@ -511,6 +546,30 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
         <p class="profile-meta" id="profileMeta">Speichert Tempo, Schriftgröße, Zeilenabstand, Leseposition und Lesemodus — nicht dein Skript.</p>
       </div>
 
+      <div class="section-title" id="syncSectionTitle">Cloud-Sync</div>
+      <div class="sync-stack">
+        <div class="sync-status">
+          <span class="sync-dot" id="syncDot"></span>
+          <span class="sync-status-text" id="syncStatusText">Nicht verbunden</span>
+        </div>
+        <div class="sync-actions">
+          <button class="btn primary full" id="syncConnectBtn">☁ Ordner verbinden</button>
+          <button class="btn" id="syncPullBtn" disabled>↓ Laden</button>
+          <button class="btn" id="syncPushBtn" disabled>↑ Sichern</button>
+          <button class="btn danger full" id="syncDisconnectBtn" disabled>× Trennen</button>
+        </div>
+        <div class="sync-toggles">
+          <label class="toggle"><input type="checkbox" id="syncAutoToggle" checked> <span id="syncAutoToggleLabel">Autosave in den Sync-Ordner</span></label>
+          <label class="toggle"><input type="checkbox" id="syncScriptToggle"> <span id="syncScriptToggleLabel">Skript mitsynchronisieren</span></label>
+        </div>
+        <div class="sync-actions" id="syncFallbackActions" hidden>
+          <button class="btn" id="syncFileImportBtn">↓ Datei laden</button>
+          <button class="btn" id="syncFileExportBtn">↑ Datei sichern</button>
+        </div>
+        <p class="sync-meta" id="syncMeta">Verbinde einmalig deinen OneDrive-Ordner — danach liegen deine Leseprofile auf jedem Gerät bereit.</p>
+      </div>
+      <input type="file" id="syncFileInput" accept="application/json,.json" hidden />
+
       <div class="section-title" id="readingModeSectionTitle">Lesemodus</div>
       <div class="setting">
         <label for="fontSize" id="fontSizeLabel">Schriftgröße</label><span class="value" id="fontSizeValue">52 px</span>
@@ -572,7 +631,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
   </main>
 
   <footer class="app-footer">
-    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.3.7</span></span>
+    <span>Made with Love © – TalkScroll <span id="footerVersion">v1.4.0</span></span>
     <a href="mailto:cryptopower@outlook.de?subject=TalkScroll%20Feedback">✉ Feedback</a>
   </footer>
 
@@ -638,6 +697,19 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     const langEnBtn = document.getElementById('langEnBtn');
     const timerLabel = document.getElementById('timerLabel');
     const keyboardHint = document.getElementById('keyboardHint');
+    const syncDot = document.getElementById('syncDot');
+    const syncStatusText = document.getElementById('syncStatusText');
+    const syncConnectBtn = document.getElementById('syncConnectBtn');
+    const syncPullBtn = document.getElementById('syncPullBtn');
+    const syncPushBtn = document.getElementById('syncPushBtn');
+    const syncDisconnectBtn = document.getElementById('syncDisconnectBtn');
+    const syncAutoToggle = document.getElementById('syncAutoToggle');
+    const syncScriptToggle = document.getElementById('syncScriptToggle');
+    const syncMeta = document.getElementById('syncMeta');
+    const syncFallbackActions = document.getElementById('syncFallbackActions');
+    const syncFileImportBtn = document.getElementById('syncFileImportBtn');
+    const syncFileExportBtn = document.getElementById('syncFileExportBtn');
+    const syncFileInput = document.getElementById('syncFileInput');
 
     const languageStorageKey = 'talkscroll-v1-language';
     const i18n = {
@@ -677,7 +749,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlankTitle: 'Macht den Abstand zwischen Absätzen (Leerzeilen) kleiner, ohne den Zeilenabstand im Text zu verändern.',
         sidebarHideTitle: 'Einstellungen ausblenden',
         sidebarShowTitle: 'Einstellungen einblenden',
-        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Textmarker:</strong> Wort in <kbd>==doppelte==</kbd> Gleichheitszeichen setzen, um es beim Scrollen farbig hervorzuheben — wird auch aus Word-Markierungen (Textmarker-Farbe) beim Import automatisch übernommen.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Die Schaltfläche oben links blendet die Seitenleiste ein oder aus.',
+        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Cloud-Sync:</strong> einmal deinen OneDrive-Ordner verbinden — Leseprofile werden dann automatisch in „talkscroll-sync.json“ gesichert und auf jedem Gerät zusammengeführt.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Textmarker:</strong> Wort in <kbd>==doppelte==</kbd> Gleichheitszeichen setzen, um es beim Scrollen farbig hervorzuheben — wird auch aus Word-Markierungen (Textmarker-Farbe) beim Import automatisch übernommen.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Die Schaltfläche oben links blendet die Seitenleiste ein oder aus.',
         timerLabel: 'Talkzeit',
         timerTitle: 'Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.',
         restartTitle: 'Zurück zum Anfang',
@@ -696,8 +768,37 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           profileUpdated: 'Profil „{name}“ aktualisiert',
           profileSaved: 'Profil „{name}“ gespeichert',
           profileDeleted: 'Profil „{name}“ gelöscht',
+          syncConnected: 'Sync-Ordner „{name}“ verbunden',
+          syncLoaded: 'Profile aus dem Sync-Ordner geladen',
+          syncUpToDate: 'Sync-Ordner ist aktuell',
+          syncSaved: 'In den Sync-Ordner gesichert',
+          syncEmpty: 'Sync-Ordner war leer — neu angelegt',
+          syncDisconnected: 'Sync-Ordner getrennt',
+          syncFailed: 'Sync fehlgeschlagen',
           importing: 'Importiert …',
           importFailed: 'Import fehlgeschlagen'
+        },
+        syncSection: 'Cloud-Sync',
+        sync: {
+          connect: '☁ Ordner verbinden',
+          changeFolder: '☁ Ordner wechseln',
+          grant: '☁ Ordner freigeben',
+          pull: '↓ Laden',
+          push: '↑ Sichern',
+          disconnect: '× Trennen',
+          fileImport: '↓ Datei laden',
+          fileExport: '↑ Datei sichern',
+          autoLabel: 'Autosave in den Sync-Ordner',
+          scriptLabel: 'Skript mitsynchronisieren',
+          disconnectedState: 'Nicht verbunden',
+          needsPermission: '{name} — Freigabe nötig',
+          unsupported: 'Ordner-Sync in diesem Browser nicht möglich',
+          metaIdle: 'Verbinde einmalig deinen OneDrive-Ordner — danach liegen deine Leseprofile auf jedem Gerät bereit.',
+          metaConnected: 'Verbunden. Profile werden automatisch in „{file}“ gesichert und beim Start zusammengeführt.',
+          metaSynced: 'Zuletzt synchronisiert um {time} · Datei „{file}“',
+          metaPermission: 'Der Ordner ist bekannt. Chrome braucht nach dem Neustart einmal deine Freigabe per Klick.',
+          metaUnsupported: 'Dieser Browser kann keine Ordner öffnen (z. B. Firefox, Safari, Android). Nutze „Datei laden/sichern“, um dieselbe Sync-Datei manuell zu übertragen.',
+          disconnectConfirm: 'Sync-Ordner trennen? Deine Profile bleiben in diesem Browser erhalten.'
         },
         profileNumber: 'Profil {number}',
         myReadingSpeed: 'Mein Lesetempo',
@@ -752,7 +853,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlankTitle: 'Shrinks the gap between paragraphs (blank lines) without changing the line spacing within the text.',
         sidebarHideTitle: 'Hide settings',
         sidebarShowTitle: 'Show settings',
-        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Highlighting:</strong> wrap a word in <kbd>==double==</kbd> equals signs to highlight it while scrolling — this is also picked up automatically from Word text highlighting on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The button in the top-left shows or hides the sidebar.',
+        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Cloud sync:</strong> connect your OneDrive folder once — reading profiles are then saved to “talkscroll-sync.json” automatically and merged on every device.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Highlighting:</strong> wrap a word in <kbd>==double==</kbd> equals signs to highlight it while scrolling — this is also picked up automatically from Word text highlighting on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The button in the top-left shows or hides the sidebar.',
         timerLabel: 'Talk Time',
         timerTitle: 'Starts with the first press of Start and keeps running when you pause the text.',
         restartTitle: 'Back to start',
@@ -771,8 +872,37 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           profileUpdated: 'Profile “{name}” updated',
           profileSaved: 'Profile “{name}” saved',
           profileDeleted: 'Profile “{name}” deleted',
+          syncConnected: 'Sync folder “{name}” connected',
+          syncLoaded: 'Profiles loaded from the sync folder',
+          syncUpToDate: 'Sync folder is up to date',
+          syncSaved: 'Saved to the sync folder',
+          syncEmpty: 'Sync folder was empty — created',
+          syncDisconnected: 'Sync folder disconnected',
+          syncFailed: 'Sync failed',
           importing: 'Importing …',
           importFailed: 'Import failed'
+        },
+        syncSection: 'Cloud Sync',
+        sync: {
+          connect: '☁ Connect folder',
+          changeFolder: '☁ Change folder',
+          grant: '☁ Allow access',
+          pull: '↓ Load',
+          push: '↑ Save',
+          disconnect: '× Disconnect',
+          fileImport: '↓ Load file',
+          fileExport: '↑ Save file',
+          autoLabel: 'Autosave to the sync folder',
+          scriptLabel: 'Sync the script as well',
+          disconnectedState: 'Not connected',
+          needsPermission: '{name} — needs access',
+          unsupported: 'Folder sync is not available in this browser',
+          metaIdle: 'Connect your OneDrive folder once — your reading profiles are then ready on every device.',
+          metaConnected: 'Connected. Profiles are saved automatically to “{file}” and merged on start.',
+          metaSynced: 'Last synced at {time} · file “{file}”',
+          metaPermission: 'The folder is known. After a restart Chrome asks you to allow access once.',
+          metaUnsupported: 'This browser cannot open folders (e.g. Firefox, Safari, Android). Use “Load/Save file” to move the same sync file manually.',
+          disconnectConfirm: 'Disconnect the sync folder? Your profiles stay in this browser.'
         },
         profileNumber: 'Profile {number}',
         myReadingSpeed: 'My reading speed',
@@ -853,6 +983,15 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       saveProfileBtn.textContent = tr('save');
       overwriteProfileBtn.textContent = tr('overwrite');
       deleteProfileBtn.textContent = tr('delete');
+      document.getElementById('syncSectionTitle').textContent = tr('syncSection');
+      syncPullBtn.textContent = tr('sync.pull');
+      syncPushBtn.textContent = tr('sync.push');
+      syncDisconnectBtn.textContent = tr('sync.disconnect');
+      syncFileImportBtn.textContent = tr('sync.fileImport');
+      syncFileExportBtn.textContent = tr('sync.fileExport');
+      document.getElementById('syncAutoToggleLabel').textContent = tr('sync.autoLabel');
+      document.getElementById('syncScriptToggleLabel').textContent = tr('sync.scriptLabel');
+      renderSyncUi();
       document.getElementById('readingModeSectionTitle').textContent = tr('readingModeSection');
       document.getElementById('fontSizeLabel').textContent = tr('fontSize');
       document.getElementById('speedLabel').textContent = tr('scrollSpeed');
@@ -933,6 +1072,422 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 
     const storageKey = 'talkscroll-v1-settings';
     const profileStorageKey = 'talkscroll-v1-reading-profiles';
+
+    /* ===================================================================
+       Cloud sync via a local sync folder (OneDrive, Dropbox, Google Drive
+       Desktop …). The folder is picked once with the File System Access API;
+       the handle is kept in IndexedDB so it survives a restart. Everything
+       lives in a single JSON file, and profiles from other devices are
+       merged by their `updatedAt` timestamp instead of being overwritten.
+       =================================================================== */
+
+    const syncFileName = 'talkscroll-sync.json';
+    const syncDbName = 'talkscroll-sync';
+    const syncStoreName = 'handles';
+    const syncHandleKey = 'sync-dir';
+    const syncPrefsKey = 'talkscroll-v1-sync-prefs';
+    const tombstoneKey = 'talkscroll-v1-deleted-profiles';
+    const deviceKey = 'talkscroll-v1-device';
+    const tombstoneMaxAgeMs = 1000 * 60 * 60 * 24 * 180;
+
+    const hasFileSystemAccess = typeof window.showDirectoryPicker === 'function';
+
+    let syncDirHandle = null;
+    // A folder we already know from a previous session but that still needs one
+    // user click before the browser hands the permission back.
+    let pendingSyncHandle = null;
+    let syncTimer = null;
+    let syncBusy = false;
+    let syncMerging = false;
+    let lastSyncLabel = '';
+    let scriptUpdatedAt = '';
+    let deletedProfiles = [];
+
+    const deviceName = (() => {
+      let name = '';
+      try { name = localStorage.getItem(deviceKey) || ''; } catch (error) { /* private mode */ }
+      if (!name) {
+        name = 'device-' + Math.random().toString(36).slice(2, 7);
+        try { localStorage.setItem(deviceKey, name); } catch (error) { /* ignore */ }
+      }
+      return name;
+    })();
+
+    function idbOpen() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(syncDbName, 1);
+        request.onupgradeneeded = () => {
+          if (!request.result.objectStoreNames.contains(syncStoreName)) request.result.createObjectStore(syncStoreName);
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbSet(key, value) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(syncStoreName, 'readwrite');
+        tx.objectStore(syncStoreName).put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbGet(key) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(syncStoreName, 'readonly');
+        const request = tx.objectStore(syncStoreName).get(key);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbDelete(key) {
+      const db = await idbOpen();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(syncStoreName, 'readwrite');
+        tx.objectStore(syncStoreName).delete(key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    function timeOf(value) {
+      const time = Date.parse(value || '');
+      return Number.isFinite(time) ? time : 0;
+    }
+
+    function loadTombstones() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(tombstoneKey) || '[]');
+        deletedProfiles = Array.isArray(raw) ? raw.filter(entry => entry && typeof entry.id === 'string') : [];
+      } catch (error) { deletedProfiles = []; }
+    }
+
+    function saveTombstones() {
+      try { localStorage.setItem(tombstoneKey, JSON.stringify(deletedProfiles)); }
+      catch (error) { console.warn('Löschmarker konnten nicht gespeichert werden.', error); }
+    }
+
+    function loadSyncPrefs() {
+      try {
+        const prefs = JSON.parse(localStorage.getItem(syncPrefsKey) || '{}');
+        syncAutoToggle.checked = prefs.auto !== false;
+        syncScriptToggle.checked = !!prefs.script;
+        scriptUpdatedAt = typeof prefs.scriptUpdatedAt === 'string' ? prefs.scriptUpdatedAt : '';
+      } catch (error) { /* defaults are fine */ }
+    }
+
+    function saveSyncPrefs() {
+      try {
+        localStorage.setItem(syncPrefsKey, JSON.stringify({
+          auto: syncAutoToggle.checked,
+          script: syncScriptToggle.checked,
+          scriptUpdatedAt
+        }));
+      } catch (error) { /* ignore */ }
+    }
+
+    function renderSyncUi() {
+      const connected = Boolean(syncDirHandle);
+      syncPullBtn.disabled = !connected || syncBusy;
+      syncPushBtn.disabled = !connected || syncBusy;
+      syncDisconnectBtn.disabled = !connected;
+      syncConnectBtn.disabled = !hasFileSystemAccess;
+
+      if (!hasFileSystemAccess) {
+        syncDot.className = 'sync-dot is-warn';
+        syncStatusText.textContent = tr('sync.unsupported');
+        syncConnectBtn.textContent = tr('sync.connect');
+        syncMeta.textContent = tr('sync.metaUnsupported');
+        syncFallbackActions.hidden = false;
+        return;
+      }
+
+      syncFallbackActions.hidden = true;
+      if (connected) {
+        syncDot.className = 'sync-dot is-on' + (syncBusy ? ' is-busy' : '');
+        syncStatusText.textContent = syncDirHandle.name;
+        syncConnectBtn.textContent = tr('sync.changeFolder');
+        syncMeta.textContent = lastSyncLabel
+          ? tr('sync.metaSynced', { time: lastSyncLabel, file: syncFileName })
+          : tr('sync.metaConnected', { file: syncFileName });
+      } else if (pendingSyncHandle) {
+        syncDot.className = 'sync-dot is-warn';
+        syncStatusText.textContent = tr('sync.needsPermission', { name: pendingSyncHandle.name });
+        syncConnectBtn.textContent = tr('sync.grant');
+        syncMeta.textContent = tr('sync.metaPermission');
+      } else {
+        syncDot.className = 'sync-dot';
+        syncStatusText.textContent = tr('sync.disconnectedState');
+        syncConnectBtn.textContent = tr('sync.connect');
+        syncMeta.textContent = tr('sync.metaIdle');
+      }
+    }
+
+    function markSynced() {
+      lastSyncLabel = new Date().toLocaleTimeString(i18n[currentLanguage].locale, { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function buildSyncPayload() {
+      const payload = {
+        app: 'TalkScroll',
+        format: 1,
+        updatedAt: new Date().toISOString(),
+        device: deviceName,
+        preferredProfileId: profileSelect.value || preferredProfileId || '',
+        profiles,
+        deletedProfiles
+      };
+      if (syncScriptToggle.checked && !isDemoText && editor.value.trim()) {
+        payload.script = { text: editor.value, updatedAt: scriptUpdatedAt || new Date().toISOString() };
+      }
+      return payload;
+    }
+
+    // Merges a remote payload into the local data. Newer wins per profile, and a
+    // delete on one device removes the profile everywhere (unless it was edited
+    // again afterwards elsewhere).
+    function mergeSyncPayload(remote) {
+      if (!remote || typeof remote !== 'object') return false;
+      syncMerging = true;
+      let changed = false;
+
+      const byId = new Map();
+      profiles.forEach(profile => byId.set(profile.id, profile));
+
+      (Array.isArray(remote.profiles) ? remote.profiles : []).forEach(candidate => {
+        if (!candidate || typeof candidate.id !== 'string' || typeof candidate.name !== 'string' || !candidate.name.trim()) return;
+        const local = byId.get(candidate.id);
+        if (!local || timeOf(candidate.updatedAt) > timeOf(local.updatedAt)) {
+          byId.set(candidate.id, candidate);
+          changed = true;
+        }
+      });
+
+      const tombstones = new Map();
+      deletedProfiles.forEach(entry => tombstones.set(entry.id, entry));
+      (Array.isArray(remote.deletedProfiles) ? remote.deletedProfiles : []).forEach(entry => {
+        if (!entry || typeof entry.id !== 'string') return;
+        const known = tombstones.get(entry.id);
+        if (!known || timeOf(entry.deletedAt) > timeOf(known.deletedAt)) tombstones.set(entry.id, entry);
+      });
+      tombstones.forEach(entry => {
+        const profile = byId.get(entry.id);
+        if (profile && timeOf(entry.deletedAt) >= timeOf(profile.updatedAt)) {
+          byId.delete(entry.id);
+          changed = true;
+        }
+      });
+
+      const cutoff = Date.now() - tombstoneMaxAgeMs;
+      deletedProfiles = [...tombstones.values()].filter(entry => timeOf(entry.deletedAt) > cutoff);
+      saveTombstones();
+
+      profiles = [...byId.values()].sort((a, b) => a.name.localeCompare(b.name, i18n[currentLanguage].locale));
+      saveProfilesToBrowser();
+
+      if (syncScriptToggle.checked && remote.script && typeof remote.script.text === 'string'
+          && timeOf(remote.script.updatedAt) > timeOf(scriptUpdatedAt)) {
+        editor.value = remote.script.text;
+        isDemoText = false;
+        scriptUpdatedAt = remote.script.updatedAt;
+        saveSyncPrefs();
+        updateText();
+        changed = true;
+      }
+
+      if (!preferredProfileId && typeof remote.preferredProfileId === 'string'
+          && profiles.some(profile => profile.id === remote.preferredProfileId)) {
+        preferredProfileId = remote.preferredProfileId;
+      }
+
+      updateProfileUi(profileSelect.value || preferredProfileId);
+      syncMerging = false;
+      return changed;
+    }
+
+    async function readSyncFile() {
+      if (!syncDirHandle) return null;
+      try {
+        const fileHandle = await syncDirHandle.getFileHandle(syncFileName);
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        return JSON.parse(text);
+      } catch (error) {
+        if (error && error.name === 'NotFoundError') return null;
+        console.warn('Sync-Datei konnte nicht gelesen werden.', error);
+        return null;
+      }
+    }
+
+    async function writeSyncFile() {
+      if (!syncDirHandle) return false;
+      clearTimeout(syncTimer);
+      syncBusy = true;
+      renderSyncUi();
+      try {
+        const fileHandle = await syncDirHandle.getFileHandle(syncFileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(buildSyncPayload(), null, 2));
+        await writable.close();
+        markSynced();
+        return true;
+      } catch (error) {
+        console.warn('Sync-Datei konnte nicht geschrieben werden.', error);
+        setStatus('syncFailed');
+        return false;
+      } finally {
+        syncBusy = false;
+        renderSyncUi();
+      }
+    }
+
+    // Debounced autosave — every profile change ends up here.
+    function queueCloudSave() {
+      if (!syncDirHandle || !syncAutoToggle.checked || syncMerging) return;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => { writeSyncFile(); }, 1200);
+    }
+
+    async function pullFromCloud({ quiet = false } = {}) {
+      if (!syncDirHandle) return;
+      syncBusy = true;
+      renderSyncUi();
+      const remote = await readSyncFile();
+      syncBusy = false;
+      if (!remote) {
+        await writeSyncFile();
+        if (!quiet) setStatus('syncEmpty');
+        return;
+      }
+      const changed = mergeSyncPayload(remote);
+      // Push the merged result back, otherwise profiles that only exist on this
+      // device would stay invisible to the other machines until the next edit.
+      if (syncAutoToggle.checked) await writeSyncFile();
+      markSynced();
+      renderSyncUi();
+      if (!quiet) setStatus(changed ? 'syncLoaded' : 'syncUpToDate');
+    }
+
+    async function connectSyncFolder(handle, { announce = true } = {}) {
+      syncDirHandle = handle;
+      pendingSyncHandle = null;
+      try { await idbSet(syncHandleKey, handle); } catch (error) { console.warn('Ordner konnte nicht gemerkt werden.', error); }
+      renderSyncUi();
+      await pullFromCloud({ quiet: true });
+      if (!syncAutoToggle.checked) await writeSyncFile();
+      renderSyncUi();
+      if (announce) setStatus('syncConnected', { name: handle.name });
+    }
+
+    async function restoreSyncFolder() {
+      renderSyncUi();
+      if (!hasFileSystemAccess) return;
+      let handle = null;
+      try { handle = await idbGet(syncHandleKey); } catch (error) { return; }
+      if (!handle) return;
+      try {
+        const permission = typeof handle.queryPermission === 'function'
+          ? await handle.queryPermission({ mode: 'readwrite' })
+          : 'granted';
+        if (permission === 'granted') {
+          await connectSyncFolder(handle, { announce: false });
+        } else {
+          pendingSyncHandle = handle;
+          renderSyncUi();
+        }
+      } catch (error) {
+        console.warn('Sync-Ordner konnte nicht wiederhergestellt werden.', error);
+      }
+    }
+
+    async function chooseSyncFolder() {
+      if (!hasFileSystemAccess) return;
+      try {
+        if (pendingSyncHandle) {
+          const permission = await pendingSyncHandle.requestPermission({ mode: 'readwrite' });
+          if (permission === 'granted') {
+            await connectSyncFolder(pendingSyncHandle);
+            return;
+          }
+        }
+        const handle = await window.showDirectoryPicker({ id: 'talkscroll-sync', mode: 'readwrite', startIn: 'documents' });
+        const permission = typeof handle.requestPermission === 'function'
+          ? await handle.requestPermission({ mode: 'readwrite' })
+          : 'granted';
+        if (permission !== 'granted') return;
+        await connectSyncFolder(handle);
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        console.warn('Sync-Ordner konnte nicht geöffnet werden.', error);
+        setStatus('syncFailed');
+      }
+    }
+
+    async function disconnectSyncFolder() {
+      if (!syncDirHandle) return;
+      if (!confirm(tr('sync.disconnectConfirm'))) return;
+      clearTimeout(syncTimer);
+      syncDirHandle = null;
+      pendingSyncHandle = null;
+      lastSyncLabel = '';
+      try { await idbDelete(syncHandleKey); } catch (error) { /* ignore */ }
+      renderSyncUi();
+      setStatus('syncDisconnected');
+    }
+
+    // Fallback for browsers without the File System Access API (Firefox, Safari,
+    // Android): the very same JSON file, moved by hand.
+    function exportSyncFile() {
+      const blob = new Blob([JSON.stringify(buildSyncPayload(), null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = syncFileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      setStatus('syncSaved');
+    }
+
+    syncConnectBtn.addEventListener('click', chooseSyncFolder);
+    syncPullBtn.addEventListener('click', () => pullFromCloud());
+    syncPushBtn.addEventListener('click', async () => {
+      if (await writeSyncFile()) setStatus('syncSaved');
+    });
+    syncDisconnectBtn.addEventListener('click', disconnectSyncFolder);
+    syncAutoToggle.addEventListener('change', () => { saveSyncPrefs(); if (syncAutoToggle.checked) queueCloudSave(); });
+    syncScriptToggle.addEventListener('change', () => { saveSyncPrefs(); queueCloudSave(); });
+    syncFileExportBtn.addEventListener('click', exportSyncFile);
+    syncFileImportBtn.addEventListener('click', () => syncFileInput.click());
+    syncFileInput.addEventListener('change', async () => {
+      const file = syncFileInput.files?.[0];
+      if (!file) return;
+      try {
+        const changed = mergeSyncPayload(JSON.parse(await file.text()));
+        setStatus(changed ? 'syncLoaded' : 'syncUpToDate');
+      } catch (error) {
+        console.warn('Sync-Datei konnte nicht gelesen werden.', error);
+        setStatus('syncFailed');
+      } finally {
+        syncFileInput.value = '';
+      }
+    });
+
+    // Coming back to the tab is the moment another device is most likely to have
+    // written something new — and leaving is the moment a pending autosave must land.
+    document.addEventListener('visibilitychange', () => {
+      if (!syncDirHandle) return;
+      if (document.visibilityState === 'visible') pullFromCloud({ quiet: true });
+      else if (syncAutoToggle.checked) writeSyncFile();
+    });
+    window.addEventListener('pagehide', () => {
+      if (syncDirHandle && syncAutoToggle.checked) writeSyncFile();
+    });
 
     // Renders editor.value into #script as paragraphs (so the blank-line gap between
     // them can be controlled via CSS margin instead of a literal, line-height-sized
@@ -1224,6 +1779,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         console.warn('Leseprofile konnten nicht gespeichert werden.', error);
         alert('Das Leseprofil konnte in diesem Browser nicht gespeichert werden.');
       }
+      queueCloudSave();
     }
 
     function updateProfileUi(selectedId = profileSelect.value) {
@@ -1342,6 +1898,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       if (!profile) return;
       if (!confirm(tr('deleteProfileConfirm', { name: profile.name }))) return;
       profiles = profiles.filter(item => item.id !== profile.id);
+      deletedProfiles = deletedProfiles.filter(entry => entry.id !== profile.id);
+      deletedProfiles.push({ id: profile.id, deletedAt: new Date().toISOString() });
+      saveTombstones();
       saveProfilesToBrowser();
       preferredProfileId = '';
       updateProfileUi();
@@ -1470,8 +2029,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 
     editor.addEventListener('input', () => {
       isDemoText = false;
+      scriptUpdatedAt = new Date().toISOString();
+      saveSyncPrefs();
       rememberCursorPosition();
       updateText();
+      if (syncScriptToggle.checked) queueCloudSave();
     });
     ['click', 'keyup', 'select', 'focus'].forEach(eventName => editor.addEventListener(eventName, rememberCursorPosition));
     [speed, fontSize, lineHeight, lightToggle, guideToggle, cameraPosition, compactBlankToggle].forEach(el => el.addEventListener('input', updateControls));
@@ -1581,10 +2143,13 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     });
 
     loadSaved();
+    loadTombstones();
+    loadSyncPrefs();
     loadProfiles();
     updateText();
     updateControls();
     applyLanguage(currentLanguage, { persist: false });
+    restoreSyncFolder();
   </script>
 </body>
 </html>
