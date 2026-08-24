@@ -554,7 +554,7 @@
     <footer>
       <span class="mono" style="font-size:11.5px;color:var(--dim)" id="footStat">bereit</span>
       <div class="signature">
-        <span>Made with Love © — Audio Patchbay v2.2</span>
+        <span>Made with Love © — Audio Patchbay v2.2.2</span>
         <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
       </div>
     </footer>
@@ -593,7 +593,7 @@
         <div class="field" id="folderSubField">
           <label for="folderSub">Unterordner im Sync-Ordner</label>
           <input type="text" id="folderSub" placeholder="engine">
-          <p class="hint">Die fünf Engine-Dateien im Sync-Ordner, z.&nbsp;B. <code>…/OneDrive/Codeprojekte/Patchbay/engine/</code>. Leer lassen, wenn sie direkt neben <code>patchbay-settings.json</code> liegen. Kein Netzwerk nötig — läuft auch, wenn das Tool von GitHub Pages kommt.</p>
+          <p class="hint">Die fünf Engine-Dateien im Sync-Ordner, z.&nbsp;B. <code>engine/ffmpeg</code>. Unterordner mit Schrägstrich trennen, leer lassen, wenn sie direkt neben <code>patchbay-settings.json</code> liegen. Kein Netzwerk nötig — läuft auch, wenn das Tool von GitHub Pages kommt.</p>
           <div class="btn-row"><button class="ghost-btn" id="testFolderBtn">ORDNER PRÜFEN</button></div>
           <p class="hint" id="folderCheckOut" style="display:none"></p>
         </div>
@@ -759,7 +759,7 @@
 // FFmpeg.wasm (Konvertierung) + Transformers.js/Whisper (Transkription)
 // ===========================================================================
 
-const APP_VERSION = '2.2';
+const APP_VERSION = '2.2.2';
 const SETTINGS_KEY = 'patchbay.settings.v2';
 const SETTINGS_FILE = 'patchbay-settings.json';
 const ENGINE_CACHE = 'patchbay-engine-v1';
@@ -791,8 +791,20 @@ function cdnSet(root) {
     wasm:   `${root}/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm/ffmpeg-core.wasm`,
   };
 }
+function normalizeBase(s) {
+  let b = String(s || '').trim().replace(/\\/g, '/');
+  if (!b) return './';
+  if (/^\.[^/.]/.test(b)) b = '.' + '/' + b.slice(1);   // ".engine/x" -> "./engine/x"
+  if (!/^(https?:)?\/\//.test(b) && !b.startsWith('/') && !b.startsWith('./') && !b.startsWith('../')) b = './' + b;
+  b = b.replace(/\/{2,}/g, (m, i) => (i && b.slice(0, i).match(/^(https?:)?$/) ? m : '/'));
+  return b.endsWith('/') ? b : b + '/';
+}
+function normalizeSub(s) {
+  return String(s || '').trim().replace(/\\/g, '/').replace(/^[./]+|\/+$/g, '');
+}
+
 function flatSet(base, id, label) {
-  const b = base.endsWith('/') ? base : base + '/';
+  const b = normalizeBase(base);
   return {
     id, label, kind: 'url',
     ffmpeg: b + LOCAL_FILES.ffmpeg,
@@ -1292,8 +1304,18 @@ bind('#customModel', 'customModel', 'value', updateEngineStatus);
 bind('#optLang', 'language');
 bind('#optTask', 'task');
 bind('#engineSource', 'engineSource', 'value', () => { updateEngineSourceFields(); updateEngineStatus(); });
-bind('#folderSub', 'folderSub');
-bind('#localBase', 'localBase');
+bind('#folderSub', 'folderSub', 'value', () => {
+  const n = normalizeSub(settings.folderSub);
+  if (n !== settings.folderSub) { settings.folderSub = n; $('#folderSub').value = n; saveSettings(); }
+});
+bind('#localBase', 'localBase', 'value', () => {
+  const n = normalizeBase(settings.localBase);
+  if (n !== settings.localBase) {
+    logInfo(`Pfad korrigiert: "${settings.localBase}" → "${n}"`);
+    settings.localBase = n; $('#localBase').value = n; saveSettings();
+  }
+  updateEngineSourceFields();
+});
 bind('#customBase', 'customBase');
 bind('#optEngineCache', 'engineCache', 'checked', updateCacheStatus);
 bind('#logAutoscroll', 'logAutoscroll', 'checked');
@@ -1301,11 +1323,10 @@ bind('#logAutoscroll', 'logAutoscroll', 'checked');
 function updateEngineSourceFields() {
   const s = settings.engineSource;
   $('#folderSubField').style.display = (s === 'auto' || s === 'folder') ? 'block' : 'none';
-  $('#localBaseField').style.display = (s === 'auto' || s === 'local') ? 'block' : 'none';
+  $('#localBaseField').style.display = (s === 'local') ? 'block' : 'none';
   $('#customBaseField').style.display = s === 'custom' ? 'block' : 'none';
   try {
-    const base = settings.localBase || './engine/ffmpeg/';
-    $('#resolvedBase').textContent = new URL(base.endsWith('/') ? base : base + '/', location.href).href;
+    $('#resolvedBase').textContent = new URL(normalizeBase(settings.localBase || './engine/ffmpeg/'), location.href).href;
   } catch { $('#resolvedBase').textContent = '—'; }
 }
 
