@@ -466,6 +466,7 @@
     padding: 11px 18px; border-radius: 8px; font-size: 13px; z-index: 90;
     box-shadow: 0 12px 40px -12px #000, 0 0 30px var(--accent-soft);
     transition: transform .3s cubic-bezier(.2,.8,.3,1); max-width: 90vw;
+    pointer-events: none;
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -553,7 +554,7 @@
     <footer>
       <span class="mono" style="font-size:11.5px;color:var(--dim)" id="footStat">bereit</span>
       <div class="signature">
-        <span>Made with Love © — Audio Patchbay v2.1.1</span>
+        <span>Made with Love © — Audio Patchbay v2.1.2</span>
         <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
       </div>
     </footer>
@@ -757,7 +758,7 @@
 // FFmpeg.wasm (Konvertierung) + Transformers.js/Whisper (Transkription)
 // ===========================================================================
 
-const APP_VERSION = '2.1.1';
+const APP_VERSION = '2.1.2';
 const SETTINGS_KEY = 'patchbay.settings.v2';
 const SETTINGS_FILE = 'patchbay-settings.json';
 const ENGINE_CACHE = 'patchbay-engine-v1';
@@ -1309,8 +1310,8 @@ function updateEngineSourceFields() {
 
 $('#testFolderBtn').addEventListener('click', async () => {
   if (!syncDirHandle) {
-    toast('Erst einen Sync-Ordner verbinden');
-    logWarn('Ordnerprüfung: noch kein Sync-Ordner verbunden — unter „Einstellungen & Ordner" auswählen');
+    logInfo('Noch kein Sync-Ordner verbunden — Auswahl wird geöffnet');
+    $('#pickSyncBtn').click();
     return;
   }
   const where = `${syncDirHandle.name}${settings.folderSub ? '/' + settings.folderSub : ''}`;
