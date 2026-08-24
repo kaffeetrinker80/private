@@ -205,6 +205,27 @@ details.more .inner{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 .le .t{color:var(--dim);flex:none}
 .le.ok .m{color:var(--ok)}.le.err .m{color:var(--err)}.le.warn .m{color:var(--warn)}.le.info .m{color:var(--txt)}
 
+/* ---------- Cover-Suche ---------- */
+#cvBack{position:fixed;inset:0;z-index:60;background:rgba(6,4,14,.72);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;padding:18px}
+#cvBack.show{display:flex}
+#cvBox{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(760px,100%);
+  max-height:88vh;display:flex;flex-direction:column;box-shadow:0 30px 80px -30px #000}
+#cvBox .ptitle{border-radius:16px 16px 0 0}
+.cvsearch{padding:12px 15px;display:flex;gap:8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cvsearch input{flex:1;min-width:200px;background:var(--deep);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+.cvsearch input:focus{outline:none;border-color:var(--cyan)}
+#cvGrid{overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.cv{border:1px solid var(--line);border-radius:11px;overflow:hidden;cursor:pointer;background:var(--panel2);transition:.14s}
+.cv:hover{border-color:var(--mag);transform:translateY(-2px);box-shadow:0 8px 22px -12px var(--mag)}
+.cv img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--deep)}
+.cv .cvi{padding:7px 9px}
+.cv .cvt{font-size:12.5px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cv .cva{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cvfoot{padding:10px 15px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cvfoot label{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mut);cursor:pointer}
+.cvmsg{padding:34px 18px;text-align:center;color:var(--mut);grid-column:1/-1;line-height:1.7}
+
 /* ---------- Toast ---------- */
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);z-index:99;
   background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 18px;opacity:0;
@@ -220,7 +241,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.3.1</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.5</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
   <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
@@ -266,6 +287,9 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
           <div class="artbtns">
             <button class="btn sm cy" id="btnSquare" disabled title="Mittig quadratisch zuschneiden">quadrieren</button>
             <button class="btn sm danger" id="btnArtDel" disabled>entfernen</button>
+          </div>
+          <div class="artbtns">
+            <button class="btn sm" id="btnCover" style="flex:1;justify-content:center" title="Cover über die iTunes-Suche finden">⌕ Cover suchen</button>
           </div>
           <input type="file" id="artFile" accept="image/*" hidden>
 
@@ -343,8 +367,26 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.3.1</footer>
+<footer>Made with Love © — ID3 Studio v1.5</footer>
 <div id="toast"></div>
+
+<div id="cvBack">
+  <div id="cvBox">
+    <div class="ptitle"><span class="dot" style="background:var(--mag);box-shadow:0 0 8px var(--mag)"></span>
+      Cover suchen <span style="font-family:var(--ui);text-transform:none;letter-spacing:0;color:var(--dim)">· Quelle: iTunes</span>
+      <span class="spacer"></span><button class="btn sm ghost" id="cvClose">schließen</button></div>
+    <div class="cvsearch">
+      <input id="cvQuery" placeholder="Interpret Titel" spellcheck="false">
+      <button class="btn sm primary" id="cvGo">suchen</button>
+    </div>
+    <div id="cvGrid"><div class="cvmsg">Suchbegriff eingeben und suchen.</div></div>
+    <div class="cvfoot">
+      <label><input type="checkbox" id="cvMeta"> Album und Jahr mit übernehmen</label>
+      <span class="spacer"></span>
+      <span class="hint" id="cvHint"></span>
+    </div>
+  </div>
+</div>
 
 <datalist id="genres"></datalist>
 <datalist id="dlArtists"></datalist>
@@ -355,7 +397,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.3.1
+   ID3 Studio v1.5
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -726,19 +768,34 @@ async function openFolder(handle,{rescan=false}={}){
     if(e.kind==="file"&&/\.mp3$/i.test(e.name)) names.push(e);
   }
   names.sort((a,b)=>a.name.localeCompare(b.name,"de"));
-  const next=[]; let errs=0, fresh=0;
-  for(const fh of names){
-    const prev=known.get(fh.name);
-    if(prev&&isDirty(prev)){ next.push(prev); continue; }   // ungespeicherte Arbeit nicht überschreiben
-    try{
-      const {parsed,size,info,mtime}=await readTagOnly(fh);
-      const rec={handle:fh,name:fh.name,size,info,mtime,orig:{...parsed.tags},tags:{...parsed.tags},
-        origPic:parsed.pic,pic:parsed.pic,picDirty:false,version:parsed.version,
-        isNew:rescan&&!prev};
-      if(rec.isNew) fresh++;
-      next.push(rec);
-    }catch(err){ errs++; log(`konnte ${fh.name} nicht lesen: ${err.message}`,"err"); }
+  // In Gruppen parallel lesen: unter Android kostet jeder Dateizugriff viel Wartezeit,
+  // die sich so überlappt. Die Reihenfolge bleibt durch feste Indexplätze erhalten.
+  const CHUNK=8;
+  const slots=new Array(names.length); let errs=0, fresh=0, done=0;
+  const t0=performance.now();
+  for(let i=0;i<names.length;i+=CHUNK){
+    const group=names.slice(i,i+CHUNK);
+    await Promise.all(group.map(async(fh,k)=>{
+      const idx=i+k, prev=known.get(fh.name);
+      if(prev&&isDirty(prev)){ slots[idx]=prev; done++; return; }  // ungespeicherte Arbeit nicht überschreiben
+      try{
+        const {parsed,size,info,mtime}=await readTagOnly(fh);
+        const rec={handle:fh,name:fh.name,size,info,mtime,orig:{...parsed.tags},tags:{...parsed.tags},
+          origPic:parsed.pic,pic:parsed.pic,picDirty:false,version:parsed.version,
+          isNew:rescan&&!prev};
+        if(rec.isNew) fresh++;
+        slots[idx]=rec;
+      }catch(err){ errs++; log(`konnte ${fh.name} nicht lesen: ${err.message}`,"err"); }
+      done++;
+    }));
+    // Zwischenstand zeigen, statt bis zum Ende zu warten
+    if(names.length>24&&i+CHUNK<names.length){
+      files=slots.filter(Boolean); render();
+      $("count").textContent=`${done} / ${names.length}`;
+    }
   }
+  const next=slots.filter(Boolean);
+  const secs=((performance.now()-t0)/1000).toFixed(1);
   const gone=rescan? [...known.keys()].filter(n=>!names.some(e=>e.name===n)) : [];
   files=next;
   current = keepName? (files.find(f=>f.name===keepName)||null) : current;
@@ -747,7 +804,7 @@ async function openFolder(handle,{rescan=false}={}){
     log(`neu geladen: ${files.length} Datei(en)`+(fresh?`, ${fresh} neu`:", nichts Neues")+(gone.length?`, ${gone.length} verschwunden`:""),fresh?"ok":"info");
     if(fresh) toast(`${fresh} neue Datei(en)`,"ok");
   }else
-    log(`Ordner „${handle.name}“: ${files.length} MP3${files.length===1?"":"s"} eingelesen${errs?`, ${errs} Fehler`:""}`,"ok");
+    log(`Ordner „${handle.name}“: ${files.length} MP3${files.length===1?"":"s"} in ${secs}s eingelesen${errs?`, ${errs} Fehler`:""}`,"ok");
   try{ await saveHandle(handle); $("btnLast").style.display="none"; }catch(e){}
 }
 
@@ -804,26 +861,39 @@ function render(){
 
 /* Laufschrift nur dort, wo der Text wirklich nicht passt.
    Gemessen wird die echte Rendergröße im Browser — unabhängig von Gerät und Fenstergröße. */
-let marqRaf;
-function measureMarquee(){
-  cancelAnimationFrame(marqRaf);
-  marqRaf=requestAnimationFrame(()=>{
-    for(const box of listEl.querySelectorAll(".l1,.l2")){
-      const tt=box.firstElementChild; if(!tt) continue;
-      const over=Math.round(tt.scrollWidth-box.clientWidth);
-      if(over>6){
-        box.classList.add("marq");
-        box.style.setProperty("--shift",over+"px");
-        // ca. 45 px/s plus Lesepausen an beiden Enden
-        box.style.setProperty("--dur",Math.min(26,Math.max(4,over/45+2.5)).toFixed(1)+"s");
-      }else{
-        box.classList.remove("marq");
-        box.style.removeProperty("--shift"); box.style.removeProperty("--dur");
-      }
-    }
-  });
+function measureBox(box){
+  const tt=box.firstElementChild; if(!tt) return;
+  const over=Math.round(tt.scrollWidth-box.clientWidth);
+  if(over>6){
+    box.classList.add("marq");
+    box.style.setProperty("--shift",over+"px");
+    // ca. 45 px/s plus Lesepausen an beiden Enden
+    box.style.setProperty("--dur",Math.min(26,Math.max(4,over/45+2.5)).toFixed(1)+"s");
+  }else{
+    box.classList.remove("marq");
+    box.style.removeProperty("--shift"); box.style.removeProperty("--dur");
+  }
 }
-if(window.ResizeObserver) new ResizeObserver(()=>measureMarquee()).observe(listEl);
+/* Ausmessen kostet je Zeile eine Layout-Berechnung. Bei 300 Dateien wären das 600 —
+   deshalb wird nur gemessen, was tatsächlich ins Sichtfenster kommt. */
+const marqSeen=new WeakSet();
+const marqObs=window.IntersectionObserver? new IntersectionObserver(es=>{
+  for(const e of es){
+    if(!e.isIntersecting||marqSeen.has(e.target)) continue;
+    marqSeen.add(e.target);
+    requestAnimationFrame(()=>e.target.querySelectorAll(".l1,.l2").forEach(measureBox));
+  }
+},{root:listEl,rootMargin:"120px"}) : null;
+function measureMarquee(){
+  if(!marqObs){
+    requestAnimationFrame(()=>listEl.querySelectorAll(".l1,.l2").forEach(measureBox));
+    return;
+  }
+  for(const row of listEl.children) marqObs.observe(row);
+}
+if(window.ResizeObserver) new ResizeObserver(()=>{
+  requestAnimationFrame(()=>listEl.querySelectorAll(".l1,.l2").forEach(measureBox));
+}).observe(listEl);
 
 /* ============================================================
    Editor
@@ -974,6 +1044,96 @@ $("btnFromName").onclick=()=>{
   log(`Aus Dateiname gelesen: „${m[1].trim()}“ / „${m[2].trim()}“ — noch nicht gespeichert`,"info");
   toast("Felder gefüllt — noch speichern");
 };
+
+/* ============================================================
+   Cover-Suche über die offene iTunes-Search-API
+   (kein Konto, kein Schlüssel — braucht aber eine Internetverbindung)
+   ============================================================ */
+let cvResults=[];
+function cvOpen(){
+  if(!current) return;
+  const a=($("fArtist").value||"").trim(), t=($("fTitle").value||"").trim();
+  $("cvQuery").value=[a,t].filter(Boolean).join(" ")||current.name.replace(/\.mp3$/i,"");
+  $("cvBack").classList.add("show");
+  $("cvHint").textContent="";
+  $("cvQuery").focus(); $("cvQuery").select();
+  if($("cvQuery").value.trim()) cvSearch();
+}
+function cvClose(){ $("cvBack").classList.remove("show"); }
+async function cvSearch(){
+  const q=$("cvQuery").value.trim();
+  const grid=$("cvGrid");
+  if(!q){ grid.innerHTML='<div class="cvmsg">Suchbegriff eingeben.</div>'; return; }
+  grid.innerHTML='<div class="cvmsg">suche…</div>';
+  try{
+    const url="https://itunes.apple.com/search?media=music&entity=song&limit=18&country=DE&term="+encodeURIComponent(q);
+    const res=await fetch(url);
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data=await res.json();
+    cvResults=(data.results||[]).filter(r=>r.artworkUrl100);
+    if(!cvResults.length){
+      grid.innerHTML='<div class="cvmsg">Nichts gefunden.<br>Bei Live-Sets und YouTube-Mitschnitten ist das normal — die stehen in keinem Musikkatalog.<br>Versuch es mit einem kürzeren Suchbegriff.</div>';
+      log(`Cover-Suche „${q}“: kein Treffer`,"warn"); return;
+    }
+    grid.innerHTML="";
+    cvResults.forEach((r,i)=>{
+      const big=r.artworkUrl100.replace(/\/100x100bb\./,"/600x600bb.");
+      const el=document.createElement("div");
+      el.className="cv";
+      el.innerHTML=`<img loading="lazy" alt=""><div class="cvi"><div class="cvt"></div><div class="cva"></div></div>`;
+      el.querySelector("img").src=r.artworkUrl100.replace(/\/100x100bb\./,"/200x200bb.");
+      el.querySelector(".cvt").textContent=r.collectionName||r.trackName||"";
+      el.querySelector(".cva").textContent=[r.artistName,(r.releaseDate||"").slice(0,4)].filter(Boolean).join(" · ");
+      el.onclick=()=>cvPick(r,big);
+      grid.appendChild(el);
+    });
+    $("cvHint").textContent=cvResults.length+" Treffer";
+    log(`Cover-Suche „${q}“: ${cvResults.length} Treffer`,"ok");
+  }catch(e){
+    grid.innerHTML='<div class="cvmsg">Suche nicht möglich — keine Verbindung, oder der Browser blockiert den Zugriff.<br>Über <code>file://</code> geöffnet passiert das häufig; von der GitHub-Seite aus sollte es laufen.</div>';
+    log("Cover-Suche fehlgeschlagen: "+e.message,"err");
+  }
+}
+async function cvPick(r,url){
+  if(!current) return;
+  $("cvHint").textContent="lade Bild…";
+  try{
+    let blob;
+    try{
+      const res=await fetch(url); if(!res.ok) throw new Error("HTTP "+res.status);
+      blob=await res.blob();
+    }catch(err){
+      // Zweiter Versuch über ein Bild-Element mit Zeichenfläche
+      blob=await new Promise((ok,no)=>{
+        const im=new Image(); im.crossOrigin="anonymous";
+        im.onload=()=>{ const c=document.createElement("canvas"); c.width=im.naturalWidth;c.height=im.naturalHeight;
+          c.getContext("2d").drawImage(im,0,0); c.toBlob(b=>b?ok(b):no(new Error("Zeichenfläche gesperrt")),"image/jpeg",.9); };
+        im.onerror=()=>no(new Error("Bild nicht ladbar")); im.src=url;
+      });
+    }
+    await setCoverFromBlob(blob,{crop:true,size:600});
+    if($("cvMeta").checked){
+      const changed=[];
+      if(r.collectionName&&!$("fAlbum").value.trim()){ $("fAlbum").value=r.collectionName; changed.push("Album"); }
+      const yr=(r.releaseDate||"").slice(0,4);
+      if(yr&&!$("fYear").value.trim()){ $("fYear").value=yr; changed.push("Jahr"); }
+      if(r.primaryGenreName&&!$("fGenre").value.trim()){ $("fGenre").value=r.primaryGenreName; changed.push("Genre"); }
+      if(changed.length){ readFields(); updatePreview(); render(); log("übernommen: "+changed.join(", ")+" (nur leere Felder)","info"); }
+    }
+    log(`Cover übernommen: ${r.artistName} — ${r.collectionName||r.trackName}`,"ok");
+    cvClose(); toast("Cover eingesetzt — noch speichern","ok");
+  }catch(e){
+    $("cvHint").textContent="";
+    log("Cover konnte nicht geladen werden: "+e.message,"err");
+    toast("Bild nicht ladbar","err");
+  }
+}
+$("btnCover").onclick=cvOpen;
+$("cvClose").onclick=cvClose;
+$("cvGo").onclick=cvSearch;
+$("cvQuery").addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault();cvSearch();} });
+$("cvBack").addEventListener("click",e=>{ if(e.target.id==="cvBack") cvClose(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&$("cvBack").classList.contains("show")) cvClose(); });
 
 /* ============================================================
    Aufräumen: typische Download-Reste entfernen
