@@ -260,7 +260,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.6.1</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.7</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
   <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
@@ -393,7 +393,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.6.1</footer>
+<footer>Made with Love © — ID3 Studio v1.7</footer>
 <div id="toast"></div>
 
 <div id="bxBack" class="modalback">
@@ -415,6 +415,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
       </div>
       <label class="bchk"><input type="checkbox" id="bxCover"> <span id="bxCoverTxt">Cover der geöffneten Datei auf alle übertragen</span></label>
       <label class="bchk"><input type="checkbox" id="bxTrack"> Tracknummern nach Listenreihenfolge vergeben (1/n)</label>
+      <label class="bchk"><input type="checkbox" id="bxRename"> <span id="bxRenameTxt">Dateinamen anschließend nach Muster neu setzen</span></label>
     </div>
     <div class="cvfoot">
       <button class="btn" id="bxApply">Übernehmen</button>
@@ -452,7 +453,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.6.1
+   ID3 Studio v1.7
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -984,6 +985,9 @@ function updateMarkbar(){
   const n=marked.size;
   $("markbar").classList.toggle("show",n>0);
   $("markN").textContent=`${n} markiert`;
+  $("btnRenameAll").textContent = n? `${n} markierte umbenennen…` : "Alle umbenennen…";
+  $("btnRenameAll").title = n? "Muster auf die markierten Dateien anwenden" : "Muster auf alle Dateien im Ordner anwenden";
+  $("btnSaveAll").textContent = n? `${n} markierte speichern` : "Alle geänderten speichern";
 }
 $("btnMarkAll").onclick=()=>{ visibleFiles().forEach(f=>marked.add(f)); updateMarkbar(); render(); };
 $("btnMarkNone").onclick=()=>{ marked.clear(); lastMarkIdx=-1; updateMarkbar(); render(); };
@@ -1152,7 +1156,8 @@ function bxOpen(){
   $("bxAlbumArtist").value=common("TPE2");
   $("bxGenre").value=common("TCON");
   $("bxYear").value=common("TYER");
-  $("bxCover").checked=false; $("bxTrack").checked=false;
+  $("bxCover").checked=false; $("bxTrack").checked=false; $("bxRename").checked=false;
+  $("bxRenameTxt").textContent=`Dateinamen anschließend nach Muster neu setzen  (${$("pattern").value||"%artist% - %title%"})`;
   const has=current&&current.pic&&current.pic.data;
   $("bxCover").disabled=!has;
   $("bxCoverTxt").textContent=has? `Cover aus „${current.name}“ auf alle übertragen`
@@ -1183,17 +1188,28 @@ function bxApply(){
 }
 $("btnBatch").onclick=bxOpen;
 $("bxClose").onclick=bxClose;
-$("bxApply").onclick=()=>{ if(bxApply()){ bxClose(); toast("Übernommen — noch speichern"); } };
+$("bxApply").onclick=()=>{
+  if($("bxRename").checked){ toast("Umbenennen läuft nur über „Übernehmen und speichern“","err"); return; }
+  if(bxApply()){ bxClose(); toast("Übernommen — noch speichern"); }
+};
 $("bxApplySave").onclick=async()=>{
+  const doRename=$("bxRename").checked;
   const n=bxApply(); if(!n) return;
   bxClose();
-  const list=[...marked]; let ok=0;
+  const list=[...marked]; let ok=0, ren=0;
   $("bxHint").textContent="";
   for(const f of list){
     try{ await saveFile(f); ok++; log(`gespeichert: ${f.name}`,"ok"); }
-    catch(e){ log(`Fehler bei ${f.name}: ${e.message}`,"err"); }
+    catch(e){ log(`Fehler bei ${f.name}: ${e.message}`,"err"); continue; }
+    if(doRename){
+      try{ const old=await renameFile(f); if(old!==null){ ren++; log(`umbenannt: ${old}  →  ${f.name}`,"ok"); } }
+      catch(e){ log(`Umbenennen von ${f.name}: ${e.message}`,"err"); }
+    }
   }
-  render(); toast(`${ok} von ${list.length} gespeichert`,ok===list.length?"ok":"err");
+  if(doRename) files.sort((a,b)=>a.name.localeCompare(b.name,"de"));
+  if(current) $("edTitle").textContent=current.name;
+  render(); updatePreview();
+  toast(`${ok} gespeichert${doRename?`, ${ren} umbenannt`:""}`,ok===list.length?"ok":"err");
 };
 $("bxBack").addEventListener("click",e=>{ if(e.target.id==="bxBack") bxClose(); });
 
@@ -1361,8 +1377,9 @@ $("btnSave").onclick=async()=>{
   finally{ $("btnSave").disabled=false; }
 };
 $("btnSaveAll").onclick=async()=>{
-  const dirty=files.filter(isDirty);
-  if(!dirty.length){ toast("Nichts geändert"); return; }
+  const scope=marked.size? [...marked] : files;
+  const dirty=scope.filter(isDirty);
+  if(!dirty.length){ toast(marked.size?"Bei den markierten ist nichts geändert":"Nichts geändert"); return; }
   if(!confirm(`${dirty.length} geänderte Datei(en) speichern?`)) return;
   let ok=0;
   for(const f of dirty){
@@ -1416,10 +1433,13 @@ $("btnRename").onclick=async()=>{
 };
 $("btnRenameAll").onclick=async()=>{
   if(!files.length) return;
-  const plan=files.map(f=>({f,nn:buildName(f)})).filter(x=>x.nn&&x.nn!==x.f.name);
+  // Sind Dateien markiert, gilt die Aktion nur für diese
+  const scope=marked.size? [...marked] : files;
+  const plan=scope.map(f=>({f,nn:buildName(f)})).filter(x=>x.nn&&x.nn!==x.f.name);
   if(!plan.length){ toast("Alle Namen passen bereits"); return; }
   const sample=plan.slice(0,6).map(x=>`${x.f.name}\n   → ${x.nn}`).join("\n");
-  if(!confirm(`${plan.length} Datei(en) umbenennen?\n\n${sample}${plan.length>6?`\n\n… und ${plan.length-6} weitere`:""}`)) return;
+  const head=marked.size? `${plan.length} von ${marked.size} markierten Datei(en) umbenennen?` : `${plan.length} Datei(en) umbenennen?`;
+  if(!confirm(`${head}\n\n${sample}${plan.length>6?`\n\n… und ${plan.length-6} weitere`:""}`)) return;
   let ok=0;
   for(const x of plan){
     try{ const old=await renameFile(x.f); if(old!==null){ok++;log(`umbenannt: ${old}  →  ${x.f.name}`,"ok");} }
