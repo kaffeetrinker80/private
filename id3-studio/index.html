@@ -139,7 +139,7 @@ main{flex:1 0 auto;display:grid;grid-template-columns:minmax(300px,380px) 1fr;ga
 #edPanel{display:flex;flex-direction:column;position:relative;z-index:1}
 .edwrap{padding:16px;display:grid;grid-template-columns:auto 1fr;gap:20px}
 @media(max-width:900px){.edwrap{grid-template-columns:1fr}main{grid-template-columns:1fr}#listPanel{position:static;max-height:52vh}}
-.art{width:190px}
+.art{width:190px;min-width:0;max-width:190px}
 .artbox{width:190px;height:190px;border-radius:12px;border:1px dashed var(--line);background:var(--deep);
   display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer;transition:.15s}
 .artbox:hover,.artbox.drag{border-color:var(--mag);box-shadow:0 0 0 3px rgba(255,46,136,.15)}
@@ -148,14 +148,15 @@ main{flex:1 0 auto;display:grid;grid-template-columns:minmax(300px,380px) 1fr;ga
 .artinfo{font-family:var(--mono);font-size:11.5px;color:var(--mut);margin-top:8px;text-align:center}
 .artinfo.warn{color:var(--warn)}
 /* Mini-Player */
-.player{margin-top:12px;background:var(--deep);border:1px solid var(--line);border-radius:11px;padding:10px 11px}
-.prow{display:flex;align-items:center;gap:9px}
+.player{margin-top:12px;background:var(--deep);border:1px solid var(--line);border-radius:11px;padding:10px 11px;
+  width:100%;max-width:100%;overflow:hidden}
+.prow{display:flex;align-items:center;gap:9px;min-width:0}
 .pbtn{width:36px;height:36px;flex:none;border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:14px;
   background:linear-gradient(135deg,var(--mag),var(--cyan));display:flex;align-items:center;justify-content:center;transition:.14s}
 .pbtn:hover{filter:brightness(1.15);transform:scale(1.05)}
 .pbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.ptime{font-family:var(--mono);font-size:11.5px;color:var(--mut);flex:none;min-width:82px;text-align:right}
-.seek{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:var(--line);cursor:pointer}
+.ptime{display:block;font-family:var(--mono);font-size:11.5px;color:var(--mut);text-align:center;margin-top:7px}
+.seek{flex:1 1 0;min-width:0;width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:var(--line);cursor:pointer;margin:0}
 .seek::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--mag);
   box-shadow:0 0 8px -1px var(--mag);cursor:pointer}
 .seek::-moz-range-thumb{width:13px;height:13px;border:none;border-radius:50%;background:var(--mag)}
@@ -205,13 +206,31 @@ details.more .inner{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 .le .t{color:var(--dim);flex:none}
 .le.ok .m{color:var(--ok)}.le.err .m{color:var(--err)}.le.warn .m{color:var(--warn)}.le.info .m{color:var(--txt)}
 
+/* ---------- Mehrfachauswahl ---------- */
+.row .ck{flex:none;width:16px;height:16px;accent-color:var(--mag);cursor:pointer;margin:0}
+.row.marked{background:rgba(255,61,147,.10);border-color:rgba(255,61,147,.3)}
+.row.marked .strip{background:var(--mag)}
+.markbar{display:none;padding:9px 11px;border-bottom:1px solid var(--line);gap:8px;align-items:center;flex-wrap:wrap;
+  background:linear-gradient(92deg,rgba(255,61,147,.14),transparent)}
+.markbar.show{display:flex}
+.markbar .n{font-family:var(--mono);font-size:12.5px;color:var(--mag);font-weight:600}
+.bfield{display:grid;grid-template-columns:1fr;gap:12px}
+.bhint{font-size:12.5px;color:var(--dim);margin-top:-4px}
+#bxBody{overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:13px}
+#bxBody .f input{background:var(--deep)}
+.bchk{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mut);cursor:pointer}
+.bchk input{width:16px;height:16px;accent-color:var(--mag);cursor:pointer}
+.bfiles{font-family:var(--mono);font-size:11px;color:var(--dim);background:var(--deep);border:1px solid var(--line);
+  border-radius:9px;padding:9px 11px;max-height:110px;overflow-y:auto;line-height:1.6}
+
 /* ---------- Cover-Suche ---------- */
-#cvBack{position:fixed;inset:0;z-index:60;background:rgba(6,4,14,.72);backdrop-filter:blur(4px);
+#cvBack,#bxBack{position:fixed;inset:0;z-index:60;background:rgba(6,4,14,.72);backdrop-filter:blur(4px);
   display:none;align-items:center;justify-content:center;padding:18px}
-#cvBack.show{display:flex}
-#cvBox{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(760px,100%);
+#cvBack.show,#bxBack.show{display:flex}
+#cvBox,#bxBox{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(760px,100%);
   max-height:88vh;display:flex;flex-direction:column;box-shadow:0 30px 80px -30px #000}
-#cvBox .ptitle{border-radius:16px 16px 0 0}
+#bxBox{width:min(600px,100%)}
+#cvBox .ptitle,#bxBox .ptitle{border-radius:16px 16px 0 0}
 .cvsearch{padding:12px 15px;display:flex;gap:8px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .cvsearch input{flex:1;min-width:200px;background:var(--deep);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
 .cvsearch input:focus{outline:none;border-color:var(--cyan)}
@@ -241,7 +260,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.5</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.6.1</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
   <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
@@ -264,6 +283,13 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
     <div class="toolbar">
       <input class="search" id="search" placeholder="filtern…">
       <button class="btn sm cy" id="btnReload" title="Ordner neu einlesen — neue Dateien werden markiert">↻ neu laden</button>
+    </div>
+    <div class="markbar" id="markbar">
+      <span class="n" id="markN">0 markiert</span>
+      <span class="spacer"></span>
+      <button class="btn sm" id="btnMarkAll">alle</button>
+      <button class="btn sm ghost" id="btnMarkNone">keine</button>
+      <button class="btn sm primary" id="btnBatch">Sammel-Bearbeitung</button>
     </div>
     <div id="list"><div class="empty">Noch kein Ordner geöffnet.<br>Oben auf <b>Ordner öffnen</b> klicken und deinen Arbeitsordner wählen.</div></div>
   </section>
@@ -297,8 +323,8 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
             <div class="prow">
               <button class="pbtn" id="btnPlay" title="Abspielen (Leertaste)">▶</button>
               <input type="range" class="seek" id="seek" value="0" min="0" max="1000" step="1">
-              <span class="ptime" id="ptime">0:00 / 0:00</span>
             </div>
+            <span class="ptime" id="ptime">0:00 / 0:00</span>
             <div class="pnote" id="pnote">Wiedergabe pausiert beim Speichern</div>
           </div>
           <audio id="audio" preload="none"></audio>
@@ -367,8 +393,37 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.5</footer>
+<footer>Made with Love © — ID3 Studio v1.6.1</footer>
 <div id="toast"></div>
+
+<div id="bxBack" class="modalback">
+  <div id="bxBox">
+    <div class="ptitle"><span class="dot" style="background:var(--mag);box-shadow:0 0 8px var(--mag)"></span>
+      Mehrere Dateien bearbeiten <span class="spacer"></span>
+      <button class="btn sm ghost" id="bxClose">schließen</button></div>
+    <div id="bxBody">
+      <div class="bfiles" id="bxFiles"></div>
+      <div class="bhint">Leere Felder bleiben unverändert. Geschrieben wird erst beim Speichern.</div>
+      <div class="f"><label>Album · TALB</label><input id="bxAlbum" list="dlAlbums" autocomplete="off" spellcheck="false"></div>
+      <div class="grid2">
+        <div class="f"><label>Interpret · TPE1</label><input id="bxArtist" list="dlArtists" autocomplete="off" spellcheck="false"></div>
+        <div class="f"><label>Album-Interpret · TPE2</label><input id="bxAlbumArtist" autocomplete="off" spellcheck="false"></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label>Genre · TCON</label><input id="bxGenre" list="genres" spellcheck="false"></div>
+        <div class="f"><label>Jahr · TYER</label><input id="bxYear" maxlength="4" inputmode="numeric"></div>
+      </div>
+      <label class="bchk"><input type="checkbox" id="bxCover"> <span id="bxCoverTxt">Cover der geöffneten Datei auf alle übertragen</span></label>
+      <label class="bchk"><input type="checkbox" id="bxTrack"> Tracknummern nach Listenreihenfolge vergeben (1/n)</label>
+    </div>
+    <div class="cvfoot">
+      <button class="btn" id="bxApply">Übernehmen</button>
+      <button class="btn primary" id="bxApplySave">Übernehmen und speichern</button>
+      <span class="spacer"></span>
+      <span class="hint" id="bxHint"></span>
+    </div>
+  </div>
+</div>
 
 <div id="cvBack">
   <div id="cvBox">
@@ -397,7 +452,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.5
+   ID3 Studio v1.6.1
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -799,6 +854,7 @@ async function openFolder(handle,{rescan=false}={}){
   const gone=rescan? [...known.keys()].filter(n=>!names.some(e=>e.name===n)) : [];
   files=next;
   current = keepName? (files.find(f=>f.name===keepName)||null) : current;
+  updateMarkbar();
   if(current) select(current); else render();
   if(rescan){
     log(`neu geladen: ${files.length} Datei(en)`+(fresh?`, ${fresh} neu`:", nichts Neues")+(gone.length?`, ${gone.length} verschwunden`:""),fresh?"ok":"info");
@@ -842,7 +898,8 @@ function render(){
     const a=f.tags.TPE1||"", t=f.tags.TIT2||"";
     const l1=(a||t)?`${a}${a&&t?" – ":""}${t}`:"(ohne Tag)";
     if(f===playing) r.classList.add("playing");
-    r.innerHTML=`<span class="strip"></span><div class="meta">
+    if(marked.has(f)) r.classList.add("marked");
+    r.innerHTML=`<span class="strip"></span><input type="checkbox" class="ck"${marked.has(f)?" checked":""}><div class="meta">
         <div class="l1"><span class="tt"></span></div>
         <div class="l2"><span class="tt"><span class="dur"></span><span class="fn"></span></span></div></div>
       <div class="flags">
@@ -853,7 +910,12 @@ function render(){
     r.querySelector(".l1 .tt").textContent=l1;
     r.querySelector(".dur").textContent=f.info?`${fmtTime(f.info.dur)} · ${f.info.kbps}${f.info.vbr?"~":""} · `:"";
     r.querySelector(".fn").textContent=f.name;
-    r.onclick=()=>select(f);
+    const idx=vis.indexOf(f);
+    r.querySelector(".ck").onclick=e=>{ e.stopPropagation(); toggleMark(f,idx,e.shiftKey); };
+    r.onclick=e=>{
+      if(e.ctrlKey||e.metaKey||e.shiftKey){ toggleMark(f,idx,e.shiftKey); return; }
+      select(f);
+    };
     listEl.appendChild(r);
   }
   measureMarquee();
@@ -894,6 +956,37 @@ function measureMarquee(){
 if(window.ResizeObserver) new ResizeObserver(()=>{
   requestAnimationFrame(()=>listEl.querySelectorAll(".l1,.l2").forEach(measureBox));
 }).observe(listEl);
+
+/* ============================================================
+   Mehrfachauswahl
+   ============================================================ */
+const marked=new Set();
+let lastMarkIdx=-1;
+function visibleFiles(){
+  const q=filter.toLowerCase();
+  return files.filter(f=>!q||f.name.toLowerCase().includes(q)||
+    (f.tags.TPE1||"").toLowerCase().includes(q)||(f.tags.TIT2||"").toLowerCase().includes(q));
+}
+function toggleMark(f,idx,range){
+  if(range&&lastMarkIdx>=0){
+    const vis=visibleFiles();
+    const [a,b]=[Math.min(lastMarkIdx,idx),Math.max(lastMarkIdx,idx)];
+    const on=!marked.has(f);
+    for(let i=a;i<=b;i++){ on?marked.add(vis[i]):marked.delete(vis[i]); }
+  }else{
+    marked.has(f)?marked.delete(f):marked.add(f);
+  }
+  lastMarkIdx=idx;
+  updateMarkbar(); render();
+}
+function updateMarkbar(){
+  for(const f of [...marked]) if(!files.includes(f)) marked.delete(f);
+  const n=marked.size;
+  $("markbar").classList.toggle("show",n>0);
+  $("markN").textContent=`${n} markiert`;
+}
+$("btnMarkAll").onclick=()=>{ visibleFiles().forEach(f=>marked.add(f)); updateMarkbar(); render(); };
+$("btnMarkNone").onclick=()=>{ marked.clear(); lastMarkIdx=-1; updateMarkbar(); render(); };
 
 /* ============================================================
    Editor
@@ -1046,6 +1139,65 @@ $("btnFromName").onclick=()=>{
 };
 
 /* ============================================================
+   Sammel-Bearbeitung
+   ============================================================ */
+function bxOpen(){
+  if(!marked.size) return;
+  const list=[...marked];
+  $("bxFiles").textContent=list.map(f=>f.name).join("\n");
+  // Vorbelegung: übereinstimmende Werte der Auswahl anbieten
+  const common=k=>{ const v=list[0].tags[k]||""; return list.every(f=>(f.tags[k]||"")===v)?v:""; };
+  $("bxAlbum").value=common("TALB");
+  $("bxArtist").value=common("TPE1");
+  $("bxAlbumArtist").value=common("TPE2");
+  $("bxGenre").value=common("TCON");
+  $("bxYear").value=common("TYER");
+  $("bxCover").checked=false; $("bxTrack").checked=false;
+  const has=current&&current.pic&&current.pic.data;
+  $("bxCover").disabled=!has;
+  $("bxCoverTxt").textContent=has? `Cover aus „${current.name}“ auf alle übertragen`
+                                 : "Cover übertragen — dafür erst eine Datei mit Bild öffnen";
+  $("bxHint").textContent=`${list.length} Datei(en)`;
+  $("bxBack").classList.add("show");
+}
+function bxClose(){ $("bxBack").classList.remove("show"); }
+function bxApply(){
+  const list=[...marked];
+  if(!list.length) return 0;
+  const set={TALB:$("bxAlbum").value.trim(),TPE1:$("bxArtist").value.trim(),
+             TPE2:$("bxAlbumArtist").value.trim(),TCON:$("bxGenre").value.trim(),TYER:$("bxYear").value.trim()};
+  const fields=Object.entries(set).filter(([,v])=>v);
+  const cover=$("bxCover").checked&&current&&current.pic&&current.pic.data;
+  const track=$("bxTrack").checked;
+  if(!fields.length&&!cover&&!track){ toast("Nichts einzutragen"); return 0; }
+  list.forEach((f,i)=>{
+    for(const [k,v] of fields) f.tags[k]=v;
+    if(cover){ f.pic={mime:current.pic.mime,data:current.pic.data}; f.picDirty=true; }
+    if(track) f.tags.TRCK=`${i+1}/${list.length}`;
+  });
+  const what=[...fields.map(([k])=>k),cover?"Cover":null,track?"Tracknummern":null].filter(Boolean);
+  log(`Sammel-Bearbeitung: ${what.join(", ")} auf ${list.length} Datei(en) übertragen`,"ok");
+  if(current&&marked.has(current)) select(current); else render();
+  updateMarkbar();
+  return list.length;
+}
+$("btnBatch").onclick=bxOpen;
+$("bxClose").onclick=bxClose;
+$("bxApply").onclick=()=>{ if(bxApply()){ bxClose(); toast("Übernommen — noch speichern"); } };
+$("bxApplySave").onclick=async()=>{
+  const n=bxApply(); if(!n) return;
+  bxClose();
+  const list=[...marked]; let ok=0;
+  $("bxHint").textContent="";
+  for(const f of list){
+    try{ await saveFile(f); ok++; log(`gespeichert: ${f.name}`,"ok"); }
+    catch(e){ log(`Fehler bei ${f.name}: ${e.message}`,"err"); }
+  }
+  render(); toast(`${ok} von ${list.length} gespeichert`,ok===list.length?"ok":"err");
+};
+$("bxBack").addEventListener("click",e=>{ if(e.target.id==="bxBack") bxClose(); });
+
+/* ============================================================
    Cover-Suche über die offene iTunes-Search-API
    (kein Konto, kein Schlüssel — braucht aber eine Internetverbindung)
    ============================================================ */
@@ -1133,7 +1285,11 @@ $("cvClose").onclick=cvClose;
 $("cvGo").onclick=cvSearch;
 $("cvQuery").addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault();cvSearch();} });
 $("cvBack").addEventListener("click",e=>{ if(e.target.id==="cvBack") cvClose(); });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&$("cvBack").classList.contains("show")) cvClose(); });
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape") return;
+  if($("cvBack").classList.contains("show")) cvClose();
+  else if($("bxBack").classList.contains("show")) bxClose();
+});
 
 /* ============================================================
    Aufräumen: typische Download-Reste entfernen
