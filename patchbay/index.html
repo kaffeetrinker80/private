@@ -461,7 +461,7 @@
 
   /* ---------- Toast ---------- */
   #toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(140%);
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-260%);
     background: var(--panel-2); border: 1px solid var(--accent-dim); color: var(--text);
     padding: 11px 18px; border-radius: 8px; font-size: 13px; z-index: 90;
     box-shadow: 0 12px 40px -12px #000, 0 0 30px var(--accent-soft);
@@ -554,7 +554,7 @@
     <footer>
       <span class="mono" style="font-size:11.5px;color:var(--dim)" id="footStat">bereit</span>
       <div class="signature">
-        <span>Made with Love © — Audio Patchbay v2.1.2</span>
+        <span>Made with Love © — Audio Patchbay v2.2</span>
         <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
       </div>
     </footer>
@@ -595,6 +595,7 @@
           <input type="text" id="folderSub" placeholder="engine">
           <p class="hint">Die fünf Engine-Dateien im Sync-Ordner, z.&nbsp;B. <code>…/OneDrive/Codeprojekte/Patchbay/engine/</code>. Leer lassen, wenn sie direkt neben <code>patchbay-settings.json</code> liegen. Kein Netzwerk nötig — läuft auch, wenn das Tool von GitHub Pages kommt.</p>
           <div class="btn-row"><button class="ghost-btn" id="testFolderBtn">ORDNER PRÜFEN</button></div>
+          <p class="hint" id="folderCheckOut" style="display:none"></p>
         </div>
         <div class="field" id="localBaseField">
           <label for="localBase">Lokaler Pfad</label>
@@ -758,7 +759,7 @@
 // FFmpeg.wasm (Konvertierung) + Transformers.js/Whisper (Transkription)
 // ===========================================================================
 
-const APP_VERSION = '2.1.2';
+const APP_VERSION = '2.2';
 const SETTINGS_KEY = 'patchbay.settings.v2';
 const SETTINGS_FILE = 'patchbay-settings.json';
 const ENGINE_CACHE = 'patchbay-engine-v1';
@@ -923,9 +924,9 @@ function appendLogEntry(e) {
   div.innerHTML = `<span class="t">${stamp(e.at)}</span><span class="m"></span>`;
   div.querySelector('.m').textContent = e.msg + (e.detail ? '  ' + (typeof e.detail === 'string' ? e.detail : JSON.stringify(e.detail)) : '');
   if (logFilter !== 'all' && logFilter !== e.level) div.style.display = 'none';
-  logList.appendChild(div);
-  while (logList.children.length > LOG_MAX) logList.removeChild(logList.firstChild);
-  if (settings.logAutoscroll) logList.scrollTop = logList.scrollHeight;
+  logList.insertBefore(div, logList.firstChild);
+  while (logList.children.length > LOG_MAX) logList.removeChild(logList.lastChild);
+  if (settings.logAutoscroll) logList.scrollTop = 0;
 }
 
 function renderLogFilter() {
@@ -1309,29 +1310,38 @@ function updateEngineSourceFields() {
 }
 
 $('#testFolderBtn').addEventListener('click', async () => {
+  const out = $('#folderCheckOut');
+  const say = (txt, color) => {
+    out.style.display = 'block';
+    out.textContent = txt;
+    out.style.color = color || 'var(--dim)';
+  };
   if (!syncDirHandle) {
+    say('Kein Sync-Ordner verbunden — Auswahl wird geöffnet …');
     logInfo('Noch kein Sync-Ordner verbunden — Auswahl wird geöffnet');
     $('#pickSyncBtn').click();
     return;
   }
   const where = `${syncDirHandle.name}${settings.folderSub ? '/' + settings.folderSub : ''}`;
+  say(`Prüfe ${where} …`);
   logInfo(`Prüfe Engine-Dateien in ${where} …`);
   let dir;
   try {
     dir = await getDirByPath(syncDirHandle, settings.folderSub);
   } catch (e) {
     logErr(`Unterordner "${settings.folderSub}" nicht gefunden`, e.message);
-    toast('Unterordner nicht gefunden');
+    say(`Unterordner "${settings.folderSub}" existiert nicht in ${syncDirHandle.name}.`, 'var(--red)');
     return;
   }
-  let ok = 0;
+  let ok = 0; const missing = [];
   for (const fname of Object.values(LOCAL_FILES)) {
     try {
       const f = await (await dir.getFileHandle(fname)).getFile();
       ok++; logOk(`gefunden: ${fname} (${fmtBytes(f.size)})`);
-    } catch { logErr(`fehlt: ${where}/${fname}`); }
+    } catch { missing.push(fname); logErr(`fehlt: ${where}/${fname}`); }
   }
-  toast(ok === 5 ? 'Alle 5 Dateien im Ordner' : `${ok} von 5 gefunden — Details im Log`);
+  if (ok === 5) say(`Alle 5 Dateien in ${where} gefunden — Engine startklar.`, 'var(--neon)');
+  else say(`${ok} von 5 gefunden in ${where}. Fehlt: ${missing.join(', ')}`, 'var(--amber)');
 });
 
 $('#testBaseBtn').addEventListener('click', async () => {
