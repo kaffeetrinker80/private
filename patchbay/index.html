@@ -10,526 +10,470 @@
 
 <link rel="manifest" href="site.webmanifest">
 
-<meta name="theme-color" content="#172f4d">
+<meta name="theme-color" content="#0e1112">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audio Patchbay — Format & Transcription Deck</title>
+<title>Audio Patchbay — Format &amp; Transcription Deck</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --void: #e9e7ee;
-    --panel: #faf9fc;
-    --channel: #ffffff;
-    --channel-hover: #f1eff6;
-    --hairline: #ddd9e4;
-    --hairline-soft: #e7e4ed;
-    --text: #211c29;
-    --text-muted: #6e6678;
-    --text-dim: #a59cb0;
-    --cyan: #00c2d1;
-    --cyan-text: #0093a3;
-    --cyan-soft: rgba(0, 194, 209, 0.12);
-    --magenta: #e0177e;
-    --magenta-text: #b30f64;
-    --magenta-soft: rgba(224, 23, 126, 0.12);
-    --amber: #c9790a;
-    --green: #1c9c64;
-    --red: #d6364a;
-    --accent: var(--cyan);
-    --accent-text: var(--cyan-text);
-    --accent-soft: var(--cyan-soft);
+    --bg: #0e1112;
+    --panel: #161b1c;
+    --panel-2: #1b2122;
+    --raise: #212829;
+    --line: #283031;
+    --line-2: #333d3e;
+    --text: #e8f0ed;
+    --muted: #93a29f;
+    --dim: #63716f;
+
+    --neon: #00ff95;
+    --neon-dim: #00c974;
+    --neon-soft: rgba(0, 255, 149, 0.12);
+    --lime: #ccff00;
+    --lime-dim: #a8d400;
+    --lime-soft: rgba(204, 255, 0, 0.12);
+
+    --amber: #ffb020;
+    --red: #ff4d6a;
+    --ink: #06110c;
+
+    --accent: var(--neon);
+    --accent-dim: var(--neon-dim);
+    --accent-soft: var(--neon-soft);
+
     --radius: 10px;
     --radius-sm: 6px;
   }
 
   :root.mode-transcribe {
-    --accent: var(--magenta);
-    --accent-text: var(--magenta-text);
-    --accent-soft: var(--magenta-soft);
+    --accent: var(--lime);
+    --accent-dim: var(--lime-dim);
+    --accent-soft: var(--lime-soft);
   }
 
   * { box-sizing: border-box; }
 
   html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--void);
+    margin: 0; padding: 0;
+    background: var(--bg);
     color: var(--text);
     font-family: 'Space Grotesk', sans-serif;
     min-height: 100vh;
   }
 
   body {
-    padding: 34px 18px 70px;
+    padding: 26px 20px 60px;
     background-image:
-      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(0,194,209,0.07), transparent 60%);
+      radial-gradient(ellipse 1100px 520px at 50% -8%, rgba(0,255,149,0.10), transparent 62%),
+      linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+    background-size: auto, 34px 34px, 34px 34px;
   }
 
   .mono { font-family: 'JetBrains Mono', monospace; }
 
-  .deck {
-    max-width: 1000px;
+  /* ---------- Shell / two column layout ---------- */
+  .shell {
+    max-width: 1560px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .deck {
     background: var(--panel);
-    border: 1px solid var(--hairline);
-    border-radius: 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
     position: relative;
-    box-shadow: 0 30px 70px -35px rgba(33,28,41,0.22), inset 0 1px 0 rgba(255,255,255,0.6);
     overflow: hidden;
+    box-shadow: 0 30px 70px -40px #000, inset 0 1px 0 rgba(255,255,255,0.04);
   }
 
   .rivet {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #fdfdfe, #cac4d3);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 1px 1px rgba(33,28,41,0.15);
+    position: absolute; width: 6px; height: 6px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #3b4546, #101415);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.12), 0 1px 2px #000;
   }
-  .rivet.tl { top: 12px; left: 12px; }
-  .rivet.tr { top: 12px; right: 12px; }
-  .rivet.bl { bottom: 12px; left: 12px; }
-  .rivet.br { bottom: 12px; right: 12px; }
+  .rivet.tl { top: 11px; left: 11px; }
+  .rivet.tr { top: 11px; right: 11px; }
+  .rivet.bl { bottom: 11px; left: 11px; }
+  .rivet.br { bottom: 11px; right: 11px; }
 
-  /* ---------- Header / faceplate ---------- */
+  /* ---------- Header ---------- */
   header {
-    padding: 32px 34px 28px;
-    border-bottom: 1px solid var(--hairline);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    background: linear-gradient(180deg, rgba(255,255,255,0.025), transparent 60%);
+    padding: 26px 30px 22px;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    background:
+      linear-gradient(180deg, rgba(0,255,149,0.05), transparent 70%),
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 4px);
   }
 
-  .brand { display: flex; align-items: center; gap: 16px; }
-
-  .led-strip { display: flex; gap: 6px; margin-bottom: 10px; }
+  .led-strip { display: flex; gap: 6px; margin-bottom: 9px; }
   .led {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--hairline);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.4);
-    transition: background .3s, box-shadow .3s;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #232b2c;
+    box-shadow: inset 0 1px 2px #000;
+    transition: background .25s, box-shadow .25s;
   }
-  .led.lit { background: var(--green); box-shadow: 0 0 8px var(--green), 0 0 2px var(--green); }
-  .led.busy { background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: pulse 1s ease-in-out infinite; }
-  .led.err { background: var(--red); box-shadow: 0 0 8px var(--red); }
-
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  .led.lit  { background: var(--neon); box-shadow: 0 0 10px var(--neon), 0 0 3px var(--neon); }
+  .led.busy { background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse 1s ease-in-out infinite; }
+  .led.err  { background: var(--red); box-shadow: 0 0 10px var(--red); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 
   .eyebrow {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: var(--accent-text);
-    margin-bottom: 2px;
+    display: block; font-size: 12px; font-weight: 700; letter-spacing: 3.5px;
+    color: var(--accent); margin-bottom: 3px; text-shadow: 0 0 14px var(--accent-soft);
   }
 
   .title-block h1 {
     font-family: 'Big Shoulders Display', sans-serif;
-    font-weight: 800;
-    font-size: 46px;
-    letter-spacing: 1px;
-    margin: 0;
-    line-height: 0.9;
-    text-transform: uppercase;
-    background: linear-gradient(180deg, var(--text), #4a4256);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 800; font-size: 52px; letter-spacing: 1px;
+    margin: 0; line-height: 0.88; text-transform: uppercase;
+    color: var(--text);
+    text-shadow: 0 0 26px rgba(0,255,149,0.18);
   }
-  .title-block p {
-    margin: 7px 0 0;
-    font-size: 14px;
-    color: var(--text-muted);
-    letter-spacing: 0.4px;
+  .title-block h1 em {
+    font-style: normal; color: var(--accent);
+    text-shadow: 0 0 22px var(--accent-soft);
   }
+  .title-block p { margin: 8px 0 0; font-size: 13.5px; color: var(--muted); letter-spacing: 0.4px; }
 
   .mode-toggle {
-    display: flex;
-    background: var(--channel);
-    border: 1px solid var(--hairline);
-    border-radius: 999px;
-    padding: 4px;
-    gap: 4px;
-    align-self: center;
+    display: flex; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 4px; gap: 4px; align-self: center;
   }
   .mode-toggle button {
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 12px 24px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: all .25s ease;
+    border: none; background: transparent; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;
+    letter-spacing: 1.2px; padding: 12px 26px; border-radius: 999px;
+    cursor: pointer; transition: all .2s ease;
   }
   .mode-toggle button.active {
-    color: #0d0b11;
-    background: var(--accent);
-    box-shadow: 0 0 16px var(--accent-soft), 0 0 0 1px var(--accent-soft);
+    color: var(--ink); background: var(--accent);
+    box-shadow: 0 0 22px var(--accent-soft);
   }
-  .mode-toggle button:not(.active):hover { color: var(--text); }
+  .mode-toggle button:not(.active):hover { color: var(--text); background: var(--raise); }
 
   .error-banner {
-    display: none;
-    margin: 16px 30px 0;
-    background: rgba(214, 54, 74, 0.08);
-    border: 1px solid var(--red);
-    color: #9c2233;
-    border-radius: var(--radius-sm);
-    padding: 13px 16px;
-    font-size: 13.5px;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    display: none; margin: 14px 26px 0;
+    background: rgba(255,77,106,0.08); border: 1px solid var(--red); color: #ffb3c0;
+    border-radius: var(--radius-sm); padding: 12px 15px; font-size: 13.5px;
+    align-items: center; justify-content: space-between; gap: 12px;
   }
-  .error-banner button {
-    background: none; border: none; color: #9c2233;
-    font-size: 18px; cursor: pointer; line-height: 1;
-  }
+  .error-banner button { background: none; border: none; color: #ffb3c0; font-size: 18px; cursor: pointer; line-height: 1; }
 
-  .engine-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px;
-    font-weight: 700;
-    background: none;
-    border: 1px solid var(--hairline);
-    color: var(--text-muted);
-    border-radius: 4px;
-    padding: 6px 12px;
-    cursor: pointer;
-    margin-left: 6px;
-  }
-  .engine-btn:hover { color: var(--text); border-color: var(--text-dim); }
-
-  /* ---------- Whisper model toggle ---------- */
-  .model-toggle-wrap {
-    padding: 18px 34px 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .model-label {
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-  }
-  .model-toggle { display: flex; gap: 6px; }
-  .model-chip {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    color: var(--text-muted);
-    background: var(--channel);
-    border: 1px solid var(--hairline);
-    border-radius: 999px;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .model-chip:hover { border-color: var(--text-dim); color: var(--text); }
-  .model-chip.active {
-    color: var(--accent-text);
-    border-color: var(--accent-text);
-    background: var(--accent-soft);
-  }
-
-  /* ---------- Drop zone ---------- */
-  .dropzone-wrap { padding: 26px 34px 4px; }
+  /* ---------- Dropzone ---------- */
+  .dropzone-wrap { padding: 22px 30px 4px; }
   .dropzone {
-    border: 1.5px dashed var(--hairline);
-    border-radius: var(--radius);
-    padding: 38px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color .2s, background .2s;
-    position: relative;
+    border: 1.5px dashed var(--line-2); border-radius: var(--radius);
+    padding: 30px 20px; text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+    background: var(--panel-2);
   }
   .dropzone:hover, .dropzone.drag {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    border-color: var(--accent); background: var(--accent-soft);
+    box-shadow: inset 0 0 40px -20px var(--accent);
   }
   .dropzone .dz-icon {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 27px;
-    color: var(--accent-text);
-    margin-bottom: 10px;
-    display: block;
+    font-family: 'JetBrains Mono', monospace; font-size: 24px;
+    color: var(--accent); margin-bottom: 8px; display: block; letter-spacing: 2px;
+    text-shadow: 0 0 16px var(--accent-soft);
   }
-  .dropzone .dz-text { font-size: 16px; color: var(--text); margin: 0 0 5px; }
-  .dropzone .dz-sub { font-size: 13px; color: var(--text-dim); margin: 0; }
+  .dropzone .dz-text { font-size: 15.5px; color: var(--text); margin: 0 0 4px; }
+  .dropzone .dz-sub { font-size: 12.5px; color: var(--dim); margin: 0; }
   .dropzone input[type=file] { display: none; }
 
   /* ---------- Toolbar ---------- */
   .toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 34px 0;
-    gap: 10px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 30px 0; gap: 10px; flex-wrap: wrap;
   }
+  .toolbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .toolbar .count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--text-muted);
-    letter-spacing: 0.5px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    color: var(--muted); letter-spacing: 0.5px;
   }
   .btn-render-all {
-    background: var(--accent);
-    color: #0d0b11;
-    border: none;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 13.5px;
-    letter-spacing: 0.8px;
-    padding: 13px 22px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    box-shadow: 0 0 18px var(--accent-soft);
-    transition: transform .15s, opacity .15s;
+    background: var(--accent); color: var(--ink); border: none;
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13.5px;
+    letter-spacing: 1px; padding: 13px 24px; border-radius: var(--radius-sm);
+    cursor: pointer; box-shadow: 0 0 26px var(--accent-soft);
+    transition: transform .15s, opacity .15s, box-shadow .15s;
   }
-  .btn-render-all:hover { transform: translateY(-1px); }
-  .btn-render-all:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .btn-render-all:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 0 34px var(--accent-soft); }
+  .btn-render-all:disabled { opacity: .35; cursor: not-allowed; transform: none; box-shadow: none; }
 
-  /* ---------- Channel list ---------- */
-  .channels { padding: 20px 34px 10px; display: flex; flex-direction: column; gap: 13px; }
-
-  .empty-state {
-    padding: 36px 10px;
-    text-align: center;
-    color: var(--text-dim);
-    font-size: 14px;
+  .ghost-btn {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700;
+    background: var(--raise); border: 1px solid var(--line-2); color: var(--muted);
+    border-radius: 5px; padding: 8px 12px; cursor: pointer; letter-spacing: .4px;
+    transition: all .15s;
   }
+  .ghost-btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent-dim); }
+  .ghost-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* ---------- Channels ---------- */
+  .channels { padding: 16px 30px 8px; display: flex; flex-direction: column; gap: 11px; }
+  .empty-state { padding: 34px 10px; text-align: center; color: var(--dim); font-size: 13.5px; }
 
   .channel {
-    background: var(--channel);
-    border: 1px solid var(--hairline-soft);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    display: grid;
-    grid-template-columns: 40px 1fr auto;
-    gap: 16px;
-    align-items: center;
-    transition: background .2s;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 15px 17px;
+    display: grid; grid-template-columns: 34px minmax(0,1fr) minmax(210px, auto);
+    gap: 14px; align-items: center; transition: border-color .2s, background .2s;
   }
-  .channel:hover { background: var(--channel-hover); }
+  .channel:hover { border-color: var(--line-2); background: var(--raise); }
+  .channel.is-done { border-color: rgba(0,255,149,0.35); }
+  .channel.is-error { border-color: rgba(255,77,106,0.45); }
 
   .ch-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12.5px;
-    color: var(--accent-text);
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    letter-spacing: 1px;
-    opacity: 0.8;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--accent);
+    writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 1.5px; opacity: .75;
   }
 
-  .ch-main { min-width: 0; display: flex; flex-direction: column; gap: 9px; }
-  .ch-info { display: flex; align-items: baseline; gap: 11px; flex-wrap: wrap; }
+  .ch-main { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ch-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .ch-name {
-    font-size: 15px;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 280px;
+    font-size: 14.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; max-width: 340px;
   }
-  .ch-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.3px;
-  }
+  .ch-meta { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--dim); }
   .ch-badge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    font-weight: 700;
-    color: var(--text-muted);
-    border: 1px solid var(--hairline);
-    border-radius: 4px;
-    padding: 2px 7px;
-    letter-spacing: 0.5px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+    color: var(--muted); border: 1px solid var(--line-2); border-radius: 4px;
+    padding: 2px 6px; letter-spacing: .5px;
   }
 
-  canvas.waveform { width: 100%; height: 40px; display: block; border-radius: 4px; }
-
-  .ch-progress {
-    height: 5px;
-    background: var(--hairline-soft);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 2px;
+  .wave-wrap { position: relative; }
+  canvas.waveform { width: 100%; height: 44px; display: block; border-radius: 4px; cursor: pointer; }
+  .play-btn {
+    position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(14,17,18,.82); border: 1px solid var(--line-2);
+    color: var(--accent); cursor: pointer; font-size: 11px; line-height: 1;
+    display: flex; align-items: center; justify-content: center; padding: 0;
+    opacity: 0; transition: opacity .15s;
   }
+  .channel:hover .play-btn, .play-btn.playing { opacity: 1; }
+  .play-btn:hover { border-color: var(--accent); }
+
+  .ch-progress { height: 4px; background: #0d1112; border-radius: 2px; overflow: hidden; }
   .ch-progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent-soft);
-    transition: width .2s ease;
+    height: 100%; width: 0%; background: var(--accent);
+    box-shadow: 0 0 10px var(--accent); transition: width .2s ease;
   }
-  .ch-status-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px;
-    color: var(--text-dim);
-    letter-spacing: 0.4px;
-  }
+  .ch-status-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: .3px; min-height: 14px; }
+  .ch-status-text.err { color: var(--red); }
+  .ch-status-text.ok { color: var(--neon-dim); }
 
-  .ch-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; min-width: 170px; }
-  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .ch-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .chip-row { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
   .chip {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    color: var(--text-muted);
-    background: var(--panel);
-    border: 1px solid var(--hairline);
-    border-radius: 4px;
-    padding: 6px 11px;
-    cursor: pointer;
-    transition: all .15s;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: .4px; color: var(--muted); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 4px; padding: 6px 9px;
+    cursor: pointer; transition: all .12s;
   }
-  .chip:hover { color: var(--text); border-color: var(--text-dim); }
-  .chip.active {
-    color: #0d0b11;
-    background: var(--accent);
-    border-color: var(--accent);
-  }
-  .chip.quality { font-size: 10.5px; padding: 5px 9px; opacity: 0.85; }
+  .chip:hover { color: var(--text); border-color: var(--line-2); }
+  .chip.active { color: var(--ink); background: var(--accent); border-color: var(--accent); }
+  .chip.quality { font-size: 10px; padding: 5px 8px; }
 
-  .ch-actions { display: flex; gap: 8px; align-items: center; }
+  .ch-actions { display: flex; gap: 6px; align-items: center; }
   .ch-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12.5px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    border: 1px solid var(--accent-text);
-    color: var(--accent-text);
-    background: transparent;
-    border-radius: var(--radius-sm);
-    padding: 10px 16px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all .15s;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+    letter-spacing: .5px; border: 1px solid var(--accent-dim); color: var(--accent);
+    background: transparent; border-radius: var(--radius-sm); padding: 10px 15px;
+    cursor: pointer; white-space: nowrap; transition: all .15s; max-width: 260px;
+    overflow: hidden; text-overflow: ellipsis;
   }
-  .ch-btn:hover { background: var(--accent-soft); }
+  .ch-btn:hover:not(:disabled) { background: var(--accent-soft); box-shadow: 0 0 18px var(--accent-soft); }
   .ch-btn:disabled { opacity: .35; cursor: not-allowed; }
-  .ch-btn.download { border-color: var(--green); color: var(--green); }
-  .ch-btn.download:hover { background: rgba(93,255,160,0.12); }
-  .ch-remove {
-    background: none; border: none; color: var(--text-dim);
-    cursor: pointer; font-size: 19px; line-height: 1; padding: 6px;
-  }
+  .ch-remove { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px 6px; margin-left: auto; }
   .ch-remove:hover { color: var(--red); }
 
   .transcript-panel {
-    grid-column: 1 / -1;
-    margin-top: 4px;
-    background: var(--panel);
-    border: 1px solid var(--hairline-soft);
-    border-radius: var(--radius-sm);
-    padding: 15px 17px;
-    display: none;
-    max-height: 260px;
-    overflow-y: auto;
+    grid-column: 1 / -1; margin-top: 2px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 13px 15px; display: none; max-height: 300px; overflow-y: auto;
   }
   .transcript-panel.open { display: block; }
   .transcript-line {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    line-height: 1.7;
-    color: var(--text);
-    display: flex;
-    gap: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.65;
+    color: var(--text); display: flex; gap: 10px; padding: 1px 0; border-radius: 3px;
   }
-  .transcript-line .ts { color: var(--accent-text); flex-shrink: 0; opacity: 0.9; font-weight: 700; }
+  .transcript-line:hover { background: var(--raise); }
+  .transcript-line .ts { color: var(--accent); flex-shrink: 0; font-weight: 700; cursor: pointer; }
   .transcript-actions {
-    display: flex; gap: 8px; margin-top: 10px;
-    border-top: 1px solid var(--hairline-soft); padding-top: 10px;
+    display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+    border-top: 1px solid var(--line); padding-top: 10px;
   }
-  .transcript-actions button {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px; font-weight: 700;
-    background: none; border: 1px solid var(--hairline);
-    color: var(--text-muted); border-radius: 4px;
-    padding: 7px 13px; cursor: pointer;
-  }
-  .transcript-actions button:hover { color: var(--text); border-color: var(--text-dim); }
 
   /* ---------- Footer ---------- */
   footer {
-    margin-top: 10px;
-    padding: 20px 34px 26px;
-    border-top: 1px solid var(--hairline);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+    padding: 16px 30px 20px; border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px;
   }
-  .engine-status-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2px;
-  }
-  .engine-status {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.3px;
-  }
-  .engine-status span { color: var(--text-muted); }
-  .signature {
-    font-size: 12.5px;
-    color: var(--text-dim);
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .signature a { color: var(--text-muted); text-decoration: none; }
+  .signature { font-size: 12px; color: var(--dim); display: flex; gap: 10px; align-items: center; }
+  .signature a { color: var(--muted); text-decoration: none; }
   .signature a:hover { color: var(--accent); }
 
-  @media (max-width: 680px) {
-    .channel { grid-template-columns: 1fr; }
-    .ch-num { display: none; }
-    .ch-controls { align-items: flex-start; width: 100%; min-width: 0; }
-    .chip-row { justify-content: flex-start; }
-    .ch-name { max-width: 100%; }
-    header { padding: 24px 20px; gap: 18px; }
-    .mode-toggle { width: 100%; }
-    .mode-toggle button { flex: 1; }
-    .model-toggle-wrap, .dropzone-wrap, .toolbar, .channels { padding-left: 20px; padding-right: 20px; }
-    .toolbar { flex-direction: column; align-items: stretch; }
-    .btn-render-all { width: 100%; padding-top: 14px; padding-bottom: 14px; }
-    footer { padding-left: 20px; padding-right: 20px; flex-direction: column; align-items: flex-start; }
-    .engine-status-row { gap: 8px 6px; }
-    .engine-btn { padding: 8px 13px; }
-    .ch-btn { padding: 11px 16px; }
-    .chip { padding: 8px 13px; }
-    .ch-remove { padding: 8px; }
-    .dropzone { padding: 30px 18px; }
+  /* ---------- Rail ---------- */
+  .rail {
+    position: sticky; top: 26px;
+    display: flex; flex-direction: column; gap: 14px;
+    max-height: calc(100vh - 52px); overflow-y: auto;
+    padding-right: 2px;
+  }
+  .rail::-webkit-scrollbar, .transcript-panel::-webkit-scrollbar, .log-list::-webkit-scrollbar { width: 8px; }
+  .rail::-webkit-scrollbar-thumb, .transcript-panel::-webkit-scrollbar-thumb, .log-list::-webkit-scrollbar-thumb {
+    background: var(--line-2); border-radius: 4px;
   }
 
-  @media (max-width: 420px) {
-    .title-block h1 { font-size: 38px; }
-    .dz-icon { font-size: 22px; }
-    .dz-sub { font-size: 12px; }
-    header { padding: 20px 16px; }
-    .model-toggle-wrap, .dropzone-wrap, .toolbar, .channels { padding-left: 16px; padding-right: 16px; }
-    footer { padding-left: 16px; padding-right: 16px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; padding: 12px 14px; cursor: pointer; user-select: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+    border-bottom: 1px solid transparent;
+  }
+  .card.open .card-head { border-bottom-color: var(--line); }
+  .card-head h2 {
+    margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    font-weight: 700; letter-spacing: 2px; color: var(--muted); text-transform: uppercase;
+  }
+  .card.open .card-head h2 { color: var(--accent); }
+  .card-head .caret { color: var(--dim); font-size: 11px; transition: transform .2s; }
+  .card.open .card-head .caret { transform: rotate(90deg); }
+  .card-body { display: none; padding: 14px; }
+  .card.open .card-body { display: block; }
+  .head-tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .5px;
+    color: var(--dim); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+  }
+  .head-tag.ok { color: var(--neon); border-color: var(--neon-dim); }
+  .head-tag.warn { color: var(--amber); border-color: var(--amber); }
+  .head-tag.err { color: var(--red); border-color: var(--red); }
+
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field > label {
+    display: block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: 1.2px; color: var(--dim); text-transform: uppercase; margin-bottom: 5px;
+  }
+  select, input[type=text], input[type=number] {
+    width: 100%; background: var(--bg); border: 1px solid var(--line);
+    color: var(--text); border-radius: 5px; padding: 8px 9px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  }
+  select:focus, input:focus { border-color: var(--accent-dim); outline: none; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .switch { display: flex; align-items: center; gap: 9px; cursor: pointer; padding: 5px 0; }
+  .switch input { display: none; }
+  .switch .track {
+    width: 34px; height: 18px; border-radius: 999px; background: var(--raise);
+    border: 1px solid var(--line-2); position: relative; transition: all .18s; flex-shrink: 0;
+  }
+  .switch .track::after {
+    content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--dim); transition: all .18s;
+  }
+  .switch input:checked + .track { background: var(--accent-soft); border-color: var(--accent-dim); }
+  .switch input:checked + .track::after { left: 17px; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .switch span.lbl { font-size: 12.5px; color: var(--muted); }
+  .switch:hover span.lbl { color: var(--text); }
+
+  .hint { font-size: 11px; color: var(--dim); line-height: 1.5; margin: 6px 0 0; }
+  .hint code { font-family: 'JetBrains Mono', monospace; color: var(--muted); background: var(--bg); padding: 1px 4px; border-radius: 3px; }
+
+  .status-line {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted);
+    display: flex; justify-content: space-between; gap: 8px; padding: 5px 0;
+    border-bottom: 1px dashed var(--line); letter-spacing: .2px;
+  }
+  .status-line:last-of-type { border-bottom: none; }
+  .status-line b { font-weight: 500; color: var(--dim); }
+  .status-line .v.ok { color: var(--neon); }
+  .status-line .v.err { color: var(--red); }
+  .status-line .v.warn { color: var(--amber); }
+
+  .dl-bar { height: 4px; background: #0d1112; border-radius: 2px; overflow: hidden; margin-top: 8px; display: none; }
+  .dl-bar.on { display: block; }
+  .dl-bar > i { display: block; height: 100%; width: 0%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width .15s; }
+
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+
+  /* ---------- Log console ---------- */
+  .log-toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+  .log-filter {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+    background: var(--bg); border: 1px solid var(--line); color: var(--dim);
+    border-radius: 4px; padding: 4px 8px; cursor: pointer; letter-spacing: .5px;
+  }
+  .log-filter.active { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-soft); }
+  .log-list {
+    background: #0a0d0e; border: 1px solid var(--line); border-radius: 6px;
+    height: 260px; overflow-y: auto; padding: 8px 9px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.55;
+    scroll-behavior: smooth;
+  }
+  .log-entry { display: flex; gap: 7px; padding: 1px 0; border-left: 2px solid transparent; padding-left: 6px; }
+  .log-entry:hover { background: rgba(255,255,255,0.03); }
+  .log-entry .t { color: #46514f; flex-shrink: 0; }
+  .log-entry .m { color: var(--muted); word-break: break-word; min-width: 0; }
+  .log-entry.debug .m { color: #5c6a68; }
+  .log-entry.info  { border-left-color: #2f3a3b; }
+  .log-entry.ok    { border-left-color: var(--neon); }
+  .log-entry.ok .m { color: var(--neon); }
+  .log-entry.warn  { border-left-color: var(--amber); }
+  .log-entry.warn .m { color: var(--amber); }
+  .log-entry.error { border-left-color: var(--red); background: rgba(255,77,106,0.06); }
+  .log-entry.error .m { color: #ff8fa2; }
+  .log-empty { color: var(--dim); font-style: italic; }
+
+  /* ---------- Toast ---------- */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(140%);
+    background: var(--panel-2); border: 1px solid var(--accent-dim); color: var(--text);
+    padding: 11px 18px; border-radius: 8px; font-size: 13px; z-index: 90;
+    box-shadow: 0 12px 40px -12px #000, 0 0 30px var(--accent-soft);
+    transition: transform .3s cubic-bezier(.2,.8,.3,1); max-width: 90vw;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1180px) {
+    .shell { grid-template-columns: minmax(0,1fr); }
+    .rail { position: static; max-height: none; overflow: visible; }
+  }
+  @media (max-width: 680px) {
+    body { padding: 16px 12px 40px; }
+    .channel { grid-template-columns: 1fr; }
+    .ch-num { display: none; }
+    .ch-controls { align-items: flex-start; width: 100%; }
+    .chip-row { justify-content: flex-start; }
+    .ch-name { max-width: 100%; }
+    header { padding: 22px 18px; }
+    .title-block h1 { font-size: 42px; }
+    .mode-toggle { width: 100%; }
+    .mode-toggle button { flex: 1; padding: 12px 10px; }
+    .dropzone-wrap, .toolbar, .channels, footer { padding-left: 18px; padding-right: 18px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .btn-render-all { width: 100%; }
+    .play-btn { opacity: 1; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -537,98 +481,306 @@
     * { transition-duration: 0.01ms !important; }
   }
 
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 </style>
 </head>
 <body>
 
-<div class="deck">
-  <span class="rivet tl"></span><span class="rivet tr"></span>
-  <span class="rivet bl"></span><span class="rivet br"></span>
+<div class="shell">
 
-  <header>
-    <div class="brand">
+  <!-- ===================== MAIN DECK ===================== -->
+  <div class="deck">
+    <span class="rivet tl"></span><span class="rivet tr"></span>
+    <span class="rivet bl"></span><span class="rivet br"></span>
+
+    <header>
       <div class="title-block">
         <div class="led-strip">
-          <div class="led" id="led1"></div>
-          <div class="led" id="led2"></div>
-          <div class="led" id="led3"></div>
+          <div class="led" id="led1" title="FFmpeg"></div>
+          <div class="led" id="led2" title="Whisper"></div>
+          <div class="led" id="led3" title="UI"></div>
         </div>
         <span class="eyebrow mono">AUDIO //</span>
-        <h1>Patchbay</h1>
-        <p>Format conversion &amp; transcription deck</p>
+        <h1>Patch<em>bay</em></h1>
+        <p>Konvertieren &amp; transkribieren — komplett im Browser</p>
+      </div>
+      <div class="mode-toggle">
+        <button id="modeConvertBtn" class="active">CONVERT</button>
+        <button id="modeTranscribeBtn">TRANSCRIBE</button>
+      </div>
+    </header>
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <div class="dropzone-wrap">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Audiodateien auswählen">
+        <span class="dz-icon">▁▂▃▅▇▅▃▂▁</span>
+        <p class="dz-text">Dateien hier ablegen oder klicken zum Auswählen</p>
+        <p class="dz-sub">WAV · MP3 · OGG · FLAC · M4A/AAC · OPUS · AIFF — Ordner werden mit eingelesen</p>
+        <input type="file" id="fileInput" multiple accept="audio/*">
       </div>
     </div>
-    <div class="mode-toggle">
-      <button id="modeConvertBtn" class="active">CONVERT</button>
-      <button id="modeTranscribeBtn">TRANSCRIBE</button>
-    </div>
-  </header>
 
-  <div class="error-banner" id="errorBanner"></div>
-
-  <div class="model-toggle-wrap" id="modelToggleWrap" style="display:none;">
-    <span class="model-label mono">WHISPER MODEL</span>
-    <div class="model-toggle" id="modelToggle">
-      <button class="model-chip active" data-model="base">BASE · ~150 MB</button>
-      <button class="model-chip" data-model="small">SMALL · ~500 MB, genauer</button>
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <span class="count mono" id="channelCount">0 Kanäle geladen</span>
+        <button class="ghost-btn" id="clearAllBtn" disabled>LEEREN</button>
+        <button class="ghost-btn" id="zipBtn" disabled>ALLE ALS ZIP</button>
+        <button class="ghost-btn" id="saveFolderBtn" disabled>IN ORDNER SPEICHERN</button>
+      </div>
+      <button class="btn-render-all" id="renderAllBtn" disabled>RENDER ALL ▸</button>
     </div>
+
+    <div class="channels" id="channels">
+      <div class="empty-state" id="emptyState">— keine Dateien geladen —</div>
+    </div>
+
+    <footer>
+      <span class="mono" style="font-size:11.5px;color:var(--dim)" id="footStat">bereit</span>
+      <div class="signature">
+        <span>Made with Love © — Audio Patchbay v2.0</span>
+        <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
+      </div>
+    </footer>
   </div>
 
-  <div class="dropzone-wrap">
-    <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Audiodateien auswählen">
-      <span class="dz-icon">▁▂▃▅▇▅▃▂▁</span>
-      <p class="dz-text">Dateien hier ablegen oder klicken zum Auswählen</p>
-      <p class="dz-sub">WAV · MP3 · OGG · FLAC · M4A/AAC · OPUS · AIFF — mehrere Dateien gleichzeitig möglich</p>
-      <input type="file" id="fileInput" multiple accept="audio/*">
-    </div>
-  </div>
+  <!-- ===================== RAIL ===================== -->
+  <aside class="rail">
 
-  <div class="toolbar">
-    <span class="count mono" id="channelCount">0 Kanäle geladen</span>
-    <button class="btn-render-all" id="renderAllBtn" disabled>RENDER ALL ▸</button>
-  </div>
+    <!-- Engine -->
+    <section class="card open" id="cardEngine">
+      <div class="card-head" data-toggle><h2>Engine</h2><div style="display:flex;gap:6px;align-items:center"><span class="head-tag" id="engineTag">idle</span><span class="caret">▸</span></div></div>
+      <div class="card-body">
+        <div class="status-line"><b>FFmpeg</b><span class="v" id="stFfmpeg">nicht geladen</span></div>
+        <div class="status-line"><b>Whisper</b><span class="v" id="stWhisper">nicht geladen</span></div>
+        <div class="status-line"><b>Quelle</b><span class="v" id="stSource">—</span></div>
+        <div class="status-line"><b>Cache</b><span class="v" id="stCache">—</span></div>
+        <div class="dl-bar" id="dlBar"><i></i></div>
 
-  <div class="channels" id="channels">
-    <div class="empty-state" id="emptyState">— keine Dateien geladen —</div>
-  </div>
+        <div class="btn-row">
+          <button class="ghost-btn" id="preloadFfmpegBtn">FFMPEG LADEN</button>
+          <button class="ghost-btn" id="preloadWhisperBtn">WHISPER LADEN</button>
+          <button class="ghost-btn" id="clearCacheBtn">CACHE LEEREN</button>
+        </div>
 
-  <footer>
-    <div class="engine-status-row">
-      <span class="engine-status mono" id="engineStatus">FFmpeg: <span>nicht geladen</span> · Whisper: <span>nicht geladen</span></span>
-      <button class="engine-btn" id="preloadFfmpegBtn">FFmpeg jetzt laden</button>
-      <button class="engine-btn" id="preloadWhisperBtn">Whisper jetzt laden</button>
-    </div>
-    <div class="signature">
-      <span>Made with Love © — Audio Patchbay v1.5</span>
-      <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
-    </div>
-  </footer>
+        <div class="field" style="margin-top:14px">
+          <label for="engineSource">Decoder-Quelle</label>
+          <select id="engineSource">
+            <option value="auto">Auto — erst lokal, dann CDN</option>
+            <option value="local">Nur lokal (neben dem Tool)</option>
+            <option value="custom">Eigene URL</option>
+            <option value="jsdelivr">Nur jsDelivr CDN</option>
+            <option value="unpkg">Nur unpkg CDN</option>
+          </select>
+        </div>
+        <div class="field" id="localBaseField">
+          <label for="localBase">Lokaler Pfad</label>
+          <input type="text" id="localBase" placeholder="./engine/ffmpeg/">
+          <p class="hint">Ordner mit <code>ffmpeg.js</code>, <code>814.ffmpeg.js</code>, <code>util.js</code>, <code>ffmpeg-core.js</code>, <code>ffmpeg-core.wasm</code>. Relativ zum Tool — läuft dann ohne CDN.</p>
+        </div>
+        <div class="field" id="customBaseField" style="display:none">
+          <label for="customBase">Eigene Basis-URL</label>
+          <input type="text" id="customBase" placeholder="https://…/engine/ffmpeg/">
+        </div>
+        <label class="switch"><input type="checkbox" id="optEngineCache"><span class="track"></span><span class="lbl">Engine im Browser-Cache halten</span></label>
+      </div>
+    </section>
+
+    <!-- Render options -->
+    <section class="card open" id="cardOptions">
+      <div class="card-head" data-toggle><h2>Render-Optionen</h2><span class="caret">▸</span></div>
+      <div class="card-body">
+        <div class="row-2">
+          <div class="field">
+            <label for="optFormat">Standardformat</label>
+            <select id="optFormat"></select>
+          </div>
+          <div class="field">
+            <label for="optQuality">Bitrate</label>
+            <select id="optQuality">
+              <option value="low">128 kbit/s</option>
+              <option value="med">192 kbit/s</option>
+              <option value="high">320 kbit/s</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="optRate">Samplerate</label>
+            <select id="optRate">
+              <option value="orig">unverändert</option>
+              <option value="48000">48 000 Hz</option>
+              <option value="44100">44 100 Hz</option>
+              <option value="32000">32 000 Hz</option>
+              <option value="22050">22 050 Hz</option>
+              <option value="16000">16 000 Hz</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="optChannels">Kanäle</label>
+            <select id="optChannels">
+              <option value="orig">unverändert</option>
+              <option value="2">Stereo</option>
+              <option value="1">Mono</option>
+            </select>
+          </div>
+        </div>
+        <label class="switch"><input type="checkbox" id="optNormalize"><span class="track"></span><span class="lbl">Lautheit angleichen (EBU R128)</span></label>
+        <label class="switch"><input type="checkbox" id="optApplyAll"><span class="track"></span><span class="lbl">Format sofort auf alle Kanäle</span></label>
+        <label class="switch"><input type="checkbox" id="optAutoSave"><span class="track"></span><span class="lbl">Fertiges direkt in Ausgabeordner</span></label>
+      </div>
+    </section>
+
+    <!-- Whisper -->
+    <section class="card" id="cardWhisper">
+      <div class="card-head" data-toggle><h2>Transkription</h2><span class="caret">▸</span></div>
+      <div class="card-body">
+        <div class="field">
+          <label for="optModel">Modell</label>
+          <select id="optModel">
+            <option value="tiny">Tiny · ~75 MB · schnell</option>
+            <option value="base">Base · ~150 MB · Standard</option>
+            <option value="small">Small · ~500 MB · genauer</option>
+            <option value="custom">Eigenes Modell …</option>
+          </select>
+        </div>
+        <div class="field" id="customModelField" style="display:none">
+          <label for="customModel">Modell-ID (Hugging Face)</label>
+          <input type="text" id="customModel" placeholder="Xenova/whisper-medium">
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="optLang">Sprache</label>
+            <select id="optLang">
+              <option value="auto">automatisch</option>
+              <option value="german">Deutsch</option>
+              <option value="english">Englisch</option>
+              <option value="italian">Italienisch</option>
+              <option value="spanish">Spanisch</option>
+              <option value="french">Französisch</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="optTask">Aufgabe</label>
+            <select id="optTask">
+              <option value="transcribe">Transkribieren</option>
+              <option value="translate">Ins Englische</option>
+            </select>
+          </div>
+        </div>
+        <p class="hint">Modelle werden einmalig geladen und bleiben im Browser-Cache. Erster Lauf dauert entsprechend länger.</p>
+      </div>
+    </section>
+
+    <!-- Cloud settings -->
+    <section class="card" id="cardSync">
+      <div class="card-head" data-toggle><h2>Einstellungen &amp; Ordner</h2><div style="display:flex;gap:6px;align-items:center"><span class="head-tag" id="syncTag">lokal</span><span class="caret">▸</span></div></div>
+      <div class="card-body">
+        <div class="status-line"><b>Sync-Ordner</b><span class="v" id="stSyncDir">nicht verbunden</span></div>
+        <div class="status-line"><b>Zuletzt</b><span class="v" id="stSyncTime">—</span></div>
+        <div class="btn-row">
+          <button class="ghost-btn" id="pickSyncBtn">ORDNER WÄHLEN</button>
+          <button class="ghost-btn" id="syncSaveBtn" disabled>SPEICHERN</button>
+          <button class="ghost-btn" id="syncLoadBtn" disabled>LADEN</button>
+          <button class="ghost-btn" id="syncOffBtn" disabled>TRENNEN</button>
+        </div>
+        <p class="hint">Legt <code>patchbay-settings.json</code> in den gewählten Ordner — z.&nbsp;B. direkt neben das Tool im Cloud-Ordner. Wird beim Start automatisch gelesen.</p>
+
+        <div class="status-line" style="margin-top:14px"><b>Ausgabeordner</b><span class="v" id="stOutDir">nicht gesetzt</span></div>
+        <div class="btn-row">
+          <button class="ghost-btn" id="pickOutBtn">ORDNER WÄHLEN</button>
+          <button class="ghost-btn" id="outOffBtn" disabled>TRENNEN</button>
+        </div>
+
+        <div class="btn-row" style="margin-top:14px">
+          <button class="ghost-btn" id="exportSettingsBtn">EXPORT .JSON</button>
+          <button class="ghost-btn" id="importSettingsBtn">IMPORT .JSON</button>
+          <button class="ghost-btn" id="resetSettingsBtn">ZURÜCKSETZEN</button>
+        </div>
+        <input type="file" id="settingsFileInput" accept="application/json" style="display:none">
+      </div>
+    </section>
+
+    <!-- Log -->
+    <section class="card open" id="cardLog">
+      <div class="card-head" data-toggle><h2>Log</h2><div style="display:flex;gap:6px;align-items:center"><span class="head-tag" id="logTag">0</span><span class="caret">▸</span></div></div>
+      <div class="card-body">
+        <div class="log-toolbar">
+          <button class="log-filter active" data-level="all">ALLE</button>
+          <button class="log-filter" data-level="info">INFO</button>
+          <button class="log-filter" data-level="warn">WARN</button>
+          <button class="log-filter" data-level="error">FEHLER</button>
+          <button class="log-filter" data-level="debug">DEBUG</button>
+        </div>
+        <div class="log-list" id="logList"><div class="log-empty">Log leer.</div></div>
+        <div class="btn-row">
+          <button class="ghost-btn" id="logCopyBtn">KOPIEREN</button>
+          <button class="ghost-btn" id="logSaveBtn">.LOG SPEICHERN</button>
+          <button class="ghost-btn" id="logClearBtn">LEEREN</button>
+        </div>
+        <label class="switch"><input type="checkbox" id="logAutoscroll" checked><span class="track"></span><span class="lbl">Automatisch scrollen</span></label>
+      </div>
+    </section>
+
+  </aside>
 </div>
 
+<div id="toast" role="status" aria-live="polite"></div>
+
 <script type="module">
-// ---------------------------------------------------------------------------
-// PATCHBAY — single-file offline audio converter & transcriber
-// FFmpeg.wasm for format conversion, Transformers.js (Whisper) for transcription
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// AUDIO PATCHBAY v2.0 — single-file offline audio converter & transcriber
+// FFmpeg.wasm (Konvertierung) + Transformers.js/Whisper (Transkription)
+// ===========================================================================
+
+const APP_VERSION = '2.0';
+const SETTINGS_KEY = 'patchbay.settings.v2';
+const SETTINGS_FILE = 'patchbay-settings.json';
+const ENGINE_CACHE = 'patchbay-engine-v1';
+const IDB_NAME = 'patchbay';
+const IDB_STORE = 'handles';
 
 const FFMPEG_VERSION = '0.12.10';
 const FFMPEG_CORE_VERSION = '0.12.10';
 const FFMPEG_UTIL_VERSION = '0.12.1';
-const FFMPEG_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/umd`;
-const FFMPEG_UTIL_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/util@${FFMPEG_UTIL_VERSION}/dist/umd`;
-const FFMPEG_CORE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm`;
+
+// Dateinamen im lokalen Engine-Ordner (flach)
+const LOCAL_FILES = {
+  ffmpeg: 'ffmpeg.js',
+  worker: '814.ffmpeg.js',
+  util:   'util.js',
+  core:   'ffmpeg-core.js',
+  wasm:   'ffmpeg-core.wasm',
+};
+
+function cdnSet(root) {
+  return {
+    id: root.includes('jsdelivr') ? 'jsdelivr' : 'unpkg',
+    label: root.includes('jsdelivr') ? 'jsDelivr' : 'unpkg',
+    ffmpeg: `${root}/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/umd/ffmpeg.js`,
+    worker: `${root}/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/umd/814.ffmpeg.js`,
+    util:   `${root}/@ffmpeg/util@${FFMPEG_UTIL_VERSION}/dist/umd/index.js`,
+    core:   `${root}/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm/ffmpeg-core.js`,
+    wasm:   `${root}/@ffmpeg/core@${FFMPEG_CORE_VERSION}/dist/esm/ffmpeg-core.wasm`,
+  };
+}
+function flatSet(base, id, label) {
+  const b = base.endsWith('/') ? base : base + '/';
+  return {
+    id, label,
+    ffmpeg: b + LOCAL_FILES.ffmpeg,
+    worker: b + LOCAL_FILES.worker,
+    util:   b + LOCAL_FILES.util,
+    core:   b + LOCAL_FILES.core,
+    wasm:   b + LOCAL_FILES.wasm,
+  };
+}
 
 const WHISPER_MODELS = {
+  tiny:  { id: 'Xenova/whisper-tiny',  label: 'Tiny · ~75 MB' },
   base:  { id: 'Xenova/whisper-base',  label: 'Base · ~150 MB' },
   small: { id: 'Xenova/whisper-small', label: 'Small · ~500 MB' },
 };
-let whisperModelKey = 'base';
-let loadedWhisperModelKey = null;
-
-// Canvas 2D fillStyle can't resolve CSS custom properties, so we mirror the
-// accent colors here as plain hex values for waveform drawing.
-const WAVE_COLORS = { convert: '#00c2d1', transcribe: '#e0177e' };
 
 const FORMATS = {
   wav:  { label: 'WAV',  mime: 'audio/wav',  lossy: false },
@@ -640,17 +792,51 @@ const FORMATS = {
   aiff: { label: 'AIFF', mime: 'audio/aiff', lossy: false },
 };
 const QUALITY_PRESETS = { low: 128, med: 192, high: 320 };
+const WAVE_COLORS = { convert: '#00ff95', transcribe: '#ccff00' };
 
-let mode = 'convert'; // 'convert' | 'transcribe'
+// ---------------------------------------------------------------------------
+// Settings
+// ---------------------------------------------------------------------------
+const DEFAULT_SETTINGS = {
+  version: APP_VERSION,
+  mode: 'convert',
+  format: 'mp3',
+  quality: 'med',
+  sampleRate: 'orig',
+  channels: 'orig',
+  normalize: false,
+  applyAll: false,
+  autoSave: false,
+  whisperModel: 'base',
+  customModel: '',
+  language: 'auto',
+  task: 'transcribe',
+  engineSource: 'auto',
+  localBase: './engine/ffmpeg/',
+  customBase: '',
+  engineCache: true,
+  logAutoscroll: true,
+};
+
+let settings = { ...DEFAULT_SETTINGS };
+
+// ---------------------------------------------------------------------------
+// Runtime state
+// ---------------------------------------------------------------------------
+let mode = 'convert';
 let channels = [];
 let chId = 0;
 
-let ffmpeg = null;
-let ffmpegReady = false;
-let transcriber = null;
-let transcriberReady = false;
+let ffmpeg = null, ffmpegReady = false, activeSourceLabel = null;
+let transcriber = null, transcriberReady = false, loadedModelId = null;
 
-const $ = (sel) => document.querySelector(sel);
+let syncDirHandle = null, outDirHandle = null;
+let syncSaveTimer = null;
+let previewAudio = null, previewCh = null, previewRaf = null;
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
 const channelsEl = $('#channels');
 const emptyState = $('#emptyState');
 const channelCount = $('#channelCount');
@@ -658,68 +844,699 @@ const renderAllBtn = $('#renderAllBtn');
 const dropzone = $('#dropzone');
 const fileInput = $('#fileInput');
 const led1 = $('#led1'), led2 = $('#led2'), led3 = $('#led3');
-const engineStatus = $('#engineStatus');
+const dlBar = $('#dlBar');
 
-function setLed(led, state) {
-  led.classList.remove('lit', 'busy', 'err');
-  if (state) led.classList.add(state);
+// ===========================================================================
+// LOG
+// ===========================================================================
+const LOG_MAX = 800;
+let logEntries = [];
+let logFilter = 'all';
+const logList = $('#logList');
+
+function stamp(d) {
+  const p = (n, l = 2) => String(n).padStart(l, '0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${p(d.getMilliseconds(), 3)}`;
+}
+
+function log(level, msg, detail) {
+  const e = { level, msg: String(msg), detail: detail === undefined ? null : detail, at: new Date() };
+  logEntries.push(e);
+  if (logEntries.length > LOG_MAX) logEntries.splice(0, logEntries.length - LOG_MAX);
+  appendLogEntry(e);
+  $('#logTag').textContent = logEntries.length;
+  const errs = logEntries.filter(x => x.level === 'error').length;
+  $('#logTag').className = 'head-tag' + (errs ? ' err' : '');
+}
+const logInfo  = (m, d) => log('info', m, d);
+const logOk    = (m, d) => log('ok', m, d);
+const logWarn  = (m, d) => log('warn', m, d);
+const logErr   = (m, d) => log('error', m, d);
+const logDebug = (m, d) => log('debug', m, d);
+
+function logText(e) {
+  let s = `[${stamp(e.at)}] ${e.level.toUpperCase().padEnd(5)} ${e.msg}`;
+  if (e.detail) s += `  ${typeof e.detail === 'string' ? e.detail : JSON.stringify(e.detail)}`;
+  return s;
+}
+
+function appendLogEntry(e) {
+  const empty = logList.querySelector('.log-empty');
+  if (empty) empty.remove();
+  const div = document.createElement('div');
+  div.className = 'log-entry ' + e.level;
+  div.dataset.level = e.level;
+  div.innerHTML = `<span class="t">${stamp(e.at)}</span><span class="m"></span>`;
+  div.querySelector('.m').textContent = e.msg + (e.detail ? '  ' + (typeof e.detail === 'string' ? e.detail : JSON.stringify(e.detail)) : '');
+  if (logFilter !== 'all' && logFilter !== e.level) div.style.display = 'none';
+  logList.appendChild(div);
+  while (logList.children.length > LOG_MAX) logList.removeChild(logList.firstChild);
+  if (settings.logAutoscroll) logList.scrollTop = logList.scrollHeight;
+}
+
+function renderLogFilter() {
+  logList.querySelectorAll('.log-entry').forEach(n => {
+    n.style.display = (logFilter === 'all' || n.dataset.level === logFilter) ? 'flex' : 'none';
+  });
+}
+
+$$('.log-filter').forEach(btn => btn.addEventListener('click', () => {
+  logFilter = btn.dataset.level;
+  $$('.log-filter').forEach(b => b.classList.toggle('active', b === btn));
+  renderLogFilter();
+}));
+$('#logClearBtn').addEventListener('click', () => {
+  logEntries = [];
+  logList.innerHTML = '<div class="log-empty">Log leer.</div>';
+  $('#logTag').textContent = '0';
+  $('#logTag').className = 'head-tag';
+});
+$('#logCopyBtn').addEventListener('click', async () => {
+  await navigator.clipboard.writeText(logEntries.map(logText).join('\n'));
+  toast('Log kopiert');
+});
+$('#logSaveBtn').addEventListener('click', () => {
+  const header = `Audio Patchbay v${APP_VERSION} — Log\n${new Date().toISOString()}\n${'-'.repeat(60)}\n`;
+  triggerDownload(new Blob([header + logEntries.map(logText).join('\n')], { type: 'text/plain' }),
+    `patchbay-log_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.log`);
+});
+
+window.addEventListener('error', (e) => logErr('JS-Fehler: ' + e.message, `${e.filename}:${e.lineno}`));
+window.addEventListener('unhandledrejection', (e) => logErr('Unbehandelte Promise: ' + (e.reason?.message || e.reason)));
+
+// ===========================================================================
+// Toast + Fehlerbanner
+// ===========================================================================
+let toastTimer = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function showError(msg) {
+  const banner = $('#errorBanner');
+  banner.innerHTML = '<span></span><button aria-label="Schließen">×</button>';
+  banner.querySelector('span').textContent = msg;
+  banner.style.display = 'flex';
+  banner.querySelector('button').addEventListener('click', () => { banner.style.display = 'none'; });
+  logErr(msg);
+}
+
+// ===========================================================================
+// IndexedDB für Verzeichnis-Handles
+// ===========================================================================
+function idb() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => { req.result.createObjectStore(IDB_STORE); };
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+async function idbSet(key, val) {
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(val, key);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbGet(key) {
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const r = tx.objectStore(IDB_STORE).get(key);
+    r.onsuccess = () => res(r.result || null);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function idbDel(key) {
+  const db = await idb();
+  return new Promise((res) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(key);
+    tx.oncomplete = res;
+  });
+}
+
+const hasFSA = 'showDirectoryPicker' in window;
+
+// ===========================================================================
+// Settings laden / speichern
+// ===========================================================================
+function loadLocalSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (raw) {
+      settings = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+      logInfo('Einstellungen aus dem Browser geladen');
+    } else {
+      logInfo('Keine gespeicherten Einstellungen — Standardwerte aktiv');
+    }
+  } catch (e) {
+    logWarn('Einstellungen im Browser unlesbar, Standardwerte aktiv', e.message);
+  }
+}
+
+function saveSettings({ toFolder = true } = {}) {
+  settings.version = APP_VERSION;
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch (e) {
+    logWarn('Speichern im Browser fehlgeschlagen', e.message);
+  }
+  if (toFolder && syncDirHandle) {
+    clearTimeout(syncSaveTimer);
+    syncSaveTimer = setTimeout(() => writeSettingsToFolder().catch(() => {}), 900);
+  }
+}
+
+async function writeSettingsToFolder() {
+  if (!syncDirHandle) return;
+  try {
+    const fh = await syncDirHandle.getFileHandle(SETTINGS_FILE, { create: true });
+    const w = await fh.createWritable();
+    await w.write(JSON.stringify({ ...settings, savedAt: new Date().toISOString() }, null, 2));
+    await w.close();
+    $('#stSyncTime').textContent = stamp(new Date());
+    logOk(`Einstellungen in ${SETTINGS_FILE} geschrieben`);
+  } catch (e) {
+    logErr('Schreiben in den Sync-Ordner fehlgeschlagen', e.message);
+    setSyncTag('err', 'Fehler');
+  }
+}
+
+async function readSettingsFromFolder({ quiet = false } = {}) {
+  if (!syncDirHandle) return false;
+  try {
+    const fh = await syncDirHandle.getFileHandle(SETTINGS_FILE);
+    const txt = await (await fh.getFile()).text();
+    const data = JSON.parse(txt);
+    delete data.savedAt;
+    settings = { ...DEFAULT_SETTINGS, ...data };
+    applySettingsToUI();
+    saveSettings({ toFolder: false });
+    $('#stSyncTime').textContent = stamp(new Date());
+    logOk(`Einstellungen aus ${SETTINGS_FILE} übernommen`);
+    return true;
+  } catch (e) {
+    if (e.name === 'NotFoundError') {
+      if (!quiet) logInfo(`${SETTINGS_FILE} noch nicht vorhanden — wird beim nächsten Speichern angelegt`);
+      return false;
+    }
+    logErr('Lesen aus dem Sync-Ordner fehlgeschlagen', e.message);
+    return false;
+  }
+}
+
+function setSyncTag(cls, txt) {
+  const t = $('#syncTag');
+  t.className = 'head-tag' + (cls ? ' ' + cls : '');
+  t.textContent = txt;
+}
+
+async function connectSyncDir(handle, { load = true } = {}) {
+  syncDirHandle = handle;
+  $('#stSyncDir').textContent = handle.name;
+  $('#stSyncDir').className = 'v ok';
+  setSyncTag('ok', 'verbunden');
+  ['#syncSaveBtn', '#syncLoadBtn', '#syncOffBtn'].forEach(s => $(s).disabled = false);
+  logOk('Sync-Ordner verbunden: ' + handle.name);
+  if (load) {
+    const found = await readSettingsFromFolder({ quiet: true });
+    if (!found) await writeSettingsToFolder();
+  }
+}
+
+async function restoreHandles() {
+  if (!hasFSA) {
+    $('#stSyncDir').textContent = 'Browser unterstützt das nicht';
+    $('#stSyncDir').className = 'v warn';
+    $('#pickSyncBtn').disabled = true;
+    $('#pickOutBtn').disabled = true;
+    logWarn('File System Access API nicht verfügbar — Einstellungen bleiben nur im Browser');
+    return;
+  }
+  for (const [key, kind] of [['syncDir', 'sync'], ['outDir', 'out']]) {
+    try {
+      const h = await idbGet(key);
+      if (!h) continue;
+      const perm = await h.queryPermission({ mode: 'readwrite' });
+      if (perm === 'granted') {
+        if (kind === 'sync') await connectSyncDir(h);
+        else setOutDir(h);
+      } else {
+        if (kind === 'sync') {
+          setSyncTag('warn', 'Freigabe nötig');
+          $('#stSyncDir').textContent = h.name + ' — Freigabe nötig';
+          $('#stSyncDir').className = 'v warn';
+          $('#pickSyncBtn').textContent = 'ORDNER FREIGEBEN';
+          $('#pickSyncBtn').dataset.reconnect = key;
+          window.__pendingSync = h;
+        } else {
+          window.__pendingOut = h;
+          $('#stOutDir').textContent = h.name + ' — Freigabe nötig';
+          $('#stOutDir').className = 'v warn';
+        }
+        logInfo(`Ordner "${h.name}" bekannt, braucht aber eine Freigabe per Klick`);
+      }
+    } catch (e) {
+      logWarn('Gemerkter Ordner nicht mehr erreichbar', e.message);
+    }
+  }
+}
+
+function setOutDir(h) {
+  outDirHandle = h;
+  $('#stOutDir').textContent = h.name;
+  $('#stOutDir').className = 'v ok';
+  $('#outOffBtn').disabled = false;
+  updateToolbar();
+  logOk('Ausgabeordner: ' + h.name);
+}
+
+$('#pickSyncBtn').addEventListener('click', async () => {
+  try {
+    if (window.__pendingSync) {
+      const h = window.__pendingSync;
+      const perm = await h.requestPermission({ mode: 'readwrite' });
+      if (perm === 'granted') {
+        window.__pendingSync = null;
+        $('#pickSyncBtn').textContent = 'ORDNER WÄHLEN';
+        await connectSyncDir(h);
+        return;
+      }
+      logWarn('Freigabe abgelehnt');
+      return;
+    }
+    const h = await window.showDirectoryPicker({ id: 'patchbay-sync', mode: 'readwrite' });
+    await idbSet('syncDir', h);
+    await connectSyncDir(h);
+    toast('Sync-Ordner verbunden');
+  } catch (e) {
+    if (e.name !== 'AbortError') logErr('Ordnerauswahl fehlgeschlagen', e.message);
+  }
+});
+$('#syncSaveBtn').addEventListener('click', () => writeSettingsToFolder().then(() => toast('Einstellungen gespeichert')));
+$('#syncLoadBtn').addEventListener('click', () => readSettingsFromFolder().then(ok => ok && toast('Einstellungen geladen')));
+$('#syncOffBtn').addEventListener('click', async () => {
+  syncDirHandle = null;
+  await idbDel('syncDir');
+  $('#stSyncDir').textContent = 'nicht verbunden';
+  $('#stSyncDir').className = 'v';
+  setSyncTag('', 'lokal');
+  ['#syncSaveBtn', '#syncLoadBtn', '#syncOffBtn'].forEach(s => $(s).disabled = true);
+  logInfo('Sync-Ordner getrennt');
+});
+
+$('#pickOutBtn').addEventListener('click', async () => {
+  try {
+    if (window.__pendingOut) {
+      const h = window.__pendingOut;
+      if (await h.requestPermission({ mode: 'readwrite' }) === 'granted') {
+        window.__pendingOut = null; setOutDir(h); return;
+      }
+      return;
+    }
+    const h = await window.showDirectoryPicker({ id: 'patchbay-out', mode: 'readwrite' });
+    await idbSet('outDir', h);
+    setOutDir(h);
+    toast('Ausgabeordner gesetzt');
+  } catch (e) {
+    if (e.name !== 'AbortError') logErr('Ordnerauswahl fehlgeschlagen', e.message);
+  }
+});
+$('#outOffBtn').addEventListener('click', async () => {
+  outDirHandle = null;
+  await idbDel('outDir');
+  $('#stOutDir').textContent = 'nicht gesetzt';
+  $('#stOutDir').className = 'v';
+  $('#outOffBtn').disabled = true;
+  updateToolbar();
+  logInfo('Ausgabeordner getrennt');
+});
+
+$('#exportSettingsBtn').addEventListener('click', () => {
+  triggerDownload(new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' }), SETTINGS_FILE);
+});
+$('#importSettingsBtn').addEventListener('click', () => $('#settingsFileInput').click());
+$('#settingsFileInput').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    settings = { ...DEFAULT_SETTINGS, ...JSON.parse(await f.text()) };
+    applySettingsToUI(); saveSettings();
+    toast('Einstellungen importiert'); logOk('Einstellungen aus Datei importiert: ' + f.name);
+  } catch (err) { logErr('Import fehlgeschlagen', err.message); }
+  e.target.value = '';
+});
+$('#resetSettingsBtn').addEventListener('click', () => {
+  settings = { ...DEFAULT_SETTINGS };
+  applySettingsToUI(); saveSettings();
+  toast('Auf Standard zurückgesetzt'); logInfo('Einstellungen zurückgesetzt');
+});
+
+// ===========================================================================
+// Settings <-> UI
+// ===========================================================================
+const fmtSelect = $('#optFormat');
+fmtSelect.innerHTML = Object.entries(FORMATS)
+  .map(([k, f]) => `<option value="${k}">${f.label}${f.lossy ? '' : ' · verlustfrei'}</option>`).join('');
+
+function applySettingsToUI() {
+  $('#optFormat').value = settings.format;
+  $('#optQuality').value = settings.quality;
+  $('#optRate').value = settings.sampleRate;
+  $('#optChannels').value = settings.channels;
+  $('#optNormalize').checked = settings.normalize;
+  $('#optApplyAll').checked = settings.applyAll;
+  $('#optAutoSave').checked = settings.autoSave;
+  $('#optModel').value = settings.whisperModel;
+  $('#customModel').value = settings.customModel;
+  $('#customModelField').style.display = settings.whisperModel === 'custom' ? 'block' : 'none';
+  $('#optLang').value = settings.language;
+  $('#optTask').value = settings.task;
+  $('#engineSource').value = settings.engineSource;
+  $('#localBase').value = settings.localBase;
+  $('#customBase').value = settings.customBase;
+  $('#optEngineCache').checked = settings.engineCache;
+  $('#logAutoscroll').checked = settings.logAutoscroll;
+  updateEngineSourceFields();
+  updateEngineStatus();
+  setMode(settings.mode || 'convert', { silent: true });
+}
+
+function bind(sel, key, prop = 'value', after) {
+  const el = $(sel);
+  el.addEventListener('change', () => {
+    settings[key] = prop === 'checked' ? el.checked : el.value;
+    saveSettings();
+    logDebug(`Einstellung geändert: ${key} = ${settings[key]}`);
+    if (after) after();
+  });
+}
+bind('#optFormat', 'format', 'value', () => {
+  if (settings.applyAll) { channels.forEach(c => { c.targetFormat = settings.format; resetChannel(c); }); renderChannels(); }
+});
+bind('#optQuality', 'quality', 'value', () => {
+  if (settings.applyAll) { channels.forEach(c => { c.quality = settings.quality; resetChannel(c); }); renderChannels(); }
+});
+bind('#optRate', 'sampleRate');
+bind('#optChannels', 'channels');
+bind('#optNormalize', 'normalize', 'checked');
+bind('#optApplyAll', 'applyAll', 'checked');
+bind('#optAutoSave', 'autoSave', 'checked');
+bind('#optModel', 'whisperModel', 'value', () => {
+  $('#customModelField').style.display = settings.whisperModel === 'custom' ? 'block' : 'none';
+  updateEngineStatus();
+});
+bind('#customModel', 'customModel', 'value', updateEngineStatus);
+bind('#optLang', 'language');
+bind('#optTask', 'task');
+bind('#engineSource', 'engineSource', 'value', () => { updateEngineSourceFields(); updateEngineStatus(); });
+bind('#localBase', 'localBase');
+bind('#customBase', 'customBase');
+bind('#optEngineCache', 'engineCache', 'checked', updateCacheStatus);
+bind('#logAutoscroll', 'logAutoscroll', 'checked');
+
+function updateEngineSourceFields() {
+  const s = settings.engineSource;
+  $('#localBaseField').style.display = (s === 'auto' || s === 'local') ? 'block' : 'none';
+  $('#customBaseField').style.display = s === 'custom' ? 'block' : 'none';
+}
+
+// Karten auf/zu
+$$('.card-head[data-toggle]').forEach(h => h.addEventListener('click', () => h.parentElement.classList.toggle('open')));
+
+// ===========================================================================
+// Engine: Quellenauflösung, Cache, Laden
+// ===========================================================================
+function engineCandidates() {
+  const jsd = cdnSet('https://cdn.jsdelivr.net/npm');
+  const unp = cdnSet('https://unpkg.com');
+  switch (settings.engineSource) {
+    case 'local':    return [flatSet(settings.localBase || './engine/ffmpeg/', 'local', 'lokal')];
+    case 'custom':   return [flatSet(settings.customBase || './', 'custom', 'eigene URL')];
+    case 'jsdelivr': return [jsd];
+    case 'unpkg':    return [unp];
+    default:         return [flatSet(settings.localBase || './engine/ffmpeg/', 'local', 'lokal'), jsd, unp];
+  }
+}
+
+function setDlProgress(pct) {
+  dlBar.classList.toggle('on', pct !== null);
+  if (pct !== null) dlBar.firstElementChild.style.width = Math.max(0, Math.min(100, pct)) + '%';
+}
+
+async function cachedFetchBlobURL(url, mime, label) {
+  const t0 = performance.now();
+  if (settings.engineCache && 'caches' in window) {
+    try {
+      const c = await caches.open(ENGINE_CACHE);
+      const hit = await c.match(url);
+      if (hit) {
+        const blob = await hit.blob();
+        logOk(`${label} aus dem Cache (${fmtBytes(blob.size)}, ${Math.round(performance.now() - t0)} ms)`);
+        return URL.createObjectURL(new Blob([blob], { type: mime }));
+      }
+    } catch (e) { logWarn('Cache nicht lesbar', e.message); }
+  }
+
+  logInfo(`${label} wird geladen …`, url);
+  let resp;
+  try { resp = await fetch(url); }
+  catch (e) { throw new Error(`Netzwerkfehler bei ${url}: ${e.message || e}`); }
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} bei ${url}`);
+
+  const total = Number(resp.headers.get('content-length')) || 0;
+  let blob;
+  if (resp.body && total > 1_000_000) {
+    const reader = resp.body.getReader();
+    const chunks = []; let got = 0;
+    setDlProgress(0);
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value); got += value.length;
+      setDlProgress((got / total) * 100);
+      $('#stSource').textContent = `${label} ${fmtBytes(got)} / ${fmtBytes(total)}`;
+    }
+    setDlProgress(null);
+    blob = new Blob(chunks, { type: mime });
+  } else {
+    blob = await resp.blob();
+  }
+
+  if (settings.engineCache && 'caches' in window) {
+    try {
+      const c = await caches.open(ENGINE_CACHE);
+      await c.put(url, new Response(blob, { headers: { 'content-type': mime, 'content-length': String(blob.size) } }));
+      logDebug(`${label} im Cache abgelegt`);
+    } catch (e) { logWarn(`${label} konnte nicht gecacht werden`, e.message); }
+  }
+  logOk(`${label} geladen (${fmtBytes(blob.size)}, ${Math.round(performance.now() - t0)} ms)`);
+  return URL.createObjectURL(new Blob([blob], { type: mime }));
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Skript nicht ladbar: ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+async function tryLoadFFmpegFrom(set) {
+  logInfo(`Engine-Quelle "${set.label}" wird versucht`);
+  if (!window.FFmpegWASM) await loadScript(set.ffmpeg);
+  if (!window.FFmpegUtil) await loadScript(set.util);
+  const { FFmpeg } = window.FFmpegWASM;
+  const inst = new FFmpeg();
+  inst.on('log', ({ message }) => { if (message) logDebug('ffmpeg: ' + message); });
+  await inst.load({
+    // Der Worker-Chunk lässt sich nicht direkt von einer fremden Domain starten —
+    // deshalb holen wir alle Teile selbst und übergeben Blob-URLs.
+    classWorkerURL: await cachedFetchBlobURL(set.worker, 'text/javascript', 'FFmpeg Worker'),
+    coreURL:        await cachedFetchBlobURL(set.core, 'text/javascript', 'FFmpeg Core'),
+    wasmURL:        await cachedFetchBlobURL(set.wasm, 'application/wasm', 'FFmpeg WASM (~32 MB)'),
+  });
+  return inst;
+}
+
+async function ensureFFmpeg() {
+  if (ffmpegReady) return ffmpeg;
+  setLed(led1, 'busy');
+  setEngineTag('warn', 'lädt');
+  const t0 = performance.now();
+  const errors = [];
+  for (const set of engineCandidates()) {
+    try {
+      ffmpeg = await tryLoadFFmpegFrom(set);
+      ffmpegReady = true;
+      activeSourceLabel = set.label;
+      setLed(led1, 'lit');
+      setEngineTag('ok', 'bereit');
+      updateEngineStatus();
+      updateCacheStatus();
+      logOk(`FFmpeg bereit über "${set.label}" (${Math.round(performance.now() - t0)} ms)`);
+      return ffmpeg;
+    } catch (e) {
+      errors.push(`${set.label}: ${e.message || e}`);
+      logWarn(`Quelle "${set.label}" fehlgeschlagen`, e.message || String(e));
+      setDlProgress(null);
+    }
+  }
+  setLed(led1, 'err');
+  setEngineTag('err', 'Fehler');
+  const fileProto = location.protocol === 'file:';
+  showError('FFmpeg konnte nicht geladen werden. ' + errors.join(' | ') +
+    (fileProto ? ' — Die Seite läuft über file://. Bitte über http(s):// öffnen, z. B. GitHub Pages oder lokal mit "python -m http.server 8000".' : ''));
+  throw new Error('FFmpeg nicht ladbar');
+}
+
+function setEngineTag(cls, txt) {
+  const t = $('#engineTag');
+  t.className = 'head-tag' + (cls ? ' ' + cls : '');
+  t.textContent = txt;
+}
+
+function currentModel() {
+  return settings.whisperModel === 'custom'
+    ? { id: settings.customModel.trim(), label: settings.customModel.trim() || '(keine Modell-ID)' }
+    : WHISPER_MODELS[settings.whisperModel];
 }
 
 function updateEngineStatus() {
-  const ff = ffmpegReady
-    ? '<span style="color:var(--green)">geladen</span>'
-    : '<span>nicht geladen — lädt automatisch beim ersten Convert</span>';
-  const modelLabel = WHISPER_MODELS[whisperModelKey].label;
-  const whLoaded = transcriberReady && loadedWhisperModelKey === whisperModelKey;
-  const wh = whLoaded
-    ? `<span style="color:var(--green)">${modelLabel} geladen</span>`
-    : `<span>${modelLabel} — lädt automatisch beim ersten Transcribe</span>`;
-  engineStatus.innerHTML = `FFmpeg: ${ff} · Whisper: ${wh}`;
+  const ff = $('#stFfmpeg');
+  ff.textContent = ffmpegReady ? `bereit · ${activeSourceLabel}` : 'nicht geladen';
+  ff.className = 'v' + (ffmpegReady ? ' ok' : '');
+  const m = currentModel();
+  const wh = $('#stWhisper');
+  const loaded = transcriberReady && loadedModelId === m.id;
+  wh.textContent = loaded ? `${m.label} bereit` : m.label;
+  wh.className = 'v' + (loaded ? ' ok' : '');
+  const srcLabels = { auto: 'Auto (lokal → CDN)', local: 'lokal', custom: 'eigene URL', jsdelivr: 'jsDelivr', unpkg: 'unpkg' };
+  $('#stSource').textContent = srcLabels[settings.engineSource] || settings.engineSource;
 }
 
+async function updateCacheStatus() {
+  const el = $('#stCache');
+  if (!settings.engineCache) { el.textContent = 'aus'; el.className = 'v'; return; }
+  if (!('caches' in window)) { el.textContent = 'nicht verfügbar'; el.className = 'v warn'; return; }
+  try {
+    const c = await caches.open(ENGINE_CACHE);
+    const keys = await c.keys();
+    if (!keys.length) { el.textContent = 'leer'; el.className = 'v'; return; }
+    let bytes = 0;
+    for (const k of keys) {
+      const r = await c.match(k);
+      bytes += Number(r?.headers.get('content-length')) || 0;
+    }
+    el.textContent = `${keys.length} Dateien · ${fmtBytes(bytes)}`;
+    el.className = 'v ok';
+  } catch (e) { el.textContent = 'unbekannt'; el.className = 'v'; }
+}
+
+$('#clearCacheBtn').addEventListener('click', async () => {
+  try {
+    await caches.delete(ENGINE_CACHE);
+    logOk('Engine-Cache geleert');
+    toast('Cache geleert — nächster Start lädt neu');
+    updateCacheStatus();
+  } catch (e) { logErr('Cache leeren fehlgeschlagen', e.message); }
+});
+$('#preloadFfmpegBtn').addEventListener('click', () => ensureFFmpeg().catch(() => {}));
+$('#preloadWhisperBtn').addEventListener('click', () => ensureTranscriber().catch(() => {}));
+
+// ===========================================================================
+// Whisper
+// ===========================================================================
+async function ensureTranscriber() {
+  const m = currentModel();
+  if (!m.id) { showError('Bitte eine Modell-ID eintragen.'); throw new Error('kein Modell'); }
+  if (transcriberReady && loadedModelId === m.id) return transcriber;
+  transcriberReady = false;
+  setLed(led2, 'busy');
+  const t0 = performance.now();
+  try {
+    logInfo(`Whisper-Modell "${m.id}" wird geladen …`);
+    const mod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
+    const { pipeline, env } = mod;
+    env.allowLocalModels = false;
+    let lastPct = -10;
+    transcriber = await pipeline('automatic-speech-recognition', m.id, {
+      progress_callback: (p) => {
+        if (p.status === 'progress') {
+          const pct = Math.round(p.progress || 0);
+          setDlProgress(pct);
+          $('#stWhisper').textContent = `lädt ${pct}%`;
+          if (pct - lastPct >= 20) { lastPct = pct; logDebug(`Modell-Download ${pct}% ${p.file || ''}`); }
+        }
+      },
+    });
+    setDlProgress(null);
+    loadedModelId = m.id;
+    transcriberReady = true;
+    setLed(led2, 'lit');
+    updateEngineStatus();
+    logOk(`Whisper bereit (${Math.round((performance.now() - t0) / 1000)} s)`);
+    return transcriber;
+  } catch (e) {
+    setDlProgress(null);
+    setLed(led2, 'err');
+    showError(`Whisper konnte nicht geladen werden: ${e.message || e}` +
+      (location.protocol === 'file:' ? ' — Die Seite muss über http(s):// laufen, nicht per Doppelklick.' : ''));
+    throw e;
+  }
+}
+
+// ===========================================================================
+// Helfer
+// ===========================================================================
+function setLed(led, state) { led.classList.remove('lit', 'busy', 'err'); if (state) led.classList.add(state); }
 function fmtBytes(b) {
+  if (!b && b !== 0) return '—';
   if (b < 1024) return b + ' B';
   if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB';
   return (b / (1024 * 1024)).toFixed(1) + ' MB';
 }
 function fmtTime(s) {
-  if (!isFinite(s)) return '--:--';
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
+  if (!isFinite(s) || s === null) return '--:--';
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
   return `${m}:${String(sec).padStart(2, '0')}`;
 }
-function extOf(name) {
-  const m = /\.([a-z0-9]+)$/i.exec(name);
-  return m ? m[1].toLowerCase() : 'audio';
-}
-function baseName(name) {
-  return name.replace(/\.[a-z0-9]+$/i, '');
+function extOf(n) { const m = /\.([a-z0-9]+)$/i.exec(n); return m ? m[1].toLowerCase() : 'audio'; }
+function baseName(n) { return n.replace(/\.[a-z0-9]+$/i, ''); }
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function triggerDownload(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-// ---------------------------------------------------------------------------
-// Channel model
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// Kanäle
+// ===========================================================================
 function createChannel(file) {
   chId += 1;
   return {
-    id: chId,
-    file,
-    name: file.name,
-    ext: extOf(file.name),
-    size: file.size,
-    duration: null,
-    audioBuffer: null,
-    peaks: null,
-    targetFormat: 'mp3',
-    quality: 'med',
-    status: 'idle', // idle | decoding | processing | done | error
-    progress: 0,
-    statusText: '',
-    outputBlob: null,
-    outputName: null,
-    transcript: null,
-    transcriptOpen: false,
+    id: chId, file, name: file.name, ext: extOf(file.name), size: file.size,
+    duration: null, audioBuffer: null, peaks: null,
+    targetFormat: settings.format, quality: settings.quality,
+    status: 'idle', progress: 0, statusText: '', statusKind: '',
+    outputBlob: null, outputName: null, savedTo: null,
+    transcript: null, transcriptOpen: false,
   };
+}
+function resetChannel(c) {
+  c.status = 'idle'; c.outputBlob = null; c.outputName = null;
+  c.progress = 0; c.statusText = ''; c.statusKind = ''; c.savedTo = null;
 }
 
 async function decodeForWaveform(ch) {
@@ -729,96 +1546,147 @@ async function decodeForWaveform(ch) {
     const audioBuffer = await ctx.decodeAudioData(buf.slice(0));
     ch.audioBuffer = audioBuffer;
     ch.duration = audioBuffer.duration;
-    ch.peaks = computePeaks(audioBuffer, 80);
+    ch.peaks = computePeaks(audioBuffer, 160);
     ctx.close();
+    logDebug(`Dekodiert: ${ch.name} · ${fmtTime(ch.duration)} · ${audioBuffer.sampleRate} Hz · ${audioBuffer.numberOfChannels} Kanal/Kanäle`);
   } catch (e) {
-    ch.audioBuffer = null;
-    ch.duration = null;
-    ch.peaks = null;
+    ch.audioBuffer = null; ch.duration = null; ch.peaks = null;
+    logWarn(`${ch.name}: Browser kann das Format nicht direkt dekodieren — FFmpeg übernimmt beim Rendern`);
   }
   renderChannels();
 }
 
 function computePeaks(audioBuffer, bins) {
   const data = audioBuffer.getChannelData(0);
-  const blockSize = Math.floor(data.length / bins) || 1;
+  const block = Math.floor(data.length / bins) || 1;
   const peaks = [];
   for (let i = 0; i < bins; i++) {
-    let max = 0;
-    const start = i * blockSize;
-    for (let j = 0; j < blockSize; j++) {
-      const v = Math.abs(data[start + j] || 0);
-      if (v > max) max = v;
-    }
+    let max = 0; const start = i * block;
+    for (let j = 0; j < block; j++) { const v = Math.abs(data[start + j] || 0); if (v > max) max = v; }
     peaks.push(max);
   }
   return peaks;
 }
 
-function drawWaveform(canvas, peaks, color) {
+function drawWaveform(canvas, ch, color) {
   if (!canvas) return;
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w) return;
   canvas.width = w * dpr; canvas.height = h * dpr;
   const c = canvas.getContext('2d');
   c.scale(dpr, dpr);
   c.clearRect(0, 0, w, h);
-  if (!peaks) {
-    c.strokeStyle = 'rgba(255,255,255,0.08)';
+  if (!ch.peaks) {
+    c.strokeStyle = 'rgba(255,255,255,0.10)';
+    c.setLineDash([3, 4]);
     c.beginPath(); c.moveTo(0, h / 2); c.lineTo(w, h / 2); c.stroke();
     return;
   }
-  const barW = w / peaks.length;
-  c.fillStyle = color;
-  peaks.forEach((p, i) => {
-    const barH = Math.max(2, p * h);
-    c.fillRect(i * barW, (h - barH) / 2, Math.max(1, barW - 1.5), barH);
+  const playPos = (previewCh === ch && previewAudio && ch.duration) ? previewAudio.currentTime / ch.duration : -1;
+  const barW = w / ch.peaks.length;
+  ch.peaks.forEach((p, i) => {
+    const barH = Math.max(2, p * (h - 4));
+    const played = playPos >= 0 && (i / ch.peaks.length) <= playPos;
+    c.fillStyle = played ? '#ffffff' : color;
+    c.globalAlpha = played ? 0.95 : 0.75;
+    c.fillRect(i * barW, (h - barH) / 2, Math.max(1, barW - 1), barH);
   });
+  c.globalAlpha = 1;
+  if (playPos >= 0) {
+    c.fillStyle = color;
+    c.fillRect(playPos * w, 0, 1.5, h);
+  }
 }
 
 // ---------------------------------------------------------------------------
-// Rendering
+// Vorhören
 // ---------------------------------------------------------------------------
-function renderChannels() {
-  channelCount.textContent = `${channels.length} Kanal${channels.length === 1 ? '' : 'äle'} geladen`;
-  renderAllBtn.disabled = channels.length === 0;
-  emptyState.style.display = channels.length === 0 ? 'block' : 'none';
+function stopPreview() {
+  if (previewAudio) { previewAudio.pause(); URL.revokeObjectURL(previewAudio.src); previewAudio = null; }
+  if (previewRaf) cancelAnimationFrame(previewRaf);
+  previewRaf = null;
+  const old = previewCh; previewCh = null;
+  if (old) refreshWave(old);
+  $$('.play-btn').forEach(b => { b.classList.remove('playing'); b.textContent = '▶'; });
+}
+function refreshWave(ch) {
+  const row = channelsEl.querySelector(`.channel[data-id="${ch.id}"]`);
+  if (row) drawWaveform(row.querySelector('.waveform'), ch, WAVE_COLORS[mode]);
+}
+function togglePreview(ch, seekRatio) {
+  if (previewCh === ch && previewAudio && seekRatio === undefined) {
+    if (previewAudio.paused) { previewAudio.play(); } else { previewAudio.pause(); }
+    const row = channelsEl.querySelector(`.channel[data-id="${ch.id}"]`);
+    const btn = row?.querySelector('.play-btn');
+    if (btn) btn.textContent = previewAudio.paused ? '▶' : '❚❚';
+    return;
+  }
+  stopPreview();
+  const src = ch.outputBlob || ch.file;
+  previewAudio = new Audio(URL.createObjectURL(src));
+  previewCh = ch;
+  previewAudio.addEventListener('ended', stopPreview);
+  previewAudio.addEventListener('error', () => { logWarn(`${ch.name}: Vorhören nicht möglich (Format)`); stopPreview(); });
+  previewAudio.play().then(() => {
+    if (seekRatio !== undefined && ch.duration) previewAudio.currentTime = seekRatio * ch.duration;
+    const row = channelsEl.querySelector(`.channel[data-id="${ch.id}"]`);
+    const btn = row?.querySelector('.play-btn');
+    if (btn) { btn.classList.add('playing'); btn.textContent = '❚❚'; }
+    const tick = () => { refreshWave(ch); previewRaf = requestAnimationFrame(tick); };
+    tick();
+  }).catch(e => logWarn('Wiedergabe abgelehnt', e.message));
+}
 
+// ===========================================================================
+// Rendering der Kanalliste
+// ===========================================================================
+function updateToolbar() {
+  const n = channels.length;
+  channelCount.textContent = `${n} ${n === 1 ? 'Kanal' : 'Kanäle'} geladen`;
+  renderAllBtn.disabled = n === 0;
+  $('#clearAllBtn').disabled = n === 0;
+  const done = channels.filter(c => c.outputBlob).length;
+  $('#zipBtn').disabled = done === 0;
+  $('#zipBtn').textContent = done ? `ZIP (${done})` : 'ALLE ALS ZIP';
+  $('#saveFolderBtn').disabled = done === 0 || !outDirHandle;
+  const totalBytes = channels.reduce((a, c) => a + c.size, 0);
+  const totalDur = channels.reduce((a, c) => a + (c.duration || 0), 0);
+  $('#footStat').textContent = n
+    ? `${n} Kanäle · ${fmtBytes(totalBytes)} · ${fmtTime(totalDur)} gesamt · ${done} fertig`
+    : 'bereit';
+}
+
+function renderChannels() {
+  updateToolbar();
+  emptyState.style.display = channels.length === 0 ? 'block' : 'none';
   channelsEl.querySelectorAll('.channel').forEach(n => n.remove());
 
   channels.forEach((ch, idx) => {
     const row = document.createElement('div');
-    row.className = 'channel';
+    row.className = 'channel' + (ch.status === 'done' ? ' is-done' : ch.status === 'error' ? ' is-error' : '');
     row.dataset.id = ch.id;
 
-    const accentColor = mode === 'convert' ? 'var(--cyan)' : 'var(--magenta)';
-    const waveHex = WAVE_COLORS[mode];
-
     const formatChips = Object.entries(FORMATS).map(([key, f]) =>
-      `<button class="chip fmt-chip ${ch.targetFormat === key ? 'active' : ''}" data-key="${key}">${f.label}</button>`
-    ).join('');
+      `<button class="chip fmt-chip ${ch.targetFormat === key ? 'active' : ''}" data-key="${key}">${f.label}</button>`).join('');
 
-    const showQuality = FORMATS[ch.targetFormat].lossy;
-    const qualityChips = showQuality ? `
-      <div class="chip-row">
-        ${Object.entries(QUALITY_PRESETS).map(([key, kbps]) =>
-          `<button class="chip quality q-chip ${ch.quality === key ? 'active' : ''}" data-key="${key}">${kbps}k</button>`
-        ).join('')}
+    const qualityChips = FORMATS[ch.targetFormat].lossy ? `
+      <div class="chip-row">${Object.entries(QUALITY_PRESETS).map(([key, kbps]) =>
+        `<button class="chip quality q-chip ${ch.quality === key ? 'active' : ''}" data-key="${key}">${kbps}k</button>`).join('')}
       </div>` : '';
 
     let actionHtml = '';
     if (mode === 'convert') {
       if (ch.status === 'done' && ch.outputBlob) {
-        actionHtml = `<button class="ch-btn download" data-action="download">⬇ ${ch.outputName} · ${fmtBytes(ch.outputBlob.size)}</button>`;
+        actionHtml = `<button class="ch-btn" data-action="download" title="${escapeHtml(ch.outputName)}">⬇ ${escapeHtml(ch.outputName)} · ${fmtBytes(ch.outputBlob.size)}</button>
+                      <button class="ghost-btn" data-action="again">↻</button>`;
       } else {
         actionHtml = `<button class="ch-btn" data-action="convert" ${ch.status === 'processing' ? 'disabled' : ''}>${ch.status === 'processing' ? 'Rendert…' : 'Convert ▸'}</button>`;
       }
     } else {
-      if (ch.transcript) {
-        actionHtml = `<button class="ch-btn" data-action="toggle-transcript">${ch.transcriptOpen ? 'Transcript ▴' : 'Transcript ▾'}</button>`;
-      } else {
-        actionHtml = `<button class="ch-btn" data-action="transcribe" ${ch.status === 'processing' ? 'disabled' : ''}>${ch.status === 'processing' ? 'Transkribiert…' : 'Transcribe ▸'}</button>`;
-      }
+      actionHtml = ch.transcript
+        ? `<button class="ch-btn" data-action="toggle-transcript">${ch.transcriptOpen ? 'Transcript ▴' : 'Transcript ▾'}</button>`
+        : `<button class="ch-btn" data-action="transcribe" ${ch.status === 'processing' ? 'disabled' : ''}>${ch.status === 'processing' ? 'Läuft…' : 'Transcribe ▸'}</button>`;
     }
 
     const controlsHtml = mode === 'convert'
@@ -829,248 +1697,85 @@ function renderChannels() {
       <div class="ch-num mono">CH ${String(idx + 1).padStart(2, '0')}</div>
       <div class="ch-main">
         <div class="ch-info">
-          <span class="ch-name" title="${ch.name}">${ch.name}</span>
+          <span class="ch-name" title="${escapeHtml(ch.name)}">${escapeHtml(ch.name)}</span>
           <span class="ch-badge">${ch.ext.toUpperCase()}</span>
           <span class="ch-meta mono">${fmtTime(ch.duration)} · ${fmtBytes(ch.size)}</span>
+          ${ch.savedTo ? `<span class="ch-badge" style="color:var(--neon);border-color:var(--neon-dim)">gespeichert</span>` : ''}
           <button class="ch-remove" data-action="remove" aria-label="Entfernen">×</button>
         </div>
-        <canvas class="waveform"></canvas>
-        <div class="ch-progress"><div class="ch-progress-fill" style="width:${ch.progress}%; background:${accentColor}; box-shadow:0 0 8px ${accentColor}"></div></div>
-        <div class="ch-status-text mono">${ch.statusText || ''}</div>
+        <div class="wave-wrap">
+          <canvas class="waveform"></canvas>
+          <button class="play-btn" data-action="play" aria-label="Vorhören">▶</button>
+        </div>
+        <div class="ch-progress"><div class="ch-progress-fill" style="width:${ch.progress}%"></div></div>
+        <div class="ch-status-text mono ${ch.statusKind}">${escapeHtml(ch.statusText || '')}</div>
       </div>
       <div class="ch-controls">${controlsHtml}</div>
-      ${mode === 'transcribe' && ch.transcript ? renderTranscriptPanel(ch) : ''}
-    `;
+      ${mode === 'transcribe' && ch.transcript ? renderTranscriptPanel(ch) : ''}`;
 
     channelsEl.appendChild(row);
-    drawWaveform(row.querySelector('.waveform'), ch.peaks, waveHex);
+    drawWaveform(row.querySelector('.waveform'), ch, WAVE_COLORS[mode]);
     wireChannelRow(row, ch);
   });
 }
 
 function renderTranscriptPanel(ch) {
-  const lines = ch.transcript.chunks.map(c =>
-    `<div class="transcript-line"><span class="ts">${fmtTime(c.timestamp[0])}</span><span>${escapeHtml(c.text.trim())}</span></div>`
-  ).join('');
+  const lines = (ch.transcript.chunks || []).map(c =>
+    `<div class="transcript-line"><span class="ts" data-seek="${c.timestamp[0] || 0}">${fmtTime(c.timestamp[0])}</span><span>${escapeHtml((c.text || '').trim())}</span></div>`).join('');
   return `
     <div class="transcript-panel ${ch.transcriptOpen ? 'open' : ''}">
-      ${lines}
+      ${lines || `<div class="transcript-line">${escapeHtml((ch.transcript.text || '').trim())}</div>`}
       <div class="transcript-actions">
-        <button data-action="copy-transcript">Copy text</button>
-        <button data-action="download-transcript">Download .txt</button>
+        <button class="ghost-btn" data-action="copy-transcript">TEXT KOPIEREN</button>
+        <button class="ghost-btn" data-action="dl-txt">.TXT</button>
+        <button class="ghost-btn" data-action="dl-srt">.SRT</button>
+        <button class="ghost-btn" data-action="dl-vtt">.VTT</button>
+        <button class="ghost-btn" data-action="dl-json">.JSON</button>
       </div>
     </div>`;
 }
 
-function escapeHtml(s) {
-  return s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-}
-
-function showError(msg) {
-  const banner = $('#errorBanner');
-  banner.innerHTML = `<span>${escapeHtml(msg)}</span><button aria-label="Schließen">×</button>`;
-  banner.style.display = 'flex';
-  banner.querySelector('button').addEventListener('click', () => { banner.style.display = 'none'; });
-}
-
 function wireChannelRow(row, ch) {
-  row.querySelectorAll('.fmt-chip').forEach(btn => {
-    btn.addEventListener('click', () => {
-      ch.targetFormat = btn.dataset.key;
-      ch.status = 'idle'; ch.outputBlob = null; ch.progress = 0; ch.statusText = '';
-      renderChannels();
-    });
-  });
-  row.querySelectorAll('.q-chip').forEach(btn => {
-    btn.addEventListener('click', () => {
-      ch.quality = btn.dataset.key;
-      renderChannels();
-    });
-  });
-  const removeBtn = row.querySelector('[data-action="remove"]');
-  if (removeBtn) removeBtn.addEventListener('click', () => {
+  row.querySelectorAll('.fmt-chip').forEach(btn => btn.addEventListener('click', () => {
+    ch.targetFormat = btn.dataset.key; resetChannel(ch); renderChannels();
+  }));
+  row.querySelectorAll('.q-chip').forEach(btn => btn.addEventListener('click', () => {
+    ch.quality = btn.dataset.key; resetChannel(ch); renderChannels();
+  }));
+  const on = (sel, fn) => { const el = row.querySelector(sel); if (el) el.addEventListener('click', fn); };
+
+  on('[data-action="remove"]', () => {
+    if (previewCh === ch) stopPreview();
     channels = channels.filter(c => c.id !== ch.id);
+    logInfo('Kanal entfernt: ' + ch.name);
     renderChannels();
   });
-  const convertBtn = row.querySelector('[data-action="convert"]');
-  if (convertBtn) convertBtn.addEventListener('click', () => convertChannel(ch));
-  const downloadBtn = row.querySelector('[data-action="download"]');
-  if (downloadBtn) downloadBtn.addEventListener('click', () => triggerDownload(ch.outputBlob, ch.outputName));
-  const transcribeBtn = row.querySelector('[data-action="transcribe"]');
-  if (transcribeBtn) transcribeBtn.addEventListener('click', () => transcribeChannel(ch));
-  const toggleBtn = row.querySelector('[data-action="toggle-transcript"]');
-  if (toggleBtn) toggleBtn.addEventListener('click', () => { ch.transcriptOpen = !ch.transcriptOpen; renderChannels(); });
-  const copyBtn = row.querySelector('[data-action="copy-transcript"]');
-  if (copyBtn) copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(ch.transcript.text.trim());
-    copyBtn.textContent = 'Copied ✓';
-    setTimeout(() => copyBtn.textContent = 'Copy text', 1500);
+  on('[data-action="convert"]', () => convertChannel(ch));
+  on('[data-action="again"]', () => { resetChannel(ch); renderChannels(); });
+  on('[data-action="download"]', () => triggerDownload(ch.outputBlob, ch.outputName));
+  on('[data-action="transcribe"]', () => transcribeChannel(ch));
+  on('[data-action="toggle-transcript"]', () => { ch.transcriptOpen = !ch.transcriptOpen; renderChannels(); });
+  on('[data-action="play"]', () => togglePreview(ch));
+
+  const canvas = row.querySelector('.waveform');
+  if (canvas) canvas.addEventListener('click', (e) => {
+    const r = canvas.getBoundingClientRect();
+    togglePreview(ch, (e.clientX - r.left) / r.width);
   });
-  const dlTxtBtn = row.querySelector('[data-action="download-transcript"]');
-  if (dlTxtBtn) dlTxtBtn.addEventListener('click', () => {
-    const blob = new Blob([ch.transcript.text.trim()], { type: 'text/plain' });
-    triggerDownload(blob, `${baseName(ch.name)}.txt`);
+
+  on('[data-action="copy-transcript"]', async () => {
+    await navigator.clipboard.writeText((ch.transcript.text || '').trim());
+    toast('Transkript kopiert');
   });
-}
+  on('[data-action="dl-txt"]', () => triggerDownload(new Blob([(ch.transcript.text || '').trim()], { type: 'text/plain' }), `${baseName(ch.name)}.txt`));
+  on('[data-action="dl-srt"]', () => triggerDownload(new Blob([toSRT(ch.transcript)], { type: 'text/plain' }), `${baseName(ch.name)}.srt`));
+  on('[data-action="dl-vtt"]', () => triggerDownload(new Blob([toVTT(ch.transcript)], { type: 'text/vtt' }), `${baseName(ch.name)}.vtt`));
+  on('[data-action="dl-json"]', () => triggerDownload(new Blob([JSON.stringify(ch.transcript, null, 2)], { type: 'application/json' }), `${baseName(ch.name)}.json`));
 
-function triggerDownload(blob, name) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-}
-
-// ---------------------------------------------------------------------------
-// File intake
-// ---------------------------------------------------------------------------
-function addFiles(fileList) {
-  const files = Array.from(fileList).filter(f => f.size > 0);
-  files.forEach(file => {
-    const ch = createChannel(file);
-    channels.push(ch);
-    decodeForWaveform(ch);
-  });
-  renderChannels();
-}
-
-dropzone.addEventListener('click', () => fileInput.click());
-dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
-fileInput.addEventListener('change', (e) => { addFiles(e.target.files); fileInput.value = ''; });
-['dragenter', 'dragover'].forEach(evt => dropzone.addEventListener(evt, (e) => {
-  e.preventDefault(); dropzone.classList.add('drag');
-}));
-['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, (e) => {
-  e.preventDefault(); dropzone.classList.remove('drag');
-}));
-dropzone.addEventListener('drop', (e) => { if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
-
-// ---------------------------------------------------------------------------
-// Mode toggle
-// ---------------------------------------------------------------------------
-$('#modeConvertBtn').addEventListener('click', () => setMode('convert'));
-$('#modeTranscribeBtn').addEventListener('click', () => setMode('transcribe'));
-function setMode(m) {
-  mode = m;
-  document.documentElement.classList.toggle('mode-transcribe', m === 'transcribe');
-  $('#modeConvertBtn').classList.toggle('active', m === 'convert');
-  $('#modeTranscribeBtn').classList.toggle('active', m === 'transcribe');
-  $('#modelToggleWrap').style.display = m === 'transcribe' ? 'flex' : 'none';
-  renderAllBtn.textContent = m === 'convert' ? 'RENDER ALL ▸' : 'TRANSCRIBE ALL ▸';
-  renderChannels();
-}
-
-document.querySelectorAll('.model-chip').forEach(btn => {
-  btn.addEventListener('click', () => {
-    whisperModelKey = btn.dataset.model;
-    document.querySelectorAll('.model-chip').forEach(b => b.classList.toggle('active', b === btn));
-    updateEngineStatus();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// FFmpeg lazy loading + conversion
-// ---------------------------------------------------------------------------
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = src; s.onload = resolve; s.onerror = () => reject(new Error('Failed to load ' + src));
-    document.head.appendChild(s);
-  });
-}
-
-async function fetchAndBlobURL(url, mime) {
-  let resp;
-  try {
-    resp = await fetch(url);
-  } catch (e) {
-    throw new Error(`Netzwerkfehler beim Laden von ${url}: ${e.message || e}`);
-  }
-  if (!resp.ok) {
-    throw new Error(`HTTP ${resp.status} (${resp.statusText}) beim Laden von ${url}`);
-  }
-  const blob = await resp.blob();
-  return URL.createObjectURL(new Blob([blob], { type: mime }));
-}
-
-async function ensureFFmpeg() {
-  if (ffmpegReady) return ffmpeg;
-  setLed(led1, 'busy');
-  try {
-    if (!window.FFmpegWASM) await loadScript(`${FFMPEG_BASE}/ffmpeg.js`);
-    if (!window.FFmpegUtil) await loadScript(`${FFMPEG_UTIL_BASE}/index.js`);
-    const { FFmpeg } = window.FFmpegWASM;
-    ffmpeg = new FFmpeg();
-    await ffmpeg.load({
-      // The internal worker chunk can't be spawned directly from a cross-origin
-      // CDN URL (browsers block `new Worker()` across origins). Fetching it
-      // ourselves and handing over a same-origin blob URL fixes that. We also
-      // check each response status explicitly so a failed/blocked file shows
-      // up as a precise error instead of the generic "failed to import".
-      classWorkerURL: await fetchAndBlobURL(`${FFMPEG_BASE}/814.ffmpeg.js`, 'text/javascript'),
-      coreURL: await fetchAndBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await fetchAndBlobURL(`${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm'),
-    });
-    ffmpegReady = true;
-    setLed(led1, 'lit');
-    updateEngineStatus();
-    return ffmpeg;
-  } catch (e) {
-    setLed(led1, 'err');
-    showError(`FFmpeg konnte nicht geladen werden: ${e.message || e}. Falls du die Datei per Doppelklick geöffnet hast (file:// in der Adresszeile) — das funktioniert nicht. Stattdessen über http(s):// öffnen, z. B. via GitHub Pages oder lokal mit "python -m http.server".`);
-    throw e;
-  }
-}
-
-function buildFfmpegArgs(inputName, outputName, targetFormat, quality) {
-  const kbps = QUALITY_PRESETS[quality];
-  switch (targetFormat) {
-    case 'wav':  return ['-i', inputName, '-c:a', 'pcm_s16le', outputName];
-    case 'mp3':  return ['-i', inputName, '-c:a', 'libmp3lame', '-b:a', `${kbps}k`, outputName];
-    case 'ogg':  return ['-i', inputName, '-c:a', 'libvorbis', '-b:a', `${kbps}k`, outputName];
-    case 'flac': return ['-i', inputName, '-c:a', 'flac', outputName];
-    case 'm4a':  return ['-i', inputName, '-c:a', 'aac', '-b:a', `${kbps}k`, '-movflags', '+faststart', outputName];
-    case 'opus': return ['-i', inputName, '-c:a', 'libopus', '-b:a', `${kbps}k`, outputName];
-    case 'aiff': return ['-i', inputName, '-c:a', 'pcm_s16be', outputName];
-    default: throw new Error('Unbekanntes Zielformat');
-  }
-}
-
-async function convertChannel(ch) {
-  ch.status = 'processing'; ch.progress = 0; ch.statusText = 'Lade Engine…';
-  renderChannels();
-  try {
-    const ff = await ensureFFmpeg();
-    ch.statusText = 'Konvertiere…';
-    renderChannels();
-
-    const inputName = `in_${ch.id}.${ch.ext}`;
-    const outputName = `out_${ch.id}.${ch.targetFormat}`;
-
-    const onProgress = ({ progress }) => {
-      ch.progress = Math.min(100, Math.max(0, Math.round((progress || 0) * 100)));
-      updateChannelProgressOnly(ch);
-    };
-    ff.on('progress', onProgress);
-
-    await ff.writeFile(inputName, await window.FFmpegUtil.fetchFile(ch.file));
-    await ff.exec(buildFfmpegArgs(inputName, outputName, ch.targetFormat, ch.quality));
-    const data = await ff.readFile(outputName);
-
-    ff.off ? ff.off('progress', onProgress) : null;
-
-    const blob = new Blob([data.buffer], { type: FORMATS[ch.targetFormat].mime });
-    ch.outputBlob = blob;
-    ch.outputName = `${baseName(ch.name)}.${ch.targetFormat}`;
-    ch.status = 'done'; ch.progress = 100; ch.statusText = 'Fertig';
-
-    await ff.deleteFile(inputName).catch(() => {});
-    await ff.deleteFile(outputName).catch(() => {});
-  } catch (e) {
-    console.error(e);
-    ch.status = 'error'; ch.statusText = `Fehler: ${e.message || e}`;
-  }
-  renderChannels();
+  row.querySelectorAll('[data-seek]').forEach(el => el.addEventListener('click', () => {
+    const t = Number(el.dataset.seek) || 0;
+    if (ch.duration) togglePreview(ch, t / ch.duration);
+  }));
 }
 
 function updateChannelProgressOnly(ch) {
@@ -1083,122 +1788,371 @@ function updateChannelProgressOnly(ch) {
 }
 
 // ---------------------------------------------------------------------------
-// Transcription (Whisper via Transformers.js)
+// Untertitel-Formate
 // ---------------------------------------------------------------------------
-async function ensureTranscriber() {
-  if (transcriberReady && loadedWhisperModelKey === whisperModelKey) return transcriber;
-  transcriberReady = false;
-  setLed(led2, 'busy');
-  try {
-    const mod = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3');
-    const { pipeline, env } = mod;
-    env.allowLocalModels = false;
-    const modelId = WHISPER_MODELS[whisperModelKey].id;
-    transcriber = await pipeline('automatic-speech-recognition', modelId, {
-      progress_callback: (p) => {
-        if (p.status === 'progress') {
-          const pct = Math.round(p.progress || 0);
-          engineStatus.innerHTML = `FFmpeg: <span>${ffmpegReady ? 'geladen' : 'nicht geladen'}</span> · Whisper: <span style="color:var(--accent-text)">lädt ${WHISPER_MODELS[whisperModelKey].label} ${p.file ? '— ' + p.file + ' ' : ''}${pct}%</span>`;
-        }
-      },
-    });
-    loadedWhisperModelKey = whisperModelKey;
-    transcriberReady = true;
-    setLed(led2, 'lit');
-    updateEngineStatus();
-    return transcriber;
-  } catch (e) {
-    setLed(led2, 'err');
-    showError(`Whisper konnte nicht geladen werden: ${e.message || e}. Tipp: Diese Seite muss über http:// oder https:// geöffnet werden — nicht per Doppelklick (file://).`);
-    throw e;
-  }
+function tc(sec, comma) {
+  if (!isFinite(sec)) sec = 0;
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = Math.floor(sec % 60);
+  const ms = Math.round((sec - Math.floor(sec)) * 1000);
+  const p = (n, l = 2) => String(n).padStart(l, '0');
+  return `${p(h)}:${p(m)}:${p(s)}${comma ? ',' : '.'}${p(ms, 3)}`;
+}
+function toSRT(tr) {
+  return (tr.chunks || []).map((c, i) =>
+    `${i + 1}\n${tc(c.timestamp[0] || 0, true)} --> ${tc(c.timestamp[1] ?? (c.timestamp[0] + 2), true)}\n${(c.text || '').trim()}\n`).join('\n');
+}
+function toVTT(tr) {
+  return 'WEBVTT\n\n' + (tr.chunks || []).map(c =>
+    `${tc(c.timestamp[0] || 0)} --> ${tc(c.timestamp[1] ?? (c.timestamp[0] + 2))}\n${(c.text || '').trim()}\n`).join('\n');
 }
 
-async function getMono16kFloatArray(ch) {
+// ===========================================================================
+// Konvertierung
+// ===========================================================================
+function buildFfmpegArgs(inputName, outputName, ch) {
+  const kbps = QUALITY_PRESETS[ch.quality];
+  const args = ['-i', inputName];
+  if (settings.normalize) args.push('-af', 'loudnorm=I=-16:TP=-1.5:LRA=11');
+  if (settings.sampleRate !== 'orig') args.push('-ar', settings.sampleRate);
+  if (settings.channels !== 'orig') args.push('-ac', settings.channels);
+  switch (ch.targetFormat) {
+    case 'wav':  args.push('-c:a', 'pcm_s16le'); break;
+    case 'mp3':  args.push('-c:a', 'libmp3lame', '-b:a', `${kbps}k`); break;
+    case 'ogg':  args.push('-c:a', 'libvorbis', '-b:a', `${kbps}k`); break;
+    case 'flac': args.push('-c:a', 'flac'); break;
+    case 'm4a':  args.push('-c:a', 'aac', '-b:a', `${kbps}k`, '-movflags', '+faststart'); break;
+    case 'opus': args.push('-c:a', 'libopus', '-b:a', `${kbps}k`); break;
+    case 'aiff': args.push('-c:a', 'pcm_s16be'); break;
+    default: throw new Error('Unbekanntes Zielformat: ' + ch.targetFormat);
+  }
+  args.push(outputName);
+  return args;
+}
+
+async function convertChannel(ch) {
+  ch.status = 'processing'; ch.progress = 0; ch.statusText = 'Engine wird geladen…'; ch.statusKind = '';
+  renderChannels();
+  const t0 = performance.now();
+  try {
+    const ff = await ensureFFmpeg();
+    ch.statusText = 'Konvertiere…';
+    renderChannels();
+
+    const inputName = `in_${ch.id}.${ch.ext}`;
+    const outputName = `out_${ch.id}.${ch.targetFormat}`;
+    const args = buildFfmpegArgs(inputName, outputName, ch);
+    logInfo(`Konvertiere ${ch.name} → ${ch.targetFormat.toUpperCase()}`, args.join(' '));
+
+    const onProgress = ({ progress }) => {
+      ch.progress = Math.min(100, Math.max(0, Math.round((progress || 0) * 100)));
+      updateChannelProgressOnly(ch);
+    };
+    ff.on('progress', onProgress);
+
+    await ff.writeFile(inputName, await window.FFmpegUtil.fetchFile(ch.file));
+    await ff.exec(args);
+    const data = await ff.readFile(outputName);
+    if (ff.off) ff.off('progress', onProgress);
+
+    const blob = new Blob([data.buffer], { type: FORMATS[ch.targetFormat].mime });
+    ch.outputBlob = blob;
+    ch.outputName = `${baseName(ch.name)}.${ch.targetFormat}`;
+    ch.status = 'done'; ch.progress = 100;
+    const secs = ((performance.now() - t0) / 1000).toFixed(1);
+    const delta = ch.size ? Math.round((blob.size / ch.size) * 100) : 0;
+    ch.statusText = `Fertig in ${secs}s · ${fmtBytes(blob.size)} (${delta}% der Quelle)`;
+    ch.statusKind = 'ok';
+    logOk(`${ch.name} → ${ch.outputName} · ${fmtBytes(blob.size)} in ${secs}s`);
+
+    await ff.deleteFile(inputName).catch(() => {});
+    await ff.deleteFile(outputName).catch(() => {});
+
+    if (settings.autoSave && outDirHandle) await saveChannelToFolder(ch);
+  } catch (e) {
+    console.error(e);
+    ch.status = 'error'; ch.statusKind = 'err';
+    ch.statusText = `Fehler: ${e.message || e}`;
+    logErr(`Konvertierung fehlgeschlagen: ${ch.name}`, e.message || String(e));
+  }
+  renderChannels();
+}
+
+// ===========================================================================
+// Transkription
+// ===========================================================================
+async function getMono16k(ch) {
   let audioBuffer = ch.audioBuffer;
   if (!audioBuffer) {
-    // Original format couldn't be decoded directly by the browser — transcode to WAV via FFmpeg first.
+    logInfo(`${ch.name}: Zwischenschritt über FFmpeg nach WAV`);
     const ff = await ensureFFmpeg();
-    const inputName = `tin_${ch.id}.${ch.ext}`;
-    const outputName = `tout_${ch.id}.wav`;
+    const inputName = `tin_${ch.id}.${ch.ext}`, outputName = `tout_${ch.id}.wav`;
     await ff.writeFile(inputName, await window.FFmpegUtil.fetchFile(ch.file));
-    await ff.exec(['-i', inputName, '-c:a', 'pcm_s16le', outputName]);
+    await ff.exec(['-i', inputName, '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', outputName]);
     const data = await ff.readFile(outputName);
     await ff.deleteFile(inputName).catch(() => {});
     await ff.deleteFile(outputName).catch(() => {});
-    const blob = new Blob([data.buffer], { type: 'audio/wav' });
+    const wav = new Blob([data.buffer], { type: 'audio/wav' });
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    audioBuffer = await ctx.decodeAudioData(await blob.arrayBuffer());
+    audioBuffer = await ctx.decodeAudioData(await wav.arrayBuffer());
     ctx.close();
     ch.audioBuffer = audioBuffer;
     ch.duration = audioBuffer.duration;
+    ch.peaks = computePeaks(audioBuffer, 160);
   }
-  const targetRate = 16000;
-  const offline = new OfflineAudioContext(1, Math.ceil(audioBuffer.duration * targetRate), targetRate);
+  const rate = 16000;
+  const offline = new OfflineAudioContext(1, Math.ceil(audioBuffer.duration * rate), rate);
   const src = offline.createBufferSource();
-  src.buffer = audioBuffer;
-  src.connect(offline.destination);
-  src.start(0);
+  src.buffer = audioBuffer; src.connect(offline.destination); src.start(0);
   const rendered = await offline.startRendering();
   return rendered.getChannelData(0);
 }
 
 async function transcribeChannel(ch) {
-  ch.status = 'processing'; ch.progress = 0; ch.statusText = 'Lade Whisper…';
+  ch.status = 'processing'; ch.progress = 0; ch.statusText = 'Modell wird geladen…'; ch.statusKind = '';
   renderChannels();
+  const t0 = performance.now();
   try {
     const tr = await ensureTranscriber();
-    ch.statusText = 'Bereite Audio vor…';
+    ch.statusText = 'Audio wird vorbereitet…'; ch.progress = 20;
     renderChannels();
-    const floatArray = await getMono16kFloatArray(ch);
-    ch.statusText = 'Transkribiere…';
-    ch.progress = 50;
-    renderChannels();
+    const audio = await getMono16k(ch);
+    ch.statusText = 'Transkribiere…'; ch.progress = 50;
+    updateChannelProgressOnly(ch);
+    logInfo(`Transkribiere ${ch.name} (${fmtTime(ch.duration)}, ${settings.language}, ${settings.task})`);
 
-    const result = await tr(floatArray, {
-      chunk_length_s: 30,
-      stride_length_s: 5,
-      return_timestamps: true,
-    });
+    const opts = { chunk_length_s: 30, stride_length_s: 5, return_timestamps: true };
+    if (settings.language !== 'auto') opts.language = settings.language;
+    if (settings.task === 'translate') opts.task = 'translate';
 
+    const result = await tr(audio, opts);
     ch.transcript = result;
     ch.transcriptOpen = true;
-    ch.status = 'done'; ch.progress = 100; ch.statusText = 'Fertig';
+    ch.status = 'done'; ch.progress = 100;
+    const secs = ((performance.now() - t0) / 1000).toFixed(1);
+    const words = (result.text || '').trim().split(/\s+/).filter(Boolean).length;
+    ch.statusText = `Fertig in ${secs}s · ${words} Wörter`;
+    ch.statusKind = 'ok';
+    logOk(`${ch.name}: ${words} Wörter in ${secs}s`);
   } catch (e) {
     console.error(e);
-    ch.status = 'error'; ch.statusText = `Fehler: ${e.message || e}`;
+    ch.status = 'error'; ch.statusKind = 'err';
+    ch.statusText = `Fehler: ${e.message || e}`;
+    logErr(`Transkription fehlgeschlagen: ${ch.name}`, e.message || String(e));
   }
   renderChannels();
 }
 
-// ---------------------------------------------------------------------------
-// Render all
-// ---------------------------------------------------------------------------
+// ===========================================================================
+// Ausgabe: Ordner + ZIP
+// ===========================================================================
+async function saveChannelToFolder(ch) {
+  if (!outDirHandle || !ch.outputBlob) return;
+  try {
+    const fh = await outDirHandle.getFileHandle(ch.outputName, { create: true });
+    const w = await fh.createWritable();
+    await w.write(ch.outputBlob);
+    await w.close();
+    ch.savedTo = outDirHandle.name;
+    logOk(`Gespeichert: ${outDirHandle.name}/${ch.outputName}`);
+  } catch (e) {
+    logErr(`Speichern fehlgeschlagen: ${ch.outputName}`, e.message);
+  }
+}
+
+$('#saveFolderBtn').addEventListener('click', async () => {
+  const done = channels.filter(c => c.outputBlob);
+  for (const ch of done) await saveChannelToFolder(ch);
+  renderChannels();
+  toast(`${done.length} Dateien gespeichert`);
+});
+
+// Minimaler ZIP-Writer (store, ohne Kompression — Audio ist bereits komprimiert)
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(u8) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function dosTime(d) {
+  return { t: ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() / 2)) & 0xFFFF,
+           d: (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF };
+}
+function buildZip(files) {
+  const enc = new TextEncoder();
+  const now = dosTime(new Date());
+  const parts = [], central = [];
+  let offset = 0;
+  files.forEach(f => {
+    const name = enc.encode(f.name);
+    const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true);
+    lh.setUint16(8, 0, true); lh.setUint16(10, now.t, true); lh.setUint16(12, now.d, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true);
+    lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+    ch.setUint16(12, now.t, true); ch.setUint16(14, now.d, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true);
+    ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), name);
+    offset += 30 + name.length + f.data.length;
+  });
+  const centralSize = central.reduce((a, p) => a + p.length, 0);
+  const eocd = new DataView(new ArrayBuffer(22));
+  eocd.setUint32(0, 0x06054b50, true);
+  eocd.setUint16(8, files.length, true); eocd.setUint16(10, files.length, true);
+  eocd.setUint32(12, centralSize, true); eocd.setUint32(16, offset, true);
+  return new Blob([...parts, ...central, new Uint8Array(eocd.buffer)], { type: 'application/zip' });
+}
+
+$('#zipBtn').addEventListener('click', async () => {
+  const done = channels.filter(c => c.outputBlob);
+  if (!done.length) return;
+  $('#zipBtn').disabled = true;
+  try {
+    const files = [];
+    const used = new Set();
+    for (const c of done) {
+      let name = c.outputName, i = 2;
+      while (used.has(name)) name = `${baseName(c.outputName)}_${i++}.${c.targetFormat}`;
+      used.add(name);
+      files.push({ name, data: new Uint8Array(await c.outputBlob.arrayBuffer()) });
+    }
+    const zip = buildZip(files);
+    triggerDownload(zip, `patchbay_${new Date().toISOString().slice(0, 10)}.zip`);
+    logOk(`ZIP erstellt: ${files.length} Dateien · ${fmtBytes(zip.size)}`);
+  } catch (e) {
+    logErr('ZIP fehlgeschlagen', e.message);
+  }
+  $('#zipBtn').disabled = false;
+});
+
+// ===========================================================================
+// Dateiannahme
+// ===========================================================================
+const AUDIO_EXT = /\.(wav|mp3|ogg|oga|flac|m4a|aac|opus|aiff|aif|wma|mp4|webm|mkv|mov)$/i;
+
+function addFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.size > 0 && (f.type.startsWith('audio') || AUDIO_EXT.test(f.name)));
+  if (!files.length) { logWarn('Keine verwertbaren Audiodateien in der Auswahl'); return; }
+  files.forEach(file => {
+    const ch = createChannel(file);
+    channels.push(ch);
+    logInfo(`Geladen: ${file.name} · ${fmtBytes(file.size)}`);
+    decodeForWaveform(ch);
+  });
+  renderChannels();
+}
+
+async function collectEntries(entry, out) {
+  if (entry.isFile) {
+    out.push(await new Promise(res => entry.file(res)));
+  } else if (entry.isDirectory) {
+    const reader = entry.createReader();
+    for (;;) {
+      const batch = await new Promise(res => reader.readEntries(res));
+      if (!batch.length) break;
+      for (const e of batch) await collectEntries(e, out);
+    }
+  }
+}
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+fileInput.addEventListener('change', e => { addFiles(e.target.files); fileInput.value = ''; });
+['dragenter', 'dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', async (e) => {
+  const items = e.dataTransfer.items;
+  const entries = [];
+  if (items && items.length && items[0].webkitGetAsEntry) {
+    for (const it of items) { const en = it.webkitGetAsEntry?.(); if (en) entries.push(en); }
+  }
+  if (entries.length) {
+    const out = [];
+    for (const en of entries) await collectEntries(en, out);
+    addFiles(out);
+  } else if (e.dataTransfer.files.length) {
+    addFiles(e.dataTransfer.files);
+  }
+});
+
+$('#clearAllBtn').addEventListener('click', () => {
+  stopPreview();
+  channels = []; renderChannels();
+  logInfo('Alle Kanäle entfernt');
+});
+
+// ===========================================================================
+// Modus + Render All
+// ===========================================================================
+$('#modeConvertBtn').addEventListener('click', () => setMode('convert'));
+$('#modeTranscribeBtn').addEventListener('click', () => setMode('transcribe'));
+
+function setMode(m, { silent = false } = {}) {
+  mode = m;
+  document.documentElement.classList.toggle('mode-transcribe', m === 'transcribe');
+  $('#modeConvertBtn').classList.toggle('active', m === 'convert');
+  $('#modeTranscribeBtn').classList.toggle('active', m === 'transcribe');
+  $('#cardOptions').style.display = m === 'convert' ? '' : 'none';
+  $('#cardWhisper').style.display = m === 'transcribe' ? '' : 'none';
+  if (m === 'transcribe') $('#cardWhisper').classList.add('open');
+  renderAllBtn.textContent = m === 'convert' ? 'RENDER ALL ▸' : 'TRANSCRIBE ALL ▸';
+  if (!silent) { settings.mode = m; saveSettings(); logDebug('Modus: ' + m); }
+  renderChannels();
+}
+
 renderAllBtn.addEventListener('click', async () => {
   renderAllBtn.disabled = true;
-  for (const ch of channels) {
-    if (mode === 'convert' && ch.status !== 'done') await convertChannel(ch);
-    if (mode === 'transcribe' && !ch.transcript) await transcribeChannel(ch);
+  const t0 = performance.now();
+  const todo = channels.filter(ch => mode === 'convert' ? ch.status !== 'done' : !ch.transcript);
+  logInfo(`Stapel gestartet: ${todo.length} Kanäle`);
+  for (const ch of todo) {
+    if (mode === 'convert') await convertChannel(ch);
+    else await transcribeChannel(ch);
   }
+  logOk(`Stapel fertig in ${((performance.now() - t0) / 1000).toFixed(1)}s`);
+  toast('Stapel fertig');
   renderAllBtn.disabled = channels.length === 0;
 });
 
-// ---------------------------------------------------------------------------
-// Manual engine preload (and a clear place to see load errors directly)
-// ---------------------------------------------------------------------------
-$('#preloadFfmpegBtn').addEventListener('click', async () => {
-  try { await ensureFFmpeg(); } catch (e) { /* already surfaced via showError */ }
-});
-$('#preloadWhisperBtn').addEventListener('click', async () => {
-  try { await ensureTranscriber(); } catch (e) { /* already surfaced via showError */ }
+// Tastenkürzel
+document.addEventListener('keydown', (e) => {
+  if (e.target.matches('input, select, textarea')) return;
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); renderAllBtn.click(); }
+  if (e.key === 'Escape') stopPreview();
 });
 
-// ---------------------------------------------------------------------------
+window.addEventListener('resize', () => channels.forEach(refreshWave));
+
+// ===========================================================================
 // Init
-// ---------------------------------------------------------------------------
-setLed(led3, 'lit');
-updateEngineStatus();
-renderChannels();
+// ===========================================================================
+(async function init() {
+  logInfo(`Audio Patchbay v${APP_VERSION} gestartet`);
+  logDebug(`Umgebung: ${location.protocol}//${location.host || 'lokal'} · sicher: ${window.isSecureContext} · FSA: ${hasFSA}`);
+  if (location.protocol === 'file:') {
+    logWarn('Läuft über file:// — FFmpeg und Whisper brauchen http(s)://. Lokal z. B. mit "python -m http.server 8000".');
+  }
+  loadLocalSettings();
+  applySettingsToUI();
+  setLed(led3, 'lit');
+  await restoreHandles();
+  updateCacheStatus();
+  renderChannels();
+  logOk('Bereit.');
+})();
 </script>
 </body>
 </html>
