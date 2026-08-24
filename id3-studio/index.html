@@ -260,7 +260,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.7</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.7.1</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
   <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
@@ -393,7 +393,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.7</footer>
+<footer>Made with Love © — ID3 Studio v1.7.1</footer>
 <div id="toast"></div>
 
 <div id="bxBack" class="modalback">
@@ -453,7 +453,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.7
+   ID3 Studio v1.7.1
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -585,12 +585,14 @@ const listEl=$("list");
    Log & Toast
    ============================================================ */
 let LOGBUF=[], logTimer;
-function logRow(t,msg,type){
+function logRow(t,msg,type,atEnd=false){
   const d=document.createElement("div");
   d.className="le "+type;
   d.innerHTML=`<span class="t">${t}</span><span class="m"></span>`;
   d.querySelector(".m").textContent=msg;
-  const b=$("logBody"); b.appendChild(d); b.scrollTop=b.scrollHeight;
+  const b=$("logBody");
+  if(atEnd) b.appendChild(d);
+  else { b.insertBefore(d,b.firstChild); b.scrollTop=0; }
 }
 function log(msg,type="info"){
   const t=new Date().toLocaleTimeString("de-DE");
@@ -604,13 +606,13 @@ function restoreLog(){
   try{
     const raw=store.get("id3.log",null); if(!raw) return;
     LOGBUF=JSON.parse(raw)||[];
-    for(const [t,m,ty] of LOGBUF) logRow(t,m,ty);
     if(LOGBUF.length){
       const sep=document.createElement("div");
       sep.className="le info"; sep.style.opacity=".6"; sep.style.borderTop="1px dashed var(--line)";
       sep.style.margin="6px 0 2px"; sep.style.paddingTop="5px";
       sep.innerHTML='<span class="m">— vorherige Sitzung —</span>';
       $("logBody").appendChild(sep);
+      for(let i=LOGBUF.length-1;i>=0;i--){ const [t,m,ty]=LOGBUF[i]; logRow(t,m,ty,true); }
     }
   }catch(e){}
 }
