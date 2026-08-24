@@ -540,7 +540,7 @@
     <footer>
       <span class="mono" style="font-size:11.5px;color:var(--dim)" id="footStat">bereit</span>
       <div class="signature">
-        <span>Made with Love © — Audio Patchbay v2.0.1</span>
+        <span>Made with Love © — Audio Patchbay v2.1</span>
         <a href="mailto:cryptopower@outlook.de?subject=Audio%20Patchbay%20Feedback">Feedback</a>
       </div>
     </footer>
@@ -568,12 +568,19 @@
         <div class="field" style="margin-top:14px">
           <label for="engineSource">Decoder-Quelle</label>
           <select id="engineSource">
-            <option value="auto">Auto — erst lokal, dann CDN</option>
+            <option value="auto">Auto — Sync-Ordner, lokal, dann CDN</option>
+            <option value="folder">Nur Sync-Ordner (OneDrive)</option>
             <option value="local">Nur lokal (neben dem Tool)</option>
             <option value="custom">Eigene URL</option>
             <option value="jsdelivr">Nur jsDelivr CDN</option>
             <option value="unpkg">Nur unpkg CDN</option>
           </select>
+        </div>
+        <div class="field" id="folderSubField">
+          <label for="folderSub">Unterordner im Sync-Ordner</label>
+          <input type="text" id="folderSub" placeholder="engine">
+          <p class="hint">Die fünf Engine-Dateien im Sync-Ordner, z.&nbsp;B. <code>…/OneDrive/Codeprojekte/Patchbay/engine/</code>. Leer lassen, wenn sie direkt neben <code>patchbay-settings.json</code> liegen. Kein Netzwerk nötig — läuft auch, wenn das Tool von GitHub Pages kommt.</p>
+          <div class="btn-row"><button class="ghost-btn" id="testFolderBtn">ORDNER PRÜFEN</button></div>
         </div>
         <div class="field" id="localBaseField">
           <label for="localBase">Lokaler Pfad</label>
@@ -737,7 +744,7 @@
 // FFmpeg.wasm (Konvertierung) + Transformers.js/Whisper (Transkription)
 // ===========================================================================
 
-const APP_VERSION = '2.0.1';
+const APP_VERSION = '2.1';
 const SETTINGS_KEY = 'patchbay.settings.v2';
 const SETTINGS_FILE = 'patchbay-settings.json';
 const ENGINE_CACHE = 'patchbay-engine-v1';
@@ -761,6 +768,7 @@ function cdnSet(root) {
   return {
     id: root.includes('jsdelivr') ? 'jsdelivr' : 'unpkg',
     label: root.includes('jsdelivr') ? 'jsDelivr' : 'unpkg',
+    kind: 'url',
     ffmpeg: `${root}/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/umd/ffmpeg.js`,
     worker: `${root}/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/umd/814.ffmpeg.js`,
     util:   `${root}/@ffmpeg/util@${FFMPEG_UTIL_VERSION}/dist/umd/index.js`,
@@ -771,7 +779,7 @@ function cdnSet(root) {
 function flatSet(base, id, label) {
   const b = base.endsWith('/') ? base : base + '/';
   return {
-    id, label,
+    id, label, kind: 'url',
     ffmpeg: b + LOCAL_FILES.ffmpeg,
     worker: b + LOCAL_FILES.worker,
     util:   b + LOCAL_FILES.util,
@@ -779,6 +787,13 @@ function flatSet(base, id, label) {
     wasm:   b + LOCAL_FILES.wasm,
   };
 }
+function folderSet() {
+  return { id: 'folder', label: 'Sync-Ordner', kind: 'folder' };
+}
+const ENGINE_MIME = {
+  ffmpeg: 'text/javascript', worker: 'text/javascript', util: 'text/javascript',
+  core: 'text/javascript', wasm: 'application/wasm',
+};
 
 const WHISPER_MODELS = {
   tiny:  { id: 'Xenova/whisper-tiny',  label: 'Tiny · ~75 MB' },
@@ -817,6 +832,7 @@ const DEFAULT_SETTINGS = {
   task: 'transcribe',
   engineSource: 'auto',
   localBase: './engine/ffmpeg/',
+  folderSub: 'engine',
   customBase: '',
   engineCache: true,
   logAutoscroll: true,
@@ -1223,6 +1239,7 @@ function applySettingsToUI() {
   $('#optLang').value = settings.language;
   $('#optTask').value = settings.task;
   $('#engineSource').value = settings.engineSource;
+  $('#folderSub').value = settings.folderSub;
   $('#localBase').value = settings.localBase;
   $('#customBase').value = settings.customBase;
   $('#optEngineCache').checked = settings.engineCache;
@@ -1260,6 +1277,7 @@ bind('#customModel', 'customModel', 'value', updateEngineStatus);
 bind('#optLang', 'language');
 bind('#optTask', 'task');
 bind('#engineSource', 'engineSource', 'value', () => { updateEngineSourceFields(); updateEngineStatus(); });
+bind('#folderSub', 'folderSub');
 bind('#localBase', 'localBase');
 bind('#customBase', 'customBase');
 bind('#optEngineCache', 'engineCache', 'checked', updateCacheStatus);
@@ -1267,6 +1285,7 @@ bind('#logAutoscroll', 'logAutoscroll', 'checked');
 
 function updateEngineSourceFields() {
   const s = settings.engineSource;
+  $('#folderSubField').style.display = (s === 'auto' || s === 'folder') ? 'block' : 'none';
   $('#localBaseField').style.display = (s === 'auto' || s === 'local') ? 'block' : 'none';
   $('#customBaseField').style.display = s === 'custom' ? 'block' : 'none';
   try {
@@ -1274,6 +1293,32 @@ function updateEngineSourceFields() {
     $('#resolvedBase').textContent = new URL(base.endsWith('/') ? base : base + '/', location.href).href;
   } catch { $('#resolvedBase').textContent = '—'; }
 }
+
+$('#testFolderBtn').addEventListener('click', async () => {
+  if (!syncDirHandle) {
+    toast('Erst einen Sync-Ordner verbinden');
+    logWarn('Ordnerprüfung: noch kein Sync-Ordner verbunden — unter „Einstellungen & Ordner" auswählen');
+    return;
+  }
+  const where = `${syncDirHandle.name}${settings.folderSub ? '/' + settings.folderSub : ''}`;
+  logInfo(`Prüfe Engine-Dateien in ${where} …`);
+  let dir;
+  try {
+    dir = await getDirByPath(syncDirHandle, settings.folderSub);
+  } catch (e) {
+    logErr(`Unterordner "${settings.folderSub}" nicht gefunden`, e.message);
+    toast('Unterordner nicht gefunden');
+    return;
+  }
+  let ok = 0;
+  for (const fname of Object.values(LOCAL_FILES)) {
+    try {
+      const f = await (await dir.getFileHandle(fname)).getFile();
+      ok++; logOk(`gefunden: ${fname} (${fmtBytes(f.size)})`);
+    } catch { logErr(`fehlt: ${where}/${fname}`); }
+  }
+  toast(ok === 5 ? 'Alle 5 Dateien im Ordner' : `${ok} von 5 gefunden — Details im Log`);
+});
 
 $('#testBaseBtn').addEventListener('click', async () => {
   const set = flatSet(settings.localBase || './engine/ffmpeg/', 'local', 'lokal');
@@ -1299,13 +1344,41 @@ $$('.card-head[data-toggle]').forEach(h => h.addEventListener('click', () => h.p
 function engineCandidates() {
   const jsd = cdnSet('https://cdn.jsdelivr.net/npm');
   const unp = cdnSet('https://unpkg.com');
+  const loc = () => flatSet(settings.localBase || './engine/ffmpeg/', 'local', 'lokal');
   switch (settings.engineSource) {
-    case 'local':    return [flatSet(settings.localBase || './engine/ffmpeg/', 'local', 'lokal')];
+    case 'folder':   return [folderSet()];
+    case 'local':    return [loc()];
     case 'custom':   return [flatSet(settings.customBase || './', 'custom', 'eigene URL')];
     case 'jsdelivr': return [jsd];
     case 'unpkg':    return [unp];
-    default:         return [flatSet(settings.localBase || './engine/ffmpeg/', 'local', 'lokal'), jsd, unp];
+    default: {
+      const list = [];
+      if (syncDirHandle) list.push(folderSet());
+      list.push(loc(), jsd, unp);
+      return list;
+    }
   }
+}
+
+async function getDirByPath(root, sub) {
+  let d = root;
+  for (const part of String(sub || '').split('/').map(s => s.trim()).filter(Boolean)) {
+    d = await d.getDirectoryHandle(part);
+  }
+  return d;
+}
+
+async function readEngineFromFolder() {
+  if (!syncDirHandle) throw new Error('kein Sync-Ordner verbunden');
+  const dir = await getDirByPath(syncDirHandle, settings.folderSub);
+  const urls = {};
+  for (const [key, fname] of Object.entries(LOCAL_FILES)) {
+    const fh = await dir.getFileHandle(fname);
+    const file = await fh.getFile();
+    urls[key] = URL.createObjectURL(new Blob([file], { type: ENGINE_MIME[key] }));
+    logOk(`${fname} aus dem Sync-Ordner (${fmtBytes(file.size)})`);
+  }
+  return urls;
 }
 
 function setDlProgress(pct) {
@@ -1375,18 +1448,25 @@ function loadScript(src) {
 
 async function tryLoadFFmpegFrom(set) {
   logInfo(`Engine-Quelle "${set.label}" wird versucht`);
-  if (!window.FFmpegWASM) await loadScript(set.ffmpeg);
-  if (!window.FFmpegUtil) await loadScript(set.util);
+  let urls;
+  if (set.kind === 'folder') {
+    urls = await readEngineFromFolder();
+  } else {
+    urls = {
+      ffmpeg: set.ffmpeg, util: set.util,
+      worker: await cachedFetchBlobURL(set.worker, 'text/javascript', 'FFmpeg Worker'),
+      core:   await cachedFetchBlobURL(set.core, 'text/javascript', 'FFmpeg Core'),
+      wasm:   await cachedFetchBlobURL(set.wasm, 'application/wasm', 'FFmpeg WASM (~32 MB)'),
+    };
+  }
+  if (!window.FFmpegWASM) await loadScript(urls.ffmpeg);
+  if (!window.FFmpegUtil) await loadScript(urls.util);
   const { FFmpeg } = window.FFmpegWASM;
   const inst = new FFmpeg();
   inst.on('log', ({ message }) => { if (message) logDebug('ffmpeg: ' + message); });
-  await inst.load({
-    // Der Worker-Chunk lässt sich nicht direkt von einer fremden Domain starten —
-    // deshalb holen wir alle Teile selbst und übergeben Blob-URLs.
-    classWorkerURL: await cachedFetchBlobURL(set.worker, 'text/javascript', 'FFmpeg Worker'),
-    coreURL:        await cachedFetchBlobURL(set.core, 'text/javascript', 'FFmpeg Core'),
-    wasmURL:        await cachedFetchBlobURL(set.wasm, 'application/wasm', 'FFmpeg WASM (~32 MB)'),
-  });
+  // Der Worker-Chunk lässt sich nicht direkt von einer fremden Domain starten —
+  // deshalb bekommt FFmpeg immer Blob-URLs aus gleicher Herkunft.
+  await inst.load({ classWorkerURL: urls.worker, coreURL: urls.core, wasmURL: urls.wasm });
   return inst;
 }
 
@@ -1442,7 +1522,7 @@ function updateEngineStatus() {
   const loaded = transcriberReady && loadedModelId === m.id;
   wh.textContent = loaded ? `${m.label} bereit` : m.label;
   wh.className = 'v' + (loaded ? ' ok' : '');
-  const srcLabels = { auto: 'Auto (lokal → CDN)', local: 'lokal', custom: 'eigene URL', jsdelivr: 'jsDelivr', unpkg: 'unpkg' };
+  const srcLabels = { auto: 'Auto (Ordner → lokal → CDN)', folder: 'Sync-Ordner', local: 'lokal', custom: 'eigene URL', jsdelivr: 'jsDelivr', unpkg: 'unpkg' };
   $('#stSource').textContent = srcLabels[settings.engineSource] || settings.engineSource;
 }
 
