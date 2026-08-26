@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rechnung &amp; Angebot – Vorlage v11.0</title>
+<title>Faktura 1.2 – Rechnung &amp; Angebot</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -929,6 +929,32 @@ body.tax-klein .sum-row{display:none}
   .hist-item .hist-status{grid-column:1/2}
 }
 
+/* ─── Status-Schalter & Farbvorschau (v1.2) */
+.status-trigger{display:inline-flex;align-items:center;gap:7px;min-width:118px;justify-content:center}
+.status-dot{width:9px;height:9px;border-radius:50%;background:#B9C0C6;flex:none}
+.status-dot.s-entwurf{background:#B9C0C6}
+.status-dot.s-gestellt,.status-dot.s-versendet{background:var(--amber)}
+.status-dot.s-bezahlt,.status-dot.s-angenommen{background:#3FA55F}
+.status-dot.s-gebucht{background:#4F6F91}
+.status-dot.s-storniert,.status-dot.s-abgelehnt{background:#C0392B}
+#status-menu{min-width:176px}
+#status-menu .drop-item{display:flex;align-items:center;gap:9px}
+
+.badge-gebucht{background:#DCE6F1;color:#3B5A78}
+.badge-versendet{background:var(--amberlt);color:var(--amber2)}
+.badge-angenommen{background:#DFF0E4;color:#2F7A48}
+.badge-abgelehnt{background:#F6DEDA;color:#A6382A}
+
+.swatch-grid{display:flex;flex-wrap:wrap;gap:8px}
+.swatch-tile{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 8px;border:1px solid var(--border);
+  background:var(--white);border-radius:8px;font:inherit;font-size:12.5px;color:var(--text);cursor:pointer}
+.swatch-tile:hover{border-color:var(--navy)}
+.swatch-tile.active{border-color:var(--amber2);box-shadow:0 0 0 2px var(--amberlt)}
+.swatch-tile .theme-swatch{margin:0}
+
+.hist-status select{width:100%;padding:4px 6px;border:1px solid var(--border);border-radius:6px;
+  font:inherit;font-size:11.5px;background:var(--white);color:var(--text);cursor:pointer}
+
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -942,6 +968,12 @@ body.tax-klein .sum-row{display:none}
     <button class="tbtn tbtn-amber" onclick="newDocument()">＋ Neu</button>
     <button class="tbtn tbtn-ghost" onclick="openHistory()">🕘 Verlauf</button>
     <button class="tbtn tbtn-ghost" onclick="saveDocument()" title="In Arbeitsordner bzw. lokal ablegen">💾 Sichern</button>
+    <div class="drop-wrap">
+      <button class="tbtn tbtn-ghost status-trigger" id="status-btn" onclick="toggleDrop('status-menu')" title="Status dieses Dokuments">
+        <span class="status-dot" id="status-dot"></span><span id="status-label">Entwurf</span> ▾
+      </button>
+      <div class="drop-menu" id="status-menu"></div>
+    </div>
     <div class="drop-wrap">
       <button class="tbtn tbtn-ghost" onclick="toggleDrop('file-menu')">⋯</button>
       <div class="drop-menu" id="file-menu">
@@ -990,6 +1022,12 @@ body.tax-klein .sum-row{display:none}
         👤 <span id="profile-label">Profil</span> ▾
       </button>
       <div class="drop-menu right" id="profile-menu"></div>
+    </div>
+    <div class="drop-wrap">
+      <button class="tbtn tbtn-ghost theme-trigger" id="theme-trigger" onclick="toggleDrop('theme-menu')" title="Farbschema für Ansicht und Druck">
+        <span class="theme-dot" id="theme-dot"></span><span id="theme-label">Anthrazit</span> ▾
+      </button>
+      <div class="drop-menu right theme-menu" id="theme-menu"></div>
     </div>
     <button class="tbtn tbtn-ghost" onclick="openSettings()" title="Einstellungen: Profil, Bank, Steuer, Darstellung">⚙</button>
     <button class="tbtn tbtn-navy" onclick="printDocument()">⎙ Drucken / PDF</button>
@@ -1159,10 +1197,6 @@ body.tax-klein .sum-row{display:none}
       </select>
       <select id="hist-status" onchange="renderHistory()">
         <option value="">Alle Status</option>
-        <option value="entwurf">Entwurf</option>
-        <option value="gestellt">Gestellt</option>
-        <option value="bezahlt">Bezahlt</option>
-        <option value="storniert">Storniert</option>
       </select>
     </div>
     <div class="hist-list" id="hist-list"></div>
@@ -1283,11 +1317,11 @@ body.tax-klein .sum-row{display:none}
 
       <div class="set-section">
         <div class="set-title">Darstellung</div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Farbschema</label>
+          <div class="swatch-grid" id="set-theme-grid"></div>
+        </div>
         <div class="set-grid">
-          <div class="form-group">
-            <label>Farbschema</label>
-            <select id="set-theme" onchange="setTheme(this.value)"></select>
-          </div>
           <div class="form-group">
             <label>Ausgabe</label>
             <select id="set-output" onchange="setOutputMode(this.value)">
@@ -2616,7 +2650,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '11.0';
+const APP_VERSION = '1.2';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -2633,11 +2667,18 @@ const THEMES = {
   salbei: 'Salbei', bordeaux: 'Bordeaux', sand: 'Sand'
 };
 
+// Status je Dokumentart – Reihenfolge = Reihenfolge im Menü
+const STATUS_SETS = {
+  rechnung: ['entwurf', 'gestellt', 'bezahlt', 'gebucht', 'storniert'],
+  angebot:  ['entwurf', 'versendet', 'angenommen', 'abgelehnt']
+};
 const STATUS = {
-  entwurf:   'Entwurf',
-  gestellt:  'Gestellt',
-  bezahlt:   'Bezahlt',
-  storniert: 'Storniert'
+  entwurf: 'Entwurf', gestellt: 'Gestellt', bezahlt: 'Bezahlt', gebucht: 'Gebucht',
+  storniert: 'Storniert', versendet: 'Versendet', angenommen: 'Angenommen', abgelehnt: 'Abgelehnt'
+};
+const SWATCHES = {
+  anthrazit: '#3F454B', blau: '#4F6F91', petrol: '#2F6D73',
+  salbei: '#66736B', bordeaux: '#75495A', sand: '#74634C'
 };
 
 let stunden      = 'ohne';
@@ -2648,6 +2689,7 @@ let outputMode   = 'eco';
 let paymentQr    = false;
 let rowIdx       = 0;
 let currentDocId = null;
+let currentStatus = 'entwurf';
 let autosaveTimer = null;
 let autosavePaused = false;
 let store = { updatedAt: null, activeId: null, profiles: [] };
@@ -2800,6 +2842,48 @@ function renderNotice() {
     txt + (thanks ? `<div class="thanks-line">${escHtml(thanks)}</div>` : '');
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ STATUS DES DOKUMENTS
+function renderStatusUI() {
+  const set = STATUS_SETS[docType] || STATUS_SETS.rechnung;
+  if (!set.includes(currentStatus)) currentStatus = 'entwurf';
+  document.getElementById('status-label').textContent = STATUS[currentStatus];
+  document.getElementById('status-dot').className = 'status-dot s-' + currentStatus;
+  document.getElementById('status-menu').innerHTML = set.map(s =>
+    `<button class="drop-item" onclick="setStatus('${s}');closeDrop()">
+       <span class="status-dot s-${s}"></span>${STATUS[s]}${s === currentStatus ? ' ✓' : ''}</button>`).join('');
+}
+
+// Status des offenen Dokuments ändern – sichert es bei Bedarf gleich mit
+function setStatus(s) {
+  if (!STATUS[s]) return;
+  currentStatus = s;
+  renderStatusUI();
+  const entry = indexData.find(e => e.id === currentDocId);
+  if (entry) {
+    entry.status = s;
+    entry.updatedAt = new Date().toISOString();
+    saveIndex();
+    logEvent('status', `${entry.nr} → ${STATUS[s]}`);
+    toast('Status: ' + STATUS[s]);
+    if (document.getElementById('modal-history').classList.contains('open')) renderHistory();
+  } else if (s !== 'entwurf') {
+    saveDocument();               // noch nicht im Verlauf → jetzt anlegen
+  }
+  scheduleAutosave();
+}
+
+// Status eines Eintrags direkt im Verlauf ändern
+function setEntryStatus(id, s) {
+  const e = indexData.find(x => x.id === id);
+  if (!e || !STATUS[s]) return;
+  e.status = s;
+  e.updatedAt = new Date().toISOString();
+  saveIndex();
+  if (id === currentDocId) { currentStatus = s; renderStatusUI(); }
+  logEvent('status', `${e.nr} → ${STATUS[s]}`);
+  renderHistory();
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MODUS-SCHALTER
 function setStunden(m) {
   stunden = m;
@@ -2831,6 +2915,7 @@ function setDocType(t) {
   const cur = document.getElementById('inv-nr').value;
   const digits = cur.replace(new RegExp('^[' + escRe(n.invoicePrefix) + escRe(n.offerPrefix) + ']'), '');
   document.getElementById('inv-nr').value = (isAng ? n.offerPrefix : n.invoicePrefix) + digits;
+  renderStatusUI();
   renderPaymentQr();
   scheduleAutosave();
 }
@@ -2838,10 +2923,24 @@ function setDocType(t) {
 function setTheme(name, persist = true) {
   theme = Object.prototype.hasOwnProperty.call(THEMES, name) ? name : 'anthrazit';
   document.body.dataset.theme = theme;
-  const sel = document.getElementById('set-theme');
-  if (sel) sel.value = theme;
+  renderThemePickers();
   if (persist && store.profiles.length) { P().theme = theme; saveStore(); }
   scheduleAutosave();
+}
+
+function renderThemePickers() {
+  const lbl = document.getElementById('theme-label');
+  if (lbl) lbl.textContent = THEMES[theme];
+  const dot = document.getElementById('theme-dot');
+  if (dot) dot.style.background = SWATCHES[theme];
+  const menu = document.getElementById('theme-menu');
+  if (menu) menu.innerHTML = Object.entries(THEMES).map(([k, l]) =>
+    `<button class="drop-item theme-option" onclick="setTheme('${k}');closeDrop()">
+       <span class="theme-swatch swatch-${k}"></span>${l}${k === theme ? ' ✓' : ''}</button>`).join('');
+  const grid = document.getElementById('set-theme-grid');
+  if (grid) grid.innerHTML = Object.entries(THEMES).map(([k, l]) =>
+    `<button class="swatch-tile${k === theme ? ' active' : ''}" onclick="setTheme('${k}')">
+       <span class="theme-swatch swatch-${k}"></span>${l}</button>`).join('');
 }
 
 function setOutputMode(mode, persist = true) {
@@ -3013,6 +3112,7 @@ function getState() {
     id: currentDocId,
     profileId: store.activeId,
     docType, stunden, bankIdx, theme, outputMode, paymentQr,
+    status: currentStatus,
     docWord: (document.getElementById('doc-type-word').innerText || '').trim(),
     betreffLabel: (document.getElementById('betreff-label').innerText || '').trim(),
     nr:      document.getElementById('inv-nr').value,
@@ -3031,6 +3131,7 @@ function applyState(s) {
     applyProfileToDocument();
   }
   currentDocId = s.id || null;
+  currentStatus = STATUS[s.status] ? s.status : 'entwurf';
   if (s.docType) setDocType(s.docType);
   if (s.stunden) setStunden(s.stunden);
   bankIdx = Number.isInteger(s.bankIdx) ? s.bankIdx : 0;
@@ -3055,6 +3156,7 @@ function applyState(s) {
     autoH(tr.querySelector('textarea'));
   });
   if (!(s.rows || []).length) { addRow(); addRow(); addRow(); }
+  renderStatusUI();
   autosavePaused = false;
   calcTotal();
 }
@@ -3064,6 +3166,8 @@ function newDocument() {
   if (!confirm(`Neue(s) ${label} starten?\n(Der aktuelle Entwurf wird zurückgesetzt – bereits gesicherte Dokumente bleiben im Verlauf.)`)) return;
   autosavePaused = true;
   currentDocId = null;
+  currentStatus = 'entwurf';
+  renderStatusUI();
   localStorage.removeItem(LS.autosave);
   document.getElementById('tbody').innerHTML = '';
   rowIdx = 0;
@@ -3161,7 +3265,7 @@ async function saveDocument() {
     kunde: (state.kunde || '').split('\n')[0].trim(),
     betreff: (state.betreff || '').split('\n')[0].trim(),
     net: state.totals.net, vat: state.totals.vat, total: state.totals.gross,
-    status: existing?.status || 'entwurf',
+    status: currentStatus || existing?.status || 'entwurf',
     year, file: docFileName(state),
     updatedAt: new Date().toISOString()
   };
@@ -3181,6 +3285,11 @@ function openHistory() {
   const cur = sel.value;
   sel.innerHTML = '<option value="">Alle Jahre</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
   sel.value = years.includes(cur) ? cur : '';
+  const st = document.getElementById('hist-status');
+  const curSt = st.value;
+  st.innerHTML = '<option value="">Alle Status</option>' +
+    Object.keys(STATUS).map(s => `<option value="${s}">${STATUS[s]}</option>`).join('');
+  st.value = curSt;
   renderHistory();
   openModal('modal-history');
 }
@@ -3211,25 +3320,19 @@ function renderHistory() {
           <span class="hist-sub">${escHtml(formatDate(e.date))}${e.betreff ? ' · ' + escHtml(e.betreff) : ''}</span></span>
         <span class="hist-status"><span class="badge badge-${e.status || 'entwurf'}">${STATUS[e.status] || 'Entwurf'}</span></span>
         <span class="hist-sum">${fmtEur(e.total || 0)}</span>
-        <span onclick="event.stopPropagation();cycleStatus('${e.id}')" class="row-del" title="Status weiterschalten" style="cursor:pointer;text-align:center;line-height:28px">↻</span>
+        <span onclick="event.stopPropagation()" style="grid-column:auto">
+          <select onchange="setEntryStatus('${e.id}', this.value)" onclick="event.stopPropagation()" title="Status ändern">
+            ${(STATUS_SETS[e.docType] || STATUS_SETS.rechnung).map(s =>
+              `<option value="${s}"${s === (e.status || 'entwurf') ? ' selected' : ''}>${STATUS[s]}</option>`).join('')}
+          </select></span>
       </div>`).join('');
   }
-  const open = list.filter(e => e.docType === 'rechnung' && (e.status || 'entwurf') !== 'bezahlt' && e.status !== 'storniert')
+  const done = ['bezahlt', 'gebucht', 'storniert'];
+  const open = list.filter(e => e.docType === 'rechnung' && !done.includes(e.status || 'entwurf'))
                    .reduce((s, e) => s + (e.total || 0), 0);
-  const paid = list.filter(e => e.status === 'bezahlt').reduce((s, e) => s + (e.total || 0), 0);
+  const paid = list.filter(e => e.status === 'bezahlt' || e.status === 'gebucht').reduce((s, e) => s + (e.total || 0), 0);
   document.getElementById('hist-stats').innerHTML =
     `<span>Dokumente: <b>${list.length}</b></span><span>Offen: <b>${fmtEur(open)}</b></span><span>Bezahlt: <b>${fmtEur(paid)}</b></span>`;
-}
-
-function cycleStatus(id) {
-  const e = indexData.find(x => x.id === id);
-  if (!e) return;
-  const order = ['entwurf', 'gestellt', 'bezahlt', 'storniert'];
-  e.status = order[(order.indexOf(e.status || 'entwurf') + 1) % order.length];
-  e.updatedAt = new Date().toISOString();
-  saveIndex();
-  renderHistory();
-  logEvent('status', `${e.nr} → ${STATUS[e.status]}`);
 }
 
 async function openDocument(id) {
@@ -3241,6 +3344,8 @@ async function openDocument(id) {
   if (!state) { toast('Datei nicht gefunden – Arbeitsordner verbunden?'); return; }
   applyState(state);
   currentDocId = id;
+  currentStatus = entry.status || state.status || 'entwurf';
+  renderStatusUI();
   closeModal('modal-history');
   saveDraftNow();
   toast('Geöffnet: ' + (entry.nr || ''));
@@ -3569,8 +3674,7 @@ function fillSettings() {
   const v = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
   document.getElementById('set-profile-select').innerHTML =
     store.profiles.map(x => `<option value="${x.id}"${x.id === p.id ? ' selected' : ''}>${escHtml(x.label)}</option>`).join('');
-  document.getElementById('set-theme').innerHTML =
-    Object.entries(THEMES).map(([k, l]) => `<option value="${k}"${k === theme ? ' selected' : ''}>${l}</option>`).join('');
+  renderThemePickers();
   v('set-label', p.label);
   v('set-name', p.sender.name); v('set-slogan', p.sender.slogan); v('set-service', p.sender.service);
   v('set-street', p.sender.street); v('set-zip', p.sender.zip); v('set-city', p.sender.city);
@@ -3842,6 +3946,7 @@ function markEmptyRowsForPrint() {
   setOutputMode(ui.outputMode || 'eco', false);
   setPaymentQr(!!ui.paymentQr, false);
   applyProfileToDocument();
+  renderStatusUI();
   autosavePaused = false;
 
   const restored = restoreAutosavedDraft();
