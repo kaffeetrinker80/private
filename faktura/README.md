@@ -1,4 +1,6 @@
-# Rechnung & Angebot – Single-File-Vorlage
+# Faktura
+
+**Rechnungen & Angebote als einzelne HTML-Datei – offline, ohne Server, mit SEPA-QR.**
 
 Eine einzelne HTML-Datei zum Erstellen von Rechnungen und Angeboten. Kein Server, kein Build,
 keine Abhängigkeiten, keine Tracker – einfach `index.html` im Browser öffnen.
@@ -12,14 +14,16 @@ Alle Daten bleiben auf dem eigenen Gerät bzw. im selbst gewählten Arbeitsordne
 - **SEPA-Zahlungs-QR** nach EPC-Standard, offline erzeugt – scannbar mit jeder Banking-App
 - **Profile**: mehrere Absender (z.B. zwei Gewerbe) in einer Installation, jederzeit umschaltbar
 - **Kundenverwaltung** je Profil
+- **Status je Dokument** direkt in der Kopfleiste – Rechnung: Entwurf → Gestellt → Bezahlt → Gebucht → Storniert,
+  Angebot: Entwurf → Versendet → Angenommen → Abgelehnt
 - **Arbeitsordner (OneDrive, iCloud Drive, lokal)**: Ordner einmal pro Gerät wählen,
   alles Weitere legt das Tool selbst an – damit arbeitet man auf mehreren Rechnern am selben Stand
-- **Verlauf** mit Suche, Jahres-/Art-/Statusfilter und Status *Entwurf → Gestellt → Bezahlt → Storniert*,
+- **Verlauf** mit Suche, Jahres-, Art- und Statusfilter,
   inklusive Summe der offenen Beträge
 - **Protokoll** aller Aktionen (angelegt, gesichert, gedruckt, Status geändert) mit Gerätekennung
 - **Automatische Entwurfssicherung** lokal und im Arbeitsordner – auch geräteübergreifend
 - **Druck-/PDF-Layout** für A4 mit Faltmarken und Fensterumschlag-Adresszeile,
-  sechs Farbschemata sowie Modus „Druck sparsam" bzw. „PDF kräftig"
+  sechs Farbschemata mit Vorschau sowie Modus „Druck sparsam" bzw. „PDF kräftig"
 
 ## Erste Schritte
 
