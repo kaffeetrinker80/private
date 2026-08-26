@@ -1,0 +1,34 @@
+{
+  "updatedAt": "2026-01-01T00:00:00.000Z",
+  "activeId": "p-demo",
+  "profiles": [
+    {
+      "id": "p-demo",
+      "label": "Beispielprofil",
+      "sender": {
+        "name": "Max Mustermann",
+        "slogan": "… kurzer Zusatz unter dem Namen",
+        "service": "Freiberufliche Dienstleistungen",
+        "street": "Musterstraße 1",
+        "zip": "12345",
+        "city": "Musterstadt",
+        "phone": "+49 000 0000000",
+        "mail": "mail@example.de"
+      },
+      "legal": { "taxLabel": "Steuer-Nr.", "taxNo": "000/000/00000", "court": "Musterstadt" },
+      "tax": { "mode": "klein", "rate": 19 },
+      "terms": {
+        "payDays": 20,
+        "offerDays": 30,
+        "thanks": "Vielen Dank für Ihren Auftrag!",
+        "offerThanks": "Wir freuen uns auf Ihre Rückmeldung!"
+      },
+      "banks": [
+        { "name": "Musterbank", "iban": "DE00 0000 0000 0000 0000 00" }
+      ],
+      "numbering": { "invoicePrefix": "R", "offerPrefix": "A", "pad": 3 },
+      "customers": [],
+      "theme": "anthrazit"
+    }
+  ]
+}

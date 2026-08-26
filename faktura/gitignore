@@ -1,0 +1,9 @@
+# Eigene Daten niemals ins Repo
+profil.json
+index.json
+log.jsonl
+autosave.json
+Rechnungen/
+System/
+Profil/
+*.local.html
