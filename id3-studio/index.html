@@ -206,6 +206,19 @@ details.more .inner{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 .le .t{color:var(--dim);flex:none}
 .le.ok .m{color:var(--ok)}.le.err .m{color:var(--err)}.le.warn .m{color:var(--warn)}.le.info .m{color:var(--txt)}
 
+/* ---------- Sync-Menü ---------- */
+#syncWrap{position:relative}
+#syncMenu{display:none;position:absolute;right:0;top:calc(100% + 7px);z-index:70;min-width:230px;
+  background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:6px;
+  box-shadow:0 18px 44px -18px #000}
+#syncMenu.show{display:block}
+#syncMenu .mi{display:block;width:100%;text-align:left;background:none;border:none;border-radius:8px;
+  padding:9px 11px;cursor:pointer;font-size:13.5px;color:var(--txt)}
+#syncMenu .mi:hover{background:var(--panel2);color:var(--mag)}
+#syncMenu .mi.danger:hover{color:var(--err)}
+#syncMenu .sep{height:1px;background:var(--line);margin:5px 3px}
+#syncMenu .info{padding:8px 11px 6px;font-family:var(--mono);font-size:10.5px;color:var(--dim);line-height:1.6;word-break:break-word}
+
 /* ---------- Mehrfachauswahl ---------- */
 .row .ck{flex:none;width:16px;height:16px;accent-color:var(--mag);cursor:pointer;margin:0}
 .row.marked{background:rgba(255,61,147,.10);border-color:rgba(255,61,147,.3)}
@@ -260,10 +273,19 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 
 <header>
   <div class="eq"><i></i><i></i><i></i><i></i></div>
-  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.7.1</span></div>
+  <div class="brand"><h1>ID3 Studio</h1><span class="badge">v1.8</span></div>
   <div class="spacer"></div>
   <span class="hint" id="folderName">kein Ordner geöffnet</span>
-  <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
+  <span id="syncWrap">
+    <button class="btn sm ghost" id="btnSync" title="Einstellungen über einen Cloud-Ordner abgleichen">☁ Sync</button>
+    <div id="syncMenu">
+      <div class="info" id="syncInfo"></div>
+      <button class="mi" id="miSync">Jetzt abgleichen</button>
+      <button class="mi" id="miPick">Anderen Ordner wählen…</button>
+      <div class="sep"></div>
+      <button class="mi danger" id="miOff">Sync trennen</button>
+    </div>
+  </span>
   <button class="btn sm ghost" id="btnTheme" title="Hell / Dunkel">◐</button>
   <button class="btn primary" id="btnOpen">Ordner öffnen</button>
   <button class="btn cy" id="btnLast" style="display:none">Letzter Ordner</button>
@@ -393,7 +415,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
   <div id="logBody"></div>
 </section>
 
-<footer>Made with Love © — ID3 Studio v1.7.1</footer>
+<footer>Made with Love © — ID3 Studio v1.8</footer>
 <div id="toast"></div>
 
 <div id="bxBack" class="modalback">
@@ -453,7 +475,7 @@ footer{text-align:center;padding:6px 0 20px;font-family:var(--mono);font-size:11
 <script>
 "use strict";
 /* ============================================================
-   ID3 Studio v1.7.1
+   ID3 Studio v1.8
    Single-File MP3-Tag-Editor  ·  ID3v2.2 lesen / v2.3 schreiben
    ============================================================ */
 
@@ -531,14 +553,36 @@ function mergeCfg(remote){
 }
 
 /* ---------- Cloud-Ordner (OneDrive, Drive, Dropbox — jeder synchronisierte Ordner) ---------- */
-let syncHandle=null, syncBusy=false;
+let syncHandle=null, syncBusy=false, syncState="off", syncErr="";
 function syncLabel(t,cls){ const b=$("btnSync"); b.textContent=t; b.style.color=cls||""; }
-async function pushCfg(){
+function syncSetState(st,detail){
+  syncState=st; syncErr=detail||"";
+  if(st==="ok")      syncLabel("☁ "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}),"var(--cyan)");
+  else if(st==="busy")  syncLabel("☁ …","");
+  else if(st==="needperm") syncLabel("☁ freigeben","var(--warn)");
+  else if(st==="err")   syncLabel("☁ Fehler","var(--err)");
+  else syncLabel("☁ Sync","");
+}
+function syncErrText(e){
+  const m=(e&&e.message||"")+" "+(e&&e.name||"");
+  if(/NotFoundError|not be found|nicht gefunden/i.test(m)) return "Der Sync-Ordner ist nicht mehr auffindbar — vermutlich verschoben, umbenannt oder von OneDrive freigegeben (nur online verfügbar).";
+  if(/NotAllowedError|denied|permission/i.test(m)) return "Keine Schreibrechte für den Sync-Ordner. Über „Jetzt abgleichen“ fragt der Browser erneut nach.";
+  if(/AbortError/i.test(m)) return "Abgebrochen.";
+  return e&&e.message||"Unbekannter Fehler";
+}
+async function pushCfg({ask=false}={}){
   if(!syncHandle) return;
+  const opt={mode:"readwrite"};
+  let st=await syncHandle.queryPermission(opt);
+  if(st!=="granted"){
+    if(!ask){ syncSetState("needperm"); return; }        // ohne Klick des Nutzers nicht nachfragen
+    st=await syncHandle.requestPermission(opt);
+    if(st!=="granted"){ syncSetState("needperm"); throw new Error("Freigabe abgelehnt"); }
+  }
   const fh=await syncHandle.getFileHandle(CFG_FILE,{create:true});
   const w=await fh.createWritable();
   await w.write(JSON.stringify(CFG,null,1)); await w.close();
-  syncLabel("☁ "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}),"var(--cyan)");
+  syncSetState("ok");
 }
 async function pullCfg(){
   if(!syncHandle) return 0;
@@ -551,17 +595,30 @@ async function pullCfg(){
     throw e;
   }
 }
-async function syncNow({quiet=false}={}){
-  if(!syncHandle||syncBusy) return;
-  syncBusy=true; syncLabel("☁ …");
+async function syncNow({quiet=false,ask=false}={}){
+  if(!syncHandle||syncBusy) return false;
+  syncBusy=true; syncSetState("busy");
   try{
+    // Rechte verfallen beim Schließen des Browsers — auf Klick hin neu erfragen
+    const opt={mode:"readwrite"};
+    if(await syncHandle.queryPermission(opt)!=="granted"){
+      if(!ask){ syncSetState("needperm"); return false; }
+      if(await syncHandle.requestPermission(opt)!=="granted"){
+        syncSetState("needperm","Freigabe abgelehnt");
+        log("Sync: Freigabe für den Ordner wurde abgelehnt","warn");
+        return false;
+      }
+    }
     const added=await pullCfg();
-    await pushCfg();
+    await pushCfg({ask});
     applyCfg();
     if(!quiet) log(`Abgleich fertig${added?` — ${added} neue Einträge übernommen`:" — nichts Neues"}`,"ok");
+    return true;
   }catch(e){
-    syncLabel("☁ Fehler","var(--err)");
-    log("Abgleich fehlgeschlagen: "+e.message,"err");
+    const txt=syncErrText(e);
+    syncSetState("err",txt);
+    log("Abgleich fehlgeschlagen: "+txt,"err");
+    return false;
   }finally{ syncBusy=false; }
 }
 async function connectSync(){
@@ -569,9 +626,8 @@ async function connectSync(){
     const h=await window.showDirectoryPicker({mode:"readwrite",id:"id3sync"});
     syncHandle=h; await saveKV("sync",h);
     log(`Sync-Ordner verbunden: ${h.name}`,"ok");
-    await syncNow();
-    toast("Sync verbunden","ok");
-  }catch(e){ if(e.name!=="AbortError") log("Sync-Ordner konnte nicht gesetzt werden: "+e.message,"err"); }
+    if(await syncNow({ask:true})) toast("Sync verbunden","ok");
+  }catch(e){ if(e.name!=="AbortError") log("Sync-Ordner konnte nicht gesetzt werden: "+syncErrText(e),"err"); }
 }
 
 /* ---------- State ---------- */
@@ -1479,17 +1535,29 @@ $("btnLogToggle").onclick=()=>{
   $("btnLogToggle").textContent=c?"▸":"▾";
   store.set("id3.logCollapsed",c?"1":"0");
 };
-$("btnSync").onclick=async()=>{
-  if(!SUPPORTED) return;
-  if(!syncHandle){ await connectSync(); return; }
-  await syncNow();
-};
-$("btnSync").oncontextmenu=e=>{
-  e.preventDefault();
-  if(syncHandle&&confirm("Sync-Ordner trennen?\nEinstellungen bleiben lokal erhalten.")){
-    syncHandle=null; saveKV("sync",null); syncLabel("☁ Sync"); log("Sync-Ordner getrennt","warn");
+function syncMenu(show){
+  const m=$("syncMenu");
+  if(show){
+    const name=syncHandle?syncHandle.name:"—";
+    const state={ok:"zuletzt erfolgreich abgeglichen",busy:"läuft…",needperm:"Freigabe nötig — Chrome fragt beim Abgleich nach",
+                 err:syncErr||"Fehler",off:"nicht verbunden"}[syncState];
+    $("syncInfo").textContent=`Ordner: ${name}\n${state}`;
+    $("miSync").textContent = syncState==="needperm" ? "Ordner freigeben und abgleichen" : "Jetzt abgleichen";
+    $("miSync").style.display=syncHandle?"":"none";
+    $("miOff").style.display=syncHandle?"":"none";
+    $("miPick").textContent=syncHandle?"Anderen Ordner wählen…":"Sync-Ordner wählen…";
   }
+  m.classList.toggle("show",!!show);
+}
+$("btnSync").onclick=e=>{ e.stopPropagation(); if(!SUPPORTED) return; syncMenu(!$("syncMenu").classList.contains("show")); };
+$("miSync").onclick=async()=>{ syncMenu(false); if(await syncNow({ask:true})) toast("Abgeglichen","ok"); };
+$("miPick").onclick=async()=>{ syncMenu(false); await connectSync(); };
+$("miOff").onclick=()=>{
+  syncMenu(false);
+  if(!confirm("Sync-Ordner trennen?\nDeine Einstellungen bleiben auf diesem Gerät erhalten.")) return;
+  syncHandle=null; saveKV("sync",null); syncSetState("off"); log("Sync-Ordner getrennt","warn");
 };
+document.addEventListener("click",e=>{ if(!e.target.closest("#syncWrap")) syncMenu(false); });
 $("btnLogClear").onclick=()=>{$("logBody").innerHTML="";LOGBUF=[];store.set("id3.log","[]");};
 $("btnLogCopy").onclick=()=>{
   const txt=[...$("logBody").children].map(d=>d.textContent.replace(/^(\d{2}:\d{2}:\d{2})/,"$1  ")).join("\n");
@@ -1559,10 +1627,14 @@ function init(){
       }
     });
     loadKV("sync").then(async h=>{
-      if(!h) return;
+      if(!h){ syncSetState("off"); return; }
       syncHandle=h;
-      if(await h.queryPermission({mode:"readwrite"})==="granted"){ await syncNow({quiet:true}); log(`Sync-Ordner „${h.name}“ abgeglichen`,"ok"); }
-      else syncLabel("☁ verbinden","var(--warn)");
+      if(await h.queryPermission({mode:"readwrite"})==="granted"){
+        if(await syncNow({quiet:true})) log(`Sync-Ordner „${h.name}“ abgeglichen`,"ok");
+      }else{
+        syncSetState("needperm");
+        log(`Sync-Ordner „${h.name}“ braucht eine Freigabe — auf „☁ freigeben“ oben klicken`,"warn");
+      }
     });
     log("bereit — Ordner öffnen zum Starten","info");
   }
