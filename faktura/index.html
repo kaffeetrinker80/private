@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Faktura – Rechnung &amp; Angebot</title>
+<title>Faktura – Angebot &amp; Rechnung</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1026,6 +1026,25 @@ body.tax-klein .sum-row{display:none}
   .step-date{width:100%;margin-left:28px}
 }
 
+/* ─── v1.3.0: Rückgängig, Druckabfrage, Modal-Untertitel */
+.undo-group{display:flex;gap:6px}
+.tbtn.icon-only[disabled]{opacity:.35;cursor:default}
+.tbtn.icon-only[disabled]:hover{background:white;color:var(--navy)}
+#undo-btn,#redo-btn{font-size:15px;line-height:1;padding:8px 13px}
+.modal-sub{display:block;margin-top:3px;font-family:'Barlow',sans-serif;font-size:12px;
+  font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted)}
+.print-choice{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.choice-card{display:flex;align-items:flex-start;gap:13px;width:100%;text-align:left;
+  padding:14px 16px;border:1.5px solid var(--border);border-radius:11px;background:var(--white);
+  font:inherit;cursor:pointer;transition:.15s}
+.choice-card:hover{border-color:var(--navy);background:var(--row-hover)}
+.choice-icon{font-size:22px;line-height:1.1;flex:none}
+.choice-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.choice-txt b{font-family:'Barlow',sans-serif;font-size:13.5px;font-weight:600;color:var(--text)}
+.choice-txt span{font-size:12px;color:var(--muted);line-height:1.45}
+.remember-row{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);cursor:pointer}
+.remember-row input{width:16px;height:16px;accent-color:var(--navy);cursor:pointer}
+
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -1086,14 +1105,17 @@ body.tax-klein .sum-row{display:none}
     <div class="tb-group">
       <button class="tbtn tbtn-amber" onclick="newDocument()">＋ Neu</button>
       <div class="pill-toggle">
-        <button class="pill-btn active" id="tab-rechnung" onclick="setDocType('rechnung')">Rechnung</button>
         <button class="pill-btn" id="tab-angebot" onclick="setDocType('angebot')">Angebot</button>
+        <button class="pill-btn active" id="tab-rechnung" onclick="setDocType('rechnung')">Rechnung</button>
       </div>
       <div class="pill-toggle">
         <button class="pill-btn active" id="tab-ohne" onclick="setStunden('ohne')">Ohne Std.</button>
         <button class="pill-btn" id="tab-mit" onclick="setStunden('mit')">Mit Stundensatz</button>
       </div>
-      <button class="tbtn tbtn-ghost" onclick="addRow()">＋ Zeile</button>
+      <div class="undo-group">
+        <button class="tbtn tbtn-ghost icon-only" id="undo-btn" onclick="undo()" title="Rückgängig (Strg+Z)" disabled>↶</button>
+        <button class="tbtn tbtn-ghost icon-only" id="redo-btn" onclick="redo()" title="Wiederherstellen (Strg+Y)" disabled>↷</button>
+      </div>
     </div>
 
     <div class="tb-spacer"></div>
@@ -1106,7 +1128,7 @@ body.tax-klein .sum-row{display:none}
         <div class="drop-menu right status-panel" id="status-menu"></div>
       </div>
       <button class="tbtn tbtn-ghost" onclick="saveDocument()" title="Dokument in Verlauf und Arbeitsordner ablegen">💾 Sichern</button>
-      <button class="tbtn tbtn-ghost" onclick="openHistory()">🕘 Verlauf</button>
+      <button class="tbtn tbtn-ghost" onclick="openHistory()" title="Alle gesicherten Rechnungen und Angebote">🗂 Dokumente</button>
     </div>
   </div>
 </div>
@@ -1270,7 +1292,7 @@ body.tax-klein .sum-row{display:none}
 <div class="modal-overlay" id="modal-history">
   <div class="modal-box wide">
     <div class="modal-title">
-      Verlauf
+      Dokumente <span class="modal-sub">Alle gesicherten Rechnungen &amp; Angebote</span>
       <button class="modal-close" onclick="closeModal('modal-history')">×</button>
     </div>
     <div class="hist-bar">
@@ -1409,10 +1431,11 @@ body.tax-klein .sum-row{display:none}
         </div>
         <div class="set-grid">
           <div class="form-group">
-            <label>Ausgabe</label>
-            <select id="set-output" onchange="setOutputMode(this.value)">
-              <option value="eco">Druck sparsam (Papier)</option>
-              <option value="vivid">PDF kräftig (Versand)</option>
+            <label>Ausgabe beim Drucken</label>
+            <select id="set-output" onchange="setPrintPreference(this.value)">
+              <option value="ask">Jedes Mal fragen</option>
+              <option value="eco">Immer druckfreundlich (Papier)</option>
+              <option value="vivid">Immer kräftig (PDF-Versand)</option>
             </select>
           </div>
           <div class="form-group">
@@ -1439,6 +1462,35 @@ body.tax-klein .sum-row{display:none}
     <div class="modal-actions">
       <button class="mbtn mbtn-ghost" onclick="closeModal('modal-settings')">Abbrechen</button>
       <button class="mbtn mbtn-primary" onclick="saveSettings()">💾 Übernehmen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MODAL: Druckausgabe -->
+<div class="modal-overlay" id="modal-print">
+  <div class="modal-box">
+    <div class="modal-title">
+      Ausgabe wählen
+      <button class="modal-close" onclick="closeModal('modal-print')">×</button>
+    </div>
+    <div class="print-choice">
+      <button class="choice-card" onclick="doPrint('vivid')">
+        <span class="choice-icon">📄</span>
+        <span class="choice-txt"><b>Kräftig – wie am Bildschirm</b>
+          <span>Flächen und Farben voll ausgefüllt. Für PDF-Versand per E-Mail.</span></span>
+      </button>
+      <button class="choice-card" onclick="doPrint('eco')">
+        <span class="choice-icon">🖨</span>
+        <span class="choice-txt"><b>Druckfreundlich – sparsam</b>
+          <span>Helle Flächen, wenig Farbauftrag. Für den Ausdruck auf Papier.</span></span>
+      </button>
+    </div>
+    <label class="remember-row">
+      <input type="checkbox" id="print-remember">
+      <span>Auswahl merken und nicht mehr fragen</span>
+    </label>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-ghost" onclick="closeModal('modal-print')">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -2736,7 +2788,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.2.4';
+const APP_VERSION = '1.3.0';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -2795,6 +2847,11 @@ let currentStatus = 'entwurf';
 let currentM = {};   // erreichte Stufen: { gestellt:'2026-08-26', bezahlt:null, storniert:false }
 let autosaveTimer = null;
 let autosavePaused = false;
+let undoStack = [];
+let redoStack = [];
+let lastSnapshot = null;
+let historyLocked = false;
+let askBeforePrint = true;
 let store = { updatedAt: null, activeId: null, profiles: [] };
 let indexData = [];
 
@@ -3123,7 +3180,7 @@ function setOutputMode(mode, persist = true) {
   outputMode = mode === 'vivid' ? 'vivid' : 'eco';
   document.body.dataset.printMode = outputMode;
   const sel = document.getElementById('set-output');
-  if (sel) sel.value = outputMode;
+  if (sel && !askBeforePrint) sel.value = outputMode;
   if (persist) saveUi();
   scheduleAutosave();
 }
@@ -3139,7 +3196,7 @@ function setPaymentQr(on, persist = true) {
 }
 
 function saveUi() {
-  localStorage.setItem(LS.ui, JSON.stringify({ outputMode, paymentQr }));
+  localStorage.setItem(LS.ui, JSON.stringify({ outputMode, paymentQr, askBeforePrint }));
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ZAHLUNGS-QR (SEPA/EPC)
@@ -3372,10 +3429,49 @@ function nextNumber() {
   return `${prefix}${year}-${String(max + 1).padStart(pad, '0')}`;
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ RÜCKGÄNGIG
+// Jeder gesicherte Entwurfsstand ist ein Schritt – Tippen wird zusammengefasst.
+function updateUndoUI() {
+  const u = document.getElementById('undo-btn'), r = document.getElementById('redo-btn');
+  if (u) u.disabled = !undoStack.length;
+  if (r) r.disabled = !redoStack.length;
+}
+
+function applySnapshot(json) {
+  historyLocked = true;
+  applyState(JSON.parse(json));
+  lastSnapshot = json;
+  historyLocked = false;
+  updateUndoUI();
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(lastSnapshot || JSON.stringify(getState()));
+  applySnapshot(undoStack.pop());
+  toast('Rückgängig');
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(lastSnapshot || JSON.stringify(getState()));
+  applySnapshot(redoStack.pop());
+  toast('Wiederhergestellt');
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ AUTOSAVE (Entwurf)
 function saveDraftNow() {
   if (autosavePaused) return;
-  const payload = { savedAt: new Date().toISOString(), device: deviceName(), state: getState() };
+  const state = getState();
+  const json = JSON.stringify(state);
+  if (!historyLocked && lastSnapshot && json !== lastSnapshot) {
+    undoStack.push(lastSnapshot);
+    if (undoStack.length > 60) undoStack.shift();
+    redoStack.length = 0;
+    updateUndoUI();
+  }
+  lastSnapshot = json;
+  const payload = { savedAt: new Date().toISOString(), device: deviceName(), state };
   try { localStorage.setItem(LS.autosave, JSON.stringify(payload)); }
   catch (e) { console.warn('Entwurf konnte nicht gesichert werden.', e); }
   Sync.pushAutosave(payload);
@@ -3537,8 +3633,31 @@ async function openDocument(id) {
 }
 
 function printDocument() {
-  logEvent('gedruckt', (document.getElementById('inv-nr').value || '') + ' · ' + fmtEur(getTotals().gross));
-  window.print();
+  if (askBeforePrint) {
+    document.getElementById('print-remember').checked = false;
+    openModal('modal-print');
+    return;
+  }
+  doPrint(outputMode);
+}
+
+function doPrint(mode) {
+  if (document.getElementById('print-remember')?.checked) {
+    askBeforePrint = false;
+    setOutputMode(mode);
+  } else {
+    setOutputMode(mode, false);
+  }
+  saveUi();
+  closeModal('modal-print');
+  logEvent('gedruckt', `${document.getElementById('inv-nr').value || ''} · ${fmtEur(getTotals().gross)} · ${mode === 'vivid' ? 'kräftig' : 'druckfreundlich'}`);
+  setTimeout(() => window.print(), 120);
+}
+
+function setPrintPreference(v) {
+  askBeforePrint = (v === 'ask');
+  if (!askBeforePrint) setOutputMode(v);
+  saveUi();
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ PROTOKOLL
@@ -3874,7 +3993,7 @@ function fillSettings() {
   v('set-thanks', p.terms.thanks); v('set-offer-thanks', p.terms.offerThanks);
   v('set-prefix-r', p.numbering.invoicePrefix); v('set-prefix-a', p.numbering.offerPrefix); v('set-pad', p.numbering.pad);
   document.getElementById('set-tax-mode').value = p.tax.mode === 'ust' ? 'ust' : 'klein';
-  document.getElementById('set-output').value = outputMode;
+  document.getElementById('set-output').value = askBeforePrint ? 'ask' : outputMode;
   document.getElementById('set-qr').value = paymentQr ? 'on' : 'off';
   renderBankRows(p.banks);
 }
@@ -4106,6 +4225,8 @@ document.addEventListener('click', e => { if (!e.target.closest('.drop-wrap')) c
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeDrop(); document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')); }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveDocument(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+  if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
 });
 document.querySelectorAll('.modal-overlay').forEach(m =>
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
@@ -4132,6 +4253,7 @@ function markEmptyRowsForPrint() {
   setStunden('ohne');
   setDocType('rechnung');
   setTheme(P().theme || 'anthrazit', false);
+  askBeforePrint = ui.askBeforePrint !== false;
   setOutputMode(ui.outputMode || 'eco', false);
   setPaymentQr(!!ui.paymentQr, false);
   applyProfileToDocument();
@@ -4156,6 +4278,9 @@ function markEmptyRowsForPrint() {
     document.querySelectorAll('#tbody tr').forEach(tr => tr.classList.remove('is-empty'));
     preparePrintLayout();
   });
+
+  lastSnapshot = JSON.stringify(getState());
+  updateUndoUI();
 
   const fv = document.getElementById('footer-version');
   if (fv) fv.textContent = 'Faktura · V' + APP_VERSION;
