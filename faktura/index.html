@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Faktura 1.2.1 – Rechnung &amp; Angebot</title>
+<title>Faktura – Rechnung &amp; Angebot</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -987,6 +987,37 @@ body.tax-klein .sum-row{display:none}
   font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--input-text);background:var(--white)}
 .step-date:disabled{opacity:.35}
 
+/* ─── Feinschliff v1.2.2: Stufen-Panel ohne Überlappung, kompakter Ordner-Knopf */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.tbtn.icon-only{padding:8px 12px;display:inline-flex;align-items:center;gap:6px}
+.tbtn.icon-only .sync-dot{width:11px;height:11px}
+.drop-head{padding:9px 16px 5px;font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted)}
+
+.status-panel{min-width:330px;padding:6px 0}
+.status-step{
+  display:grid;
+  grid-template-columns:20px minmax(0,1fr) 126px;
+  grid-template-areas:"cb title date" "cb hint hint";
+  column-gap:11px;row-gap:2px;align-items:center;
+  padding:9px 16px;cursor:pointer;font-family:'Barlow',sans-serif;
+}
+.status-step input[type=checkbox]{grid-area:cb;align-self:center;width:17px;height:17px;accent-color:var(--navy);cursor:pointer}
+.step-txt{display:contents}
+.step-txt b{grid-area:title;font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
+.step-hint{grid-area:hint;font-size:11px;color:var(--muted);line-height:1.35}
+.step-date{grid-area:date;justify-self:end;box-sizing:border-box;width:126px;padding:5px 7px;
+  border:1px solid var(--border);border-radius:6px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--input-text);background:var(--white)}
+.status-step.cancel{grid-template-areas:"cb title title" "cb hint hint"}
+@media (max-width:520px){
+  .status-panel{min-width:270px}
+  .status-step{grid-template-columns:20px minmax(0,1fr);
+    grid-template-areas:"cb title" "cb hint" ". date"}
+  .step-date{justify-self:start;margin-top:5px}
+}
+
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -995,18 +1026,30 @@ body.tax-klein .sum-row{display:none}
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOOLBAR -->
 <div id="toolbar">
 
-  <!-- Zeile 1: Dokument -->
+  <!-- Zeile 1: Programm -->
   <div class="tb-row">
     <div class="tb-group">
-      <button class="tbtn tbtn-amber" onclick="newDocument()">＋ Neu</button>
-      <button class="tbtn tbtn-ghost" onclick="openHistory()">🕘 Verlauf</button>
-      <button class="tbtn tbtn-ghost" onclick="saveDocument()" title="Dokument in Verlauf und Arbeitsordner ablegen">💾 Sichern</button>
       <div class="drop-wrap">
-        <button class="tbtn tbtn-ghost status-trigger" id="status-btn" onclick="toggleDrop('status-menu')" title="Bearbeitungsstand dieses Dokuments">
-          <span class="status-dot" id="status-dot"></span><span id="status-label">Entwurf</span> ▾
+        <button class="tbtn tbtn-ghost sync-pill icon-only" id="sync-btn" onclick="syncBtnClick()" title="Arbeitsordner">
+          <span class="sync-dot" id="sync-dot"></span><span class="sr-only" id="sync-label">Lokal</span> ▾
         </button>
-        <div class="drop-menu status-panel" id="status-menu"></div>
+        <div class="drop-menu" id="sync-menu">
+          <div class="drop-head" id="sync-head">Arbeitsordner</div>
+          <button class="drop-item" onclick="Sync.chooseFolder();closeDrop()">📁 Arbeitsordner wählen …</button>
+          <button class="drop-item" onclick="Sync.syncNow();closeDrop()">🔄 Jetzt abgleichen</button>
+          <button class="drop-item" onclick="Sync.rebuildIndex();closeDrop()">🧮 Ordner neu einlesen</button>
+          <div class="drop-sep"></div>
+          <button class="drop-item" onclick="Sync.disconnect();closeDrop()">✕ Ordner trennen</button>
+        </div>
       </div>
+      <div class="drop-wrap">
+        <button class="tbtn tbtn-ghost" onclick="toggleDrop('profile-menu')" title="Absenderprofil wechseln">
+          👤 <span id="profile-label">Profil</span> ▾
+        </button>
+        <div class="drop-menu" id="profile-menu"></div>
+      </div>
+      <button class="tbtn tbtn-ghost" onclick="openSettings()" title="Profil, Bank, Steuer, Nummernkreis, Farbschema">⚙ Einstellungen</button>
+      <button class="tbtn tbtn-navy" onclick="printDocument()">⎙ Drucken / PDF</button>
     </div>
 
     <div class="tb-spacer"></div>
@@ -1030,9 +1073,10 @@ body.tax-klein .sum-row{display:none}
     </div>
   </div>
 
-  <!-- Zeile 2: Art, Modus, Ansicht -->
+  <!-- Zeile 2: Dokument -->
   <div class="tb-row">
     <div class="tb-group">
+      <button class="tbtn tbtn-amber" onclick="newDocument()">＋ Neu</button>
       <div class="pill-toggle">
         <button class="pill-btn active" id="tab-rechnung" onclick="setDocType('rechnung')">Rechnung</button>
         <button class="pill-btn" id="tab-angebot" onclick="setDocType('angebot')">Angebot</button>
@@ -1048,36 +1092,17 @@ body.tax-klein .sum-row{display:none}
 
     <div class="tb-group">
       <div class="drop-wrap">
-        <button class="tbtn tbtn-ghost sync-pill" id="sync-btn" onclick="syncBtnClick()" title="Arbeitsordner (OneDrive o.ä.)">
-          <span class="sync-dot" id="sync-dot"></span><span id="sync-label">Lokal</span> ▾
+        <button class="tbtn tbtn-ghost status-trigger" id="status-btn" onclick="toggleDrop('status-menu')" title="Bearbeitungsstand dieses Dokuments">
+          <span class="status-dot" id="status-dot"></span><span id="status-label">Entwurf</span> ▾
         </button>
-        <div class="drop-menu right" id="sync-menu">
-          <button class="drop-item" onclick="Sync.chooseFolder();closeDrop()">📁 Arbeitsordner wählen …</button>
-          <button class="drop-item" onclick="Sync.syncNow();closeDrop()">🔄 Jetzt abgleichen</button>
-          <button class="drop-item" onclick="Sync.rebuildIndex();closeDrop()">🧮 Ordner neu einlesen</button>
-          <div class="drop-sep"></div>
-          <button class="drop-item" onclick="Sync.disconnect();closeDrop()">✕ Ordner trennen</button>
-        </div>
+        <div class="drop-menu right status-panel" id="status-menu"></div>
       </div>
-      <div class="drop-wrap">
-        <button class="tbtn tbtn-ghost" onclick="toggleDrop('profile-menu')" title="Absenderprofil">
-          👤 <span id="profile-label">Profil</span> ▾
-        </button>
-        <div class="drop-menu right" id="profile-menu"></div>
-      </div>
-      <div class="drop-wrap">
-        <button class="tbtn tbtn-ghost theme-trigger" id="theme-trigger" onclick="toggleDrop('theme-menu')" title="Farbschema für Ansicht und Druck">
-          <span class="theme-dot" id="theme-dot"></span><span id="theme-label">Anthrazit</span> ▾
-        </button>
-        <div class="drop-menu right theme-menu" id="theme-menu"></div>
-      </div>
-      <button class="tbtn tbtn-ghost" onclick="openSettings()" title="Einstellungen: Profil, Bank, Steuer, Nummernkreis">⚙ Einstellungen</button>
-      <button class="tbtn tbtn-navy" onclick="printDocument()">⎙ Drucken / PDF</button>
+      <button class="tbtn tbtn-ghost" onclick="saveDocument()" title="Dokument in Verlauf und Arbeitsordner ablegen">💾 Sichern</button>
+      <button class="tbtn tbtn-ghost" onclick="openHistory()">🕘 Verlauf</button>
     </div>
   </div>
 </div>
 
-<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ INVOICE -->
 <div id="invoice">
 
   <div class="page-two-marker" id="page-two-marker"></div>
@@ -2693,7 +2718,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.2.1';
+const APP_VERSION = '1.2.2';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3585,6 +3610,10 @@ const Sync = {
     const lbl = document.getElementById('sync-label');
     dot.className = 'sync-dot' + (state ? ' ' + state : '');
     lbl.textContent = label;
+    const btn = document.getElementById('sync-btn');
+    if (btn) btn.title = 'Arbeitsordner: ' + label;
+    const head = document.getElementById('sync-head');
+    if (head) head.textContent = 'Arbeitsordner · ' + label;
     const info = document.getElementById('set-sync-info');
     if (info) {
       info.innerHTML = !Sync.supported
