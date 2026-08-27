@@ -969,23 +969,7 @@ body.tax-klein .sum-row{display:none}
 .tb-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tb-group + .tb-group{padding-left:0;border-left:0}
 
-.status-panel{min-width:290px;padding:6px 0}
-.status-head{padding:8px 16px 6px;font-size:10.5px;font-weight:700;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--muted)}
-.status-step{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;
-  padding:8px 16px;cursor:pointer;font-family:'Barlow',sans-serif}
-.status-step:hover{background:var(--row-hover)}
-.status-step input[type=checkbox]{width:16px;height:16px;accent-color:var(--navy);cursor:pointer}
-.step-txt{display:flex;flex-direction:column;line-height:1.25;min-width:0}
-.step-txt b{font-size:13px;font-weight:600;color:var(--text)}
-.step-hint{font-size:11px;color:var(--muted)}
-.status-step.done .step-txt b{color:var(--navy)}
-.status-step.muted{opacity:.45}
-.status-step.cancel input[type=checkbox]{accent-color:#C0392B}
-.status-step.cancel.done .step-txt b{color:#C0392B}
-.step-date{width:118px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;
-  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--input-text);background:var(--white)}
-.step-date:disabled{opacity:.35}
+
 
 /* ─── Feinschliff v1.2.2: Stufen-Panel ohne Überlappung, kompakter Ordner-Knopf */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
@@ -995,27 +979,51 @@ body.tax-klein .sum-row{display:none}
 .drop-head{padding:9px 16px 5px;font-size:10.5px;font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:var(--muted)}
 
-.status-panel{min-width:330px;padding:6px 0}
+
+
+/* ─── Seitenfußzeile des Tools – niemals Teil des Rechnungsdrucks */
+.site-footer{max-width:1000px;margin:18px auto 34px;padding:0 4px;text-align:center}
+.site-footer-inner{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  gap:9px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:12.5px}
+.site-footer-sep{opacity:.6}
+.site-footer-feedback{color:var(--navy);text-decoration:none;font-weight:700;
+  padding:4px 12px;border-radius:999px;background:rgba(0,0,0,.05);transition:.15s ease}
+.site-footer-feedback:hover{background:var(--amberlt);color:var(--amber2)}
+@media print{ .site-footer{display:none!important} }
+
+
+/* ─── Bearbeitungsstand-Panel (v1.2.4) – reines Flex-Layout, kein Überlappen möglich */
+.status-panel{min-width:340px;max-width:min(92vw,380px);padding:6px 0}
+.status-panel .drop-sep{margin:6px 0}
 .status-step{
-  display:grid;
-  grid-template-columns:20px minmax(0,1fr) 126px;
-  grid-template-areas:"cb title date" "cb hint hint";
-  column-gap:11px;row-gap:2px;align-items:center;
-  padding:9px 16px;cursor:pointer;font-family:'Barlow',sans-serif;
+  display:flex;
+  align-items:flex-start;
+  gap:11px;
+  padding:10px 16px;
+  cursor:pointer;
+  font-family:'Barlow',sans-serif;
 }
-.status-step input[type=checkbox]{grid-area:cb;align-self:center;width:17px;height:17px;accent-color:var(--navy);cursor:pointer}
-.step-txt{display:contents}
-.step-txt b{grid-area:title;font-size:13px;font-weight:600;color:var(--text);line-height:1.2}
-.step-hint{grid-area:hint;font-size:11px;color:var(--muted);line-height:1.35}
-.step-date{grid-area:date;justify-self:end;box-sizing:border-box;width:126px;padding:5px 7px;
-  border:1px solid var(--border);border-radius:6px;font-family:'JetBrains Mono',monospace;
-  font-size:11px;color:var(--input-text);background:var(--white)}
-.status-step.cancel{grid-template-areas:"cb title title" "cb hint hint"}
-@media (max-width:520px){
-  .status-panel{min-width:270px}
-  .status-step{grid-template-columns:20px minmax(0,1fr);
-    grid-template-areas:"cb title" "cb hint" ". date"}
-  .step-date{justify-self:start;margin-top:5px}
+.status-step:hover{background:var(--row-hover)}
+.status-step > input[type=checkbox]{
+  flex:0 0 auto;width:17px;height:17px;margin:2px 0 0;accent-color:var(--navy);cursor:pointer
+}
+.step-txt{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+.step-txt b{font-size:13px;font-weight:600;color:var(--text);line-height:1.25}
+.step-hint{font-size:11px;color:var(--muted);line-height:1.35}
+.step-date{
+  flex:0 0 auto;align-self:flex-start;box-sizing:border-box;width:124px;margin-top:1px;
+  padding:5px 7px;border:1px solid var(--border);border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--input-text);background:var(--white)
+}
+.step-date:disabled{opacity:.35}
+.status-step.done .step-txt b{color:var(--navy)}
+.status-step.muted{opacity:.45}
+.status-step.cancel > input[type=checkbox]{accent-color:#C0392B}
+.status-step.cancel.done .step-txt b{color:#C0392B}
+@media (max-width:560px){
+  .status-panel{min-width:250px}
+  .status-step{flex-wrap:wrap}
+  .step-date{width:100%;margin-left:28px}
 }
 
 </style>
@@ -1212,6 +1220,16 @@ body.tax-klein .sum-row{display:none}
     </div>
   </div>
 </div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ FOOTER (erscheint nie im Druck) -->
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <span class="site-footer-version" id="footer-version">Faktura</span>
+    <span class="site-footer-sep">·</span>
+    <span>Made with Love ©</span>
+    <a class="site-footer-feedback" id="footer-feedback" href="mailto:cryptopower@outlook.de">✉ Feedback</a>
+  </div>
+</footer>
 
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MODAL: Kunde speichern -->
 <div class="modal-overlay" id="modal-save-customer">
@@ -2718,7 +2736,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.2.2';
+const APP_VERSION = '1.2.4';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -2965,9 +2983,8 @@ function renderStatusUI() {
       <label class="status-step${currentM[s.key] ? ' done' : ''}${cancelled ? ' muted' : ''}">
         <input type="checkbox" ${currentM[s.key] ? 'checked' : ''} onchange="toggleMilestone('${s.key}', this.checked)">
         <span class="step-txt"><b>${s.label}</b><span class="step-hint">${s.hint}</span></span>
-        <input type="date" class="step-date" value="${currentM[s.key] && currentM[s.key] !== true ? currentM[s.key] : ''}"
-               ${currentM[s.key] ? '' : 'disabled'} onclick="event.preventDefault();event.stopPropagation()"
-               onchange="setMilestoneDate('${s.key}', this.value)">
+        ${currentM[s.key] ? `<input type="date" class="step-date" value="${currentM[s.key] !== true ? currentM[s.key] : today()}"
+               onclick="event.stopPropagation()" onchange="setMilestoneDate('${s.key}', this.value)">` : ''}
       </label>`).join('') +
     `<div class="drop-sep"></div>
      <label class="status-step cancel${cancelled ? ' done' : ''}">
@@ -4139,6 +4156,11 @@ function markEmptyRowsForPrint() {
     document.querySelectorAll('#tbody tr').forEach(tr => tr.classList.remove('is-empty'));
     preparePrintLayout();
   });
+
+  const fv = document.getElementById('footer-version');
+  if (fv) fv.textContent = 'Faktura · V' + APP_VERSION;
+  const ff = document.getElementById('footer-feedback');
+  if (ff) ff.href = 'mailto:cryptopower@outlook.de?subject=' + encodeURIComponent('Feedback: Faktura V' + APP_VERSION);
 
   Sync.init();
   if (firstRun) setTimeout(openSettings, 400);
