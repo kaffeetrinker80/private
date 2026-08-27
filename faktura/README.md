@@ -3,31 +3,34 @@
 **Rechnungen & Angebote als einzelne HTML-Datei – offline, ohne Server, mit SEPA-QR.**
 
 Eine einzelne HTML-Datei zum Erstellen von Rechnungen und Angeboten. Kein Server, kein Build,
-keine Abhängigkeiten, keine Tracker – einfach `index.html` im Browser öffnen.
+keine Abhängigkeiten, keine Tracker – einfach `Faktura_1.3.0.html` im Browser öffnen.
 Alle Daten bleiben auf dem eigenen Gerät bzw. im selbst gewählten Arbeitsordner.
 
 ## Funktionen
 
-- **Rechnung und Angebot** in einem Dokument – umschaltbar, inkl. eigener Nummernkreise
+- **Angebot und Rechnung** in einem Dokument – umschaltbar, inkl. eigener Nummernkreise
 - **Positionen wahlweise mit Stundensatz** (Stunden × Satz) oder als Pauschalbeträge
 - **Kleinunternehmer (§ 19 UStG) oder Umsatzsteuer-Ausweis** mit frei wählbarem Satz
 - **SEPA-Zahlungs-QR** nach EPC-Standard, offline erzeugt – scannbar mit jeder Banking-App
 - **Profile**: mehrere Absender (z.B. zwei Gewerbe) in einer Installation, jederzeit umschaltbar
+- **Rückgängig / Wiederherstellen** über Knöpfe oder `Strg+Z` / `Strg+Y`
 - **Kundenverwaltung** je Profil
-- **Status je Dokument** direkt in der Kopfleiste – Rechnung: Entwurf → Gestellt → Bezahlt → Gebucht → Storniert,
-  Angebot: Entwurf → Versendet → Angenommen → Abgelehnt
+- **Bearbeitungsstand je Dokument** direkt in der Kopfleiste: einzeln abhakbare Stufen mit Datum –
+  Rechnung *Gestellt · Bezahlt · Gebucht*, Angebot *Versendet · Angenommen*.
+  *Storniert* bzw. *Abgelehnt* überschreibt die Anzeige, ohne die erfassten Stufen zu löschen
 - **Arbeitsordner (OneDrive, iCloud Drive, lokal)**: Ordner einmal pro Gerät wählen,
   alles Weitere legt das Tool selbst an – damit arbeitet man auf mehreren Rechnern am selben Stand
-- **Verlauf** mit Suche, Jahres-, Art- und Statusfilter,
+- **Dokumentenübersicht** aller gesicherten Rechnungen und Angebote mit Suche, Jahres-, Art- und Statusfilter,
   inklusive Summe der offenen Beträge
 - **Protokoll** aller Aktionen (angelegt, gesichert, gedruckt, Status geändert) mit Gerätekennung
 - **Automatische Entwurfssicherung** lokal und im Arbeitsordner – auch geräteübergreifend
 - **Druck-/PDF-Layout** für A4 mit Faltmarken und Fensterumschlag-Adresszeile,
-  sechs Farbschemata mit Vorschau sowie Modus „Druck sparsam" bzw. „PDF kräftig"
+  sechs Farbschemata mit Vorschau und Abfrage vor jedem Druck: kräftig für den PDF-Versand
+  oder druckfreundlich fürs Papier
 
 ## Erste Schritte
 
-1. `index.html` herunterladen und im Browser öffnen (Chrome oder Edge empfohlen).
+1. `Faktura_1.3.0.html` herunterladen und im Browser öffnen (Chrome oder Edge empfohlen).
 2. Beim ersten Start öffnen sich die Einstellungen: Absender, Steuerangaben und Bankverbindung eintragen.
 3. Optional **Arbeitsordner wählen** (⚙ oder das Ordner-Feld oben rechts) – z.B. einen Ordner in OneDrive.
 4. Fertig. `💾 Sichern` legt das Dokument im Verlauf und im Arbeitsordner ab, `⎙ Drucken / PDF` erzeugt die Ausgabe.
@@ -81,12 +84,21 @@ versehentlich im Repository landet. `beispiel-profil.json` zeigt das Format eine
 | Kürzel | Funktion |
 | --- | --- |
 | `Strg`/`Cmd` + `S` | Dokument sichern |
+| `Strg`/`Cmd` + `Z` | Rückgängig |
+| `Strg`/`Cmd` + `Y` | Wiederherstellen |
 | `Esc` | Dialoge und Menüs schließen |
 
 ## Hinweis
 
 Die Vorlage erzeugt Dokumente nach üblichen Pflichtangaben, ersetzt aber keine steuerliche Beratung.
 Ob die Angaben im konkreten Fall vollständig sind, klärt am besten das Steuerbüro.
+
+## Beim Forken anpassen
+
+Die Fußzeile unter dem Dokument enthält einen Feedback-Link auf eine feste E-Mail-Adresse
+(`cryptopower@outlook.de`). Wer das Tool für sich übernimmt, ersetzt sie im `<footer>` bzw. in der
+Zeile mit `footer-feedback` im Script. Die Fußzeile wird beim Drucken ausgeblendet und erscheint
+nie auf der Rechnung.
 
 ## Lizenz
 
