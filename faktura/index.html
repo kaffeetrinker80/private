@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Faktura 1.2 – Rechnung &amp; Angebot</title>
+<title>Faktura 1.2.1 – Rechnung &amp; Angebot</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -962,6 +962,31 @@ body.tax-klein .sum-row{display:none}
 .hist-set select:hover{border-color:var(--navy)}
 .log-list{padding:4px 6px}
 
+/* ─── Zweizeilige Toolbar & Stufen-Panel (v1.2.1) */
+#toolbar{flex-direction:column;align-items:stretch;gap:10px}
+.tb-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tb-row + .tb-row{padding-top:10px;border-top:1px solid var(--border)}
+.tb-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tb-group + .tb-group{padding-left:0;border-left:0}
+
+.status-panel{min-width:290px;padding:6px 0}
+.status-head{padding:8px 16px 6px;font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted)}
+.status-step{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;
+  padding:8px 16px;cursor:pointer;font-family:'Barlow',sans-serif}
+.status-step:hover{background:var(--row-hover)}
+.status-step input[type=checkbox]{width:16px;height:16px;accent-color:var(--navy);cursor:pointer}
+.step-txt{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.step-txt b{font-size:13px;font-weight:600;color:var(--text)}
+.step-hint{font-size:11px;color:var(--muted)}
+.status-step.done .step-txt b{color:var(--navy)}
+.status-step.muted{opacity:.45}
+.status-step.cancel input[type=checkbox]{accent-color:#C0392B}
+.status-step.cancel.done .step-txt b{color:#C0392B}
+.step-date{width:118px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--input-text);background:var(--white)}
+.step-date:disabled{opacity:.35}
+
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -970,74 +995,85 @@ body.tax-klein .sum-row{display:none}
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOOLBAR -->
 <div id="toolbar">
 
-  <!-- Dokument -->
-  <div class="tb-group">
-    <button class="tbtn tbtn-amber" onclick="newDocument()">＋ Neu</button>
-    <button class="tbtn tbtn-ghost" onclick="openHistory()">🕘 Verlauf</button>
-    <button class="tbtn tbtn-ghost" onclick="saveDocument()" title="In Arbeitsordner bzw. lokal ablegen">💾 Sichern</button>
-    <div class="drop-wrap">
-      <button class="tbtn tbtn-ghost status-trigger" id="status-btn" onclick="toggleDrop('status-menu')" title="Status dieses Dokuments">
-        <span class="status-dot" id="status-dot"></span><span id="status-label">Entwurf</span> ▾
-      </button>
-      <div class="drop-menu" id="status-menu"></div>
-    </div>
-    <div class="drop-wrap">
-      <button class="tbtn tbtn-ghost" onclick="toggleDrop('file-menu')">⋯</button>
-      <div class="drop-menu" id="file-menu">
-        <button class="drop-item" onclick="exportJson();closeDrop()">⬇ Als JSON exportieren</button>
-        <button class="drop-item" onclick="loadJsonFile();closeDrop()">⬆ JSON-Datei laden</button>
-        <div class="drop-sep"></div>
-        <button class="drop-item" onclick="openSaveCustomer();closeDrop()">👤 Empfänger als Kunde speichern</button>
-        <button class="drop-item" onclick="openLoadCustomer();closeDrop()">📇 Gespeicherte Kunden</button>
-        <div class="drop-sep"></div>
-        <button class="drop-item" onclick="openLog();closeDrop()">📋 Protokoll ansehen</button>
+  <!-- Zeile 1: Dokument -->
+  <div class="tb-row">
+    <div class="tb-group">
+      <button class="tbtn tbtn-amber" onclick="newDocument()">＋ Neu</button>
+      <button class="tbtn tbtn-ghost" onclick="openHistory()">🕘 Verlauf</button>
+      <button class="tbtn tbtn-ghost" onclick="saveDocument()" title="Dokument in Verlauf und Arbeitsordner ablegen">💾 Sichern</button>
+      <div class="drop-wrap">
+        <button class="tbtn tbtn-ghost status-trigger" id="status-btn" onclick="toggleDrop('status-menu')" title="Bearbeitungsstand dieses Dokuments">
+          <span class="status-dot" id="status-dot"></span><span id="status-label">Entwurf</span> ▾
+        </button>
+        <div class="drop-menu status-panel" id="status-menu"></div>
       </div>
+    </div>
+
+    <div class="tb-spacer"></div>
+
+    <div class="tb-group">
+      <div class="drop-wrap">
+        <button class="tbtn tbtn-ghost" onclick="toggleDrop('file-menu')">📄 Datei ▾</button>
+        <div class="drop-menu right" id="file-menu">
+          <button class="drop-item" onclick="exportJson();closeDrop()">⬇ Als JSON-Datei exportieren</button>
+          <button class="drop-item" onclick="loadJsonFile();closeDrop()">⬆ JSON-Datei laden</button>
+        </div>
+      </div>
+      <div class="drop-wrap">
+        <button class="tbtn tbtn-ghost" onclick="toggleDrop('cust-menu')">👥 Kunden ▾</button>
+        <div class="drop-menu right" id="cust-menu">
+          <button class="drop-item" onclick="openSaveCustomer();closeDrop()">＋ Empfänger als Kunde speichern</button>
+          <button class="drop-item" onclick="openLoadCustomer();closeDrop()">📇 Gespeicherte Kunden</button>
+        </div>
+      </div>
+      <button class="tbtn tbtn-ghost" onclick="openLog()" title="Protokoll aller Aktionen">📋 Protokoll</button>
     </div>
   </div>
 
-  <!-- Dokumentart / Modus -->
-  <div class="tb-group">
-    <div class="pill-toggle">
-      <button class="pill-btn active" id="tab-rechnung" onclick="setDocType('rechnung')">Rechnung</button>
-      <button class="pill-btn" id="tab-angebot" onclick="setDocType('angebot')">Angebot</button>
-    </div>
-    <div class="pill-toggle">
-      <button class="pill-btn active" id="tab-ohne" onclick="setStunden('ohne')">Ohne Std.</button>
-      <button class="pill-btn" id="tab-mit" onclick="setStunden('mit')">Mit Stundensatz</button>
-    </div>
-    <button class="tbtn tbtn-ghost" onclick="addRow()">＋ Zeile</button>
-  </div>
-
-  <div class="tb-spacer"></div>
-
-  <!-- Ansicht / Sync / Profil -->
-  <div class="tb-group">
-    <div class="drop-wrap">
-      <button class="tbtn tbtn-ghost sync-pill" id="sync-btn" onclick="syncBtnClick()" title="Arbeitsordner (OneDrive o.ä.)">
-        <span class="sync-dot" id="sync-dot"></span><span id="sync-label">Lokal</span> ▾
-      </button>
-      <div class="drop-menu right" id="sync-menu">
-        <button class="drop-item" onclick="Sync.chooseFolder();closeDrop()">📁 Arbeitsordner wählen …</button>
-        <button class="drop-item" onclick="Sync.syncNow();closeDrop()">🔄 Jetzt abgleichen</button>
-        <button class="drop-item" onclick="Sync.rebuildIndex();closeDrop()">🧮 Ordner neu einlesen</button>
-        <div class="drop-sep"></div>
-        <button class="drop-item" onclick="Sync.disconnect();closeDrop()">✕ Ordner trennen</button>
+  <!-- Zeile 2: Art, Modus, Ansicht -->
+  <div class="tb-row">
+    <div class="tb-group">
+      <div class="pill-toggle">
+        <button class="pill-btn active" id="tab-rechnung" onclick="setDocType('rechnung')">Rechnung</button>
+        <button class="pill-btn" id="tab-angebot" onclick="setDocType('angebot')">Angebot</button>
       </div>
+      <div class="pill-toggle">
+        <button class="pill-btn active" id="tab-ohne" onclick="setStunden('ohne')">Ohne Std.</button>
+        <button class="pill-btn" id="tab-mit" onclick="setStunden('mit')">Mit Stundensatz</button>
+      </div>
+      <button class="tbtn tbtn-ghost" onclick="addRow()">＋ Zeile</button>
     </div>
-    <div class="drop-wrap">
-      <button class="tbtn tbtn-ghost" onclick="toggleDrop('profile-menu')" title="Absenderprofil">
-        👤 <span id="profile-label">Profil</span> ▾
-      </button>
-      <div class="drop-menu right" id="profile-menu"></div>
+
+    <div class="tb-spacer"></div>
+
+    <div class="tb-group">
+      <div class="drop-wrap">
+        <button class="tbtn tbtn-ghost sync-pill" id="sync-btn" onclick="syncBtnClick()" title="Arbeitsordner (OneDrive o.ä.)">
+          <span class="sync-dot" id="sync-dot"></span><span id="sync-label">Lokal</span> ▾
+        </button>
+        <div class="drop-menu right" id="sync-menu">
+          <button class="drop-item" onclick="Sync.chooseFolder();closeDrop()">📁 Arbeitsordner wählen …</button>
+          <button class="drop-item" onclick="Sync.syncNow();closeDrop()">🔄 Jetzt abgleichen</button>
+          <button class="drop-item" onclick="Sync.rebuildIndex();closeDrop()">🧮 Ordner neu einlesen</button>
+          <div class="drop-sep"></div>
+          <button class="drop-item" onclick="Sync.disconnect();closeDrop()">✕ Ordner trennen</button>
+        </div>
+      </div>
+      <div class="drop-wrap">
+        <button class="tbtn tbtn-ghost" onclick="toggleDrop('profile-menu')" title="Absenderprofil">
+          👤 <span id="profile-label">Profil</span> ▾
+        </button>
+        <div class="drop-menu right" id="profile-menu"></div>
+      </div>
+      <div class="drop-wrap">
+        <button class="tbtn tbtn-ghost theme-trigger" id="theme-trigger" onclick="toggleDrop('theme-menu')" title="Farbschema für Ansicht und Druck">
+          <span class="theme-dot" id="theme-dot"></span><span id="theme-label">Anthrazit</span> ▾
+        </button>
+        <div class="drop-menu right theme-menu" id="theme-menu"></div>
+      </div>
+      <button class="tbtn tbtn-ghost" onclick="openSettings()" title="Einstellungen: Profil, Bank, Steuer, Nummernkreis">⚙ Einstellungen</button>
+      <button class="tbtn tbtn-navy" onclick="printDocument()">⎙ Drucken / PDF</button>
     </div>
-    <div class="drop-wrap">
-      <button class="tbtn tbtn-ghost theme-trigger" id="theme-trigger" onclick="toggleDrop('theme-menu')" title="Farbschema für Ansicht und Druck">
-        <span class="theme-dot" id="theme-dot"></span><span id="theme-label">Anthrazit</span> ▾
-      </button>
-      <div class="drop-menu right theme-menu" id="theme-menu"></div>
-    </div>
-    <button class="tbtn tbtn-ghost" onclick="openSettings()" title="Einstellungen: Profil, Bank, Steuer, Darstellung">⚙</button>
-    <button class="tbtn tbtn-navy" onclick="printDocument()">⎙ Drucken / PDF</button>
   </div>
 </div>
 
@@ -2657,7 +2693,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.2.1';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -2674,7 +2710,23 @@ const THEMES = {
   salbei: 'Salbei', bordeaux: 'Bordeaux', sand: 'Sand'
 };
 
-// Status je Dokumentart – Reihenfolge = Reihenfolge im Menü
+// Bearbeitungsstand: einzelne Stufen, die nacheinander erreicht werden.
+// Jede Stufe hält ihr Datum; der angezeigte Status ist die jeweils höchste erreichte.
+const MILESTONES = {
+  rechnung: [
+    { key: 'gestellt', label: 'Gestellt',  hint: 'verschickt / übergeben' },
+    { key: 'bezahlt',  label: 'Bezahlt',   hint: 'Zahlung eingegangen' },
+    { key: 'gebucht',  label: 'Gebucht',   hint: 'in der Buchhaltung erfasst' }
+  ],
+  angebot: [
+    { key: 'versendet',  label: 'Versendet',  hint: 'an den Kunden geschickt' },
+    { key: 'angenommen', label: 'Angenommen', hint: 'Auftrag erteilt' }
+  ]
+};
+const CANCEL = {
+  rechnung: { key: 'storniert', label: 'Storniert', hint: 'überschreibt alle Stufen' },
+  angebot:  { key: 'abgelehnt', label: 'Abgelehnt', hint: 'überschreibt alle Stufen' }
+};
 const STATUS_SETS = {
   rechnung: ['entwurf', 'gestellt', 'bezahlt', 'gebucht', 'storniert'],
   angebot:  ['entwurf', 'versendet', 'angenommen', 'abgelehnt']
@@ -2697,6 +2749,7 @@ let paymentQr    = false;
 let rowIdx       = 0;
 let currentDocId = null;
 let currentStatus = 'entwurf';
+let currentM = {};   // erreichte Stufen: { gestellt:'2026-08-26', bezahlt:null, storniert:false }
 let autosaveTimer = null;
 let autosavePaused = false;
 let store = { updatedAt: null, activeId: null, profiles: [] };
@@ -2849,45 +2902,117 @@ function renderNotice() {
     txt + (thanks ? `<div class="thanks-line">${escHtml(thanks)}</div>` : '');
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ STATUS DES DOKUMENTS
-function renderStatusUI() {
-  const set = STATUS_SETS[docType] || STATUS_SETS.rechnung;
-  if (!set.includes(currentStatus)) currentStatus = 'entwurf';
-  document.getElementById('status-label').textContent = STATUS[currentStatus];
-  document.getElementById('status-dot').className = 'status-dot s-' + currentStatus;
-  document.getElementById('status-menu').innerHTML = set.map(s =>
-    `<button class="drop-item" onclick="setStatus('${s}');closeDrop()">
-       <span class="status-dot s-${s}"></span>${STATUS[s]}${s === currentStatus ? ' ✓' : ''}</button>`).join('');
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ BEARBEITUNGSSTAND
+function today() { return new Date().toISOString().slice(0, 10); }
+
+// Angezeigter Status = höchste erreichte Stufe (Storno/Ablehnung überschreibt alles)
+function deriveStatus(m, type) {
+  m = m || {};
+  const c = CANCEL[type] || CANCEL.rechnung;
+  if (m[c.key]) return c.key;
+  const steps = MILESTONES[type] || MILESTONES.rechnung;
+  for (let i = steps.length - 1; i >= 0; i--) if (m[steps[i].key]) return steps[i].key;
+  return 'entwurf';
 }
 
-// Status des offenen Dokuments ändern – sichert es bei Bedarf gleich mit
-function setStatus(s) {
-  if (!STATUS[s]) return;
-  currentStatus = s;
+// Ältere Dateien mit einfachem Status-Feld übernehmen
+function milestonesFromStatus(status, type) {
+  const m = {};
+  if (!status || status === 'entwurf') return m;
+  const c = CANCEL[type] || CANCEL.rechnung;
+  if (status === c.key) { m[c.key] = true; return m; }
+  const steps = MILESTONES[type] || MILESTONES.rechnung;
+  const idx = steps.findIndex(s => s.key === status);
+  steps.slice(0, idx + 1).forEach(s => m[s.key] = today());
+  return m;
+}
+
+function renderStatusUI() {
+  currentStatus = deriveStatus(currentM, docType);
+  const steps = MILESTONES[docType] || MILESTONES.rechnung;
+  const c = CANCEL[docType] || CANCEL.rechnung;
+  document.getElementById('status-label').textContent = STATUS[currentStatus];
+  document.getElementById('status-dot').className = 'status-dot s-' + currentStatus;
+  const cancelled = !!currentM[c.key];
+  document.getElementById('status-menu').innerHTML =
+    `<div class="status-head">Bearbeitungsstand</div>` +
+    steps.map(s => `
+      <label class="status-step${currentM[s.key] ? ' done' : ''}${cancelled ? ' muted' : ''}">
+        <input type="checkbox" ${currentM[s.key] ? 'checked' : ''} onchange="toggleMilestone('${s.key}', this.checked)">
+        <span class="step-txt"><b>${s.label}</b><span class="step-hint">${s.hint}</span></span>
+        <input type="date" class="step-date" value="${currentM[s.key] && currentM[s.key] !== true ? currentM[s.key] : ''}"
+               ${currentM[s.key] ? '' : 'disabled'} onclick="event.preventDefault();event.stopPropagation()"
+               onchange="setMilestoneDate('${s.key}', this.value)">
+      </label>`).join('') +
+    `<div class="drop-sep"></div>
+     <label class="status-step cancel${cancelled ? ' done' : ''}">
+       <input type="checkbox" ${cancelled ? 'checked' : ''} onchange="toggleCancel(this.checked)">
+       <span class="step-txt"><b>${c.label}</b><span class="step-hint">${c.hint}</span></span>
+     </label>`;
+}
+
+function toggleMilestone(key, on) {
+  const steps = MILESTONES[docType] || MILESTONES.rechnung;
+  if (on) {
+    currentM[key] = today();
+    // vorgelagerte Stufen mitziehen – bezahlt ohne gestellt gibt es nicht
+    const idx = steps.findIndex(s => s.key === key);
+    steps.slice(0, idx).forEach(s => { if (!currentM[s.key]) currentM[s.key] = currentM[key]; });
+  } else {
+    delete currentM[key];
+    // spätere Stufen können ohne diese nicht bestehen
+    const idx = steps.findIndex(s => s.key === key);
+    steps.slice(idx + 1).forEach(s => delete currentM[s.key]);
+  }
+  commitStatus();
+}
+
+function setMilestoneDate(key, value) {
+  if (!currentM[key]) return;
+  currentM[key] = value || today();
+  commitStatus(true);
+}
+
+// Storno überschreibt die Anzeige, löscht die Stufen aber nicht –
+// beim Zurücknehmen steht der vorherige Stand wieder da.
+function toggleCancel(on) {
+  const c = CANCEL[docType] || CANCEL.rechnung;
+  if (on) currentM[c.key] = today(); else delete currentM[c.key];
+  commitStatus();
+}
+
+function commitStatus(quiet) {
   renderStatusUI();
   const entry = indexData.find(e => e.id === currentDocId);
   if (entry) {
-    entry.status = s;
+    entry.status = currentStatus;
+    entry.milestones = Object.assign({}, currentM);
     entry.updatedAt = new Date().toISOString();
     saveIndex();
-    logEvent('status', `${entry.nr} → ${STATUS[s]}`);
-    toast('Status: ' + STATUS[s]);
+    if (!quiet) logEvent('status', `${entry.nr} → ${STATUS[currentStatus]}`);
+    if (!quiet) toast('Stand: ' + STATUS[currentStatus]);
     if (document.getElementById('modal-history').classList.contains('open')) renderHistory();
-  } else if (s !== 'entwurf') {
+  } else if (currentStatus !== 'entwurf') {
     saveDocument();               // noch nicht im Verlauf → jetzt anlegen
   }
   scheduleAutosave();
 }
 
-// Status eines Eintrags direkt im Verlauf ändern
-function setEntryStatus(id, s) {
+// Aus dem Verlauf heraus auf eine Stufe setzen (füllt alle vorherigen mit)
+function setEntryStatus(id, level) {
   const e = indexData.find(x => x.id === id);
-  if (!e || !STATUS[s]) return;
-  e.status = s;
+  if (!e) return;
+  const type = e.docType || 'rechnung';
+  const old = e.milestones || {};
+  const m = level === 'entwurf' ? {} : milestonesFromStatus(level, type);
+  // bereits erfasste Daten der erreichten Stufen behalten
+  Object.keys(m).forEach(k => { if (old[k] && old[k] !== true) m[k] = old[k]; });
+  e.milestones = m;
+  e.status = deriveStatus(m, type);
   e.updatedAt = new Date().toISOString();
   saveIndex();
-  if (id === currentDocId) { currentStatus = s; renderStatusUI(); }
-  logEvent('status', `${e.nr} → ${STATUS[s]}`);
+  if (id === currentDocId) { currentM = Object.assign({}, m); renderStatusUI(); }
+  logEvent('status', `${e.nr} → ${STATUS[e.status]}`);
   renderHistory();
 }
 
@@ -2922,6 +3047,8 @@ function setDocType(t) {
   const cur = document.getElementById('inv-nr').value;
   const digits = cur.replace(new RegExp('^[' + escRe(n.invoicePrefix) + escRe(n.offerPrefix) + ']'), '');
   document.getElementById('inv-nr').value = (isAng ? n.offerPrefix : n.invoicePrefix) + digits;
+  const valid = (MILESTONES[docType] || []).map(s => s.key).concat(CANCEL[docType]?.key);
+  Object.keys(currentM).forEach(k => { if (!valid.includes(k)) delete currentM[k]; });
   renderStatusUI();
   renderPaymentQr();
   scheduleAutosave();
@@ -3120,6 +3247,7 @@ function getState() {
     profileId: store.activeId,
     docType, stunden, bankIdx, theme, outputMode, paymentQr,
     status: currentStatus,
+    milestones: currentM,
     docWord: (document.getElementById('doc-type-word').innerText || '').trim(),
     betreffLabel: (document.getElementById('betreff-label').innerText || '').trim(),
     nr:      document.getElementById('inv-nr').value,
@@ -3138,7 +3266,7 @@ function applyState(s) {
     applyProfileToDocument();
   }
   currentDocId = s.id || null;
-  currentStatus = STATUS[s.status] ? s.status : 'entwurf';
+  currentM = s.milestones ? Object.assign({}, s.milestones) : milestonesFromStatus(s.status, s.docType || 'rechnung');
   if (s.docType) setDocType(s.docType);
   if (s.stunden) setStunden(s.stunden);
   bankIdx = Number.isInteger(s.bankIdx) ? s.bankIdx : 0;
@@ -3173,7 +3301,7 @@ function newDocument() {
   if (!confirm(`Neue(s) ${label} starten?\n(Der aktuelle Entwurf wird zurückgesetzt – bereits gesicherte Dokumente bleiben im Verlauf.)`)) return;
   autosavePaused = true;
   currentDocId = null;
-  currentStatus = 'entwurf';
+  currentM = {};
   renderStatusUI();
   localStorage.removeItem(LS.autosave);
   document.getElementById('tbody').innerHTML = '';
@@ -3272,7 +3400,8 @@ async function saveDocument() {
     kunde: (state.kunde || '').split('\n')[0].trim(),
     betreff: (state.betreff || '').split('\n')[0].trim(),
     net: state.totals.net, vat: state.totals.vat, total: state.totals.gross,
-    status: currentStatus || existing?.status || 'entwurf',
+    status: deriveStatus(currentM, state.docType),
+    milestones: Object.assign({}, currentM),
     year, file: docFileName(state),
     updatedAt: new Date().toISOString()
   };
@@ -3314,6 +3443,13 @@ function historyFiltered() {
     .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.nr).localeCompare(String(a.nr)));
 }
 
+function statusNote(e) {
+  const m = e.milestones || {};
+  const key = e.status;
+  const d = m[key];
+  return (d && d !== true) ? ` · ${STATUS[key]} am ${formatDate(d)}` : '';
+}
+
 function renderHistory() {
   const list = historyFiltered();
   const ui = document.getElementById('hist-list');
@@ -3324,7 +3460,7 @@ function renderHistory() {
       <div class="hist-item" onclick="openDocument('${e.id}')">
         <span class="hist-nr">${escHtml(e.nr || '–')}</span>
         <span class="hist-cust">${escHtml(e.kunde || 'Ohne Empfänger')}
-          <span class="hist-sub">${escHtml(formatDate(e.date))}${e.betreff ? ' · ' + escHtml(e.betreff) : ''}</span></span>
+          <span class="hist-sub">${escHtml(formatDate(e.date))}${e.betreff ? ' · ' + escHtml(e.betreff) : ''}${statusNote(e)}</span></span>
         <span class="hist-status"><span class="badge badge-${e.status || 'entwurf'}">${STATUS[e.status] || 'Entwurf'}</span></span>
         <span class="hist-sum">${fmtEur(e.total || 0)}</span>
         <span class="hist-set" onclick="event.stopPropagation()">
@@ -3351,7 +3487,7 @@ async function openDocument(id) {
   if (!state) { toast('Datei nicht gefunden – Arbeitsordner verbunden?'); return; }
   applyState(state);
   currentDocId = id;
-  currentStatus = entry.status || state.status || 'entwurf';
+  currentM = state.milestones || entry.milestones || milestonesFromStatus(entry.status, entry.docType);
   renderStatusUI();
   closeModal('modal-history');
   saveDraftNow();
@@ -3953,6 +4089,7 @@ function markEmptyRowsForPrint() {
   setOutputMode(ui.outputMode || 'eco', false);
   setPaymentQr(!!ui.paymentQr, false);
   applyProfileToDocument();
+  currentM = {};
   renderStatusUI();
   autosavePaused = false;
 
