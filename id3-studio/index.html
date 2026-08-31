@@ -221,6 +221,8 @@ details.more .inner{margin-top:12px;display:flex;flex-direction:column;gap:12px}
 .ci:hover,.ci.act{background:var(--panel2);color:var(--mag)}
 .ci .cnt{float:right;font-family:var(--mono);font-size:10.5px;color:var(--dim)}
 .cempty{padding:12px 10px;color:var(--dim);font-size:13px}
+.chead{padding:6px 10px 4px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.csep{height:1px;background:var(--line);margin:5px 3px}
 
 /* ---------- Sync-Menü ---------- */
 #syncWrap{position:relative}
@@ -527,6 +529,7 @@ function normCfg(c){
   c.pattern=c.pattern||"%artist% - %title%";
   c.patterns=Array.isArray(c.patterns)&&c.patterns.length?c.patterns:DEF_PATTERNS.slice();
   c.hist=c.hist||{}; for(const k of ["artist","title","album","genre"]) if(typeof c.hist[k]!=="object"||!c.hist[k]) c.hist[k]={};
+  c.recentGenres=Array.isArray(c.recentGenres)?c.recentGenres.slice(0,3):[];
   return c;
 }
 let cfgTimer;
@@ -538,6 +541,9 @@ function saveCfg({push=true}={}){
 function remember(field,val){
   val=(val||"").trim(); if(val.length<2) return;
   const h=CFG.hist[field]; h[val]=(h[val]||0)+1;
+  if(field==="genre"){
+    CFG.recentGenres=[val,...CFG.recentGenres.filter(g=>g!==val)].slice(0,3);
+  }
 }
 function topList(field,max=400){
   return Object.entries(CFG.hist[field]).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"de")).slice(0,max).map(x=>x[0]);
@@ -556,7 +562,10 @@ function mergeCfg(remote){
   for(const pt of remote.patterns) if(!CFG.patterns.includes(pt)) CFG.patterns.push(pt);
   CFG.patterns=CFG.patterns.slice(0,20);
   // Einzelwerte: der jüngere Stand gewinnt
-  if(remote.updated>CFG.updated){ CFG.pattern=remote.pattern; CFG.theme=remote.theme; }
+  if(remote.updated>CFG.updated){
+    CFG.pattern=remote.pattern; CFG.theme=remote.theme;
+    if(remote.recentGenres.length) CFG.recentGenres=remote.recentGenres.slice(0,3);
+  }
   return added;
 }
 
@@ -1029,7 +1038,7 @@ if(window.ResizeObserver) new ResizeObserver(()=>{
    Ersetzt <datalist>: das filtert nur beim Tippen, zeigt nie den
    ganzen Vorrat und wird vom Betriebssystem gezeichnet.
    ============================================================ */
-function upgradeCombo(inp,source,{counts=null}={}){
+function upgradeCombo(inp,source,{counts=null,pinned=null,pinLabel="zuletzt benutzt"}={}){
   const wrap=document.createElement("div"); wrap.className="combo";
   inp.parentNode.insertBefore(wrap,inp); wrap.appendChild(inp);
   const btn=document.createElement("button");
@@ -1043,21 +1052,29 @@ function upgradeCombo(inp,source,{counts=null}={}){
   function open(all){
     const q=all?"":inp.value.trim().toLowerCase();
     const src=source()||[];
-    items=q? src.filter(v=>v.toLowerCase().includes(q)) : src.slice();
+    const pin=(!q&&pinned)? pinned().filter(v=>src.includes(v)).slice(0,3) : [];
+    const rest=q? src.filter(v=>v.toLowerCase().includes(q)) : src.slice();
+    items=[...pin,...rest];
     pop.innerHTML="";
     if(!items.length){
       pop.innerHTML='<div class="cempty">'+(src.length?"kein Treffer":"noch keine Einträge")+"</div>";
       pop.classList.add("show"); return;
     }
-    items.slice(0,300).forEach((v,i)=>{
+    const row=(v,i)=>{
       const d=document.createElement("div");
       d.className="ci"; d.textContent=v;
       if(counts&&counts()[v]>1){
         const c=document.createElement("span"); c.className="cnt"; c.textContent=counts()[v]+"×"; d.appendChild(c);
       }
       d.onmousedown=e=>{ e.preventDefault(); pick(i); };
-      pop.appendChild(d);
-    });
+      return d;
+    };
+    if(pin.length){
+      const h=document.createElement("div"); h.className="chead"; h.textContent=pinLabel; pop.appendChild(h);
+      pin.forEach((v,i)=>pop.appendChild(row(v,i)));
+      const sep=document.createElement("div"); sep.className="csep"; pop.appendChild(sep);
+    }
+    rest.slice(0,300).forEach((v,i)=>pop.appendChild(row(v,pin.length+i)));
     act=-1; pop.classList.add("show"); pop.scrollTop=0;
   }
   function pick(i){
@@ -1664,12 +1681,14 @@ function init(){
   loadCfg();
   restoreLog();
   // Genre: fester Vorrat, ergänzt um selbst eingetragene Werte
+  // Fester Vorrat plus selbst eingetragene Werte, durchgehend alphabetisch
   const genreSrc=()=>{
     const own=topList("genre").filter(g=>!GENRES.includes(g));
-    return [...own,...GENRES];
+    return [...new Set([...GENRES,...own])].sort((a,b)=>a.localeCompare(b,"de",{sensitivity:"base"}));
   };
-  upgradeCombo($("fGenre"),genreSrc);
-  upgradeCombo($("bxGenre"),genreSrc);
+  const genreOpt={pinned:()=>CFG.recentGenres,pinLabel:"zuletzt benutzt"};
+  upgradeCombo($("fGenre"),genreSrc,genreOpt);
+  upgradeCombo($("bxGenre"),genreSrc,genreOpt);
   upgradeCombo($("fArtist"),()=>topList("artist"),{counts:()=>CFG.hist.artist});
   upgradeCombo($("fTitle"), ()=>topList("title"), {counts:()=>CFG.hist.title});
   upgradeCombo($("fAlbum"), ()=>topList("album"), {counts:()=>CFG.hist.album});
