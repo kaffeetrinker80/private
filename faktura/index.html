@@ -1,24 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<!-- Icons + Manifest -->
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="manifest" href="site.webmanifest">
-<meta name="theme-color" content="#eaecef" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#12151a" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-title" content="Rechnungs-Tool">
-<meta name="application-name" content="Faktura - Angebot &amp; Rechnung">
-
-<!-- Link-Vorschau -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="Faktura - Angebot &amp; Rechnung">
-<meta property="og:description" content="Angebot &amp; Rechnung im Handumdrehen">
-<meta property="og:url" content="https://kaffeetrinker80.github.io/private/faktura/">
-<meta property="og:image" content="https://kaffeetrinker80.github.io/private/faktura/og-image.png">
-<meta name="twitter:card" content="summary_large_image">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faktura – Angebot &amp; Rechnung</title>
@@ -1122,6 +1104,7 @@ body.tax-klein .sum-row{display:none}
   <div class="tb-row">
     <div class="tb-group">
       <button class="tbtn tbtn-amber" onclick="newDocument()">＋ Neu</button>
+      <button class="tbtn tbtn-ghost" onclick="duplicateDocument()" title="Kopie des offenen Dokuments mit neuer Nummer und heutigem Datum">⧉ Duplizieren</button>
       <div class="pill-toggle">
         <button class="pill-btn" id="tab-angebot" onclick="setDocType('angebot')">Angebot</button>
         <button class="pill-btn active" id="tab-rechnung" onclick="setDocType('rechnung')">Rechnung</button>
@@ -1328,6 +1311,7 @@ body.tax-klein .sum-row{display:none}
     <div class="hist-list" id="hist-list"></div>
     <div class="hist-stats" id="hist-stats"></div>
     <div class="modal-actions">
+      <button class="mbtn mbtn-ghost" onclick="refreshHistory()">🔄 Aktualisieren</button>
       <button class="mbtn mbtn-ghost" onclick="Sync.rebuildIndex()">🧮 Ordner neu einlesen</button>
       <button class="mbtn mbtn-ghost" onclick="closeModal('modal-history')">Schließen</button>
     </div>
@@ -2806,7 +2790,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3434,6 +3418,22 @@ function newDocument() {
   saveDraftNow();
 }
 
+// Kopie des offenen Dokuments: neue Nummer, heutiges Datum, Stand zurück auf Entwurf
+async function duplicateDocument() {
+  const state = getState();
+  if (!state.kunde.trim() && !state.rows.some(r => r.desc || r.betrag)) {
+    toast('Nichts zu duplizieren.'); return;
+  }
+  currentDocId = null;
+  currentM = {};
+  document.getElementById('inv-nr').value = nextNumber();
+  document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
+  renderStatusUI();
+  calcTotal();
+  await saveDocument();
+  toast('Kopie angelegt: ' + document.getElementById('inv-nr').value);
+}
+
 function nextNumber() {
   const p = P();
   const year = new Date().getFullYear();
@@ -3549,6 +3549,7 @@ async function saveDocument() {
   state.id = currentDocId;
   const year = (state.date || '').slice(0, 4) || String(new Date().getFullYear());
   const existing = indexData.find(e => e.id === currentDocId);
+  const previous = existing ? { file: existing.file, year: existing.year } : null;
   const entry = {
     id: currentDocId,
     profileId: store.activeId,
@@ -3566,12 +3567,13 @@ async function saveDocument() {
   try { localStorage.setItem(LS.doc + currentDocId, JSON.stringify(state)); }
   catch (e) { console.warn('Lokale Ablage voll?', e); }
   saveIndex();
-  await Sync.pushDocument(entry, state);
+  await Sync.pushDocument(entry, state, previous);
   logEvent(isNew ? 'angelegt' : 'gesichert', `${entry.nr} · ${entry.kunde || 'ohne Empfänger'} · ${fmtEur(entry.total)}`);
   toast(Sync.connected ? 'Im Arbeitsordner gesichert.' : 'Lokal gesichert.');
 }
 
-function openHistory() {
+async function openHistory() {
+  if (Sync.connected) await Sync.pullIndex();
   const years = [...new Set(indexData.map(e => e.year))].sort().reverse();
   const sel = document.getElementById('hist-year');
   const cur = sel.value;
@@ -3584,6 +3586,15 @@ function openHistory() {
   st.value = curSt;
   renderHistory();
   openModal('modal-history');
+}
+
+async function refreshHistory() {
+  if (!Sync.connected) { toast('Kein Arbeitsordner verbunden.'); return; }
+  Sync.setStatus('busy', 'Aktualisiere …');
+  await Sync.pullIndex();
+  Sync.setStatus('on', Sync.root.name);
+  renderHistory();
+  toast('Liste aktualisiert.');
 }
 
 function historyFiltered() {
@@ -3638,9 +3649,12 @@ async function openDocument(id) {
   const entry = indexData.find(e => e.id === id);
   if (!entry) return;
   let state = null;
-  try { state = JSON.parse(localStorage.getItem(LS.doc + id) || 'null'); } catch {}
-  if (!state) state = await Sync.pullDocument(entry);
-  if (!state) { toast('Datei nicht gefunden – Arbeitsordner verbunden?'); return; }
+  if (Sync.connected) {
+    state = await Sync.pullDocument(entry);           // Ordner hat Vorrang
+    if (state) { try { localStorage.setItem(LS.doc + id, JSON.stringify(state)); } catch {} }
+  }
+  if (!state) { try { state = JSON.parse(localStorage.getItem(LS.doc + id) || 'null'); } catch {} }
+  if (!state) { toast('Dokument nicht gefunden – Arbeitsordner verbunden?'); return; }
   applyState(state);
   currentDocId = id;
   currentM = state.milestones || entry.milestones || milestonesFromStatus(entry.status, entry.docType);
@@ -3896,6 +3910,24 @@ const Sync = {
     try { await Sync.writeJson(Sync.dirs.profil, 'profil.json', store); } catch (e) { console.warn(e); }
   },
 
+  // Nur den Index aus dem Ordner nachladen und einmischen
+  async pullIndex() {
+    if (!Sync.connected) return;
+    const rIdx = await Sync.readJson(Sync.dirs.system, 'index.json');
+    if (rIdx && Array.isArray(rIdx.entries)) {
+      const map = new Map(indexData.map(e => [e.id, e]));
+      rIdx.entries.forEach(e => {
+        const l = map.get(e.id);
+        if (!l || Date.parse(e.updatedAt || 0) > Date.parse(l.updatedAt || 0)) {
+          map.set(e.id, e);
+          localStorage.removeItem(LS.doc + e.id);      // veralteten lokalen Abzug verwerfen
+        }
+      });
+      indexData = [...map.values()];
+      saveIndex(false);
+    }
+  },
+
   async pushIndex() {
     if (!Sync.connected) return;
     try { await Sync.writeJson(Sync.dirs.system, 'index.json', { updatedAt: new Date().toISOString(), entries: indexData }); }
@@ -3910,11 +3942,19 @@ const Sync = {
     }, 2500);
   },
 
-  async pushDocument(entry, state) {
+  async pushDocument(entry, state, previous) {
     if (!Sync.connected) return;
     try {
       const yearDir = await Sync.dirs.rechnungen.getDirectoryHandle(String(entry.year), { create: true });
       await Sync.writeJson(yearDir, entry.file, state);
+      // Nummer, Datum oder Empfänger geändert → alte Datei aufräumen, sonst bleibt ein Zwilling liegen
+      if (previous && previous.file && (previous.file !== entry.file || String(previous.year) !== String(entry.year))) {
+        try {
+          const oldDir = String(previous.year) === String(entry.year)
+            ? yearDir : await Sync.dirs.rechnungen.getDirectoryHandle(String(previous.year));
+          await oldDir.removeEntry(previous.file);
+        } catch {}
+      }
     } catch (e) { console.warn(e); toast('Datei konnte nicht in den Ordner geschrieben werden.'); }
   },
 
