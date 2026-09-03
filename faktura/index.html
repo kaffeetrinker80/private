@@ -1116,12 +1116,6 @@ body.tax-klein .sum-row{display:none}
     <div class="tb-spacer"></div>
 
     <div class="tb-group">
-      <div class="drop-wrap">
-        <button class="tbtn tbtn-ghost status-trigger" id="status-btn" onclick="toggleDrop('status-menu')" title="Bearbeitungsstand dieses Dokuments">
-          <span class="status-dot" id="status-dot"></span><span id="status-label">Entwurf</span> ▾
-        </button>
-        <div class="drop-menu right status-panel" id="status-menu"></div>
-      </div>
       <button class="tbtn tbtn-ghost" onclick="saveDocument()" title="Dokument in Verlauf und Arbeitsordner ablegen">💾 Sichern</button>
       <button class="tbtn tbtn-ghost" onclick="openHistory()" title="Alle gesicherten Rechnungen und Angebote">🗂 Dokumente</button>
     </div>
@@ -2784,7 +2778,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.3.2';
+const APP_VERSION = '1.3.3';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -2807,7 +2801,7 @@ const MILESTONES = {
   rechnung: [
     { key: 'gestellt', label: 'Gestellt',  hint: 'verschickt / übergeben' },
     { key: 'bezahlt',  label: 'Bezahlt',   hint: 'Zahlung eingegangen' },
-    { key: 'gebucht',  label: 'Gebucht',   hint: 'in der Buchhaltung erfasst', headerHidden: true }
+    { key: 'gebucht',  label: 'Gebucht',   hint: 'in der Buchhaltung erfasst' }
   ],
   angebot: [
     { key: 'versendet',  label: 'Versendet',  hint: 'an den Kunden geschickt' },
@@ -3043,27 +3037,14 @@ function milestonesFromStatus(status, type) {
   return m;
 }
 
+// Der Bearbeitungsstand wird in der Dokumentenliste gepflegt, nicht in der Kopfleiste.
+// Diese Funktion hält nur den abgeleiteten Stand aktuell (und füllt ein Anzeigefeld, falls vorhanden).
 function renderStatusUI() {
   currentStatus = deriveStatus(currentM, docType);
-  const steps = (MILESTONES[docType] || MILESTONES.rechnung).filter(s => !s.headerHidden);
-  const c = CANCEL[docType] || CANCEL.rechnung;
-  document.getElementById('status-label').textContent = STATUS[currentStatus];
-  document.getElementById('status-dot').className = 'status-dot s-' + currentStatus;
-  const cancelled = !!currentM[c.key];
-  document.getElementById('status-menu').innerHTML =
-    `<div class="status-head">Bearbeitungsstand</div>` +
-    steps.map(s => `
-      <label class="status-step${currentM[s.key] ? ' done' : ''}${cancelled ? ' muted' : ''}">
-        <input type="checkbox" ${currentM[s.key] ? 'checked' : ''} onchange="toggleMilestone('${s.key}', this.checked)">
-        <span class="step-txt"><b>${s.label}</b><span class="step-hint">${s.hint}</span></span>
-        ${currentM[s.key] ? `<input type="date" class="step-date" value="${currentM[s.key] !== true ? currentM[s.key] : today()}"
-               onclick="event.stopPropagation()" onchange="setMilestoneDate('${s.key}', this.value)">` : ''}
-      </label>`).join('') +
-    `<div class="drop-sep"></div>
-     <label class="status-step cancel${cancelled ? ' done' : ''}">
-       <input type="checkbox" ${cancelled ? 'checked' : ''} onchange="toggleCancel(this.checked)">
-       <span class="step-txt"><b>${c.label}</b><span class="step-hint">${c.hint}</span></span>
-     </label>`;
+  const lbl = document.getElementById('status-label');
+  if (lbl) lbl.textContent = STATUS[currentStatus];
+  const dot = document.getElementById('status-dot');
+  if (dot) dot.className = 'status-dot s-' + currentStatus;
 }
 
 function toggleMilestone(key, on) {
@@ -3671,7 +3652,9 @@ async function openDocument(id) {
   if (!state) { toast('Dokument nicht gefunden – Arbeitsordner verbunden?'); return; }
   applyState(state);
   currentDocId = id;
-  currentM = state.milestones || entry.milestones || milestonesFromStatus(entry.status, entry.docType);
+  // Die Liste ist beim Stand führend – sie wird auch ohne Öffnen des Dokuments gepflegt
+  currentM = entry.milestones ? Object.assign({}, entry.milestones)
+           : (state.milestones || milestonesFromStatus(entry.status, entry.docType));
   renderStatusUI();
   closeModal('modal-history');
   saveDraftNow();
