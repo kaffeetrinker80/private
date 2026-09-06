@@ -329,6 +329,10 @@
       -webkit-box-decoration-break: clone;
     }
     .light-mode .script mark { background: rgba(255, 196, 46, .9); color: #241900; }
+    /* Inline formatting taken over from Word (bold / italic / underline). */
+    .script strong { font-weight: 800; }
+    .script em { font-style: italic; }
+    .script u { text-decoration: underline; text-underline-offset: .12em; text-decoration-thickness: .05em; }
 
     .stage-controls {
       position: absolute;
@@ -528,7 +532,7 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.1</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.2</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="language-switch" id="languageSwitch" role="group" aria-label="Sprache auswählen">
@@ -629,8 +633,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.1</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=TalkScroll%20Feedback">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.2</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.2">✉ Feedback</a>
       </div>
     </aside>
 
@@ -773,7 +777,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlankTitle: 'Macht den Abstand zwischen Absätzen (Leerzeilen) kleiner, ohne den Zeilenabstand im Text zu verändern.',
         sidebarHideTitle: 'Einstellungen ausblenden',
         sidebarShowTitle: 'Einstellungen einblenden',
-        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Cloud-Sync:</strong> einmal deinen OneDrive-Ordner verbinden — Leseprofile werden dann automatisch in „talkscroll-sync.json“ gesichert und auf jedem Gerät zusammengeführt.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Textmarker:</strong> Wort in <kbd>==doppelte==</kbd> Gleichheitszeichen setzen, um es beim Scrollen farbig hervorzuheben — wird auch aus Word-Markierungen (Textmarker-Farbe) beim Import automatisch übernommen.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Die Schaltfläche oben links blendet die Seitenleiste ein oder aus.',
+        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Cloud-Sync:</strong> einmal deinen OneDrive-Ordner verbinden — Leseprofile werden dann automatisch in „talkscroll-sync.json“ gesichert und auf jedem Gerät zusammengeführt.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Formatierung:</strong> <kbd>==Text==</kbd> markiert farbig, <kbd>**Text**</kbd> setzt fett, <kbd>*Text*</kbd> kursiv und <kbd>__Text__</kbd> unterstrichen. Beim Word-Import werden Textmarker-Farbe, Fett, Kursiv und Unterstrichen automatisch in diese Zeichen übersetzt.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Die Schaltfläche oben links blendet die Seitenleiste ein oder aus.',
         timerLabel: 'Talkzeit',
         timerTitle: 'Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.',
         restartTitle: 'Zurück zum Anfang',
@@ -877,7 +881,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlankTitle: 'Shrinks the gap between paragraphs (blank lines) without changing the line spacing within the text.',
         sidebarHideTitle: 'Hide settings',
         sidebarShowTitle: 'Show settings',
-        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Cloud sync:</strong> connect your OneDrive folder once — reading profiles are then saved to “talkscroll-sync.json” automatically and merged on every device.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Highlighting:</strong> wrap a word in <kbd>==double==</kbd> equals signs to highlight it while scrolling — this is also picked up automatically from Word text highlighting on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The button in the top-left shows or hides the sidebar.',
+        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Cloud sync:</strong> connect your OneDrive folder once — reading profiles are then saved to “talkscroll-sync.json” automatically and merged on every device.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Formatting:</strong> <kbd>==text==</kbd> highlights, <kbd>**text**</kbd> is bold, <kbd>*text*</kbd> italic and <kbd>__text__</kbd> underlined. Word highlighting, bold, italic and underline are translated into these markers on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The button in the top-left shows or hides the sidebar.',
         timerLabel: 'Talk Time',
         timerTitle: 'Starts with the first press of Start and keeps running when you pause the text.',
         restartTitle: 'Back to start',
@@ -1538,6 +1542,61 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         scriptRuns.push({ node, start: originalStart, end: originalStart + text.length });
       }
 
+      // Inline markers understood in the script text. Longer markers must come
+      // first so "**bold**" is not read as an italic star. Markers may be nested,
+      // e.g. **==important==** works.
+      const INLINE_MARKERS = [
+        { marker: '***', tags: ['strong', 'em'] },
+        { marker: '==', tags: ['mark'] },
+        { marker: '**', tags: ['strong'] },
+        { marker: '__', tags: ['u'] },
+        { marker: '*', tags: ['em'] },
+        { marker: '_', tags: ['em'] }
+      ];
+
+      // Turns one line of raw text into formatted nodes while keeping every text
+      // node's original character offset intact (needed for "jump to cursor").
+      function appendFormatted(parent, text, absoluteStart) {
+        let cursor = 0;
+        while (cursor < text.length) {
+          let best = null;
+          for (const entry of INLINE_MARKERS) {
+            const open = text.indexOf(entry.marker, cursor);
+            if (open === -1) continue;
+            const close = text.indexOf(entry.marker, open + entry.marker.length);
+            if (close === -1 || close === open + entry.marker.length) continue;
+            // A marker only counts when it hugs its text ("*so*", not "3 * 4 * 5"),
+            // and underscores additionally have to sit outside words (snake_case).
+            const inner = text.slice(open + entry.marker.length, close);
+            if (inner !== inner.trim()) continue;
+            if (entry.marker[0] === '_') {
+              const before = text[open - 1] || ' ';
+              const after = text[close + entry.marker.length] || ' ';
+              if (/[\w]/.test(before) || /[\w]/.test(after)) continue;
+            }
+            const better = !best || open < best.open ||
+              (open === best.open && entry.marker.length > best.entry.marker.length);
+            if (better) best = { entry, open, close };
+          }
+          if (!best) break;
+
+          if (best.open > cursor) appendRun(parent, text.slice(cursor, best.open), absoluteStart + cursor);
+          // "***text***" nests two tags, every other marker exactly one.
+          const element = document.createElement(best.entry.tags[0]);
+          let innermost = element;
+          best.entry.tags.slice(1).forEach(tag => {
+            const child = document.createElement(tag);
+            innermost.appendChild(child);
+            innermost = child;
+          });
+          const innerStart = best.open + best.entry.marker.length;
+          appendFormatted(innermost, text.slice(innerStart, best.close), absoluteStart + innerStart);
+          parent.appendChild(element);
+          cursor = best.close + best.entry.marker.length;
+        }
+        if (cursor < text.length) appendRun(parent, text.slice(cursor), absoluteStart + cursor);
+      }
+
       const paraRegex = /\n{2,}/g;
       const paragraphs = [];
       let paraStart = 0;
@@ -1555,21 +1614,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         let lineOffset = para.start;
 
         lines.forEach((line, lineIndex) => {
-          const highlightRegex = /==(.+?)==/g;
-          let cursor = 0;
-          let hMatch;
-          while ((hMatch = highlightRegex.exec(line))) {
-            if (hMatch.index > cursor) {
-              appendRun(p, line.slice(cursor, hMatch.index), lineOffset + cursor);
-            }
-            const mark = document.createElement('mark');
-            appendRun(mark, hMatch[1], lineOffset + hMatch.index + 2);
-            p.appendChild(mark);
-            cursor = hMatch.index + hMatch[0].length;
-          }
-          if (cursor < line.length) {
-            appendRun(p, line.slice(cursor), lineOffset + cursor);
-          }
+          appendFormatted(p, line, lineOffset);
 
           lineOffset += line.length;
           if (lineIndex < lines.length - 1) {
@@ -1983,8 +2028,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 
     const WORD_XML_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
 
-    // Reads a .docx and returns plain text with Word text-highlighting preserved as
-    // ==marked text== so it shows up as a highlight in the teleprompter (see renderScript).
+    // Reads a .docx and returns plain text with Word formatting preserved as simple
+    // markers: **bold**, *italic*, __underlined__ and ==highlighted== (see renderScript).
     async function readDocx(file) {
       const zip = await JSZip.loadAsync(file);
       const documentXml = await zip.file('word/document.xml')?.async('string');
@@ -1992,28 +2037,61 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const xml = new DOMParser().parseFromString(documentXml, 'application/xml');
       const paragraphs = [...xml.getElementsByTagNameNS(WORD_XML_NS, 'p')];
 
-      return paragraphs.map(p => {
-        const runs = [...p.getElementsByTagNameNS(WORD_XML_NS, 'r')];
-        let paragraphText = '';
-        let highlightOpen = false;
+      // Word writes <w:b/>, but also <w:b w:val="0"/> to switch a style off.
+      function isOn(runProperties, tagName) {
+        if (!runProperties) return false;
+        const element = [...runProperties.children].find(child => child.localName === tagName);
+        if (!element) return false;
+        const value = element.getAttributeNS(WORD_XML_NS, 'val');
+        return value !== '0' && value !== 'false' && value !== 'none';
+      }
 
+      return paragraphs.map(paragraph => {
+        const runs = [...paragraph.getElementsByTagNameNS(WORD_XML_NS, 'r')];
+
+        // 1. Collect every run with its formatting flags.
+        const segments = [];
         runs.forEach(run => {
-          const runText = [...run.getElementsByTagNameNS(WORD_XML_NS, 't')].map(t => t.textContent).join('');
-          if (!runText) return;
-          const highlight = run.getElementsByTagNameNS(WORD_XML_NS, 'highlight')[0];
-          const isHighlighted = Boolean(highlight) && highlight.getAttributeNS(WORD_XML_NS, 'val') !== 'none';
-
-          // Only emit a "==" marker when the highlight state actually changes, so
-          // consecutive highlighted runs merge into a single ==...== span.
-          if (isHighlighted !== highlightOpen) {
-            paragraphText += '==';
-            highlightOpen = isHighlighted;
-          }
-          paragraphText += runText;
+          const text = [...run.getElementsByTagNameNS(WORD_XML_NS, 't')].map(t => t.textContent).join('');
+          if (!text) return;
+          const runProperties = [...run.children].find(child => child.localName === 'rPr');
+          segments.push({
+            text,
+            bold: isOn(runProperties, 'b'),
+            italic: isOn(runProperties, 'i'),
+            underline: isOn(runProperties, 'u'),
+            highlight: isOn(runProperties, 'highlight')
+          });
         });
 
-        if (highlightOpen) paragraphText += '==';
-        return paragraphText.trim();
+        // 2. Merge neighbouring runs that share the same formatting, so Word's
+        //    internal run splits do not produce **a****b**.
+        const merged = [];
+        segments.forEach(segment => {
+          const previous = merged[merged.length - 1];
+          if (previous && previous.bold === segment.bold && previous.italic === segment.italic &&
+              previous.underline === segment.underline && previous.highlight === segment.highlight) {
+            previous.text += segment.text;
+          } else {
+            merged.push({ ...segment });
+          }
+        });
+
+        // 3. Write the markers, keeping surrounding spaces outside the markers.
+        return merged.map(segment => {
+          const markers = [];
+          if (segment.highlight) markers.push('==');
+          if (segment.bold) markers.push('**');
+          if (segment.italic) markers.push('*');
+          if (segment.underline) markers.push('__');
+          const core = segment.text.trim();
+          if (!markers.length || !core) return segment.text;
+          const leading = segment.text.slice(0, segment.text.indexOf(core[0]));
+          const trailing = segment.text.slice(leading.length + core.length);
+          const open = markers.join('');
+          const close = markers.slice().reverse().join('');
+          return leading + open + core + close + trailing;
+        }).join('').trim();
       }).filter(Boolean).join('\n\n');
     }
 
