@@ -2049,18 +2049,27 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       return paragraphs.map(paragraph => {
         const runs = [...paragraph.getElementsByTagNameNS(WORD_XML_NS, 'r')];
 
-        // 1. Collect every run with its formatting flags.
+        // 1. Collect every run with its formatting flags. Manual line breaks
+        //    (Shift+Enter in Word) become their own unformatted segment, so the
+        //    text around them never runs together.
         const segments = [];
         runs.forEach(run => {
-          const text = [...run.getElementsByTagNameNS(WORD_XML_NS, 't')].map(t => t.textContent).join('');
-          if (!text) return;
           const runProperties = [...run.children].find(child => child.localName === 'rPr');
-          segments.push({
-            text,
+          const format = {
             bold: isOn(runProperties, 'b'),
             italic: isOn(runProperties, 'i'),
             underline: isOn(runProperties, 'u'),
             highlight: isOn(runProperties, 'highlight')
+          };
+
+          [...run.children].forEach(child => {
+            if (child.localName === 't') {
+              if (child.textContent) segments.push({ text: child.textContent, ...format });
+            } else if (child.localName === 'br' || child.localName === 'cr') {
+              segments.push({ text: '\n', bold: false, italic: false, underline: false, highlight: false });
+            } else if (child.localName === 'tab') {
+              segments.push({ text: '\t', bold: false, italic: false, underline: false, highlight: false });
+            }
           });
         });
 
