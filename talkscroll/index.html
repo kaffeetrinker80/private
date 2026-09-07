@@ -189,14 +189,15 @@
     }
     .side-group + .side-group { margin-top: 9px; }
     .side-group > .section-title { margin: 0 0 7px; }
-    /* The script frame grows with the sidebar so the textarea keeps its height. */
+    /* The script frame grows with the sidebar. No min-height:0 here — the frame
+       must never shrink below the textarea, otherwise the text box spills out. */
     .side-group.script-group {
       display: flex;
       flex-direction: column;
-      flex: 1;
-      min-height: 0;
+      flex: 1 1 auto;
       margin-top: 0;
     }
+    .side-group.script-group textarea { min-height: 120px; }
 
     textarea {
       width: 100%;
@@ -553,7 +554,7 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.2</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.3</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="language-switch" id="languageSwitch" role="group" aria-label="Sprache auswählen">
@@ -664,8 +665,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.2</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.2">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.3</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.3">✉ Feedback</a>
       </div>
     </aside>
 
