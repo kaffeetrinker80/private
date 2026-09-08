@@ -197,6 +197,12 @@
     }
     .side-group + .side-group { margin-top: 9px; }
     .side-group > .section-title { margin: 0 0 7px; }
+    /* Second heading inside the same frame — profiles and their sync belong together. */
+    .side-group > .section-title.sub-title {
+      margin: 13px 0 7px;
+      padding-top: 11px;
+      border-top: 1px solid var(--border);
+    }
     /* The script frame grows with the sidebar. No min-height:0 here — the frame
        must never shrink below the textarea, otherwise the text box spills out. */
     .side-group.script-group {
@@ -567,7 +573,7 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.4</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.5</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="brand-switches">
@@ -609,7 +615,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </section>
 
       <section class="side-group">
-      <div class="section-title" id="profilesSectionTitle">Leseprofile</div>
+      <div class="section-title" id="profilesSectionTitle">Leseprofile &amp; Sync</div>
       <div class="profile-stack">
         <select id="profileSelect" class="profile-select" aria-label="Gespeichertes Leseprofil auswählen">
           <option value="">Profil auswählen …</option>
@@ -620,12 +626,10 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
           <button class="btn" id="overwriteProfileBtn" disabled>↻ Überschreiben</button>
           <button class="btn danger" id="deleteProfileBtn" disabled>× Löschen</button>
         </div>
-        <p class="profile-meta" id="profileMeta">Speichert Tempo, Schriftgröße, Zeilenabstand, Leseposition und Lesemodus — nicht dein Skript.</p>
+        <p class="profile-meta" id="profileMeta">Speichert Tempo, Schriftgröße, Zeilenabstand, Leseposition und Lesemodus — nicht dein Skript. Ohne Cloud-Sync bleiben sie in diesem Browser.</p>
       </div>
-      </section>
 
-      <section class="side-group">
-      <div class="section-title" id="syncSectionTitle">Cloud-Sync</div>
+      <div class="section-title sub-title" id="syncSectionTitle">Cloud-Sync</div>
       <div class="sync-stack">
         <div class="sync-status">
           <span class="sync-dot" id="syncDot"></span>
@@ -687,8 +691,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.4</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.4">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.5</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.5">✉ Feedback</a>
       </div>
     </aside>
 
@@ -813,14 +817,14 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         toStart: '↺ Zum Anfang',
         toStartTitle: 'Textposition zurück zum Anfang',
         clear: 'Leeren',
-        profilesSection: 'Leseprofile',
+        profilesSection: 'Leseprofile & Sync',
         profileSelect: 'Profil auswählen …',
         profileSelectAria: 'Gespeichertes Leseprofil auswählen',
         apply: '↳ Anwenden',
         save: '＋ Speichern',
         overwrite: '↻ Überschreiben',
         delete: '× Löschen',
-        profileMetaDefault: 'Speichert Tempo, Schriftgröße, Zeilenabstand, Leseposition und Lesemodus — nicht dein Skript.',
+        profileMetaDefault: 'Speichert Tempo, Schriftgröße, Zeilenabstand, Leseposition und Lesemodus — nicht dein Skript. Ohne Cloud-Sync bleiben sie in diesem Browser.',
         profileMetaSelect: 'Profil auswählen und mit „Anwenden“ laden. Änderungen bleiben zunächst nur aktuell, bis du „Überschreiben“ wählst.',
         profileMetaSelected: '„{name}“: {speed} px/s · {fontSize} px · Position {position} %',
         readingModeSection: 'Lesemodus',
@@ -918,14 +922,14 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         toStart: '↺ To Start',
         toStartTitle: 'Move the text back to the start',
         clear: 'Clear',
-        profilesSection: 'Reading Profiles',
+        profilesSection: 'Reading Profiles & Sync',
         profileSelect: 'Select a profile …',
         profileSelectAria: 'Select a saved reading profile',
         apply: '↳ Apply',
         save: '＋ Save',
         overwrite: '↻ Overwrite',
         delete: '× Delete',
-        profileMetaDefault: 'Saves speed, font size, line spacing, reading position and reading mode — not your script.',
+        profileMetaDefault: 'Saves speed, font size, line spacing, reading position and reading mode — not your script. Without cloud sync they stay in this browser.',
         profileMetaSelect: 'Select a profile and use “Apply” to load it. Changes stay temporary until you choose “Overwrite”.',
         profileMetaSelected: '“{name}”: {speed} px/s · {fontSize} px · Position {position} %',
         readingModeSection: 'Reading Mode',
