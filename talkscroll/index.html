@@ -139,7 +139,9 @@
       gap: 12px;
     }
     .brand-copy { min-width: 0; }
-    .brand-switches { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+    /* Language on top, theme directly below it — same width, same edge. */
+    .brand-switches { display: flex; flex-direction: column; align-items: stretch; gap: 6px; flex: 0 0 auto; }
+    .theme-switch button { flex: 1; }
     .language-switch,
     .theme-switch {
       display: inline-flex;
@@ -565,17 +567,17 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.3</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.4</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="brand-switches">
-            <div class="theme-switch" id="themeSwitch" role="group" aria-label="Darstellung">
-              <button type="button" class="is-active" id="themeDarkBtn" data-theme="dark" aria-pressed="true">☾</button>
-              <button type="button" id="themeLightBtn" data-theme="light" aria-pressed="false">☀</button>
-            </div>
             <div class="language-switch" id="languageSwitch" role="group" aria-label="Sprache auswählen">
               <button type="button" class="is-active" id="langDeBtn" data-language="de" aria-pressed="true">DE</button>
               <button type="button" id="langEnBtn" data-language="en" aria-pressed="false">EN</button>
+            </div>
+            <div class="theme-switch" id="themeSwitch" role="group" aria-label="Darstellung">
+              <button type="button" class="is-active" id="themeDarkBtn" data-theme="dark" aria-pressed="true">☾</button>
+              <button type="button" id="themeLightBtn" data-theme="light" aria-pressed="false">☀</button>
             </div>
           </div>
         </div>
@@ -583,7 +585,7 @@
 
       <!-- Still the one place the theme state lives (profiles, sync and autosave read it),
            but operated through the switches in the header and in the reading view. -->
-      <label class="toggle" id="lightToggleRow" hidden><input type="checkbox" id="lightToggle"> <span id="lightToggleLabel">Heller Modus</span></label>
+      <input type="checkbox" id="lightToggle" hidden />
 
       <section class="side-group script-group">
       <div class="section-title" id="scriptSectionTitle">Dein Skript</div>
@@ -685,8 +687,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.3</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.3">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.4</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.4">✉ Feedback</a>
       </div>
     </aside>
 
@@ -1083,7 +1085,6 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       document.getElementById('speedLabel').textContent = tr('scrollSpeed');
       document.getElementById('lineHeightLabel').textContent = tr('lineHeight');
       document.getElementById('cameraPositionLabel').textContent = tr('readingPosition');
-      document.getElementById('lightToggleLabel').textContent = tr('lightMode');
       syncThemeButtons();
       document.getElementById('guideToggleLabel').textContent = tr('guideLine');
       document.getElementById('cameraToggleLabel').textContent = tr('cameraMode');
