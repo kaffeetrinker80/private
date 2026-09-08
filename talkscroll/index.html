@@ -139,7 +139,9 @@
       gap: 12px;
     }
     .brand-copy { min-width: 0; }
-    .language-switch {
+    .brand-switches { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+    .language-switch,
+    .theme-switch {
       display: inline-flex;
       flex: 0 0 auto;
       padding: 3px;
@@ -148,7 +150,8 @@
       background: rgba(17,25,35,.58);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
     }
-    .language-switch button {
+    .language-switch button,
+    .theme-switch button {
       min-width: 36px;
       border: 0;
       border-radius: 999px;
@@ -161,8 +164,11 @@
       line-height: 1.15;
       transition: background .16s ease, color .16s ease, box-shadow .16s ease;
     }
-    .language-switch button:hover { color: var(--text); }
-    .language-switch button.is-active {
+    .language-switch button:hover,
+    .theme-switch button:hover { color: var(--text); }
+    .theme-switch button { min-width: 32px; font-size: .82rem; letter-spacing: 0; }
+    .language-switch button.is-active,
+    .theme-switch button.is-active {
       color: white;
       background: var(--accent-strong);
       box-shadow: 0 2px 9px rgba(0,0,0,.20);
@@ -504,14 +510,18 @@
     .light-mode .sync-status { color: #3b566f; }
     .light-mode .sync-status.is-live .sync-status-text { color: #122c47; }
     .light-mode .sync-dot { background: #93a6b8; }
-    .light-mode .language-switch {
+    .light-mode .language-switch,
+    .light-mode .theme-switch {
       background: #e5edf5;
       border-color: #a6bacd;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
     }
-    .light-mode .language-switch button { color: #36536f; }
-    .light-mode .language-switch button:hover { color: #102b46; }
-    .light-mode .language-switch button.is-active {
+    .light-mode .language-switch button,
+    .light-mode .theme-switch button { color: #36536f; }
+    .light-mode .language-switch button:hover,
+    .light-mode .theme-switch button:hover { color: #102b46; }
+    .light-mode .language-switch button.is-active,
+    .light-mode .theme-switch button.is-active {
       background: #1e62a5;
       color: #ffffff;
       box-shadow: 0 2px 8px rgba(16,43,70,.20);
@@ -544,6 +554,7 @@
       .sidebar { padding: 12px; max-height: 44vh; }
       .brand-row { gap: 8px; }
       .language-switch button { min-width: 34px; padding-inline: 7px; }
+      .theme-switch button { min-width: 30px; padding-inline: 6px; }
       .stage-controls { max-width: calc(100% - 20px); flex-wrap: wrap; justify-content: center; }
     }
   </style>
@@ -557,12 +568,22 @@
             <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.3</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
-          <div class="language-switch" id="languageSwitch" role="group" aria-label="Sprache auswählen">
-            <button type="button" class="is-active" id="langDeBtn" data-language="de" aria-pressed="true">DE</button>
-            <button type="button" id="langEnBtn" data-language="en" aria-pressed="false">EN</button>
+          <div class="brand-switches">
+            <div class="theme-switch" id="themeSwitch" role="group" aria-label="Darstellung">
+              <button type="button" class="is-active" id="themeDarkBtn" data-theme="dark" aria-pressed="true">☾</button>
+              <button type="button" id="themeLightBtn" data-theme="light" aria-pressed="false">☀</button>
+            </div>
+            <div class="language-switch" id="languageSwitch" role="group" aria-label="Sprache auswählen">
+              <button type="button" class="is-active" id="langDeBtn" data-language="de" aria-pressed="true">DE</button>
+              <button type="button" id="langEnBtn" data-language="en" aria-pressed="false">EN</button>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Still the one place the theme state lives (profiles, sync and autosave read it),
+           but operated through the switches in the header and in the reading view. -->
+      <label class="toggle" id="lightToggleRow" hidden><input type="checkbox" id="lightToggle"> <span id="lightToggleLabel">Heller Modus</span></label>
 
       <section class="side-group script-group">
       <div class="section-title" id="scriptSectionTitle">Dein Skript</div>
@@ -647,7 +668,6 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </div>
 
       <div class="option-row">
-        <label class="toggle"><input type="checkbox" id="lightToggle"> <span id="lightToggleLabel">Heller Modus</span></label>
         <label class="toggle"><input type="checkbox" id="guideToggle" checked> <span id="guideToggleLabel">Leselinie</span></label>
         <label class="toggle"><input type="checkbox" id="cameraToggle"> <span id="cameraToggleLabel">Kamera-Modus</span></label>
         <label class="toggle"><input type="checkbox" id="compactBlankToggle"> <span id="compactBlankToggleLabel">Leerzeilen kompakt</span></label>
@@ -689,6 +709,7 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
         <button class="btn" id="restartBtn" title="Zurück zum Anfang">↺</button>
         <button class="btn primary" id="playBtn">▶ Start</button>
         <span class="speed-chip" id="speedChip">28 px/s</span>
+        <button class="btn" id="stageThemeBtn" title="Heller Modus">☀</button>
         <button class="btn" id="fullscreenBtn" title="Vollbild">⛶</button>
       </div>
     </section>
@@ -728,6 +749,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     const fontSize = document.getElementById('fontSize');
     const lineHeight = document.getElementById('lineHeight');
     const lightToggle = document.getElementById('lightToggle');
+    const themeDarkBtn = document.getElementById('themeDarkBtn');
+    const themeLightBtn = document.getElementById('themeLightBtn');
+    const stageThemeBtn = document.getElementById('stageThemeBtn');
     const guideToggle = document.getElementById('guideToggle');
     const guideLine = document.getElementById('guideLine');
     const cameraToggle = document.getElementById('cameraToggle');
@@ -803,6 +827,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         lineHeight: 'Zeilenabstand',
         readingPosition: 'Leseposition',
         lightMode: 'Heller Modus',
+        darkMode: 'Dunkler Modus',
         guideLine: 'Leselinie',
         cameraMode: 'Kamera-Modus',
         compactBlank: 'Leerzeilen kompakt',
@@ -907,6 +932,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         lineHeight: 'Line spacing',
         readingPosition: 'Reading position',
         lightMode: 'Light mode',
+        darkMode: 'Dark mode',
         guideLine: 'Reading guide',
         cameraMode: 'Camera mode',
         compactBlank: 'Compact blank lines',
@@ -1058,6 +1084,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       document.getElementById('lineHeightLabel').textContent = tr('lineHeight');
       document.getElementById('cameraPositionLabel').textContent = tr('readingPosition');
       document.getElementById('lightToggleLabel').textContent = tr('lightMode');
+      syncThemeButtons();
       document.getElementById('guideToggleLabel').textContent = tr('guideLine');
       document.getElementById('cameraToggleLabel').textContent = tr('cameraMode');
       document.getElementById('compactBlankToggleLabel').textContent = tr('compactBlank');
@@ -1671,6 +1698,26 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       script.style.setProperty('--para-gap', (fontPx * lineHeightFactor * gapFactor) + 'px');
     }
 
+    // The header pill and the button in the reading view both mirror lightToggle.
+    function syncThemeButtons() {
+      const isLight = lightToggle.checked;
+      themeDarkBtn.classList.toggle('is-active', !isLight);
+      themeLightBtn.classList.toggle('is-active', isLight);
+      themeDarkBtn.setAttribute('aria-pressed', String(!isLight));
+      themeLightBtn.setAttribute('aria-pressed', String(isLight));
+      themeDarkBtn.title = tr('darkMode');
+      themeLightBtn.title = tr('lightMode');
+      // The stage button shows the mode it switches to.
+      stageThemeBtn.textContent = isLight ? '☾' : '☀';
+      stageThemeBtn.title = isLight ? tr('darkMode') : tr('lightMode');
+    }
+
+    function setLightMode(isLight) {
+      if (lightToggle.checked === isLight) return;
+      lightToggle.checked = isLight;
+      updateControls();
+    }
+
     function updateControls() {
       script.style.fontSize = fontSize.value + 'px';
       script.style.lineHeight = lineHeight.value;
@@ -1681,6 +1728,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       fontSizeValue.textContent = fontSize.value + ' px';
       lineHeightValue.textContent = Number(lineHeight.value).toFixed(2);
       document.documentElement.classList.toggle('light-mode', lightToggle.checked);
+      syncThemeButtons();
       // The reading line always follows the slider — also in camera mode.
       // Camera mode only provides a useful starting position near the webcam; it never locks the line.
       const guidePosition = Number(cameraPosition.value);
@@ -2170,6 +2218,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       URL.revokeObjectURL(url);
     }
 
+    themeDarkBtn.addEventListener('click', () => setLightMode(false));
+    themeLightBtn.addEventListener('click', () => setLightMode(true));
+    stageThemeBtn.addEventListener('click', () => setLightMode(!lightToggle.checked));
     langDeBtn.addEventListener('click', () => applyLanguage('de'));
     langEnBtn.addEventListener('click', () => applyLanguage('en'));
 
