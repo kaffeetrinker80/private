@@ -213,6 +213,29 @@
     }
     .side-group.script-group textarea { min-height: 120px; }
 
+    /* Formatting bar above the script box — nobody wants to type "==" by hand. */
+    .format-bar { display: flex; gap: 5px; margin-bottom: 6px; flex-wrap: wrap; }
+    .format-bar button {
+      flex: 1 1 0;
+      min-width: 38px;
+      padding: 6px 4px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--btn);
+      color: var(--text);
+      font: inherit;
+      font-size: .82rem;
+      line-height: 1.1;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .format-bar button:hover { background: var(--btn-hover); }
+    .format-bar button:active { transform: translateY(1px); }
+    .format-bar .fmt-mark { background: rgba(255, 196, 46, .18); flex-grow: 2; }
+    .format-bar .fmt-bold { font-weight: 800; }
+    .format-bar .fmt-italic { font-style: italic; }
+    .format-bar .fmt-underline { text-decoration: underline; }
+
     textarea {
       width: 100%;
       min-height: 130px;
@@ -573,7 +596,7 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.5</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.6</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="brand-switches">
@@ -595,6 +618,13 @@
 
       <section class="side-group script-group">
       <div class="section-title" id="scriptSectionTitle">Dein Skript</div>
+      <div class="format-bar" id="formatBar" role="group" aria-label="Formatierung">
+        <button type="button" class="fmt-mark" data-marker="==" title="Markieren">Markieren</button>
+        <button type="button" class="fmt-bold" data-marker="**" title="Fett">F</button>
+        <button type="button" class="fmt-italic" data-marker="*" title="Kursiv">K</button>
+        <button type="button" class="fmt-underline" data-marker="__" title="Unterstrichen">U</button>
+        <button type="button" class="fmt-clear" id="formatClearBtn" title="Formatierung entfernen">✕</button>
+      </div>
       <textarea id="editor" spellcheck="true" placeholder="Hier dein Skript einfügen oder schreiben …">Willkommen bei TalkScroll.
 
 Dieser Teleprompter läuft komplett lokal in deinem Browser. Du kannst den Text direkt bearbeiten, die Geschwindigkeit einstellen und mit Leertaste starten oder pausieren.
@@ -691,8 +721,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.5</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.5">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.6</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.6">✉ Feedback</a>
       </div>
     </aside>
 
@@ -840,7 +870,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlankTitle: 'Macht den Abstand zwischen Absätzen (Leerzeilen) kleiner, ohne den Zeilenabstand im Text zu verändern.',
         sidebarHideTitle: 'Einstellungen ausblenden',
         sidebarShowTitle: 'Einstellungen einblenden',
-        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Cloud-Sync:</strong> einmal deinen OneDrive-Ordner verbinden — Leseprofile werden dann automatisch in „talkscroll-sync.json“ gesichert und auf jedem Gerät zusammengeführt.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Formatierung:</strong> <kbd>==Text==</kbd> markiert farbig, <kbd>**Text**</kbd> setzt fett, <kbd>*Text*</kbd> kursiv und <kbd>__Text__</kbd> unterstrichen. Beim Word-Import werden Textmarker-Farbe, Fett, Kursiv und Unterstrichen automatisch in diese Zeichen übersetzt.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Die Schaltfläche oben links blendet die Seitenleiste ein oder aus.',
+        keyboardHint: '<strong>Tastatur:</strong><br><kbd>Leertaste</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Tempo (ab 1 px/s)<br><kbd>R</kbd> zum Anfang &nbsp; <kbd>F</kbd> Vollbild &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> zum Cursor<br><strong>Talkzeit:</strong> startet beim ersten Klick auf Start und läuft bei Textpausen weiter. „Zum Anfang“ oder „Zum Cursor“ setzt sie zurück.<br><strong>Teil üben:</strong> Cursor im Skript setzen und „Zum Cursor“ klicken — die Stelle wird an die Leselinie gesetzt und die Talkzeit zurückgesetzt.<br><strong>Profile:</strong> speichern deine Leseeinstellungen. Änderungen werden erst mit „Überschreiben“ in ein bestehendes Profil übernommen.<br><strong>Cloud-Sync:</strong> einmal deinen OneDrive-Ordner verbinden — Leseprofile werden dann automatisch in „talkscroll-sync.json“ gesichert und auf jedem Gerät zusammengeführt.<br><strong>Kamera-Modus:</strong> setzt die Leselinie nahe der Webcam; danach frei über „Leseposition“ anpassbar.<br><strong>Formatierung:</strong> Text im Skript auswählen und die Schaltflächen über dem Textfeld nutzen — oder <kbd>Strg</kbd>+<kbd>B</kbd>/<kbd>I</kbd>/<kbd>U</kbd>/<kbd>H</kbd>. Nochmal klicken hebt die Formatierung auf, <kbd>✕</kbd> entfernt alle Zeichen der Auswahl. Dahinter stecken <kbd>==Text==</kbd>, <kbd>**Text**</kbd>, <kbd>*Text*</kbd> und <kbd>__Text__</kbd>; beim Word-Import werden Textmarker-Farbe, Fett, Kursiv und Unterstrichen automatisch übersetzt.<br><strong>Touch:</strong> Tippen auf den Lesebereich startet/pausiert genau wie die Leertaste. Die Schaltfläche oben links blendet die Seitenleiste ein oder aus.',
         timerLabel: 'Talkzeit',
         timerTitle: 'Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.',
         restartTitle: 'Zurück zum Anfang',
@@ -868,6 +898,17 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           syncFailed: 'Sync fehlgeschlagen',
           importing: 'Importiert …',
           importFailed: 'Import fehlgeschlagen'
+        },
+        format: {
+          mark: 'Markieren',
+          markTitle: 'Farbig markieren (Strg+H)',
+          bold: 'F',
+          boldTitle: 'Fett (Strg+B)',
+          italic: 'K',
+          italicTitle: 'Kursiv (Strg+I)',
+          underline: 'U',
+          underlineTitle: 'Unterstrichen (Strg+U)',
+          clearTitle: 'Formatierung der Auswahl entfernen'
         },
         syncSection: 'Cloud-Sync',
         sync: {
@@ -945,7 +986,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         compactBlankTitle: 'Shrinks the gap between paragraphs (blank lines) without changing the line spacing within the text.',
         sidebarHideTitle: 'Hide settings',
         sidebarShowTitle: 'Show settings',
-        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Cloud sync:</strong> connect your OneDrive folder once — reading profiles are then saved to “talkscroll-sync.json” automatically and merged on every device.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Formatting:</strong> <kbd>==text==</kbd> highlights, <kbd>**text**</kbd> is bold, <kbd>*text*</kbd> italic and <kbd>__text__</kbd> underlined. Word highlighting, bold, italic and underline are translated into these markers on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The button in the top-left shows or hides the sidebar.',
+        keyboardHint: '<strong>Keyboard:</strong><br><kbd>Space</kbd> Start/Pause &nbsp; <kbd>↑</kbd>/<kbd>↓</kbd> Speed (from 1 px/s)<br><kbd>R</kbd> to start &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>Alt</kbd>+<kbd>J</kbd> to cursor<br><strong>Talk time:</strong> starts with the first press of Start and keeps running while the text is paused. “To Start” or “To Cursor” resets it.<br><strong>Practice a section:</strong> place the cursor in the script and click “To Cursor” — that point moves to the reading guide and talk time resets.<br><strong>Profiles:</strong> save your reading settings. Changes are saved to an existing profile only when you choose “Overwrite”.<br><strong>Cloud sync:</strong> connect your OneDrive folder once — reading profiles are then saved to “talkscroll-sync.json” automatically and merged on every device.<br><strong>Camera mode:</strong> places the reading guide near your webcam; you can then adjust it freely with “Reading position”.<br><strong>Formatting:</strong> select text in the script and use the buttons above the text box — or <kbd>Ctrl</kbd>+<kbd>B</kbd>/<kbd>I</kbd>/<kbd>U</kbd>/<kbd>H</kbd>. Clicking again removes the formatting, <kbd>✕</kbd> strips all markers from the selection. Behind them sit <kbd>==text==</kbd>, <kbd>**text**</kbd>, <kbd>*text*</kbd> and <kbd>__text__</kbd>; Word highlighting, bold, italic and underline are translated on import.<br><strong>Touch:</strong> tapping the reading area starts/pauses, just like the spacebar. The button in the top-left shows or hides the sidebar.',
         timerLabel: 'Talk Time',
         timerTitle: 'Starts with the first press of Start and keeps running when you pause the text.',
         restartTitle: 'Back to start',
@@ -973,6 +1014,17 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           syncFailed: 'Sync failed',
           importing: 'Importing …',
           importFailed: 'Import failed'
+        },
+        format: {
+          mark: 'Highlight',
+          markTitle: 'Highlight (Ctrl+H)',
+          bold: 'B',
+          boldTitle: 'Bold (Ctrl+B)',
+          italic: 'I',
+          italicTitle: 'Italic (Ctrl+I)',
+          underline: 'U',
+          underlineTitle: 'Underline (Ctrl+U)',
+          clearTitle: 'Remove formatting from the selection'
         },
         syncSection: 'Cloud Sync',
         sync: {
@@ -1096,6 +1148,15 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       compactBlankToggle.title = tr('compactBlankTitle');
       updateSidebarToggle();
       keyboardHint.innerHTML = tr('keyboardHint');
+      formatBar.querySelector('.fmt-mark').textContent = tr('format.mark');
+      formatBar.querySelector('.fmt-mark').title = tr('format.markTitle');
+      formatBar.querySelector('.fmt-bold').textContent = tr('format.bold');
+      formatBar.querySelector('.fmt-bold').title = tr('format.boldTitle');
+      formatBar.querySelector('.fmt-italic').textContent = tr('format.italic');
+      formatBar.querySelector('.fmt-italic').title = tr('format.italicTitle');
+      formatBar.querySelector('.fmt-underline').textContent = tr('format.underline');
+      formatBar.querySelector('.fmt-underline').title = tr('format.underlineTitle');
+      formatClearBtn.title = tr('format.clearTitle');
       timerLabel.textContent = tr('timerLabel');
       document.getElementById('timer').title = tr('timerTitle');
       restartBtn.title = tr('restartTitle');
@@ -2228,6 +2289,94 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     stageThemeBtn.addEventListener('click', () => setLightMode(!lightToggle.checked));
     langDeBtn.addEventListener('click', () => applyLanguage('de'));
     langEnBtn.addEventListener('click', () => applyLanguage('en'));
+
+    const formatBar = document.getElementById('formatBar');
+    const formatClearBtn = document.getElementById('formatClearBtn');
+    const ALL_MARKERS = ['***', '==', '**', '__', '*', '_'];
+
+    // Writes into the textarea through execCommand where possible, so the
+    // browser's own undo history (Ctrl+Z) keeps working.
+    function replaceInEditor(start, end, text, selectStart, selectEnd) {
+      editor.focus();
+      editor.setSelectionRange(start, end);
+      let inserted = false;
+      try {
+        inserted = document.execCommand('insertText', false, text);
+      } catch (error) {
+        inserted = false;
+      }
+      if (!inserted) {
+        editor.setRangeText(text, start, end, 'end');
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      editor.setSelectionRange(selectStart, selectEnd);
+      rememberCursorPosition();
+    }
+
+    // Wraps the selection in a marker — or unwraps it if it is already wrapped.
+    function applyMarker(marker) {
+      const value = editor.value;
+      let start = editor.selectionStart;
+      let end = editor.selectionEnd;
+
+      // No selection: drop in an empty pair and put the caret in the middle.
+      if (start === end) {
+        replaceInEditor(start, end, marker + marker, start + marker.length, start + marker.length);
+        return;
+      }
+
+      // Keep spaces at the edges outside the markers.
+      while (start < end && /\s/.test(value[start])) start += 1;
+      while (end > start && /\s/.test(value[end - 1])) end -= 1;
+      if (start === end) return;
+
+      const selected = value.slice(start, end);
+      const length = marker.length;
+
+      // Already marked, markers inside the selection?
+      if (selected.startsWith(marker) && selected.endsWith(marker) && selected.length > length * 2) {
+        replaceInEditor(start, end, selected.slice(length, -length), start, end - length * 2);
+        return;
+      }
+      // Already marked, markers just outside the selection?
+      if (value.slice(start - length, start) === marker && value.slice(end, end + length) === marker) {
+        replaceInEditor(start - length, end + length, selected, start - length, end - length);
+        return;
+      }
+      replaceInEditor(start, end, marker + selected + marker, start + length, end + length);
+    }
+
+    // Strips every marker from the selection (or from the current line).
+    function clearMarkers() {
+      const value = editor.value;
+      let start = editor.selectionStart;
+      let end = editor.selectionEnd;
+      if (start === end) {
+        start = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+        const lineEnd = value.indexOf('\n', end);
+        end = lineEnd === -1 ? value.length : lineEnd;
+      }
+      const original = value.slice(start, end);
+      let text = original;
+      ALL_MARKERS.forEach(marker => { text = text.split(marker).join(''); });
+      if (text === original) return;
+      replaceInEditor(start, end, text, start, start + text.length);
+    }
+
+    formatBar.addEventListener('click', event => {
+      const button = event.target.closest('button[data-marker]');
+      if (button) applyMarker(button.dataset.marker);
+    });
+    formatClearBtn.addEventListener('click', clearMarkers);
+
+    editor.addEventListener('keydown', event => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+      const shortcuts = { b: '**', i: '*', u: '__', h: '==' };
+      const marker = shortcuts[event.key.toLowerCase()];
+      if (!marker) return;
+      event.preventDefault();
+      applyMarker(marker);
+    });
 
     editor.addEventListener('input', () => {
       isDemoText = false;
