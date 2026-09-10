@@ -3488,7 +3488,7 @@ function addRow() {
   scheduleAutosave();
 }
 
-// ── Seitenumbruch-Engine (v1.5.1) ────────────────────────────────
+// ── Seitenumbruch-Engine (v1.5.2) ────────────────────────────────
 // Das Dokument besteht aus echten A4-Seiten. Nach jeder Änderung werden alle
 // Positionen neu auf die Seiten verteilt: was nicht mehr passt, rutscht nach
 // hinten – wird oben Platz frei, rutscht es von selbst wieder nach vorne.
@@ -3519,6 +3519,13 @@ function makePage() {
   page.innerHTML = `<div class="page-head-slim"><span class="slim-ref"></span><span class="page-num"></span></div>
     <div class="page-body"></div><div class="page-foot"></div><div class="page-fill"></div>`;
   page.querySelector('.page-body').appendChild(tableWrap);
+
+  // Wichtig: Die Fußzeile muss schon VOR der Platzmessung vorhanden sein.
+  // Sonst wirkt die Seite zunächst höher als sie später tatsächlich ist und
+  // die Umbruchlogik schiebt Inhalte nachträglich auf die nächste Seite.
+  const master = document.getElementById('footer-master');
+  if (master) page.querySelector('.page-foot').innerHTML = master.innerHTML;
+
   host.appendChild(page);
   return page;
 }
@@ -3550,6 +3557,11 @@ function paginate() {
   const tail = document.getElementById('doc-tail');
 
   collapseToFirstPage();
+
+  // Alle Seiten werden mit ihrer endgültigen Fußzeilenhöhe gemessen.
+  // Besonders Seite 1 darf nicht erst nach dem Verteilen der Positionen
+  // durch die Fußzeile kleiner werden.
+  syncFooters();
 
   let page = first, tbody = document.getElementById('tbody');
   const nextPage = () => { page = makePage(); tbody = page.querySelector('tbody'); };
