@@ -213,10 +213,10 @@ body{
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ CARD */
 #invoice{
-  max-width:1000px;
+  max-width:794px;
   margin:0 auto;
   position:relative;
-  background:white;
+  background:transparent;
   border-radius:14px;
   overflow:hidden;
   box-shadow:0 8px 40px rgba(0,0,0,.12);
@@ -681,9 +681,7 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ PRINT */
 @media print{
   /* Folgeseiten bekommen oben einen Einzug, die erste Seite bleibt bündig (Briefkopf). */
-  /* Unten bleibt Platz für die Fußzeile, die auf jeder Seite fest steht. */
-  @page{size:A4;margin:15mm 0 32mm}
-  @page:first{margin-top:0}
+  @page{size:A4;margin:0}
   html,body{height:auto;background:white;padding:0}
   body{display:block}
   #toolbar{display:none}
@@ -692,7 +690,6 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
     min-height:0;display:block;overflow:visible
   }
   .inv-main{display:block}
-  #page-guides{display:none!important}
   .del-btn,.add-bar{display:none!important}
   .bank-toggle{display:none}
   [contenteditable]:empty::before{content:none!important}
@@ -759,12 +756,11 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   #lbl-empfaenger{display:none!important}
   .senderline-window{display:block;color:var(--print-muted);border-bottom:none;font-size:8.5pt;margin-bottom:3mm;padding-bottom:0}
   .inv-footer{
-    position:fixed;left:0;right:0;bottom:-32mm;height:32mm;overflow:hidden;
     background:var(--print-footer);color:var(--input-text);
-    break-inside:avoid;margin:0;padding:4mm 12mm;
-    align-content:center;border-top:1px solid var(--print-border)
+    break-inside:avoid;margin:0;
+    border-top:1px solid var(--print-border)
   }
-  .foot-col p{line-height:1.55}
+  .foot-col p{line-height:1.6}
   .foot-lbl{margin-bottom:2mm}
   .foot-lbl{color:var(--print-theme)}
   .foot-col p{color:var(--print-muted)}
@@ -787,7 +783,7 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   .notice-box{page-break-inside:avoid;background:var(--print-notice);border-left-color:var(--print-accent)}
   tr{page-break-inside:avoid}
   thead{display:table-header-group}
-  .tbl-caption{display:table-row}
+  .tbl-caption{display:none}
   .tbl-caption th{
     display:table-cell;background:#fff;color:var(--print-muted)!important;
     padding:0 10px 2mm;font-size:8pt;font-weight:600;letter-spacing:.06em;
@@ -1174,6 +1170,51 @@ tr[data-img-pos="rechts"] > .desc-cell > .media-add{flex-basis:100%}
   .desc-edit{box-shadow:none!important;color:#111!important}
   .desc-edit:empty::before{content:none!important}
 }
+
+/* ─── v1.5.1: Maßstabsgetreue A4-Seiten ────────────────────────── */
+:root{--page-w:794px;--page-h:1123px}
+#pages{display:flex;flex-direction:column;gap:24px}
+#footer-master{display:none}
+.page{
+  width:var(--page-w);height:var(--page-h);
+  background:#fff;border-radius:14px;overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,.12);
+  display:flex;flex-direction:column;position:relative;
+}
+.page-body{flex:1 1 auto;min-height:0;overflow:hidden;display:block}
+.page-foot{margin-top:auto;flex:0 0 auto}
+.page-head-slim{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding:26px 34px 10px;border-bottom:1px solid var(--border);margin-bottom:14px;
+  font-family:'Barlow',sans-serif;font-size:11.5px;color:var(--muted);
+}
+.page-head-slim b{font-weight:600;color:var(--text)}
+.page-num{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.06em}
+.page-fill{
+  position:absolute;right:10px;bottom:8px;z-index:5;
+  font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted);opacity:.55;
+}
+tr[data-break="1"]{box-shadow:inset 0 2px 0 var(--amber)}
+.brk-btn{
+  width:20px;height:20px;border:0;background:none;color:var(--border);
+  font-size:12px;line-height:1;cursor:pointer;padding:0;display:block;margin:2px auto 0;
+}
+.brk-btn:hover{color:var(--amber2)}
+tr[data-break="1"] .brk-btn{color:var(--amber2)}
+.add-bar{display:flex;gap:10px}
+.add-page{flex:0 0 190px}
+
+@media print{
+  #pages{gap:0}
+  .page{
+    width:210mm;height:297mm;border-radius:0;box-shadow:none;overflow:hidden;
+    break-after:page;page-break-after:always;
+  }
+  .page:last-child{break-after:auto;page-break-after:auto}
+  .page-fill,.add-bar{display:none!important}
+  .page-head-slim{padding:10mm 34px 4mm}
+}
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -1233,97 +1274,108 @@ tr[data-img-pos="rechts"] > .desc-cell > .media-add{flex-basis:100%}
 </div>
 
 <div id="invoice">
+  <div id="pages">
 
-  <div class="page-two-marker" id="page-two-marker"></div>
-  <div id="page-guides" aria-hidden="true"></div>
-
+    <!-- Seite 1 -->
+    <div class="page" data-page="1">
   <!-- HEADER -->
-  <div class="inv-head">
-    <div class="head-top">
-      <div>
-        <div class="sender-name" id="sender-name"></div>
-        <div class="sender-slogan" id="sender-slogan"></div>
-        <div class="sender-service" id="sender-service"></div>
+      <div class="inv-head">
+        <div class="head-top">
+          <div>
+            <div class="sender-name" id="sender-name"></div>
+            <div class="sender-slogan" id="sender-slogan"></div>
+            <div class="sender-service" id="sender-service"></div>
+          </div>
+          <div style="text-align:right">
+            <div class="doc-type-word" id="doc-type-word" contenteditable="true" spellcheck="false" data-ph="RECHNUNG">RECHNUNG</div>
+          </div>
+        </div>
+        <div class="head-bottom">
+          <div class="head-contact-block" id="head-contact-block"></div>
+        </div>
       </div>
-      <div style="text-align:right">
-        <div class="doc-type-word" id="doc-type-word" contenteditable="true" spellcheck="false" data-ph="RECHNUNG">RECHNUNG</div>
-      </div>
-    </div>
-    <div class="head-bottom">
-      <div class="head-contact-block" id="head-contact-block"></div>
-    </div>
-  </div>
 
-  <div class="inv-main">
-  <!-- META -->
+
+      <div class="page-body">
   <div class="inv-meta">
-    <div>
-      <div class="meta-lbl" id="lbl-empfaenger">Rechnungsempfänger</div>
-      <div class="senderline-window" id="senderline-window"></div>
-      <div id="kunde" contenteditable="true"
-           data-ph="Firma / Name&#10;Straße Hausnummer&#10;PLZ Ort"></div>
-    </div>
-    <div>
-      <div class="meta-lbl">Details</div>
-      <div class="meta-ids">
-        <div class="id-field">
-          <label id="lbl-nr">Rechnungsnr.</label>
-          <input type="text" id="inv-nr" autocomplete="off">
+          <div>
+            <div class="meta-lbl" id="lbl-empfaenger">Rechnungsempfänger</div>
+            <div class="senderline-window" id="senderline-window"></div>
+            <div id="kunde" contenteditable="true"
+                 data-ph="Firma / Name&#10;Straße Hausnummer&#10;PLZ Ort"></div>
+          </div>
+          <div>
+            <div class="meta-lbl">Details</div>
+            <div class="meta-ids">
+              <div class="id-field">
+                <label id="lbl-nr">Rechnungsnr.</label>
+                <input type="text" id="inv-nr" autocomplete="off">
+              </div>
+              <div class="id-field">
+                <label>Datum</label>
+                <input type="date" id="inv-date">
+              </div>
+            </div>
+            <div class="id-field betreff-field" id="betreff-field">
+              <div id="betreff-label" class="editable-label" contenteditable="true" spellcheck="false" data-ph="Betreff">Betreff</div>
+              <div id="betreff" contenteditable="true"
+                   data-ph="z.B. Leistungen Juni 2026"
+                   style="margin-top:4px;font-size:13.5px"></div>
+            </div>
+          </div>
         </div>
-        <div class="id-field">
-          <label>Datum</label>
-          <input type="date" id="inv-date">
-        </div>
-      </div>
-      <div class="id-field betreff-field" id="betreff-field">
-        <div id="betreff-label" class="editable-label" contenteditable="true" spellcheck="false" data-ph="Betreff">Betreff</div>
-        <div id="betreff" contenteditable="true"
-             data-ph="z.B. Leistungen Juni 2026"
-             style="margin-top:4px;font-size:13.5px"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- TABLE -->
+
   <div class="table-wrap">
-    <table>
-      <thead>
-        <tr class="tbl-caption"><th colspan="6" id="tbl-caption-cell"></th></tr>
-        <tr>
-          <th style="width:36px;text-align:center">#</th>
-          <th>Leistungsbeschreibung</th>
-          <th class="r sc-head" id="th-qty" style="width:76px">Stunden</th>
-          <th class="r sc-head" id="th-rate" style="width:104px">Satz / Std.</th>
-          <th class="r" style="width:120px">Betrag</th>
-          <th style="width:36px"></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+          <table>
+            <thead>
+              <tr class="tbl-caption"><th colspan="6" id="tbl-caption-cell"></th></tr>
+              <tr>
+                <th style="width:36px;text-align:center">#</th>
+                <th>Leistungsbeschreibung</th>
+                <th class="r sc-head" id="th-qty" style="width:76px">Stunden</th>
+                <th class="r sc-head" id="th-rate" style="width:104px">Satz / Std.</th>
+                <th class="r" style="width:120px">Betrag</th>
+                <th style="width:36px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+
+        <div id="doc-tail">
+  <!-- TOTALS -->
+          <div class="totals-section">
+            <div class="totals-box">
+              <div class="sum-row"><span>Zwischensumme netto</span><span id="net-disp">0,00 €</span></div>
+              <div class="sum-row"><span id="vat-lbl">zzgl. 19 % USt.</span><span id="vat-disp">0,00 €</span></div>
+              <div class="grand-row">
+                <span class="grand-lbl" id="lbl-total">Gesamtbetrag</span>
+                <span class="grand-val" id="total-disp">0,00 €</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTICE -->
+          <div class="notice-box" id="notice-box"></div>
+
+
+        </div>
+      </div>
+      <div class="page-foot"></div>
+    </div>
+
   </div>
 
   <div class="add-bar">
     <button class="add-link" onclick="addRow()">＋ &nbsp;Zeile hinzufügen</button>
+    <button class="add-link add-page" onclick="addPageBreakRow()" title="Ab hier auf einer neuen Seite weiterschreiben">＋ &nbsp;Neue Seite</button>
   </div>
+</div>
 
-  <!-- TOTALS -->
-  <div class="totals-section">
-    <div class="totals-box">
-      <div class="sum-row"><span>Zwischensumme netto</span><span id="net-disp">0,00 €</span></div>
-      <div class="sum-row"><span id="vat-lbl">zzgl. 19 % USt.</span><span id="vat-disp">0,00 €</span></div>
-      <div class="grand-row">
-        <span class="grand-lbl" id="lbl-total">Gesamtbetrag</span>
-        <span class="grand-val" id="total-disp">0,00 €</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- NOTICE -->
-  <div class="notice-box" id="notice-box"></div>
-
-  </div>
-
-  <!-- FOOTER -->
+<!-- Vorlage der Fußzeile – wird auf jede Seite kopiert -->
+<div id="footer-master" aria-hidden="true">
   <div class="inv-footer">
     <div class="foot-col">
       <div class="foot-lbl">Bankverbindung</div>
@@ -1342,6 +1394,7 @@ tr[data-img-pos="rechts"] > .desc-cell > .media-add{flex-basis:100%}
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ FOOTER (erscheint nie im Druck) -->
@@ -2904,7 +2957,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.8.1';
+const APP_VERSION = '1.5.1';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3078,7 +3131,7 @@ function applyProfileToDocument() {
   document.getElementById('sender-name').textContent    = s.name || 'Dein Name';
   document.getElementById('sender-slogan').textContent  = s.slogan || '';
   document.getElementById('sender-service').textContent = s.service || '';
-  document.getElementById('page-two-marker').textContent = (s.name || '') + ' · Seite 2';
+  // (Folgeseiten tragen ihre Kennzeichnung jetzt in der schmalen Kopfzeile)
 
   const contact = [];
   if (full)    contact.push(['Adresse', full]);
@@ -3091,6 +3144,8 @@ function applyProfileToDocument() {
   const senderLine = [s.name, s.street, [s.zip, s.city].filter(Boolean).join(' ')].filter(Boolean).join(' – ');
   document.getElementById('senderline-window').textContent = senderLine.toUpperCase();
 
+  const legalTarget = document.getElementById('legal-info');
+  if (legalTarget) legalTarget.innerHTML = '';
   document.getElementById('legal-info').innerHTML =
     [ s.name ? escHtml(s.name) : '',
       p.legal.taxNo ? `${escHtml(p.legal.taxLabel || 'Steuer-Nr.')}: <strong>${escHtml(p.legal.taxNo)}</strong>` : '',
@@ -3098,6 +3153,7 @@ function applyProfileToDocument() {
     ].filter(Boolean).join('<br>');
 
   renderBanks();
+  scheduleLayout();
   document.body.classList.toggle('tax-klein', p.tax.mode !== 'ust');
   renderNotice();
   calcTotal();
@@ -3118,6 +3174,7 @@ function renderBanks() {
     ? `${escHtml(b.name || '')}<br>IBAN: <span class="iban-str">${escHtml(b.iban || '')}</span>`
     : '<span style="opacity:.6">Noch keine Bankverbindung hinterlegt (⚙ Einstellungen)</span>';
   renderPaymentQr();
+  syncFooters();
 }
 
 function activeBank() {
@@ -3266,7 +3323,7 @@ function setStunden(m) {
     if (calc) inp.setAttribute('readonly', ''); else inp.removeAttribute('readonly');
     inp.style.color = '';
   });
-  document.querySelectorAll('#tbody tr').forEach(calcRow);
+  allRows().forEach(calcRow);
   scheduleAutosave();
 }
 
@@ -3282,6 +3339,7 @@ function setDocType(t) {
   document.body.classList.toggle('doc-rechnung', !isAng);
   document.body.classList.toggle('doc-angebot', isAng);
   renderNotice();
+  scheduleLayout();
   const n = P().numbering;
   const cur = document.getElementById('inv-nr').value;
   const digits = cur.replace(new RegExp('^[' + escRe(n.invoicePrefix) + escRe(n.offerPrefix) + ']'), '');
@@ -3389,12 +3447,14 @@ function renderPaymentQr() {
     qr.addData(payload); qr.make();
     box.innerHTML = qrToSvg(qr);
   } catch (e) { box.innerHTML = ''; console.warn('QR-Code fehlgeschlagen', e); }
+  syncFooters();
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ZEILEN
 function addRow() {
-  const tbody = document.getElementById('tbody');
-  const nextNo = tbody.querySelectorAll('tr').length + 1;
+  const bodies = [...document.querySelectorAll('#pages tbody')];
+  const tbody = bodies[bodies.length - 1] || document.getElementById('tbody');
+  const nextNo = allRows().length + 1;
   const tr = document.createElement('tr');
   tr.dataset.row = nextNo;
   tr.innerHTML = `
@@ -3420,54 +3480,175 @@ function addRow() {
     </td>
     <td class="del-td">
       <button class="del-btn" onclick="delRow(this)" title="Zeile löschen">×</button>
+      <button class="brk-btn" onclick="toggleRowBreak(this)" title="Ab hier neue Seite">↧</button>
     </td>`;
   tbody.appendChild(tr);
   reNumber();
+  paginate();
   scheduleAutosave();
 }
 
-// ── A4-Seitenraster (v1.8.0) ─────────────────────────────────────
-// Zeigt schon am Bildschirm, wo der Drucker die Seite umbricht.
-// Die Werte entsprechen dem Druck-Layout: A4 hoch, oben 15 mm ab Seite 2, unten 12 mm.
-const PAGE = { w: 210, h: 297, top: 15, bottom: 32, firstTop: 0 };
-let guideTimer = null;
+// ── Seitenumbruch-Engine (v1.5.1) ────────────────────────────────
+// Das Dokument besteht aus echten A4-Seiten. Nach jeder Änderung werden alle
+// Positionen neu auf die Seiten verteilt: was nicht mehr passt, rutscht nach
+// hinten – wird oben Platz frei, rutscht es von selbst wieder nach vorne.
+let layoutTimer = null;
+let layoutRunning = false;
 
-function scheduleGuides() {
-  clearTimeout(guideTimer);
-  guideTimer = setTimeout(renderPageGuides, 220);
+function scheduleLayout() {
+  clearTimeout(layoutTimer);
+  layoutTimer = setTimeout(paginate, 160);
 }
 
-function renderPageGuides() {
-  const inv = document.getElementById('invoice');
-  const box = document.getElementById('page-guides');
-  if (!inv || !box) return;
-  box.innerHTML = '';
-  const width = inv.clientWidth;
-  if (!width) return;
-  const mm = width / PAGE.w;                       // Bildschirm-Pixel je Millimeter
-  const total = inv.scrollHeight;
-  const footer = inv.querySelector('.inv-footer');
-  // Die Fußzeile steht im Druck fest am Seitenende und zählt nicht zum fließenden Inhalt
-  const contentEnd = (footer && footer.offsetHeight) ? footer.offsetTop : total;
+function allRows() {
+  return [...document.querySelectorAll('#pages tbody tr')];
+}
 
-  let y = (PAGE.h - PAGE.firstTop - PAGE.bottom) * mm;   // Ende Seite 1
-  let page = 1;
-  while (y < contentEnd - 12 && page < 12) {
-    page++;
-    const el = document.createElement('div');
-    el.className = 'page-guide';
-    el.style.top = y + 'px';
-    el.dataset.label = 'Seite ' + page;
-    box.appendChild(el);
-    y += (PAGE.h - PAGE.top - PAGE.bottom) * mm;
+function pageOverflow(page) {
+  const body = page.querySelector('.page-body');
+  return body.scrollHeight > body.clientHeight + 1;
+}
+
+function makePage() {
+  const host = document.getElementById('pages');
+  const page = document.createElement('div');
+  page.className = 'page';
+  const tableWrap = document.querySelector('.page[data-page="1"] .table-wrap').cloneNode(true);
+  tableWrap.querySelector('tbody').innerHTML = '';
+  tableWrap.querySelector('tbody').removeAttribute('id');
+  page.innerHTML = `<div class="page-head-slim"><span class="slim-ref"></span><span class="page-num"></span></div>
+    <div class="page-body"></div><div class="page-foot"></div><div class="page-fill"></div>`;
+  page.querySelector('.page-body').appendChild(tableWrap);
+  host.appendChild(page);
+  return page;
+}
+
+// Alles zurück auf Seite 1 holen, bevor Folgeseiten entfernt werden –
+// sonst würde ein dort liegender Block (Summe, Hinweis) mitgelöscht.
+function collapseToFirstPage() {
+  const first = document.querySelector('#pages .page');
+  if (!first) return;
+  const tb1 = document.getElementById('tbody');
+  const body1 = first.querySelector('.page-body');
+  allRows().forEach(r => tb1.appendChild(r));
+  const tail = document.getElementById('doc-tail');
+  if (tail) body1.appendChild(tail);
+  [...document.querySelectorAll('#pages .page')].slice(1).forEach(p => p.remove());
+}
+
+function paginate() {
+  if (layoutRunning) return;
+  const host = document.getElementById('pages');
+  const first = host.querySelector('.page');
+  if (!first) return;
+  const body1 = first.querySelector('.page-body');
+  if (!body1.clientHeight) return;              // noch kein Layout (z.B. versteckt)
+
+  layoutRunning = true;
+  const caret = saveCaret();
+  const rows = allRows();
+  const tail = document.getElementById('doc-tail');
+
+  collapseToFirstPage();
+
+  let page = first, tbody = document.getElementById('tbody');
+  const nextPage = () => { page = makePage(); tbody = page.querySelector('tbody'); };
+
+  rows.forEach((row, i) => {
+    if (row.dataset.break === '1' && i > 0) { nextPage(); tbody.appendChild(row); return; }
+    tbody.appendChild(row);
+    if (pageOverflow(page) && tbody.children.length > 1) { nextPage(); tbody.appendChild(row); }
+  });
+
+  page.querySelector('.page-body').appendChild(tail);
+  if (pageOverflow(page)) {
+    nextPage();
+    page.querySelector('.page-body').appendChild(tail);
   }
-  // Hinweis, wenn der Inhalt knapp über eine Seitengrenze läuft
-  const guides = [...box.children];
-  const last = guides[guides.length - 1];
-  if (last && contentEnd - parseFloat(last.style.top) < 90) {
-    last.classList.add('tight');
-    last.dataset.label = 'Seite ' + (guides.length + 1) + ' · nur wenig Inhalt';
-  }
+
+  labelPages();
+  reNumber(true);
+  restoreCaret(caret);
+  layoutRunning = false;
+}
+
+// Die Fußzeile wird an einer Stelle gepflegt und auf jede Seite kopiert
+function syncFooters() {
+  const master = document.getElementById('footer-master');
+  if (!master) return;
+  document.querySelectorAll('#pages .page-foot').forEach(f => { f.innerHTML = master.innerHTML; });
+}
+
+function labelPages() {
+  const pages = [...document.querySelectorAll('#pages .page')];
+  syncFooters();
+  const nr = (document.getElementById('inv-nr')?.value || '').trim();
+  const kunde = (document.getElementById('kunde')?.innerText || '').split('\n')[0].trim();
+  const ref = [(docType === 'angebot' ? 'Angebot' : 'Rechnung') + (nr ? ' ' + nr : ''), kunde].filter(Boolean).join(' · ');
+
+  pages.forEach((p, i) => {
+    p.dataset.page = i + 1;
+    const slim = p.querySelector('.slim-ref');
+    if (slim) slim.innerHTML = `<b>${escHtml(ref)}</b>`;
+    const num = p.querySelector('.page-num');
+    if (num) num.textContent = `Seite ${i + 1} von ${pages.length}`;
+    // Seiten, auf denen nur der Abschlussblock landet, brauchen keine leere Tabelle
+    const tw = p.querySelector('.table-wrap');
+    if (tw && i > 0) tw.style.display = tw.querySelector('tbody')?.children.length ? '' : 'none';
+    const fill = p.querySelector('.page-fill');
+    if (fill) {
+      const body = p.querySelector('.page-body');
+      const used = Math.round(body.scrollHeight / body.clientHeight * 100);
+      fill.textContent = pages.length > 1 || used > 70 ? `Seite ${i + 1} · ${Math.min(used, 100)} % gefüllt` : '';
+    }
+  });
+}
+
+// Cursor über das Neuverteilen der Zeilen hinweg erhalten
+function saveCaret() {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return null;
+  const r = sel.getRangeAt(0);
+  const active = document.activeElement;
+  if (!active || !active.closest?.('#pages')) return null;
+  return { node: r.startContainer, offset: r.startOffset, el: active, selStart: active.selectionStart, selEnd: active.selectionEnd };
+}
+
+function restoreCaret(c) {
+  if (!c) return;
+  try {
+    if (c.el && typeof c.el.selectionStart === 'number' && c.selStart != null) {
+      c.el.focus();
+      c.el.setSelectionRange(c.selStart, c.selEnd);
+      return;
+    }
+    if (c.node && document.contains(c.node)) {
+      const r = document.createRange();
+      r.setStart(c.node, Math.min(c.offset, c.node.length ?? c.offset));
+      r.collapse(true);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      c.el?.focus?.();
+    }
+  } catch {}
+}
+
+function toggleRowBreak(btn) {
+  const tr = btn.closest('tr');
+  tr.dataset.break = tr.dataset.break === '1' ? '0' : '1';
+  paginate();
+  scheduleAutosave();
+}
+
+function addPageBreakRow() {
+  addRow();
+  const rows = allRows();
+  const last = rows[rows.length - 1];
+  if (last) last.dataset.break = '1';
+  paginate();
+  const edit = last?.querySelector('.desc-edit');
+  edit?.focus();
 }
 
 // ── Formatierung (v1.6.0) ────────────────────────────────────────
@@ -3644,14 +3825,14 @@ function removeRowImage(el) {
   scheduleAutosave();
 }
 
-function delRow(btn) { btn.closest('tr').remove(); reNumber(); calcTotal(); scheduleAutosave(); }
+function delRow(btn) { btn.closest('tr').remove(); reNumber(); paginate(); calcTotal(); scheduleAutosave(); }
 
 function reNumber() {
-  document.querySelectorAll('#tbody tr').forEach((tr, i) => {
+  allRows().forEach((tr, i) => {
     tr.dataset.row = i + 1;
     tr.querySelector('.pos-num').textContent = i + 1;
   });
-  rowIdx = document.querySelectorAll('#tbody tr').length;
+  rowIdx = allRows().length;
 }
 
 function autoH(el) {
@@ -3681,7 +3862,6 @@ function getTotals() {
 }
 
 function calcTotal() {
-  scheduleGuides();
   const t = getTotals();
   document.getElementById('net-disp').textContent   = fmtEur(t.net);
   document.getElementById('vat-lbl').textContent    = `zzgl. ${String(t.rate).replace('.', ',')} % USt.`;
@@ -3694,8 +3874,9 @@ function calcTotal() {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ DOKUMENT-STATE
 function getState() {
   const rows = [];
-  document.querySelectorAll('#tbody tr').forEach(tr => {
+  allRows().forEach(tr => {
     rows.push({
+      brk:     tr.dataset.break === '1' ? '1' : '',
       img:     tr.dataset.img || '',
       imgSize: tr.dataset.imgSize || 'm',
       imgPos:  tr.dataset.imgPos || 'unten',
@@ -3745,14 +3926,16 @@ function applyState(s) {
   document.getElementById('inv-date').value = s.date || '';
   document.getElementById('kunde').innerText   = s.kunde || '';
   document.getElementById('betreff').innerText = s.betreff || '';
+  collapseToFirstPage();
   document.getElementById('tbody').innerHTML = '';
   rowIdx = 0;
   (s.rows || []).forEach(r => {
     addRow();
-    const tr = document.getElementById('tbody').lastElementChild;
+    const tr = allRows()[allRows().length - 1];
     setDescHtml(tr.querySelector('.desc-edit'), r.desc || '');
     const set = (sel, v) => { const el = tr.querySelector(sel); if (el) el.value = v || ''; };
     set('.stunden-inp', r.stunden); set('.satz-inp', r.satz); set('.betrag-inp', r.betrag);
+    if (r.brk === '1') tr.dataset.break = '1';
     if (r.img) {
       tr.dataset.img = r.img;
       tr.dataset.imgSize = r.imgSize || 'm';
@@ -3765,6 +3948,7 @@ function applyState(s) {
   renderStatusUI();
   autosavePaused = false;
   calcTotal();
+  paginate();
 }
 
 function newDocument() {
@@ -3775,6 +3959,7 @@ function newDocument() {
   currentM = {};
   renderStatusUI();
   localStorage.removeItem(LS.autosave);
+  collapseToFirstPage();
   document.getElementById('tbody').innerHTML = '';
   rowIdx = 0;
   document.getElementById('kunde').innerHTML = '';
@@ -4696,7 +4881,7 @@ function preparePrintLayout() {
   const betreffLabel = (document.getElementById('betreff-label')?.innerText || '').trim();
   document.getElementById('betreff-field')?.classList.toggle('is-empty-print', !betreffText && !betreffLabel);
   renderPaymentQr();
-  document.querySelectorAll('#tbody tr').forEach(tr => {
+  allRows().forEach(tr => {
     const desc = (tr.querySelector('.desc-edit')?.innerText || '').trim();
     const amount = (tr.querySelector('.betrag-inp')?.value || '').trim();
     const h = (tr.querySelector('.stunden-inp')?.value || '').trim();
@@ -4760,7 +4945,7 @@ document.querySelectorAll('.modal-overlay').forEach(m =>
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
 function markEmptyRowsForPrint() {
-  document.querySelectorAll('#tbody tr').forEach(tr => {
+  allRows().forEach(tr => {
     const desc = (tr.querySelector('.desc-edit')?.innerText || '').trim();
     const betrag = (tr.querySelector('.betrag-inp')?.value || '').trim();
     const h = (tr.querySelector('.stunden-inp')?.value || '').trim();
@@ -4803,7 +4988,7 @@ function markEmptyRowsForPrint() {
   window.addEventListener('beforeunload', saveDraftNow);
   window.addEventListener('beforeprint', () => { markEmptyRowsForPrint(); preparePrintLayout(); });
   window.addEventListener('afterprint', () => {
-    document.querySelectorAll('#tbody tr').forEach(tr => tr.classList.remove('is-empty'));
+      allRows().forEach(tr => tr.classList.remove('is-empty'));
     preparePrintLayout();
   });
 
@@ -4816,10 +5001,9 @@ function markEmptyRowsForPrint() {
   if (ff) ff.href = 'mailto:cryptopower@outlook.de?subject=' + encodeURIComponent('Feedback: Faktura V' + APP_VERSION);
 
   initRichBar();
-  renderPageGuides();
-  window.addEventListener('resize', scheduleGuides);
-  document.getElementById('invoice').addEventListener('input', scheduleGuides);
-  new MutationObserver(scheduleGuides).observe(document.getElementById('tbody'), { childList: true, subtree: true });
+  document.getElementById('invoice').addEventListener('input', scheduleLayout);
+  window.addEventListener('resize', scheduleLayout);
+  setTimeout(paginate, 60);
   Sync.init();
   if (firstRun) setTimeout(openSettings, 400);
 })();
