@@ -1094,15 +1094,30 @@ body.doc-angebot .only-angebot{display:inline-flex;align-items:center}
 .media-size:hover,.media-del:hover{border-color:var(--navy);color:var(--navy)}
 .media-size.active{background:var(--navy);border-color:var(--navy);color:#fff}
 .media-del:hover{border-color:#C0392B;color:#C0392B}
-.media-add{display:none;margin-top:6px;padding:4px 10px;border:1px dashed var(--border);
-  border-radius:6px;background:none;font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer}
-body.doc-angebot .media-add{display:inline-block}
+.media-add{display:inline-block;margin-top:6px;padding:4px 10px;border:1px dashed var(--border);
+  border-radius:6px;background:none;font:inherit;font-size:11.5px;color:var(--muted);
+  cursor:pointer;opacity:.55;transition:.15s}
+.media-add:hover,#tbody tr:hover .media-add,.desc-edit:focus ~ .media-add{opacity:1}
 .media-add:hover,.media-add.drag{border-color:var(--amber2);color:var(--amber2);background:var(--amberlt)}
 #tbody tr{break-inside:avoid;page-break-inside:avoid}
 @media print{
   .media-tools,.media-add{display:none!important}
   .row-img{border-color:#D8DCE0}
 }
+
+/* ─── v1.7.0: Bildposition – unter, links oder rechts vom Text */
+.desc-cell{display:flex;flex-direction:column;align-items:flex-start}
+.desc-cell > .desc-edit{width:100%}
+.desc-cell > .media-add{flex:0 0 auto}
+tr[data-img-pos="links"] > .desc-cell,
+tr[data-img-pos="rechts"] > .desc-cell{flex-direction:row;flex-wrap:wrap;align-items:flex-start;gap:14px}
+tr[data-img-pos="links"] > .desc-cell > .desc-edit,
+tr[data-img-pos="rechts"] > .desc-cell > .desc-edit{flex:1 1 150px;width:auto;min-width:0}
+tr[data-img-pos="links"] > .desc-cell > .row-media{order:-1;margin-top:0}
+tr[data-img-pos="rechts"] > .desc-cell > .row-media{order:2;margin-top:0}
+tr[data-img-pos="links"] > .desc-cell > .media-add,
+tr[data-img-pos="rechts"] > .desc-cell > .media-add{flex-basis:100%}
+.tool-sep{width:1px;height:14px;background:var(--border);margin:0 2px}
 
 /* ─── v1.6.0: Formatierbare Beschreibung */
 .desc-edit{
@@ -2859,7 +2874,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.6.1';
+const APP_VERSION = '1.7.0';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3354,9 +3369,9 @@ function addRow() {
   tr.dataset.row = nextNo;
   tr.innerHTML = `
     <td class="pos-num">${nextNo}</td>
-    <td><div class="desc-edit" contenteditable="true" data-ph="Leistung beschreiben …"></div>
+    <td class="desc-cell"><div class="desc-edit" contenteditable="true" data-ph="Leistung beschreiben …"></div>
       <div class="row-media" data-size="m"></div>
-      <button class="media-add only-angebot" onclick="pickRowImage(this)"
+      <button class="media-add" onclick="pickRowImage(this)"
         ondragover="event.preventDefault();this.classList.add('drag')"
         ondragleave="this.classList.remove('drag')"
         ondrop="dropRowImage(event, this)">＋ Bild</button></td>
@@ -3508,6 +3523,7 @@ function renderRowMedia(tr) {
   const data = tr.dataset.img || '';
   if (!data) {
     box.innerHTML = '';
+    tr.removeAttribute('data-img-pos');
     box.removeAttribute('data-has-img');
     if (add) add.style.display = '';
     return;
@@ -3515,13 +3531,27 @@ function renderRowMedia(tr) {
   const size = tr.dataset.imgSize || 'm';
   box.dataset.size = size;
   box.setAttribute('data-has-img', '1');
+  const pos = tr.dataset.imgPos || 'unten';
+  tr.setAttribute('data-img-pos', pos);
+  const posBtn = { links: ['◧', 'Bild links neben dem Text'], unten: ['▤', 'Bild unter dem Text'], rechts: ['◨', 'Bild rechts neben dem Text'] };
   box.innerHTML = `<img class="row-img" src="${data}" alt="">
     <span class="media-tools">
       ${['s', 'm', 'l'].map(s => `<button class="media-size${s === size ? ' active' : ''}"
         onclick="setRowImgSize(this,'${s}')">${{ s: 'S', m: 'M', l: 'L' }[s]}</button>`).join('')}
+      <span class="tool-sep"></span>
+      ${Object.entries(posBtn).map(([p, [icon, title]]) => `<button class="media-size${p === pos ? ' active' : ''}"
+        title="${title}" onclick="setRowImgPos(this,'${p}')">${icon}</button>`).join('')}
+      <span class="tool-sep"></span>
       <button class="media-del" onclick="removeRowImage(this)" title="Bild entfernen">×</button>
     </span>`;
   if (add) add.style.display = 'none';
+}
+
+function setRowImgPos(el, pos) {
+  const tr = el.closest('tr');
+  tr.dataset.imgPos = pos;
+  renderRowMedia(tr);
+  scheduleAutosave();
 }
 
 function setRowImgSize(el, size) {
@@ -3535,6 +3565,7 @@ function removeRowImage(el) {
   const tr = el.closest('tr');
   delete tr.dataset.img;
   delete tr.dataset.imgSize;
+  delete tr.dataset.imgPos;
   renderRowMedia(tr);
   scheduleAutosave();
 }
@@ -3592,6 +3623,7 @@ function getState() {
     rows.push({
       img:     tr.dataset.img || '',
       imgSize: tr.dataset.imgSize || 'm',
+      imgPos:  tr.dataset.imgPos || 'unten',
       desc:    tr.querySelector('.desc-edit')?.innerHTML || '',
       stunden: tr.querySelector('.stunden-inp')?.value || '',
       satz:    tr.querySelector('.satz-inp')?.value || '',
@@ -3646,7 +3678,11 @@ function applyState(s) {
     setDescHtml(tr.querySelector('.desc-edit'), r.desc || '');
     const set = (sel, v) => { const el = tr.querySelector(sel); if (el) el.value = v || ''; };
     set('.stunden-inp', r.stunden); set('.satz-inp', r.satz); set('.betrag-inp', r.betrag);
-    if (r.img) { tr.dataset.img = r.img; tr.dataset.imgSize = r.imgSize || 'm'; }
+    if (r.img) {
+      tr.dataset.img = r.img;
+      tr.dataset.imgSize = r.imgSize || 'm';
+      tr.dataset.imgPos = r.imgPos || 'unten';
+    }
     renderRowMedia(tr);
 
   });
