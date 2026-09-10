@@ -569,11 +569,11 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   width:96px;
   margin-left:auto;
 }
-#payment-qr{
+.payment-qr{
   width:96px;height:96px;background:white;border-radius:8px;padding:6px;
   box-shadow:0 2px 10px rgba(0,0,0,.14)
 }
-#payment-qr svg{width:100%;height:100%;display:block}
+.payment-qr svg{width:100%;height:100%;display:block}
 .qr-caption{
   width:100%;
   font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
@@ -765,13 +765,13 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   .foot-lbl{color:var(--print-theme)}
   .foot-col p{color:var(--print-muted)}
   .foot-col:first-child{min-width:0}
-  #bank-info{white-space:normal}
-  #bank-info .iban-str{white-space:nowrap!important}
+  .footer-bank-info{white-space:normal}
+  .footer-bank-info .iban-str{white-space:nowrap!important}
   .pay-qr-box{
     width:24mm;
     margin-left:auto;
   }
-  #payment-qr{
+  .payment-qr{
     width:24mm;
     height:24mm;
     padding:1.5mm;
@@ -1379,17 +1379,17 @@ tr[data-break="1"] .brk-btn{color:var(--amber2)}
   <div class="inv-footer">
     <div class="foot-col">
       <div class="foot-lbl">Bankverbindung</div>
-      <div class="bank-toggle" id="bank-toggle" style="margin-bottom:10px"></div>
-      <p id="bank-info"></p>
+      <div class="bank-toggle footer-bank-toggle" style="margin-bottom:10px"></div>
+      <p class="footer-bank-info"></p>
     </div>
     <div class="foot-col">
       <div class="foot-lbl">Steuer &amp; Recht</div>
-      <p id="legal-info"></p>
+      <p class="footer-legal-info"></p>
     </div>
-    <div class="foot-col pay-qr-col" id="pay-qr-col">
+    <div class="foot-col pay-qr-col footer-pay-qr-col">
       <div class="pay-qr-box">
         <div class="qr-caption">Zahlungs-QR</div>
-        <div id="payment-qr" aria-label="SEPA Zahlungs-QR"></div>
+        <div class="payment-qr footer-payment-qr" aria-label="SEPA Zahlungs-QR"></div>
         <div class="qr-small">SEPA-Überweisung<br>per Banking-App</div>
       </div>
     </div>
@@ -2957,7 +2957,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.5.1';
+const APP_VERSION = '1.5.4';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3144,9 +3144,8 @@ function applyProfileToDocument() {
   const senderLine = [s.name, s.street, [s.zip, s.city].filter(Boolean).join(' ')].filter(Boolean).join(' – ');
   document.getElementById('senderline-window').textContent = senderLine.toUpperCase();
 
-  const legalTarget = document.getElementById('legal-info');
-  if (legalTarget) legalTarget.innerHTML = '';
-  document.getElementById('legal-info').innerHTML =
+  const legalTarget = document.querySelector('#footer-master .footer-legal-info');
+  if (legalTarget) legalTarget.innerHTML =
     [ s.name ? escHtml(s.name) : '',
       p.legal.taxNo ? `${escHtml(p.legal.taxLabel || 'Steuer-Nr.')}: <strong>${escHtml(p.legal.taxNo)}</strong>` : '',
       p.legal.court ? `Gerichtsstand: <strong>${escHtml(p.legal.court)}</strong>` : ''
@@ -3164,13 +3163,13 @@ function renderBanks() {
   const p = P();
   const banks = p.banks.filter(b => b.name || b.iban);
   if (bankIdx >= banks.length) bankIdx = 0;
-  const toggle = document.getElementById('bank-toggle');
+  const toggle = document.querySelector('#footer-master .footer-bank-toggle');
   toggle.innerHTML = banks.length > 1 ? banks.map((b, i) =>
     `<button class="bank-btn${i === bankIdx ? ' active' : ''}" onclick="setBank(${i})">${escHtml(b.name || 'Bank ' + (i + 1))}</button>`
   ).join('') : '';
   toggle.style.display = banks.length > 1 ? '' : 'none';
   const b = banks[bankIdx];
-  document.getElementById('bank-info').innerHTML = b
+  document.querySelector('#footer-master .footer-bank-info').innerHTML = b
     ? `${escHtml(b.name || '')}<br>IBAN: <span class="iban-str">${escHtml(b.iban || '')}</span>`
     : '<span style="opacity:.6">Noch keine Bankverbindung hinterlegt (⚙ Einstellungen)</span>';
   renderPaymentQr();
@@ -3433,11 +3432,12 @@ function qrToSvg(qrcode) {
 }
 
 function renderPaymentQr() {
-  const box = document.getElementById('payment-qr');
-  if (!box) return;
+  const box = document.querySelector('#footer-master .footer-payment-qr');
+  const col = document.querySelector('#footer-master .footer-pay-qr-col');
+  if (!box || !col) return;
   const show = paymentQr && docType === 'rechnung';
-  document.getElementById('pay-qr-col').style.display = show ? '' : 'none';
-  if (!show) { box.innerHTML = ''; return; }
+  col.style.display = show ? '' : 'none';
+  if (!show) { box.innerHTML = ''; syncFooters(); return; }
   const payload = buildEpcQrPayload();
   if (!payload) { box.innerHTML = ''; return; }
   try {
@@ -3488,7 +3488,7 @@ function addRow() {
   scheduleAutosave();
 }
 
-// ── Seitenumbruch-Engine (v1.5.2) ────────────────────────────────
+// ── Seitenumbruch-Engine (v1.5.3) ────────────────────────────────
 // Das Dokument besteht aus echten A4-Seiten. Nach jeder Änderung werden alle
 // Positionen neu auf die Seiten verteilt: was nicht mehr passt, rutscht nach
 // hinten – wird oben Platz frei, rutscht es von selbst wieder nach vorne.
@@ -3553,29 +3553,44 @@ function paginate() {
 
   layoutRunning = true;
   const caret = saveCaret();
+
+  // Zuerst alles zuverlässig auf Seite 1 sammeln und alte Folgeseiten entfernen.
+  collapseToFirstPage();
+  syncFooters();
+
+  // WICHTIG: Für die Platzberechnung dürfen weder die übrigen Positionen noch
+  // Summe/Hinweis bereits auf Seite 1 liegen. Sonst misst die erste Zeile gegen
+  // den kompletten Dokumentinhalt und fast alles wird zu früh auf Seite 2 geschoben.
   const rows = allRows();
   const tail = document.getElementById('doc-tail');
-
-  collapseToFirstPage();
-
-  // Alle Seiten werden mit ihrer endgültigen Fußzeilenhöhe gemessen.
-  // Besonders Seite 1 darf nicht erst nach dem Verteilen der Positionen
-  // durch die Fußzeile kleiner werden.
-  syncFooters();
+  rows.forEach(row => row.remove());
+  if (tail) tail.remove();
 
   let page = first, tbody = document.getElementById('tbody');
   const nextPage = () => { page = makePage(); tbody = page.querySelector('tbody'); };
 
+  // Position für Position verteilen: Seite 1 wird bis zur tatsächlich verfügbaren
+  // Höhe gefüllt. Nur die erste Zeile, die nicht mehr passt, wandert weiter.
   rows.forEach((row, i) => {
-    if (row.dataset.break === '1' && i > 0) { nextPage(); tbody.appendChild(row); return; }
+    if (row.dataset.break === '1' && i > 0 && tbody.children.length) nextPage();
+
     tbody.appendChild(row);
-    if (pageOverflow(page) && tbody.children.length > 1) { nextPage(); tbody.appendChild(row); }
+    if (pageOverflow(page) && tbody.children.length > 1) {
+      row.remove();
+      nextPage();
+      tbody.appendChild(row);
+    }
   });
 
-  page.querySelector('.page-body').appendChild(tail);
-  if (pageOverflow(page)) {
-    nextPage();
+  // Der Abschlussblock kommt erst NACH den Positionen. Passt er nicht mehr komplett,
+  // landet nur dieser Block auf einer neuen Seite – bereits passende Positionen bleiben stehen.
+  if (tail) {
     page.querySelector('.page-body').appendChild(tail);
+    if (pageOverflow(page)) {
+      tail.remove();
+      nextPage();
+      page.querySelector('.page-body').appendChild(tail);
+    }
   }
 
   labelPages();
