@@ -681,7 +681,8 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ PRINT */
 @media print{
   /* Folgeseiten bekommen oben einen Einzug, die erste Seite bleibt bündig (Briefkopf). */
-  @page{size:A4;margin:15mm 0 12mm}
+  /* Unten bleibt Platz für die Fußzeile, die auf jeder Seite fest steht. */
+  @page{size:A4;margin:15mm 0 32mm}
   @page:first{margin-top:0}
   html,body{height:auto;background:white;padding:0}
   body{display:block}
@@ -758,9 +759,13 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   #lbl-empfaenger{display:none!important}
   .senderline-window{display:block;color:var(--print-muted);border-bottom:none;font-size:8.5pt;margin-bottom:3mm;padding-bottom:0}
   .inv-footer{
-    background:var(--print-footer);color:var(--input-text);page-break-inside:avoid;
-    break-inside:avoid;margin-top:10mm;border-top:1px solid var(--print-border)
+    position:fixed;left:0;right:0;bottom:-32mm;height:32mm;overflow:hidden;
+    background:var(--print-footer);color:var(--input-text);
+    break-inside:avoid;margin:0;padding:4mm 12mm;
+    align-content:center;border-top:1px solid var(--print-border)
   }
+  .foot-col p{line-height:1.55}
+  .foot-lbl{margin-bottom:2mm}
   .foot-lbl{color:var(--print-theme)}
   .foot-col p{color:var(--print-muted)}
   .foot-col:first-child{min-width:0}
@@ -782,6 +787,7 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   .notice-box{page-break-inside:avoid;background:var(--print-notice);border-left-color:var(--print-accent)}
   tr{page-break-inside:avoid}
   thead{display:table-header-group}
+  .tbl-caption{display:table-row}
   .tbl-caption th{
     display:table-cell;background:#fff;color:var(--print-muted)!important;
     padding:0 10px 2mm;font-size:8pt;font-weight:600;letter-spacing:.06em;
@@ -2898,7 +2904,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.8.0';
+const APP_VERSION = '1.8.1';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3423,7 +3429,7 @@ function addRow() {
 // ── A4-Seitenraster (v1.8.0) ─────────────────────────────────────
 // Zeigt schon am Bildschirm, wo der Drucker die Seite umbricht.
 // Die Werte entsprechen dem Druck-Layout: A4 hoch, oben 15 mm ab Seite 2, unten 12 mm.
-const PAGE = { w: 210, h: 297, top: 15, bottom: 12, firstTop: 0 };
+const PAGE = { w: 210, h: 297, top: 15, bottom: 32, firstTop: 0 };
 let guideTimer = null;
 
 function scheduleGuides() {
@@ -3441,7 +3447,8 @@ function renderPageGuides() {
   const mm = width / PAGE.w;                       // Bildschirm-Pixel je Millimeter
   const total = inv.scrollHeight;
   const footer = inv.querySelector('.inv-footer');
-  const contentEnd = (footer && footer.offsetHeight) ? footer.offsetTop + footer.offsetHeight : total;
+  // Die Fußzeile steht im Druck fest am Seitenende und zählt nicht zum fließenden Inhalt
+  const contentEnd = (footer && footer.offsetHeight) ? footer.offsetTop : total;
 
   let y = (PAGE.h - PAGE.firstTop - PAGE.bottom) * mm;   // Ende Seite 1
   let page = 1;
