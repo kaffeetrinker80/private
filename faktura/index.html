@@ -215,6 +215,7 @@ body{
 #invoice{
   max-width:1000px;
   margin:0 auto;
+  position:relative;
   background:white;
   border-radius:14px;
   overflow:hidden;
@@ -679,15 +680,18 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ PRINT */
 @media print{
-  @page{size:A4;margin:0}
-  html,body{height:100%;background:white;padding:0}
+  /* Folgeseiten bekommen oben einen Einzug, die erste Seite bleibt bündig (Briefkopf). */
+  @page{size:A4;margin:15mm 0 12mm}
+  @page:first{margin-top:0}
+  html,body{height:auto;background:white;padding:0}
   body{display:block}
   #toolbar{display:none}
   #invoice{
     box-shadow:none;border-radius:0;max-width:100%;
-    min-height:100vh;display:flex;flex-direction:column;overflow:visible
+    min-height:0;display:block;overflow:visible
   }
-  .inv-main{flex:1 0 auto}
+  .inv-main{display:block}
+  #page-guides{display:none!important}
   .del-btn,.add-bar{display:none!important}
   .bank-toggle{display:none}
   [contenteditable]:empty::before{content:none!important}
@@ -755,7 +759,7 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   .senderline-window{display:block;color:var(--print-muted);border-bottom:none;font-size:8.5pt;margin-bottom:3mm;padding-bottom:0}
   .inv-footer{
     background:var(--print-footer);color:var(--input-text);page-break-inside:avoid;
-    margin-top:auto;border-top:1px solid var(--print-border)
+    break-inside:avoid;margin-top:10mm;border-top:1px solid var(--print-border)
   }
   .foot-lbl{color:var(--print-theme)}
   .foot-col p{color:var(--print-muted)}
@@ -778,6 +782,11 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   .notice-box{page-break-inside:avoid;background:var(--print-notice);border-left-color:var(--print-accent)}
   tr{page-break-inside:avoid}
   thead{display:table-header-group}
+  .tbl-caption th{
+    display:table-cell;background:#fff;color:var(--print-muted)!important;
+    padding:0 10px 2mm;font-size:8pt;font-weight:600;letter-spacing:.06em;
+    text-transform:none;border-bottom:none;text-align:left;
+  }
   tfoot{display:table-footer-group}
   .page-two-marker{
     display:block;position:fixed;top:0;left:0;right:0;height:0;
@@ -1105,6 +1114,19 @@ body.doc-angebot .only-angebot{display:inline-flex;align-items:center}
   .row-img{border-color:#D8DCE0}
 }
 
+/* ─── v1.8.0: Seitenraster & Tabellen-Bildunterschrift */
+.tbl-caption{display:none}
+#page-guides{position:absolute;inset:0;pointer-events:none;z-index:4}
+.page-guide{position:absolute;left:0;right:0;border-top:1px dashed rgba(120,132,145,.55)}
+.page-guide::after{
+  content:attr(data-label);position:absolute;right:10px;top:-9px;
+  background:var(--bg);padding:1px 8px;border-radius:20px;
+  font-family:'Barlow',sans-serif;font-size:9.5px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+}
+.page-guide.tight::after{content:attr(data-label);color:#B4632F}
+.page-guide.tight{border-top-color:rgba(214,138,74,.75)}
+
 /* ─── v1.7.0: Bildposition – unter, links oder rechts vom Text */
 .desc-cell{display:flex;flex-direction:column;align-items:flex-start}
 .desc-cell > .desc-edit{width:100%}
@@ -1207,6 +1229,7 @@ tr[data-img-pos="rechts"] > .desc-cell > .media-add{flex-basis:100%}
 <div id="invoice">
 
   <div class="page-two-marker" id="page-two-marker"></div>
+  <div id="page-guides" aria-hidden="true"></div>
 
   <!-- HEADER -->
   <div class="inv-head">
@@ -1259,6 +1282,7 @@ tr[data-img-pos="rechts"] > .desc-cell > .media-add{flex-basis:100%}
   <div class="table-wrap">
     <table>
       <thead>
+        <tr class="tbl-caption"><th colspan="6" id="tbl-caption-cell"></th></tr>
         <tr>
           <th style="width:36px;text-align:center">#</th>
           <th>Leistungsbeschreibung</th>
@@ -2874,7 +2898,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.8.0';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3396,6 +3420,49 @@ function addRow() {
   scheduleAutosave();
 }
 
+// ── A4-Seitenraster (v1.8.0) ─────────────────────────────────────
+// Zeigt schon am Bildschirm, wo der Drucker die Seite umbricht.
+// Die Werte entsprechen dem Druck-Layout: A4 hoch, oben 15 mm ab Seite 2, unten 12 mm.
+const PAGE = { w: 210, h: 297, top: 15, bottom: 12, firstTop: 0 };
+let guideTimer = null;
+
+function scheduleGuides() {
+  clearTimeout(guideTimer);
+  guideTimer = setTimeout(renderPageGuides, 220);
+}
+
+function renderPageGuides() {
+  const inv = document.getElementById('invoice');
+  const box = document.getElementById('page-guides');
+  if (!inv || !box) return;
+  box.innerHTML = '';
+  const width = inv.clientWidth;
+  if (!width) return;
+  const mm = width / PAGE.w;                       // Bildschirm-Pixel je Millimeter
+  const total = inv.scrollHeight;
+  const footer = inv.querySelector('.inv-footer');
+  const contentEnd = (footer && footer.offsetHeight) ? footer.offsetTop + footer.offsetHeight : total;
+
+  let y = (PAGE.h - PAGE.firstTop - PAGE.bottom) * mm;   // Ende Seite 1
+  let page = 1;
+  while (y < contentEnd - 12 && page < 12) {
+    page++;
+    const el = document.createElement('div');
+    el.className = 'page-guide';
+    el.style.top = y + 'px';
+    el.dataset.label = 'Seite ' + page;
+    box.appendChild(el);
+    y += (PAGE.h - PAGE.top - PAGE.bottom) * mm;
+  }
+  // Hinweis, wenn der Inhalt knapp über eine Seitengrenze läuft
+  const guides = [...box.children];
+  const last = guides[guides.length - 1];
+  if (last && contentEnd - parseFloat(last.style.top) < 90) {
+    last.classList.add('tight');
+    last.dataset.label = 'Seite ' + (guides.length + 1) + ' · nur wenig Inhalt';
+  }
+}
+
 // ── Formatierung (v1.6.0) ────────────────────────────────────────
 // Kleine Leiste, die über dem gerade bearbeiteten Feld erscheint.
 const RICH_FIELDS = '.desc-edit, #kunde, #betreff';
@@ -3607,6 +3674,7 @@ function getTotals() {
 }
 
 function calcTotal() {
+  scheduleGuides();
   const t = getTotals();
   document.getElementById('net-disp').textContent   = fmtEur(t.net);
   document.getElementById('vat-lbl').textContent    = `zzgl. ${String(t.rate).replace('.', ',')} % USt.`;
@@ -4610,6 +4678,13 @@ function formatPlainNumber(v) {
 }
 
 function preparePrintLayout() {
+  const cap = document.getElementById('tbl-caption-cell');
+  if (cap) {
+    const nr = (document.getElementById('inv-nr').value || '').trim();
+    const kunde = (document.getElementById('kunde').innerText || '').split('\n')[0].trim();
+    cap.textContent = [(docType === 'angebot' ? 'Angebot' : 'Rechnung') + (nr ? ' ' + nr : ''), kunde]
+      .filter(Boolean).join(' · ');
+  }
   const betreffText = (document.getElementById('betreff')?.innerText || '').trim();
   const betreffLabel = (document.getElementById('betreff-label')?.innerText || '').trim();
   document.getElementById('betreff-field')?.classList.toggle('is-empty-print', !betreffText && !betreffLabel);
@@ -4734,6 +4809,10 @@ function markEmptyRowsForPrint() {
   if (ff) ff.href = 'mailto:cryptopower@outlook.de?subject=' + encodeURIComponent('Feedback: Faktura V' + APP_VERSION);
 
   initRichBar();
+  renderPageGuides();
+  window.addEventListener('resize', scheduleGuides);
+  document.getElementById('invoice').addEventListener('input', scheduleGuides);
+  new MutationObserver(scheduleGuides).observe(document.getElementById('tbody'), { childList: true, subtree: true });
   Sync.init();
   if (firstRun) setTimeout(openSettings, 400);
 })();
