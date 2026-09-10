@@ -406,12 +406,12 @@ body{
 .betreff-field.is-empty-print{display:block}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TABLE */
-.table-wrap{padding:0 56px;min-height:178px}
+.table-wrap{padding:0 34px;min-height:178px}
 table{width:100%;border-collapse:collapse}
 
 thead tr{background:var(--navy)}
 thead th{
-  padding:11px 12px;
+  padding:11px 10px;
   font-size:9.5px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;
   color:var(--table-head-text);text-align:left;
@@ -422,7 +422,7 @@ thead th.r{text-align:right}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--row-hover)}
-tbody td{padding:9px 12px;vertical-align:middle;font-size:13.5px}
+tbody td{padding:9px 10px;vertical-align:middle;font-size:13.5px}
 td.r{text-align:right}
 
 tbody td input, tbody td textarea{
@@ -447,6 +447,7 @@ textarea::placeholder, input::placeholder{color:#767676}
 .id-field input,
 tbody td input,
 tbody td textarea,
+.desc-edit,
 .print-desc,
 .print-cell-value{
   color:var(--input-text)!important;
@@ -467,7 +468,7 @@ tbody td textarea,
 .del-btn:hover{color:#EF4444;background:#FEE2E2}
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ADD ROW */
-.add-bar{padding:10px 56px 16px}
+.add-bar{padding:10px 34px 16px}
 .add-link{
   background:none;border:1.5px dashed var(--border);
   border-radius:8px;width:100%;padding:9px;
@@ -478,7 +479,7 @@ tbody td textarea,
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOTALS */
 .totals-section{
-  padding:12px 56px 26px;
+  padding:12px 34px 26px;
   display:flex;justify-content:flex-end;
 }
 .totals-box{width:270px}
@@ -694,10 +695,10 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   textarea::placeholder{color:transparent!important}
   [contenteditable]{border-bottom-color:transparent!important}
   .id-field input{border-bottom-color:transparent}
-  tbody td input, tbody td textarea{pointer-events:none}
+  tbody td input{pointer-events:none}
+  .desc-edit{pointer-events:none}
   /* Browser drucken Textareas/Number-Inputs oft wie Formfelder – dabei wird mehrzeiliger Text abgeschnitten.
      Für den Druck zeigen wir deshalb reine Text-Spiegel an. */
-  tbody td textarea,
   tbody td input[type=number]{display:none!important}
   .print-desc{
     display:block!important;
@@ -729,6 +730,7 @@ body.qr-on.doc-rechnung .inv-footer{grid-template-columns:1fr 1fr 150px}
   tbody td,
   tbody td input,
   tbody td textarea,
+  .desc-edit,
   .print-desc,
   .print-cell-value{
     color:#111111!important;
@@ -1101,6 +1103,34 @@ body.doc-angebot .media-add{display:inline-block}
   .media-tools,.media-add{display:none!important}
   .row-img{border-color:#D8DCE0}
 }
+
+/* ─── v1.6.0: Formatierbare Beschreibung */
+.desc-edit{
+  min-height:22px;outline:none;font-family:'Barlow',sans-serif;font-size:13.5px;
+  line-height:1.45;color:var(--text);white-space:pre-wrap;word-break:break-word;
+}
+.desc-edit:empty::before{content:attr(data-ph);color:#767676;pointer-events:none}
+.desc-edit:focus{box-shadow:inset 0 -1px 0 var(--amber)}
+.desc-edit ul,.desc-edit ol{margin:2px 0 2px 18px;padding:0}
+.desc-edit li{margin:1px 0}
+
+.rich-bar{
+  position:absolute;z-index:850;display:none;gap:3px;align-items:center;
+  background:var(--navydark);border-radius:9px;padding:5px 7px;
+  box-shadow:0 8px 24px rgba(0,0,0,.24);
+}
+.rich-bar.open{display:flex}
+.rich-btn{
+  min-width:27px;height:26px;padding:0 7px;border:0;border-radius:6px;background:transparent;
+  color:#fff;font-family:'Barlow',sans-serif;font-size:13px;line-height:1;cursor:pointer;
+}
+.rich-btn:hover{background:rgba(255,255,255,.16)}
+.rich-sep{width:1px;height:16px;background:rgba(255,255,255,.25);margin:0 3px}
+@media print{
+  .rich-bar{display:none!important}
+  .desc-edit{box-shadow:none!important;color:#111!important}
+  .desc-edit:empty::before{content:none!important}
+}
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -1140,8 +1170,9 @@ body.doc-angebot .media-add{display:inline-block}
         <button class="pill-btn active" id="tab-rechnung" onclick="setDocType('rechnung')">Rechnung</button>
       </div>
       <div class="pill-toggle">
-        <button class="pill-btn active" id="tab-ohne" onclick="setStunden('ohne')">Ohne Std.</button>
-        <button class="pill-btn" id="tab-mit" onclick="setStunden('mit')">Mit Stundensatz</button>
+        <button class="pill-btn active" id="tab-ohne" onclick="setStunden('ohne')">Pauschal</button>
+        <button class="pill-btn" id="tab-menge" onclick="setStunden('menge')">Menge × Preis</button>
+        <button class="pill-btn" id="tab-mit" onclick="setStunden('mit')">Stundensatz</button>
       </div>
       <div class="undo-group">
         <button class="tbtn tbtn-ghost icon-only" id="undo-btn" onclick="undo()" title="Rückgängig (Strg+Z)" disabled>↶</button>
@@ -1216,8 +1247,8 @@ body.doc-angebot .media-add{display:inline-block}
         <tr>
           <th style="width:36px;text-align:center">#</th>
           <th>Leistungsbeschreibung</th>
-          <th class="r sc-head" style="width:88px">Stunden</th>
-          <th class="r sc-head" style="width:110px">Satz / Std.</th>
+          <th class="r sc-head" id="th-qty" style="width:76px">Stunden</th>
+          <th class="r sc-head" id="th-rate" style="width:104px">Satz / Std.</th>
           <th class="r" style="width:120px">Betrag</th>
           <th style="width:36px"></th>
         </tr>
@@ -1523,6 +1554,15 @@ body.doc-angebot .media-add{display:inline-block}
       <button class="mbtn mbtn-ghost" onclick="closeModal('modal-print')">Abbrechen</button>
     </div>
   </div>
+</div>
+
+<div class="rich-bar" id="rich-bar" onmousedown="event.preventDefault()">
+  <button class="rich-btn" onclick="richCmd('bold')" title="Fett (Strg+B)"><b>F</b></button>
+  <button class="rich-btn" onclick="richCmd('italic')" title="Kursiv (Strg+I)"><i>K</i></button>
+  <button class="rich-btn" onclick="richCmd('underline')" title="Unterstrichen (Strg+U)"><u>U</u></button>
+  <span class="rich-sep"></span>
+  <button class="rich-btn" onclick="richCmd('insertUnorderedList')" title="Aufzählung">•—</button>
+  <button class="rich-btn" onclick="richCmd('removeFormat')" title="Formatierung entfernen">✕</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2819,7 +2859,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.4.1';
+const APP_VERSION = '1.6.0';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3162,14 +3202,23 @@ function setEntryStatus(id, level) {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MODUS-SCHALTER
+// 'ohne' = Pauschalbetrag · 'menge' = Menge × Einzelpreis · 'mit' = Stunden × Satz
 function setStunden(m) {
   stunden = m;
+  const calc = (m === 'mit' || m === 'menge');
   document.getElementById('tab-ohne').classList.toggle('active', m === 'ohne');
+  document.getElementById('tab-menge').classList.toggle('active', m === 'menge');
   document.getElementById('tab-mit').classList.toggle('active', m === 'mit');
-  document.querySelectorAll('.sc-head').forEach(el => el.style.display = m === 'mit' ? '' : 'none');
-  document.querySelectorAll('.sc-cell').forEach(el => el.style.display = m === 'mit' ? '' : 'none');
+  document.getElementById('th-qty').textContent  = m === 'menge' ? 'Menge' : 'Stunden';
+  document.getElementById('th-rate').textContent = m === 'menge' ? 'Einzelpreis' : 'Satz / Std.';
+  document.querySelectorAll('.sc-head').forEach(el => el.style.display = calc ? '' : 'none');
+  document.querySelectorAll('.sc-cell').forEach(el => el.style.display = calc ? '' : 'none');
+  document.querySelectorAll('.stunden-inp').forEach(inp => {
+    inp.step = m === 'menge' ? '1' : '0.25';
+    inp.placeholder = m === 'menge' ? '1' : '–';
+  });
   document.querySelectorAll('.betrag-inp').forEach(inp => {
-    if (m === 'mit') inp.setAttribute('readonly', ''); else inp.removeAttribute('readonly');
+    if (calc) inp.setAttribute('readonly', ''); else inp.removeAttribute('readonly');
     inp.style.color = '';
   });
   document.querySelectorAll('#tbody tr').forEach(calcRow);
@@ -3305,24 +3354,23 @@ function addRow() {
   tr.dataset.row = nextNo;
   tr.innerHTML = `
     <td class="pos-num">${nextNo}</td>
-    <td><textarea rows="1" placeholder="Leistung beschreiben …"
-      style="min-height:26px" oninput="autoH(this)"></textarea><div class="print-desc"></div>
+    <td><div class="desc-edit" contenteditable="true" data-ph="Leistung beschreiben …"></div>
       <div class="row-media" data-size="m"></div>
       <button class="media-add only-angebot" onclick="pickRowImage(this)"
         ondragover="event.preventDefault();this.classList.add('drag')"
         ondragleave="this.classList.remove('drag')"
         ondrop="dropRowImage(event, this)">＋ Bild</button></td>
-    <td class="r sc-cell" style="display:${stunden === 'mit' ? '' : 'none'}">
-      <input type="number" class="stunden-inp" placeholder="–" min="0" step="0.25"
+    <td class="r sc-cell" style="display:${stunden === 'ohne' ? 'none' : ''}">
+      <input type="number" class="stunden-inp" placeholder="${stunden === 'menge' ? '1' : '–'}" min="0" step="${stunden === 'menge' ? '1' : '0.25'}"
         oninput="calcRow(this.closest('tr'))"><span class="print-cell-value print-stunden"></span>
     </td>
-    <td class="r sc-cell" style="display:${stunden === 'mit' ? '' : 'none'}">
+    <td class="r sc-cell" style="display:${stunden === 'ohne' ? 'none' : ''}">
       <input type="number" class="satz-inp" placeholder="–" min="0" step="0.5"
         oninput="calcRow(this.closest('tr'))"><span class="print-cell-value print-satz"></span>
     </td>
     <td class="r">
       <input type="number" class="betrag-inp" placeholder="0,00" min="0" step="0.01"
-        ${stunden === 'mit' ? 'readonly style="color:#94A3B8"' : ''}
+        ${stunden === 'ohne' ? '' : 'readonly style="color:#94A3B8"'}
         oninput="calcTotal()"><span class="print-cell-value print-betrag"></span>
     </td>
     <td class="del-td">
@@ -3331,6 +3379,73 @@ function addRow() {
   tbody.appendChild(tr);
   reNumber();
   scheduleAutosave();
+}
+
+// ── Formatierung (v1.6.0) ────────────────────────────────────────
+// Kleine Leiste, die über dem gerade bearbeiteten Feld erscheint.
+const RICH_FIELDS = '.desc-edit, #kunde, #betreff';
+let richTarget = null;
+
+function initRichBar() {
+  document.addEventListener('focusin', e => {
+    const f = e.target.closest?.(RICH_FIELDS);
+    if (f) { richTarget = f; showRichBar(f); } 
+  });
+  document.addEventListener('focusout', e => {
+    setTimeout(() => {
+      if (!document.activeElement?.closest?.(RICH_FIELDS) && !document.getElementById('rich-bar')?.contains(document.activeElement)) hideRichBar();
+    }, 150);
+  });
+  document.addEventListener('scroll', () => { if (richTarget) showRichBar(richTarget); }, true);
+  window.addEventListener('resize', () => { if (richTarget) showRichBar(richTarget); });
+  // Einfügen ohne fremde Formatierung
+  document.addEventListener('paste', e => {
+    const f = e.target.closest?.(RICH_FIELDS);
+    if (!f) return;
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+}
+
+function showRichBar(field) {
+  const bar = document.getElementById('rich-bar');
+  if (!bar) return;
+  const r = field.getBoundingClientRect();
+  bar.classList.add('open');
+  const top = r.top + window.scrollY - bar.offsetHeight - 8;
+  bar.style.top = (top < window.scrollY + 6 ? r.bottom + window.scrollY + 8 : top) + 'px';
+  bar.style.left = Math.max(10, Math.min(r.left + window.scrollX, window.innerWidth - bar.offsetWidth - 14)) + 'px';
+}
+
+function hideRichBar() {
+  richTarget = null;
+  document.getElementById('rich-bar')?.classList.remove('open');
+}
+
+function richCmd(cmd, value) {
+  if (richTarget) richTarget.focus();
+  document.execCommand(cmd, false, value || null);
+  scheduleAutosave();
+}
+
+// Nur harmlose Auszeichnungen zulassen – alles andere fliegt beim Laden raus
+const ALLOWED_TAGS = ['B', 'STRONG', 'I', 'EM', 'U', 'BR', 'UL', 'OL', 'LI', 'DIV', 'P', 'SPAN'];
+
+function sanitizeHtml(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  tmp.querySelectorAll('*').forEach(el => {
+    if (!ALLOWED_TAGS.includes(el.tagName)) { el.replaceWith(...el.childNodes); return; }
+    [...el.attributes].forEach(a => el.removeAttribute(a.name));
+  });
+  return tmp.innerHTML;
+}
+
+function setDescHtml(el, value) {
+  if (!el) return;
+  if (/<[a-z][\s\S]*>/i.test(value)) el.innerHTML = sanitizeHtml(value);
+  else el.textContent = value;
 }
 
 // ── Bilder in Positionen (v1.4.0) ────────────────────────────────
@@ -3442,7 +3557,7 @@ function autoH(el) {
 
 function calcRow(tr) {
   if (!(tr instanceof HTMLElement)) return;
-  if (stunden === 'mit') {
+  if (stunden === 'mit' || stunden === 'menge') {
     const h = parseFloat(tr.querySelector('.stunden-inp')?.value) || 0;
     const s = parseFloat(tr.querySelector('.satz-inp')?.value) || 0;
     const inp = tr.querySelector('.betrag-inp');
@@ -3477,7 +3592,7 @@ function getState() {
     rows.push({
       img:     tr.dataset.img || '',
       imgSize: tr.dataset.imgSize || 'm',
-      desc:    tr.querySelector('textarea')?.value || '',
+      desc:    tr.querySelector('.desc-edit')?.innerHTML || '',
       stunden: tr.querySelector('.stunden-inp')?.value || '',
       satz:    tr.querySelector('.satz-inp')?.value || '',
       betrag:  tr.querySelector('.betrag-inp')?.value || ''
@@ -3528,12 +3643,12 @@ function applyState(s) {
   (s.rows || []).forEach(r => {
     addRow();
     const tr = document.getElementById('tbody').lastElementChild;
-    tr.querySelector('textarea').value = r.desc || '';
+    setDescHtml(tr.querySelector('.desc-edit'), r.desc || '');
     const set = (sel, v) => { const el = tr.querySelector(sel); if (el) el.value = v || ''; };
     set('.stunden-inp', r.stunden); set('.satz-inp', r.satz); set('.betrag-inp', r.betrag);
     if (r.img) { tr.dataset.img = r.img; tr.dataset.imgSize = r.imgSize || 'm'; }
     renderRowMedia(tr);
-    autoH(tr.querySelector('textarea'));
+
   });
   if (!(s.rows || []).length) { addRow(); addRow(); addRow(); }
   renderStatusUI();
@@ -4464,9 +4579,7 @@ function preparePrintLayout() {
   document.getElementById('betreff-field')?.classList.toggle('is-empty-print', !betreffText && !betreffLabel);
   renderPaymentQr();
   document.querySelectorAll('#tbody tr').forEach(tr => {
-    const ta = tr.querySelector('textarea');
-    const desc = (ta?.value || '').trim();
-    tr.querySelector('.print-desc').textContent = ta?.value || '';
+    const desc = (tr.querySelector('.desc-edit')?.innerText || '').trim();
     const amount = (tr.querySelector('.betrag-inp')?.value || '').trim();
     const h = (tr.querySelector('.stunden-inp')?.value || '').trim();
     const rate = (tr.querySelector('.satz-inp')?.value || '').trim();
@@ -4530,7 +4643,7 @@ document.querySelectorAll('.modal-overlay').forEach(m =>
 
 function markEmptyRowsForPrint() {
   document.querySelectorAll('#tbody tr').forEach(tr => {
-    const desc = (tr.querySelector('textarea')?.value || '').trim();
+    const desc = (tr.querySelector('.desc-edit')?.innerText || '').trim();
     const betrag = (tr.querySelector('.betrag-inp')?.value || '').trim();
     const h = (tr.querySelector('.stunden-inp')?.value || '').trim();
     const s = (tr.querySelector('.satz-inp')?.value || '').trim();
@@ -4584,6 +4697,7 @@ function markEmptyRowsForPrint() {
   const ff = document.getElementById('footer-feedback');
   if (ff) ff.href = 'mailto:cryptopower@outlook.de?subject=' + encodeURIComponent('Feedback: Faktura V' + APP_VERSION);
 
+  initRichBar();
   Sync.init();
   if (firstRun) setTimeout(openSettings, 400);
 })();
