@@ -1129,25 +1129,25 @@ body.doc-angebot .only-angebot{display:inline-flex;align-items:center}
 .page-guide.tight::after{content:attr(data-label);color:#B4632F}
 .page-guide.tight{border-top-color:rgba(214,138,74,.75)}
 
-/* ─── v1.5.8: Bildposition – Bildschirm und Druck identisch ──────
-   Für links/rechts zählt ausschließlich die gewählte Bildbreite.
-   Die breitere Bedienleiste darunter darf keinen Flex-Umbruch auslösen. */
-.desc-cell{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+/* ─── v1.5.9: Bildlayout nur für Zeilen MIT Bild ────────────────
+   Normale Positionen bleiben echte Tabellenzellen und behalten ihr ursprüngliches Layout.
+   Erst wenn tatsächlich ein Bild vorhanden ist, greift die links/rechts/unten-Logik. */
+.desc-cell{min-width:0}
 .desc-cell > .desc-edit{width:100%;min-width:0}
-.desc-cell > .media-add{flex:0 0 auto}
+.desc-cell > .row-media:not([data-has-img]){display:none!important;margin:0!important}
 
-/* Medienblock = echte Bildbreite; Bedienelemente bleiben darunter, zählen aber
-   nicht als notwendige Breite des Blocks. */
-.desc-cell > .row-media{position:relative;flex:0 0 auto;min-width:0;overflow:visible}
-.desc-cell > .row-media[data-size="s"]{width:90px;flex-basis:90px}
-.desc-cell > .row-media[data-size="m"]{width:145px;flex-basis:145px}
-.desc-cell > .row-media[data-size="l"]{width:215px;flex-basis:215px}
-.desc-cell > .row-media .row-img{width:100%!important;max-width:none}
-.desc-cell > .row-media .media-tools{width:max-content;max-width:none;white-space:nowrap}
+/* Medienblock = ausschließlich die gewählte Bildbreite. */
+.desc-cell > .row-media[data-has-img]{position:relative;min-width:0;overflow:visible}
+.desc-cell > .row-media[data-has-img][data-size="s"]{width:90px;flex:0 0 90px}
+.desc-cell > .row-media[data-has-img][data-size="m"]{width:145px;flex:0 0 145px}
+.desc-cell > .row-media[data-has-img][data-size="l"]{width:215px;flex:0 0 215px}
+.desc-cell > .row-media[data-has-img] .row-img{width:100%!important;max-width:none}
+.desc-cell > .row-media[data-has-img] .media-tools{width:max-content;max-width:none;white-space:nowrap}
 
+/* Nur Bildzeilen werden für links/rechts zu Flex. */
 tr[data-img-pos="links"] > .desc-cell,
 tr[data-img-pos="rechts"] > .desc-cell{
-  flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:14px
+  display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:14px
 }
 tr[data-img-pos="links"] > .desc-cell > .desc-edit,
 tr[data-img-pos="rechts"] > .desc-cell > .desc-edit{
@@ -1157,6 +1157,9 @@ tr[data-img-pos="links"] > .desc-cell > .row-media{order:-1;margin-top:0}
 tr[data-img-pos="rechts"] > .desc-cell > .row-media{order:2;margin-top:0}
 tr[data-img-pos="links"] > .desc-cell > .media-add,
 tr[data-img-pos="rechts"] > .desc-cell > .media-add{display:none!important}
+
+/* Bild unten: normales Tabellenlayout; Bild und Werkzeuge folgen einfach unter dem Text. */
+tr[data-img-pos="unten"] > .desc-cell{display:table-cell}
 .tool-sep{width:1px;height:14px;background:var(--border);margin:0 2px}
 
 /* ─── v1.6.0: Formatierbare Beschreibung */
@@ -2973,7 +2976,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.5.8';
+const APP_VERSION = '1.5.9';
 
 const LS = {
   profiles: 'inv_profiles_v1',
