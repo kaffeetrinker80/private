@@ -2976,7 +2976,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.5.10';
+const APP_VERSION = '1.5.11';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3825,6 +3825,7 @@ function loadRowImage(file) {
       catch { data = e.target.result; }
       tr.dataset.img = data;
       renderRowMedia(tr);
+      scheduleLayout();
       scheduleAutosave();
       toast('Bild eingefügt (' + Math.round(data.length / 1400) + ' KB)');
     };
@@ -3862,12 +3863,22 @@ function renderRowMedia(tr) {
       <button class="media-del" onclick="removeRowImage(this)" title="Bild entfernen">×</button>
     </span>`;
   if (add) add.style.display = 'none';
+
+  // Ein neu eingesetztes <img> kann seine endgültige Höhe erst nach dem
+  // Decodieren/Laden liefern. Danach muss die A4-Verteilung erneut prüfen,
+  // ob die komplette Position noch oberhalb des Footers Platz hat.
+  const img = box.querySelector('.row-img');
+  if (img) {
+    img.addEventListener('load', scheduleLayout, { once: true });
+    if (img.complete) requestAnimationFrame(scheduleLayout);
+  }
 }
 
 function setRowImgPos(el, pos) {
   const tr = el.closest('tr');
   tr.dataset.imgPos = pos;
   renderRowMedia(tr);
+  scheduleLayout();
   scheduleAutosave();
 }
 
@@ -3875,6 +3886,9 @@ function setRowImgSize(el, size) {
   const tr = el.closest('tr');
   tr.dataset.imgSize = size;
   renderRowMedia(tr);
+  // S/M/L verändert direkt die Zeilenhöhe. Deshalb sofort neu paginieren,
+  // damit die Zeile niemals in Bank/Steuer/QR hineinwachsen kann.
+  scheduleLayout();
   scheduleAutosave();
 }
 
@@ -3884,6 +3898,7 @@ function removeRowImage(el) {
   delete tr.dataset.imgSize;
   delete tr.dataset.imgPos;
   renderRowMedia(tr);
+  scheduleLayout();
   scheduleAutosave();
 }
 
