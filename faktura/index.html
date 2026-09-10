@@ -1200,7 +1200,7 @@ tr[data-img-pos="unten"] > .desc-cell{display:table-cell}
   box-shadow:0 8px 40px rgba(0,0,0,.12);
   display:flex;flex-direction:column;position:relative;
 }
-.page-body{flex:1 1 auto;min-height:0;overflow:hidden;display:block}
+.page-body{flex:1 1 0;min-height:0;overflow:hidden;display:block}
 .page-foot{margin-top:auto;flex:0 0 auto}
 .page-head-slim{
   display:flex;justify-content:space-between;align-items:baseline;gap:16px;
@@ -2976,7 +2976,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.5.9';
+const APP_VERSION = '1.5.10';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3525,6 +3525,22 @@ function allRows() {
 
 function pageOverflow(page) {
   const body = page.querySelector('.page-body');
+  const foot = page.querySelector('.page-foot');
+  if (!body || !foot) return false;
+
+  // Der Footer ist eine harte Grenze: Kein Tabelleninhalt und auch der
+  // Abschlussblock darf in den Bereich Bank / Steuer / QR hineinragen.
+  const footTop = foot.getBoundingClientRect().top;
+  const safety = 2; // kleine Rundungsreserve für Browser/PDF-Rendering
+
+  const tail = page.querySelector('#doc-tail');
+  if (tail && tail.getBoundingClientRect().bottom > footTop - safety) return true;
+
+  const rows = [...page.querySelectorAll('tbody tr')];
+  const lastRow = rows[rows.length - 1];
+  if (lastRow && lastRow.getBoundingClientRect().bottom > footTop - safety) return true;
+
+  // Fallback für sonstige Inhalte im Seitenkörper.
   return body.scrollHeight > body.clientHeight + 1;
 }
 
