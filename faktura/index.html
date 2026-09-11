@@ -4,6 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Faktura – Angebot &amp; Rechnung</title>
+
+<!-- Icons + Manifest -->
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#eaecef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Rechnungs-Tool">
+<meta name="application-name" content="Faktura - Angebot &amp; Rechnung">
+
+<!-- Link-Vorschau -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Faktura - Angebot &amp; Rechnung">
+<meta property="og:description" content="Angebot &amp; Rechnung im Handumdrehen">
+<meta property="og:url" content="https://kaffeetrinker80.github.io/private/faktura/">
+<meta property="og:image" content="https://kaffeetrinker80.github.io/private/faktura/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="Angebot &amp; Rechnung im Handumdrehen – offline, ohne Server, mit SEPA-QR.">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -2976,7 +2996,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.5.11';
+const APP_VERSION = '1.6.0';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3532,6 +3552,11 @@ function pageOverflow(page) {
   // Abschlussblock darf in den Bereich Bank / Steuer / QR hineinragen.
   const footTop = foot.getBoundingClientRect().top;
   const safety = 2; // kleine Rundungsreserve für Browser/PDF-Rendering
+
+  // Liefert der Browser noch keine echten Maße (Seite verborgen, Schriften
+  // nicht geladen), darf nicht umgebrochen werden – sonst entstünde je Zeile
+  // eine eigene Seite.
+  if (footTop <= 0) return body.scrollHeight > body.clientHeight + 1;
 
   const tail = page.querySelector('#doc-tail');
   if (tail && tail.getBoundingClientRect().bottom > footTop - safety) return true;
