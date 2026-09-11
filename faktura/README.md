@@ -3,17 +3,24 @@
 **Rechnungen & Angebote als einzelne HTML-Datei – offline, ohne Server, mit SEPA-QR.**
 
 Eine einzelne HTML-Datei zum Erstellen von Rechnungen und Angeboten. Kein Server, kein Build,
-keine Abhängigkeiten, keine Tracker – einfach `Faktura_1.3.0.html` im Browser öffnen.
+keine Abhängigkeiten, keine Tracker – einfach `Faktura_1.6.0.html` im Browser öffnen.
 Alle Daten bleiben auf dem eigenen Gerät bzw. im selbst gewählten Arbeitsordner.
 
 ## Funktionen
 
 - **Angebot und Rechnung** in einem Dokument – umschaltbar, inkl. eigener Nummernkreise
-- **Positionen wahlweise mit Stundensatz** (Stunden × Satz) oder als Pauschalbeträge
+- **Positionen wahlweise pauschal, als Menge × Einzelpreis oder mit Stundensatz**
 - **Kleinunternehmer (§ 19 UStG) oder Umsatzsteuer-Ausweis** mit frei wählbarem Satz
 - **SEPA-Zahlungs-QR** nach EPC-Standard, offline erzeugt – scannbar mit jeder Banking-App
 - **Profile**: mehrere Absender (z.B. zwei Gewerbe) in einer Installation, jederzeit umschaltbar
 - **Rückgängig / Wiederherstellen** über Knöpfe oder `Strg+Z` / `Strg+Y`
+- **Echte A4-Seiten im Maßstab 1:1**: automatischer Umbruch, schmale Kopfzeile und feste Fußzeile
+  auf jeder Folgeseite, manueller Umbruch pro Position
+- **Formatierung** in Beschreibung, Empfänger und Betreff: fett, kursiv, unterstrichen, Aufzählung
+- **Bilder in Positionen**: Foto pro Position, verkleinert eingebettet, Größe S/M/L,
+  wahlweise unter, links oder rechts vom Text
+- **Angebot → Rechnung** mit einem Klick, inklusive Bezugszeile im Betreff
+- **Duplizieren** eines Dokuments – gleicher Inhalt, neue Nummer, heutiges Datum, Stand zurück auf Entwurf
 - **Kundenverwaltung** je Profil
 - **Bearbeitungsstand je Dokument** direkt in der Kopfleiste: einzeln abhakbare Stufen mit Datum –
   Rechnung *Gestellt · Bezahlt · Gebucht*, Angebot *Versendet · Angenommen*.
@@ -30,7 +37,7 @@ Alle Daten bleiben auf dem eigenen Gerät bzw. im selbst gewählten Arbeitsordne
 
 ## Erste Schritte
 
-1. `Faktura_1.3.0.html` herunterladen und im Browser öffnen (Chrome oder Edge empfohlen).
+1. `Faktura_1.6.0.html` herunterladen und im Browser öffnen (Chrome oder Edge empfohlen).
 2. Beim ersten Start öffnen sich die Einstellungen: Absender, Steuerangaben und Bankverbindung eintragen.
 3. Optional **Arbeitsordner wählen** (⚙ oder das Ordner-Feld oben rechts) – z.B. einen Ordner in OneDrive.
 4. Fertig. `💾 Sichern` legt das Dokument im Verlauf und im Arbeitsordner ab, `⎙ Drucken / PDF` erzeugt die Ausgabe.
@@ -92,6 +99,12 @@ versehentlich im Repository landet. `beispiel-profil.json` zeigt das Format eine
 
 Die Vorlage erzeugt Dokumente nach üblichen Pflichtangaben, ersetzt aber keine steuerliche Beratung.
 Ob die Angaben im konkreten Fall vollständig sind, klärt am besten das Steuerbüro.
+
+## Icons und Web-App
+
+Neben der HTML-Datei liegen Favicons, `site.webmanifest` und ein Vorschaubild. Sie müssen im
+selben Ordner liegen wie die HTML-Datei, dann erscheint das Icon im Browser-Tab, auf dem
+Homebildschirm und in Link-Vorschauen. Ohne diese Dateien läuft das Tool unverändert, nur ohne Icon.
 
 ## Beim Forken anpassen
 
