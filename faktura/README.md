@@ -3,7 +3,7 @@
 **Rechnungen & Angebote als einzelne HTML-Datei – offline, ohne Server, mit SEPA-QR.**
 
 Eine einzelne HTML-Datei zum Erstellen von Rechnungen und Angeboten. Kein Server, kein Build,
-keine Abhängigkeiten, keine Tracker – einfach `Faktura_1.6.0.html` im Browser öffnen.
+keine Abhängigkeiten, keine Tracker – einfach `Faktura_1.7.0.html` im Browser öffnen.
 Alle Daten bleiben auf dem eigenen Gerät bzw. im selbst gewählten Arbeitsordner.
 
 ## Funktionen
@@ -16,6 +16,9 @@ Alle Daten bleiben auf dem eigenen Gerät bzw. im selbst gewählten Arbeitsordne
 - **Rückgängig / Wiederherstellen** über Knöpfe oder `Strg+Z` / `Strg+Y`
 - **Echte A4-Seiten im Maßstab 1:1**: automatischer Umbruch, schmale Kopfzeile und feste Fußzeile
   auf jeder Folgeseite, manueller Umbruch pro Position
+- **Eigenes Farbschema für Angebote**, damit sie sich auf den ersten Blick von Rechnungen unterscheiden
+- **Infozeilen** ohne Menge und Preis für Hinweise und Zwischenüberschriften
+- **Positionen verschieben** mit ↑ / ↓, auch über Seitengrenzen hinweg
 - **Formatierung** in Beschreibung, Empfänger und Betreff: fett, kursiv, unterstrichen, Aufzählung
 - **Bilder in Positionen**: Foto pro Position, verkleinert eingebettet, Größe S/M/L,
   wahlweise unter, links oder rechts vom Text
@@ -37,7 +40,7 @@ Alle Daten bleiben auf dem eigenen Gerät bzw. im selbst gewählten Arbeitsordne
 
 ## Erste Schritte
 
-1. `Faktura_1.6.0.html` herunterladen und im Browser öffnen (Chrome oder Edge empfohlen).
+1. `Faktura_1.7.0.html` herunterladen und im Browser öffnen (Chrome oder Edge empfohlen).
 2. Beim ersten Start öffnen sich die Einstellungen: Absender, Steuerangaben und Bankverbindung eintragen.
 3. Optional **Arbeitsordner wählen** (⚙ oder das Ordner-Feld oben rechts) – z.B. einen Ordner in OneDrive.
 4. Fertig. `💾 Sichern` legt das Dokument im Verlauf und im Arbeitsordner ab, `⎙ Drucken / PDF` erzeugt die Ausgabe.
@@ -51,7 +54,7 @@ selbstständig an:
 Rechnungstool/
 ├─ Profil/
 │  └─ profil.json          Absenderprofile, Bankverbindungen, Kunden
-├─ Rechnungen/
+├─ Dokumente/
 │  ├─ 2026/
 │  │  ├─ Re_R2026-001_2026-06-14_Musterfirma.json
 │  │  └─ An_A2026-004_2026-07-02_Beispiel-GmbH.json
