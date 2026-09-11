@@ -15,6 +15,7 @@
 <meta name="theme-color" content="#12151a" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="Rechnungs-Tool">
 <meta name="application-name" content="Faktura - Angebot &amp; Rechnung">
+<meta name="description" content="Angebot &amp; Rechnung im Handumdrehen – offline, ohne Server, mit SEPA-QR.">
 
 <!-- Link-Vorschau -->
 <meta property="og:type" content="website">
@@ -23,7 +24,6 @@
 <meta property="og:url" content="https://kaffeetrinker80.github.io/private/faktura/">
 <meta property="og:image" content="https://kaffeetrinker80.github.io/private/faktura/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="description" content="Angebot &amp; Rechnung im Handumdrehen – offline, ohne Server, mit SEPA-QR.">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1254,6 +1254,21 @@ tr[data-break="1"] .brk-btn{color:var(--amber2)}
   .page-fill,.add-bar{display:none!important}
   .page-head-slim{padding:10mm 34px 4mm}
 }
+
+/* ─── v1.7.0: Infozeile, Verschiebe-Pfeile, eigenes Angebotsschema */
+.swatch-same{background:repeating-linear-gradient(45deg,var(--border) 0 4px,var(--offwh2) 4px 8px)}
+tr[data-kind="info"] .desc-edit{font-size:13px}
+tr[data-kind="info"] .info-cell{padding-top:12px;padding-bottom:12px}
+tr[data-kind="info"]{background:linear-gradient(90deg,var(--offwh) 0%,transparent 72%)}
+.move-group{display:flex;gap:2px;justify-content:center;margin-top:3px}
+.mv-btn{width:16px;height:18px;border:0;background:none;color:var(--border);
+  font-size:11px;line-height:1;cursor:pointer;padding:0}
+.mv-btn:hover{color:var(--navy)}
+.del-td{width:46px}
+@media print{
+  tr[data-kind="info"]{background:none}
+  .move-group{display:none!important}
+}
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -1409,6 +1424,7 @@ tr[data-break="1"] .brk-btn{color:var(--amber2)}
 
   <div class="add-bar">
     <button class="add-link" onclick="addRow()">＋ &nbsp;Zeile hinzufügen</button>
+    <button class="add-link" onclick="addRow('info')" title="Textzeile ohne Menge und Preis">＋ &nbsp;Infozeile</button>
     <button class="add-link add-page" onclick="addPageBreakRow()" title="Ab hier auf einer neuen Seite weiterschreiben">＋ &nbsp;Neue Seite</button>
   </div>
 </div>
@@ -1626,6 +1642,10 @@ tr[data-break="1"] .brk-btn{color:var(--amber2)}
         <div class="form-group" style="margin-bottom:14px">
           <label>Farbschema</label>
           <div class="swatch-grid" id="set-theme-grid"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Farbschema für Angebote</label>
+          <div class="swatch-grid" id="set-theme-grid-offer"></div>
         </div>
         <div class="set-grid">
           <div class="form-group">
@@ -2996,7 +3016,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.7.0';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3077,6 +3097,7 @@ function blankProfile(label) {
               offerThanks: 'Wir freuen uns auf Ihre Rückmeldung!' },
     banks:  [{ name: '', iban: '' }],
     numbering: { invoicePrefix: 'R', offerPrefix: 'A', pad: 3 },
+    themeOffer: '',                 // leer = gleiches Schema wie bei Rechnungen
     customers: [],
     theme: 'anthrazit'
   };
@@ -3191,6 +3212,7 @@ function applyProfileToDocument() {
     ].filter(Boolean).join('<br>');
 
   renderBanks();
+  applyDocTheme();
   scheduleLayout();
   document.body.classList.toggle('tax-klein', p.tax.mode !== 'ust');
   renderNotice();
@@ -3377,6 +3399,7 @@ function setDocType(t) {
   document.body.classList.toggle('doc-rechnung', !isAng);
   document.body.classList.toggle('doc-angebot', isAng);
   renderNotice();
+  applyDocTheme();
   scheduleLayout();
   const n = P().numbering;
   const cur = document.getElementById('inv-nr').value;
@@ -3386,6 +3409,25 @@ function setDocType(t) {
   Object.keys(currentM).forEach(k => { if (!valid.includes(k)) delete currentM[k]; });
   renderStatusUI();
   renderPaymentQr();
+  scheduleAutosave();
+}
+
+// Angebote dürfen ein eigenes Farbschema tragen – so sind sie sofort erkennbar.
+function effectiveTheme() {
+  const p = P();
+  return (docType === 'angebot' && p.themeOffer && THEMES[p.themeOffer]) ? p.themeOffer : (p.theme || 'anthrazit');
+}
+
+function applyDocTheme() {
+  theme = effectiveTheme();
+  document.body.dataset.theme = theme;
+  renderThemePickers();
+}
+
+function setThemeOffer(name) {
+  P().themeOffer = THEMES[name] ? name : '';
+  saveStore();
+  applyDocTheme();
   scheduleAutosave();
 }
 
@@ -3406,10 +3448,18 @@ function renderThemePickers() {
   if (menu) menu.innerHTML = Object.entries(THEMES).map(([k, l]) =>
     `<button class="drop-item theme-option" onclick="setTheme('${k}');closeDrop()">
        <span class="theme-swatch swatch-${k}"></span>${l}${k === theme ? ' ✓' : ''}</button>`).join('');
+  const p = store.profiles.length ? P() : null;
   const grid = document.getElementById('set-theme-grid');
-  if (grid) grid.innerHTML = Object.entries(THEMES).map(([k, l]) =>
-    `<button class="swatch-tile${k === theme ? ' active' : ''}" onclick="setTheme('${k}')">
+  if (grid && p) grid.innerHTML = Object.entries(THEMES).map(([k, l]) =>
+    `<button class="swatch-tile${k === (p.theme || 'anthrazit') ? ' active' : ''}" onclick="setTheme('${k}')">
        <span class="theme-swatch swatch-${k}"></span>${l}</button>`).join('');
+  const gridO = document.getElementById('set-theme-grid-offer');
+  if (gridO && p) gridO.innerHTML =
+    `<button class="swatch-tile${!p.themeOffer ? ' active' : ''}" onclick="setThemeOffer('')">
+       <span class="theme-swatch swatch-same"></span>wie Rechnung</button>` +
+    Object.entries(THEMES).map(([k, l]) =>
+      `<button class="swatch-tile${k === p.themeOffer ? ' active' : ''}" onclick="setThemeOffer('${k}')">
+         <span class="theme-swatch swatch-${k}"></span>${l}</button>`).join('');
 }
 
 function setOutputMode(mode, persist = true) {
@@ -3490,23 +3540,42 @@ function renderPaymentQr() {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ZEILEN
-function addRow() {
+function addRow(kind) {
   const bodies = [...document.querySelectorAll('#pages tbody')];
   const tbody = bodies[bodies.length - 1] || document.getElementById('tbody');
-  const nextNo = allRows().length + 1;
   const tr = document.createElement('tr');
-  tr.dataset.row = nextNo;
-  tr.innerHTML = `
-    <td class="pos-num">${nextNo}</td>
-    <td class="desc-cell"><div class="desc-edit" contenteditable="true" data-ph="Leistung beschreiben …"></div>
+  if (kind === 'info') tr.dataset.kind = 'info';
+
+  const media = `
       <div class="row-media" data-size="m"></div>
       <button class="media-add" onclick="pickRowImage(this)"
         ondragover="event.preventDefault();this.classList.add('drag')"
         ondragleave="this.classList.remove('drag')"
-        ondrop="dropRowImage(event, this)">＋ Bild</button></td>
+        ondrop="dropRowImage(event, this)">＋ Bild</button>`;
+
+  const tools = `
+    <td class="del-td">
+      <button class="del-btn" onclick="delRow(this)" title="Zeile löschen">×</button>
+      <span class="move-group">
+        <button class="mv-btn" onclick="moveRow(this,-1)" title="Nach oben schieben">↑</button>
+        <button class="mv-btn" onclick="moveRow(this,1)" title="Nach unten schieben">↓</button>
+      </span>
+    </td>`;
+
+  if (kind === 'info') {
+    // Reine Textzeile: volle Breite, keine Nummer, zählt nicht zur Summe
+    tr.innerHTML = `
+    <td class="pos-num"></td>
+    <td class="desc-cell info-cell" colspan="4"><div class="desc-edit" contenteditable="true"
+        data-ph="Hinweis, Zwischenüberschrift oder Erläuterung …"></div>${media}</td>${tools}`;
+  } else {
+    tr.innerHTML = `
+    <td class="pos-num"></td>
+    <td class="desc-cell"><div class="desc-edit" contenteditable="true" data-ph="Leistung beschreiben …"></div>${media}</td>
     <td class="r sc-cell" style="display:${stunden === 'ohne' ? 'none' : ''}">
-      <input type="number" class="stunden-inp" placeholder="${stunden === 'menge' ? '1' : '–'}" min="0" step="${stunden === 'menge' ? '1' : '0.25'}"
-        oninput="calcRow(this.closest('tr'))"><span class="print-cell-value print-stunden"></span>
+      <input type="number" class="stunden-inp" placeholder="${stunden === 'menge' ? '1' : '–'}" min="0"
+        step="${stunden === 'menge' ? '1' : '0.25'}" oninput="calcRow(this.closest('tr'))">
+      <span class="print-cell-value print-stunden"></span>
     </td>
     <td class="r sc-cell" style="display:${stunden === 'ohne' ? 'none' : ''}">
       <input type="number" class="satz-inp" placeholder="–" min="0" step="0.5"
@@ -3516,12 +3585,27 @@ function addRow() {
       <input type="number" class="betrag-inp" placeholder="0,00" min="0" step="0.01"
         ${stunden === 'ohne' ? '' : 'readonly style="color:#94A3B8"'}
         oninput="calcTotal()"><span class="print-cell-value print-betrag"></span>
-    </td>
-    <td class="del-td">
-      <button class="del-btn" onclick="delRow(this)" title="Zeile löschen">×</button>
-      <button class="brk-btn" onclick="toggleRowBreak(this)" title="Ab hier neue Seite">↧</button>
-    </td>`;
+    </td>${tools}`;
+  }
+
   tbody.appendChild(tr);
+  reNumber();
+  paginate();
+  scheduleAutosave();
+  return tr;
+}
+
+// Ganze Zeile eine Position nach oben oder unten schieben – auch über Seitengrenzen
+function moveRow(btn, dir) {
+  const tr = btn.closest('tr');
+  const rows = allRows();
+  const i = rows.indexOf(tr);
+  const j = i + dir;
+  if (j < 0 || j >= rows.length) return;
+  const other = rows[j];
+  collapseToFirstPage();                 // erst alles in eine Reihenfolge bringen
+  if (dir < 0) other.parentNode.insertBefore(tr, other);
+  else other.parentNode.insertBefore(tr, other.nextSibling);
   reNumber();
   paginate();
   scheduleAutosave();
@@ -3553,9 +3637,8 @@ function pageOverflow(page) {
   const footTop = foot.getBoundingClientRect().top;
   const safety = 2; // kleine Rundungsreserve für Browser/PDF-Rendering
 
-  // Liefert der Browser noch keine echten Maße (Seite verborgen, Schriften
-  // nicht geladen), darf nicht umgebrochen werden – sonst entstünde je Zeile
-  // eine eigene Seite.
+  // Ohne belastbare Maße (Seite verborgen, Schriften noch nicht geladen) darf
+  // nicht umgebrochen werden – sonst entstünde je Zeile eine eigene Seite.
   if (footTop <= 0) return body.scrollHeight > body.clientHeight + 1;
 
   const tail = page.querySelector('#doc-tail');
@@ -3930,11 +4013,15 @@ function removeRowImage(el) {
 function delRow(btn) { btn.closest('tr').remove(); reNumber(); paginate(); calcTotal(); scheduleAutosave(); }
 
 function reNumber() {
-  allRows().forEach((tr, i) => {
-    tr.dataset.row = i + 1;
-    tr.querySelector('.pos-num').textContent = i + 1;
+  let n = 0;
+  allRows().forEach(tr => {
+    const cell = tr.querySelector('.pos-num');
+    if (tr.dataset.kind === 'info') { if (cell) cell.textContent = ''; return; }
+    n++;
+    tr.dataset.row = n;
+    if (cell) cell.textContent = n;
   });
-  rowIdx = allRows().length;
+  rowIdx = n;
 }
 
 function autoH(el) {
@@ -3978,6 +4065,7 @@ function getState() {
   const rows = [];
   allRows().forEach(tr => {
     rows.push({
+      kind:    tr.dataset.kind || '',
       brk:     tr.dataset.break === '1' ? '1' : '',
       img:     tr.dataset.img || '',
       imgSize: tr.dataset.imgSize || 'm',
@@ -4019,7 +4107,7 @@ function applyState(s) {
   if (s.stunden) setStunden(s.stunden);
   bankIdx = Number.isInteger(s.bankIdx) ? s.bankIdx : 0;
   renderBanks();
-  if (s.theme) setTheme(s.theme, false);
+  applyDocTheme();
   setOutputMode(s.outputMode || 'eco', false);
   setPaymentQr(!!s.paymentQr, false);
   if (s.docWord) document.getElementById('doc-type-word').innerText = s.docWord;
@@ -4032,8 +4120,7 @@ function applyState(s) {
   document.getElementById('tbody').innerHTML = '';
   rowIdx = 0;
   (s.rows || []).forEach(r => {
-    addRow();
-    const tr = allRows()[allRows().length - 1];
+    const tr = addRow(r.kind === 'info' ? 'info' : '');
     setDescHtml(tr.querySelector('.desc-edit'), r.desc || '');
     const set = (sel, v) => { const el = tr.querySelector(sel); if (el) el.value = v || ''; };
     set('.stunden-inp', r.stunden); set('.satz-inp', r.satz); set('.betrag-inp', r.betrag);
@@ -4570,7 +4657,9 @@ const Sync = {
     Sync.setStatus('busy', 'Verbinde …');
     try {
       Sync.dirs.profil     = await handle.getDirectoryHandle('Profil', { create: true });
-      Sync.dirs.rechnungen = await handle.getDirectoryHandle('Rechnungen', { create: true });
+      Sync.dirs.rechnungen = await handle.getDirectoryHandle('Dokumente', { create: true });
+      // Frühere Ablagen hießen "Rechnungen" – von dort wird weiterhin gelesen
+      try { Sync.dirs.legacy = await handle.getDirectoryHandle('Rechnungen'); } catch { Sync.dirs.legacy = null; }
       Sync.dirs.system     = await handle.getDirectoryHandle('System', { create: true });
       Sync.connected = true;
       await Sync.pullAll();
@@ -4707,10 +4796,15 @@ const Sync = {
 
   async pullDocument(entry) {
     if (!Sync.connected) return null;
-    try {
-      const yearDir = await Sync.dirs.rechnungen.getDirectoryHandle(String(entry.year));
-      return await Sync.readJson(yearDir, entry.file);
-    } catch { return null; }
+    for (const dir of [Sync.dirs.rechnungen, Sync.dirs.legacy]) {
+      if (!dir) continue;
+      try {
+        const yearDir = await dir.getDirectoryHandle(String(entry.year));
+        const doc = await Sync.readJson(yearDir, entry.file);
+        if (doc) return doc;
+      } catch {}
+    }
+    return null;
   },
 
   async rebuildIndex() {
@@ -4718,7 +4812,9 @@ const Sync = {
     Sync.setStatus('busy', 'Lese ein …');
     const found = [];
     try {
-      for await (const [yName, yHandle] of Sync.dirs.rechnungen.entries()) {
+      for (const root of [Sync.dirs.rechnungen, Sync.dirs.legacy]) {
+      if (!root) continue;
+      for await (const [yName, yHandle] of root.entries()) {
         if (yHandle.kind !== 'directory') continue;
         for await (const [fName, fHandle] of yHandle.entries()) {
           if (fHandle.kind !== 'file' || !fName.endsWith('.json')) continue;
@@ -4737,7 +4833,9 @@ const Sync = {
           } catch {}
         }
       }
-      indexData = found;
+      }
+      const seen = new Set();
+      indexData = found.filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true; });
       saveIndex();
       Sync.setStatus('on', Sync.root.name);
       toast(`${found.length} Dokument(e) eingelesen.`);
@@ -4831,7 +4929,6 @@ function saveSettings() {
                   pad: parseInt(g('set-pad'), 10) || 3 };
   p.banks = collectBankRows();
   if (!p.banks.length) p.banks = [{ name: '', iban: '' }];
-  p.theme = theme;
   saveStore();
   bankIdx = 0;
   applyProfileToDocument();
@@ -5067,7 +5164,7 @@ function markEmptyRowsForPrint() {
   document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
   setStunden('ohne');
   setDocType('rechnung');
-  setTheme(P().theme || 'anthrazit', false);
+  applyDocTheme();
   askBeforePrint = ui.askBeforePrint !== false;
   setOutputMode(ui.outputMode || 'eco', false);
   setPaymentQr(!!ui.paymentQr, false);
