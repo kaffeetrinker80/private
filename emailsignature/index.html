@@ -46,6 +46,9 @@ svg{display:block}
 .ib.danger:hover{background:rgba(251,113,133,.18);border-color:rgba(251,113,133,.5);color:#ffd0d6}
 .ib.done{background:rgba(52,211,153,.2);border-color:rgba(52,211,153,.55);color:#7ff0c2;box-shadow:none}
 .ib.sm{width:38px;height:38px;border-radius:11px}
+.ib.wide{width:auto;min-width:42px;padding:0 14px;grid-auto-flow:column;gap:8px}
+.ib.sm.wide{padding:0 12px;gap:7px}
+.ib .lbl{font-size:.85rem;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
 .ib svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .ib.sm svg{width:17px;height:17px}
 .ib[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:50%;
@@ -137,9 +140,9 @@ svg{display:block}
   border-radius:11px;padding:9px 12px;min-width:150px;flex:1;min-height:40px;font-size:16px}
 .settings input[type="text"]:focus{outline:0;border-color:var(--accent)}
 
-.contact-actions{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}
-.contact-btn{display:inline-block;padding:6px 10px;border-radius:7px;text-decoration:none!important;font:600 12px Arial,sans-serif}
-.contact-btn.wa{background:#e9f7ee;color:#176b35!important;border:1px solid #bfe7cb}
+.settings select{background:rgba(0,0,0,.3);color:var(--text);border:1px solid var(--line2);
+  border-radius:11px;padding:9px 10px;min-height:40px;font-size:15px}
+.settings select:focus{outline:0;border-color:var(--accent)}
 
 .addcard{border:2px dashed var(--line2);border-radius:var(--r);min-height:170px;display:grid;place-items:center;transition:.16s}
 .addcard:hover{border-color:var(--accent);background:rgba(93,110,224,.12)}
@@ -191,6 +194,9 @@ svg{display:block}
   .actions{gap:7px}
   .ib{width:44px;height:44px}
   .ib.sm{width:42px;height:42px}
+  .ib.wide{width:44px;min-width:0;padding:0}
+  .ib.sm.wide{width:42px;padding:0}
+  .ib .lbl{display:none}
   .card{border-radius:16px}
   .cardhead{padding:13px 12px 11px}
   .toolbar{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;position:sticky;top:68px;z-index:5}
@@ -238,12 +244,12 @@ svg{display:block}
       </div>
     </div>
     <div class="actions">
-      <button id="editToggle" class="ib" data-tip="Bearbeiten" aria-label="Bearbeiten"></button>
+      <button id="editToggle" class="ib wide" data-tip="Bearbeiten" aria-label="Bearbeiten"></button>
       <span class="sep"></span>
-      <button id="saveLocal" class="ib" data-tip="Auf Gerät speichern" aria-label="Auf Gerät speichern"></button>
-      <button id="exportJson" class="ib" data-tip="JSON exportieren" aria-label="JSON exportieren"></button>
+      <button id="saveLocal" class="ib wide" data-tip="Verschlüsselt auf diesem Gerät sichern" aria-label="Auf Gerät speichern"></button>
+      <button id="exportJson" class="ib wide" data-tip="signatures.json herunterladen" aria-label="JSON exportieren"></button>
       <span class="sep"></span>
-      <button id="lockBtn" class="ib" data-tip="Sperren" aria-label="Sperren"></button>
+      <button id="lockBtn" class="ib wide" data-tip="Sperren" aria-label="Sperren"></button>
     </div>
   </div>
   <div id="grid" class="grid"></div>
@@ -350,10 +356,21 @@ function openLinkDialog(sig,item){
   };
 }
 
+const WA_SYMBOLS={
+  "bubble":"\uD83D\uDDE8\uFE0E",  // Sprechblase, einfarbig (Segoe UI Symbol / Apple: ok)
+  "bubble2":"\uD83D\uDCAC",        // Sprechblase als Emoji – immer da, aber farbig
+  "phone":"\u2706\uFE0E",          // Telefonhörer
+  "classic":"\u260E\uFE0E",        // klassisches Telefon
+  "none":""
+};
 function contactHtml(c){
-  if(!c?.enabled||!c.phone)return "";
+  if(!c?.enabled||!c.phone||!c.whatsapp)return "";
   const p=c.phone.replace(/[^\d+]/g,"").replace(/^\+/,"");
-  return c.whatsapp?`<div class="contact-actions"><a class="contact-btn wa" href="https://wa.me/${p}">WhatsApp</a></div>`:"";
+  const sym=WA_SYMBOLS[c.symbol??"bubble"]||"";
+  const label=(c.label??"WhatsApp").trim();
+  const inner=(sym?`<span style="font-size:15px">${sym}</span>${label?"&nbsp;":""}`:"")+label;
+  if(!inner)return "";
+  return `<div style="margin-top:10px"><a href="https://wa.me/${p}" style="color:#5b6470;text-decoration:none;font-family:Arial,sans-serif;font-size:13px">${inner}</a></div>`;
 }
 
 /* ---------- Render ---------- */
@@ -378,13 +395,13 @@ function render(){
 
     const buttons=document.createElement("div");buttons.className="cardbuttons";
     const copy=document.createElement("button");
-    copy.className="ib sm primary";copy.innerHTML=svg("clipboard");
+    copy.className="ib sm primary wide";copy.innerHTML=svg("clipboard")+'<span class="lbl">Kopieren</span>';
     copy.dataset.tip="Mit Formatierung kopieren";copy.setAttribute("aria-label","Mit Formatierung kopieren");
     copy.onclick=()=>copySignature(index,copy,false);
     buttons.appendChild(copy);
 
     const copyPlain=document.createElement("button");
-    copyPlain.className="ib sm";copyPlain.innerHTML=svg("text");
+    copyPlain.className="ib sm wide";copyPlain.innerHTML=svg("text")+'<span class="lbl">Nur Text</span>';
     copyPlain.dataset.tip="Als reinen Text kopieren";copyPlain.setAttribute("aria-label","Als reinen Text kopieren");
     copyPlain.onclick=()=>copySignature(index,copyPlain,true);
     buttons.appendChild(copyPlain);
@@ -415,9 +432,18 @@ function render(){
 
     const settings=document.createElement("div");settings.className="settings";
     const c=item.contactActions;
-    settings.innerHTML=`<label><input type="checkbox" class="ca-enable" ${c.enabled?"checked":""}> Kontaktbutton</label>
-      <input class="ca-phone" type="text" inputmode="tel" value="${(c.phone||"").replace(/"/g,"&quot;")}" placeholder="+49 …">
-      <label><input type="checkbox" class="ca-wa" ${c.whatsapp?"checked":""}> WhatsApp</label>`;
+    const symVal=c.symbol??"bubble",labelVal=c.label??"WhatsApp";
+    settings.innerHTML=`<label><input type="checkbox" class="ca-enable" ${c.enabled?"checked":""}> WhatsApp-Zeile</label>
+      <input class="ca-phone" type="text" inputmode="tel" value="${(c.phone||"").replace(/"/g,"&quot;")}" placeholder="Nummer, z. B. +49 …">
+      <label><input type="checkbox" class="ca-wa" ${c.whatsapp?"checked":""}> anzeigen</label>
+      <select class="ca-sym">
+        <option value="bubble" ${symVal==="bubble"?"selected":""}>\uD83D\uDDE8\uFE0E Sprechblase</option>
+        <option value="bubble2" ${symVal==="bubble2"?"selected":""}>\uD83D\uDCAC Sprechblase farbig</option>
+        <option value="phone" ${symVal==="phone"?"selected":""}>\u2706\uFE0E Hörer</option>
+        <option value="classic" ${symVal==="classic"?"selected":""}>\u260E\uFE0E Telefon</option>
+        <option value="none" ${symVal==="none"?"selected":""}>ohne Symbol</option>
+      </select>
+      <input class="ca-label" type="text" value="${labelVal.replace(/"/g,"&quot;")}" placeholder="Beschriftung" style="min-width:120px;flex:0 1 150px">`;
 
     const sig=document.createElement("div");sig.className="sig"+(editing?" editing":"");
     sig.innerHTML=item.html;sig.contentEditable=editing?"true":"false";
@@ -435,6 +461,9 @@ function render(){
     settings.querySelector(".ca-enable").onchange=e=>{c.enabled=e.target.checked;render()};
     settings.querySelector(".ca-phone").oninput=e=>c.phone=e.target.value;
     settings.querySelector(".ca-wa").onchange=e=>{c.whatsapp=e.target.checked;render()};
+    settings.querySelector(".ca-sym").onchange=e=>{c.symbol=e.target.value;render()};
+    settings.querySelector(".ca-label").oninput=e=>{c.label=e.target.value};
+    settings.querySelector(".ca-label").onblur=()=>render();
 
     card.append(head,toolbar,settings,sig);
     if(!editing && c.enabled){
@@ -482,12 +511,16 @@ function legacyCopy(node){
   document.execCommand("copy");s.removeAllRanges();
 }
 function flash(button,msg){
-  const old=button.innerHTML,wasPrimary=button.classList.contains("primary");
-  button.innerHTML=svg("check");button.classList.add("done");button.classList.remove("primary");
+  const wasPrimary=button.classList.contains("primary");
+  const icon=button.querySelector("svg"),oldIcon=icon?icon.outerHTML:"";
+  if(icon)icon.outerHTML=svg("check");
+  button.classList.add("done");button.classList.remove("primary");
   showToast(msg);
   if(navigator.vibrate)navigator.vibrate(12);
   setTimeout(()=>{
-    button.innerHTML=old;button.classList.remove("done");
+    const cur=button.querySelector("svg");
+    if(cur&&oldIcon)cur.outerHTML=oldIcon;
+    button.classList.remove("done");
     if(wasPrimary)button.classList.add("primary");
   },1300);
 }
@@ -496,7 +529,7 @@ function showToast(text){const t=$("#toast");t.textContent=text;t.classList.add(
 /* ---------- Aktionen ---------- */
 function setEditButton(){
   const b=$("#editToggle");
-  b.innerHTML=svg(editing?"check":"pencil");
+  b.innerHTML=svg(editing?"check":"pencil")+`<span class="lbl">${editing?"Fertig":"Bearbeiten"}</span>`;
   b.dataset.tip=editing?"Bearbeiten beenden":"Bearbeiten";
   b.setAttribute("aria-label",b.dataset.tip);
   b.classList.toggle("active",editing);
@@ -514,9 +547,9 @@ function duplicateSig(index){
 }
 function deleteSig(index){if(confirm(`„${data.signatures[index].title}“ wirklich löschen?`)){data.signatures.splice(index,1);render()}}
 
-$("#saveLocal").innerHTML=svg("save");
-$("#exportJson").innerHTML=svg("download");
-$("#lockBtn").innerHTML=svg("lock");
+$("#saveLocal").innerHTML=svg("save")+'<span class="lbl">Speichern</span>';
+$("#exportJson").innerHTML=svg("download")+'<span class="lbl">Export</span>';
+$("#lockBtn").innerHTML=svg("lock")+'<span class="lbl">Sperren</span>';
 setEditButton();
 
 $("#saveLocal").onclick=async()=>{
