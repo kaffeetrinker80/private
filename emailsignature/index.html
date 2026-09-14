@@ -3,96 +3,234 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f1115">
+<meta name="theme-color" content="#34383e">
 <title>Signature Library</title>
 <style>
 :root{
-  --bg:#0f1115;--panel:#171a20;--panel2:#1e222a;--text:#eef2f7;--muted:#aeb7c4;
-  --line:#303744;--accent:#4f8df7;--accent2:#6ea8fe;--ok:#42c875;--warn:#efb34d;--danger:#e95c63;
+  --bg:#3a3e44;--bg2:#44494f;--panel:#50555c;--panel2:#5b6169;--text:#f6f7f8;--muted:#d0d4d8;
+  --line:#6b7179;--accent:#6f96e8;--accent2:#8cb0ff;--ok:#54c981;--danger:#a84d55;
 }
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+html,body{margin:0;min-height:100%;font-family:Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
 button,input{font:inherit}
 button{cursor:pointer}
-.wrap{max-width:1100px;margin:0 auto;padding:22px 14px 48px}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 14px 48px}
 .hidden{display:none!important}
 
-/* Lock screen */
 .lock{min-height:92vh;display:grid;place-items:center}
-.lockbox{
-  width:min(420px,100%);background:var(--panel);border:1px solid var(--line);
-  border-radius:22px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.35)
-}
+.lockbox{width:min(420px,100%);background:#4a4f56;border:1px solid #666c74;border-radius:22px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.22)}
 .lockbox h1{margin:0 0 8px;font-size:1.65rem}
 .lockbox p{margin:0 0 18px;color:var(--muted)}
 .pinrow{display:flex;gap:9px}
-.pinrow input{
-  flex:1;min-width:0;background:#0e1116;color:var(--text);border:1px solid var(--line);
-  border-radius:12px;padding:12px 14px;letter-spacing:.18em
-}
-.btn{
-  border:0;border-radius:11px;padding:10px 13px;background:var(--accent);color:white;font-weight:650
-}
-.btn.secondary{background:#2b313b;color:var(--text);border:1px solid #3b4451}
-.btn.danger{background:#5a2529;color:#ffdfe1;border:1px solid #7a3439}
+.pinrow input{flex:1;min-width:0;background:#3c4046;color:var(--text);border:1px solid #747a82;border-radius:12px;padding:12px 14px;letter-spacing:.18em}
+.btn{border:0;border-radius:11px;padding:10px 13px;background:var(--accent);color:white;font-weight:650}
+.btn.secondary{background:#626870;color:var(--text);border:1px solid #767d86}
+.btn.danger{background:#784149;color:#ffe9eb;border:1px solid #93525b}
 .btn.small{padding:7px 9px;font-size:.9rem}
-#error{min-height:20px;margin-top:10px;color:#ff858b;font-size:.92rem}
+#error{min-height:20px;margin-top:10px;color:#ffd1d4;font-size:.92rem}
 
-/* App */
 .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
 .topbar h1{margin:0;font-size:1.8rem}
 .sub{margin:4px 0 0;color:var(--muted)}
 .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:15px}
-.card{
-  background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;
-  box-shadow:0 9px 26px rgba(0,0,0,.18)
-}
-.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(345px,1fr));gap:15px}
+.card{background:#4e535a;border:1px solid #696f77;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:#595f66;border-bottom:1px solid #717780}
 .titlewrap{min-width:0;flex:1}
-.cardtitle{margin:0;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cardtitle.editable{
-  width:100%;background:#11151b;color:var(--text);border:1px solid #46505e;border-radius:8px;padding:7px 9px
-}
+.cardtitle{margin:0;font-size:1rem;white-space:normal;overflow:visible;line-height:1.25}
+.cardtitle.editable{width:100%;background:#454a50;color:var(--text);border:1px solid #7d848d;border-radius:8px;padding:7px 9px}
 .cardbuttons{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.sig{
-  padding:17px 18px;background:#fff;color:#222;font-family:Arial,sans-serif;font-size:14px;line-height:1.45;
-  min-height:90px;overflow-wrap:anywhere
-}
+.sig{padding:17px 18px;background:#fff;color:#222;font-family:Arial,sans-serif;font-size:14px;line-height:1.45;min-height:90px;overflow-wrap:anywhere}
 .sig a{color:#2f5fc7;text-decoration:underline}
-.sig.editing{outline:3px solid rgba(79,141,247,.35);outline-offset:-3px;min-height:150px}
-.toolbar{
-  display:none;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#11151b;border-bottom:1px solid var(--line)
-}
-.card.editmode .toolbar{display:flex}
-.tool{
-  min-width:34px;border:1px solid #3a4350;background:#252b34;color:var(--text);
-  border-radius:8px;padding:6px 8px;font-weight:600
-}
+.sig.editing{outline:3px solid rgba(111,150,232,.35);outline-offset:-3px;min-height:150px}
+.toolbar{display:none;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#4a4f56;border-bottom:1px solid #70767f}
+.card.editmode .toolbar,.card.editmode .settings{display:flex}
+.tool{min-width:34px;border:1px solid #7a818a;background:#61676f;color:var(--text);border-radius:8px;padding:6px 8px;font-weight:600}
 .tool.color input{width:22px;height:22px;padding:0;border:0;background:none;vertical-align:middle}
+.settings{display:none;gap:10px;flex-wrap:wrap;align-items:center;padding:9px 10px;background:#50555c;border-bottom:1px solid #717780;font-size:.9rem}
+.settings label{display:flex;align-items:center;gap:5px}
+.settings input[type="text"]{background:#464b51;color:white;border:1px solid #7b828b;border-radius:8px;padding:6px 8px;min-width:160px}
+.contact-actions{margin-top:10px;display:flex;gap:7px;flex-wrap:wrap}
+.contact-btn{display:inline-block;padding:5px 8px;border-radius:7px;text-decoration:none!important;font:600 12px Arial,sans-serif}
+.contact-btn.wa{background:#e9f7ee;color:#176b35!important;border:1px solid #bfe7cb}
+.contact-btn.tg{background:#eef5ff;color:#2366a8!important;border:1px solid #c9ddf6}
 .footer{margin-top:20px;color:var(--muted);font-size:.9rem}
-.status{margin-top:10px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted)}
-.addcard{
-  border:1px dashed #46505e;border-radius:18px;min-height:150px;display:grid;place-items:center;color:var(--muted)
-}
-.addcard button{background:transparent;border:0;color:var(--accent2);font-weight:700;font-size:1rem}
-.toast{
-  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);
-  background:#242a33;color:white;padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;
-  transition:.18s;box-shadow:0 8px 24px rgba(0,0,0,.35);z-index:50
-}
+.status{margin-top:10px;padding:10px 12px;border:1px dashed #747b84;border-radius:12px;color:var(--muted)}
+.addcard{border:1px dashed #818892;border-radius:18px;min-height:150px;display:grid;place-items:center;color:var(--muted)}
+.addcard button{background:transparent;border:0;color:#d6e3ff;font-weight:700;font-size:1rem}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);background:#34383e;color:white;padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;transition:.18s;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:50}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:680px){
-  .topbar{display:block}
-  .actions{justify-content:flex-start;margin-top:12px}
-  .grid{grid-template-columns:1fr}
-  .wrap{padding:14px 9px 36px}
-  .sig{font-size:13.5px}
+
+.modalback{position:fixed;inset:0;background:rgba(0,0,0,.38);display:grid;place-items:center;padding:18px;z-index:100}
+.modal{width:min(470px,100%);background:#555b62;border:1px solid #777e87;border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{margin:0 0 14px}
+.modal label{display:block;margin:10px 0 5px;color:var(--muted);font-size:.9rem}
+.modal input{width:100%;background:#454a50;color:white;border:1px solid #7f868f;border-radius:9px;padding:9px 10px}
+.modalactions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.hint{font-size:.82rem;color:var(--muted);margin-top:5px}
+
+@media(max-width:700px){
+  .topbar{display:block}.actions{justify-content:flex-start;margin-top:12px}
+  .grid{grid-template-columns:1fr}.wrap{padding:14px 9px 36px}.sig{font-size:13.5px}
+  .cardhead{align-items:flex-start}.cardbuttons{max-width:50%}
 }
+
+/* --- Mobile / Tablet polish --- */
+html{-webkit-text-size-adjust:100%}
+body{overscroll-behavior-y:none}
+button,input{touch-action:manipulation}
+.btn,.tool{min-height:42px}
+.cardbuttons .btn.small{min-height:40px}
+.sig{-webkit-user-select:text;user-select:text}
+.topbar{
+  position:relative;
+}
+.actions{
+  align-items:center;
+}
+@media (max-width: 900px){
+  .wrap{max-width:760px;padding-left:12px;padding-right:12px}
+  .grid{grid-template-columns:1fr 1fr;gap:12px}
+  .cardhead{padding:11px 12px}
+  .sig{padding:16px}
+}
+@media (max-width: 720px){
+  .wrap{padding:12px 8px 30px}
+  .topbar{display:block;margin-bottom:12px}
+  .topbar h1{font-size:1.55rem}
+  .sub{font-size:.92rem;line-height:1.35}
+  .actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:12px;
+  }
+  .actions .btn{
+    width:100%;
+    padding:10px 8px;
+    min-height:44px;
+  }
+  .grid{grid-template-columns:1fr;gap:11px}
+  .card{border-radius:15px}
+  .cardhead{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:8px;
+    padding:10px 11px;
+  }
+  .cardtitle{
+    font-size:.98rem;
+    line-height:1.25;
+  }
+  .cardbuttons{
+    max-width:none;
+    flex-wrap:nowrap;
+    gap:5px;
+  }
+  .cardbuttons .btn.small{
+    padding:8px 9px;
+    min-height:40px;
+    white-space:nowrap;
+  }
+  .toolbar{
+    position:sticky;
+    top:0;
+    z-index:5;
+    gap:5px;
+    padding:7px 8px;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    scrollbar-width:none;
+  }
+  .toolbar::-webkit-scrollbar{display:none}
+  .tool{
+    flex:0 0 auto;
+    min-width:40px;
+    min-height:40px;
+    padding:6px 9px;
+  }
+  .settings{
+    gap:8px;
+    padding:9px;
+    align-items:flex-start;
+  }
+  .settings label{
+    min-height:38px;
+    padding:5px 2px;
+  }
+  .settings input[type="text"]{
+    flex:1 1 100%;
+    width:100%;
+    min-width:0;
+    min-height:42px;
+  }
+  .sig{
+    padding:15px 14px;
+    min-height:82px;
+    font-size:14px;
+    line-height:1.5;
+  }
+  .contact-btn{
+    padding:7px 10px;
+    font-size:12.5px;
+  }
+  .status,.footer{font-size:.86rem}
+  .modalback{
+    align-items:end;
+    padding:0;
+  }
+  .modal{
+    width:100%;
+    max-width:none;
+    border-radius:18px 18px 0 0;
+    padding:18px 14px calc(18px + env(safe-area-inset-bottom));
+  }
+  .modal input{
+    min-height:44px;
+    font-size:16px; /* avoids Android/iOS zoom on focus */
+  }
+  .modalactions .btn{
+    min-height:44px;
+  }
+  .lock{
+    min-height:100dvh;
+    padding:14px;
+  }
+  .lockbox{
+    width:100%;
+    max-width:420px;
+    padding:20px 16px;
+    border-radius:18px;
+  }
+  .pinrow input{
+    min-height:46px;
+    font-size:18px;
+  }
+}
+@media (max-width: 420px){
+  .actions{grid-template-columns:1fr}
+  .cardhead{
+    grid-template-columns:1fr;
+    align-items:start;
+  }
+  .cardbuttons{
+    width:100%;
+    justify-content:flex-start;
+  }
+  .cardbuttons .btn.small:first-child{
+    flex:1;
+  }
+  .sig{font-size:13.8px}
+}
+@media (min-width: 721px) and (max-width: 1100px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cardtitle{font-size:.98rem}
+}
+
 </style>
 </head>
 <body>
-
 <div id="lockScreen" class="lock">
   <div class="lockbox">
     <h1>Signature Library</h1>
@@ -109,10 +247,7 @@ button{cursor:pointer}
 
 <main id="app" class="wrap hidden">
   <div class="topbar">
-    <div>
-      <h1>Meine Signaturen</h1>
-      <p class="sub">Kopieren, bearbeiten oder als verschlüsselte JSON sichern.</p>
-    </div>
+    <div><h1>Meine Signaturen</h1><p class="sub">Kopieren, bearbeiten oder als verschlüsselte JSON sichern.</p></div>
     <div class="actions">
       <button id="editToggle" class="btn secondary">✏️ Bearbeiten</button>
       <button id="saveLocal" class="btn secondary">💾 Auf Gerät speichern</button>
@@ -120,312 +255,145 @@ button{cursor:pointer}
       <button id="lockBtn" class="btn secondary">🔒 Sperren</button>
     </div>
   </div>
-
   <div id="grid" class="grid"></div>
-
-  <div class="status" id="status">
-    Änderungen werden erst dauerhaft, wenn du sie auf dem Gerät speicherst oder die exportierte <strong>signatures.json</strong> auf GitHub ersetzt.
-  </div>
+  <div class="status" id="status">Änderungen werden erst dauerhaft, wenn du sie auf dem Gerät speicherst oder die exportierte <strong>signatures.json</strong> auf GitHub ersetzt.</div>
   <p class="footer">Die Signaturdaten stehen nicht im HTML. Sie werden erst nach erfolgreicher Entschlüsselung von <strong>signatures.json</strong> angezeigt.</p>
 </main>
-
 <div id="toast" class="toast">Kopiert ✓</div>
+<div id="modalRoot"></div>
 
 <script>
-const DATA_FILE = "signatures.json";
-const LOCAL_KEY = "signatureLibraryEncryptedV1";
-let currentPin = "";
-let data = null;
-let editing = false;
+const DATA_FILE="signatures.json", LOCAL_KEY="signatureLibraryEncryptedV1";
+let currentPin="",data=null,editing=false;
+const enc=new TextEncoder(),dec=new TextDecoder();
+const $=s=>document.querySelector(s);
 
-const enc = new TextEncoder();
-const dec = new TextDecoder();
+function b64ToBytes(s){const bin=atob(s),out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out}
+function bytesToB64(bytes){let s="",chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)s+=String.fromCharCode(...bytes.subarray(i,i+chunk));return btoa(s)}
+async function deriveKey(pin,salt,iterations){const m=await crypto.subtle.importKey("raw",enc.encode(pin),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations,hash:"SHA-256"},m,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function decryptWrapper(w,pin){const key=await deriveKey(pin,b64ToBytes(w.salt),w.iterations);const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64ToBytes(w.iv)},key,b64ToBytes(w.ciphertext));return JSON.parse(dec.decode(plain))}
+async function encryptData(obj,pin){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),iterations=200000;const key=await deriveKey(pin,salt,iterations);const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(JSON.stringify(obj)));return{version:1,cipher:"AES-GCM",kdf:"PBKDF2-SHA256",iterations,salt:bytesToB64(salt),iv:bytesToB64(iv),ciphertext:bytesToB64(new Uint8Array(ct))}}
+async function loadWrapper(){const local=localStorage.getItem(LOCAL_KEY);if(local){try{return{wrapper:JSON.parse(local),source:"local"}}catch(e){}}const r=await fetch(DATA_FILE,{cache:"no-store"});if(!r.ok)throw new Error();return{wrapper:await r.json(),source:"github"}}
 
-function b64ToBytes(s){
-  const bin = atob(s); const out = new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
-  return out;
+$("#unlockForm").addEventListener("submit",async e=>{e.preventDefault();const pin=$("#pin").value.trim(),error=$("#error");error.textContent="Öffne …";try{const loaded=await loadWrapper();data=await decryptWrapper(loaded.wrapper,pin);currentPin=pin;data.signatures.forEach(s=>s.contactActions??={enabled:false,phone:"",whatsapp:false,telegram:false});error.textContent="";$("#lockScreen").classList.add("hidden");$("#app").classList.remove("hidden");$("#status").innerHTML=loaded.source==="local"?"Geladen wurde die <strong>lokal gespeicherte</strong> Version dieses Geräts.":"Geladen wurde <strong>signatures.json</strong> vom Server.";render()}catch(err){error.textContent="PIN falsch oder signatures.json konnte nicht geladen werden."}});
+
+function normalizeLink(v){
+  v=v.trim();
+  if(!v)return "";
+  if(/^mailto:/i.test(v)||/^tel:/i.test(v)||/^https?:\/\//i.test(v))return v;
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))return "mailto:"+v;
+  if(/^\+?[0-9 ()\-/.]{6,}$/.test(v))return "tel:"+v.replace(/[^\d+]/g,"");
+  return "https://"+v.replace(/^www\./i,"www.");
 }
-function bytesToB64(bytes){
-  let s=""; const chunk=0x8000;
-  for(let i=0;i<bytes.length;i+=chunk) s+=String.fromCharCode(...bytes.subarray(i,i+chunk));
-  return btoa(s);
-}
-async function deriveKey(pin,salt,iterations){
-  const material = await crypto.subtle.importKey("raw",enc.encode(pin),"PBKDF2",false,["deriveKey"]);
-  return crypto.subtle.deriveKey(
-    {name:"PBKDF2",salt,iterations,hash:"SHA-256"},
-    material,
-    {name:"AES-GCM",length:256},
-    false,
-    ["encrypt","decrypt"]
-  );
-}
-async function decryptWrapper(wrapper,pin){
-  const salt=b64ToBytes(wrapper.salt), iv=b64ToBytes(wrapper.iv), ct=b64ToBytes(wrapper.ciphertext);
-  const key=await deriveKey(pin,salt,wrapper.iterations);
-  const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv},key,ct);
-  return JSON.parse(dec.decode(plain));
-}
-async function encryptData(obj,pin){
-  const salt=crypto.getRandomValues(new Uint8Array(16));
-  const iv=crypto.getRandomValues(new Uint8Array(12));
-  const iterations=200000;
-  const key=await deriveKey(pin,salt,iterations);
-  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(JSON.stringify(obj)));
-  return {
-    version:1,cipher:"AES-GCM",kdf:"PBKDF2-SHA256",iterations,
-    salt:bytesToB64(salt),iv:bytesToB64(iv),ciphertext:bytesToB64(new Uint8Array(ct))
+
+function openLinkDialog(sig,item){
+  const root=$("#modalRoot");
+  root.innerHTML=`<div class="modalback"><div class="modal">
+    <h3>Link einfügen</h3>
+    <label>Linktext</label><input id="linkText" placeholder="z. B. marco@example.com">
+    <label>Ziel</label><input id="linkTarget" placeholder="E-Mail, Website oder Telefonnummer">
+    <div class="hint">E-Mail-Adressen werden automatisch zu mailto:, Telefonnummern zu tel: und Websites zu https://.</div>
+    <div class="modalactions"><button class="btn secondary" id="cancelLink">Abbrechen</button><button class="btn" id="insertLink">Einfügen</button></div>
+  </div></div>`;
+  const sel=window.getSelection();
+  const selected=sel && sel.toString ? sel.toString().trim() : "";
+  $("#linkText").value=selected;
+  $("#linkTarget").value=selected;
+  $("#cancelLink").onclick=()=>root.innerHTML="";
+  $("#insertLink").onclick=()=>{
+    const text=$("#linkText").value.trim(),target=normalizeLink($("#linkTarget").value);
+    if(!target)return;
+    sig.focus();
+    if(selected){
+      document.execCommand("createLink",false,target);
+    }else{
+      document.execCommand("insertHTML",false,`<a href="${target.replace(/"/g,"&quot;")}">${(text||$("#linkTarget").value).replace(/</g,"&lt;").replace(/>/g,"&gt;")}</a>`);
+    }
+    item.html=sig.innerHTML;root.innerHTML="";
   };
 }
-async function loadWrapper(){
-  const local=localStorage.getItem(LOCAL_KEY);
-  if(local){
-    try { return {wrapper:JSON.parse(local),source:"local"}; } catch(e){}
-  }
-  const res=await fetch(DATA_FILE,{cache:"no-store"});
-  if(!res.ok) throw new Error("signatures.json konnte nicht geladen werden.");
-  return {wrapper:await res.json(),source:"github"};
+
+function contactHtml(c){
+  if(!c?.enabled||!c.phone)return "";
+  const p=c.phone.replace(/[^\d+]/g,"").replace(/^\+/,"");
+  const btns=[];
+  if(c.whatsapp)btns.push(`<a class="contact-btn wa" href="https://wa.me/${p}">WhatsApp</a>`);
+  if(c.telegram)btns.push(`<a class="contact-btn tg" href="https://t.me/+${p}">Telegram</a>`);
+  return btns.length?`<div class="contact-actions">${btns.join("")}</div>`:"";
 }
 
-document.getElementById("unlockForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const pin=document.getElementById("pin").value.trim();
-  const error=document.getElementById("error");
-  error.textContent="Öffne …";
-  try{
-    const loaded=await loadWrapper();
-    const decoded=await decryptWrapper(loaded.wrapper,pin);
-    currentPin=pin; data=decoded;
-    error.textContent="";
-    document.getElementById("lockScreen").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("status").innerHTML =
-      loaded.source==="local"
-      ? "Geladen wurde die <strong>lokal gespeicherte</strong> Version dieses Geräts."
-      : "Geladen wurde <strong>signatures.json</strong> vom Server.";
-    render();
-  }catch(err){
-    error.textContent="PIN falsch oder signatures.json konnte nicht geladen werden.";
-  }
-});
-
 function render(){
-  const grid=document.getElementById("grid");
-  grid.innerHTML="";
+  const grid=$("#grid");grid.innerHTML="";
   data.signatures.forEach((item,index)=>{
-    const card=document.createElement("section");
-    card.className="card"+(editing?" editmode":"");
-    card.dataset.index=index;
-
-    const head=document.createElement("div");
-    head.className="cardhead";
-
-    const titleWrap=document.createElement("div");
-    titleWrap.className="titlewrap";
+    const card=document.createElement("section");card.className="card"+(editing?" editmode":"");
+    const head=document.createElement("div");head.className="cardhead";
+    const titleWrap=document.createElement("div");titleWrap.className="titlewrap";
+    if(editing){const inp=document.createElement("input");inp.className="cardtitle editable";inp.value=item.title;inp.oninput=()=>item.title=inp.value;titleWrap.appendChild(inp)}
+    else{const h=document.createElement("h2");h.className="cardtitle";h.textContent=item.title;titleWrap.appendChild(h)}
+    const buttons=document.createElement("div");buttons.className="cardbuttons";
+    const copy=document.createElement("button");copy.className="btn small";copy.textContent="📋 Kopieren";copy.onclick=()=>copySignature(index,copy);buttons.appendChild(copy);
     if(editing){
-      const inp=document.createElement("input");
-      inp.className="cardtitle editable";
-      inp.value=item.title;
-      inp.addEventListener("input",()=>item.title=inp.value);
-      titleWrap.appendChild(inp);
-    }else{
-      const h=document.createElement("h2");
-      h.className="cardtitle";
-      h.textContent=item.title;
-      titleWrap.appendChild(h);
+      const dup=document.createElement("button");dup.className="btn small secondary";dup.textContent="⧉";dup.title="Duplizieren";dup.onclick=()=>duplicateSig(index);buttons.appendChild(dup);
+      const del=document.createElement("button");del.className="btn small danger";del.textContent="🗑";del.title="Löschen";del.onclick=()=>deleteSig(index);buttons.appendChild(del);
     }
-
-    const buttons=document.createElement("div");
-    buttons.className="cardbuttons";
-
-    const copy=document.createElement("button");
-    copy.className="btn small";
-    copy.textContent="📋 Kopieren";
-    copy.onclick=()=>copySignature(index,copy);
-    buttons.appendChild(copy);
-
-    if(editing){
-      const dup=document.createElement("button");
-      dup.className="btn small secondary";
-      dup.textContent="⧉";
-      dup.title="Duplizieren";
-      dup.onclick=()=>duplicateSig(index);
-      buttons.appendChild(dup);
-
-      const del=document.createElement("button");
-      del.className="btn small danger";
-      del.textContent="🗑";
-      del.title="Löschen";
-      del.onclick=()=>deleteSig(index);
-      buttons.appendChild(del);
-    }
-
     head.append(titleWrap,buttons);
 
-    const toolbar=document.createElement("div");
-    toolbar.className="toolbar";
-    toolbar.innerHTML = `
-      <button class="tool" data-cmd="bold"><b>B</b></button>
-      <button class="tool" data-cmd="italic"><i>I</i></button>
-      <button class="tool" data-cmd="underline"><u>U</u></button>
-      <button class="tool" data-action="link">🔗</button>
-      <button class="tool" data-action="unlink">⛓️‍💥</button>
-      <button class="tool color" title="Textfarbe"><input type="color" value="#2f5fc7"></button>
-      <button class="tool" data-cmd="removeFormat">Tx</button>
-    `;
+    const toolbar=document.createElement("div");toolbar.className="toolbar";
+    toolbar.innerHTML=`<button class="tool" data-cmd="bold"><b>B</b></button><button class="tool" data-cmd="italic"><i>I</i></button><button class="tool" data-cmd="underline"><u>U</u></button><button class="tool" data-action="link">🔗</button><button class="tool" data-action="unlink">⛓️‍💥</button><button class="tool color" title="Textfarbe"><input type="color" value="#2f5fc7"></button><button class="tool" data-cmd="removeFormat" title="Formatierung entfernen">T×</button>`;
 
-    const sig=document.createElement("div");
-    sig.className="sig"+(editing?" editing":"");
-    sig.innerHTML=item.html;
-    sig.contentEditable=editing ? "true":"false";
-    sig.addEventListener("input",()=>item.html=sig.innerHTML);
-    sig.addEventListener("blur",()=>item.html=sig.innerHTML);
+    const settings=document.createElement("div");settings.className="settings";
+    const c=item.contactActions;
+    settings.innerHTML=`<label><input type="checkbox" class="ca-enable" ${c.enabled?"checked":""}> Kontaktbuttons</label>
+      <input class="ca-phone" type="text" value="${(c.phone||"").replace(/"/g,"&quot;")}" placeholder="+49 ...">
+      <label><input type="checkbox" class="ca-wa" ${c.whatsapp?"checked":""}> WhatsApp</label>
+      <label><input type="checkbox" class="ca-tg" ${c.telegram?"checked":""}> Telegram</label>`;
 
-    toolbar.querySelectorAll("[data-cmd]").forEach(b=>{
-      b.onclick=()=>{
-        sig.focus();
-        document.execCommand(b.dataset.cmd,false,null);
-        item.html=sig.innerHTML;
-      };
-    });
-    toolbar.querySelector('[data-action="link"]').onclick=()=>{
-      sig.focus();
-      const url=prompt("Link / URL eingeben:");
-      if(url) document.execCommand("createLink",false,url);
-      item.html=sig.innerHTML;
-    };
-    toolbar.querySelector('[data-action="unlink"]').onclick=()=>{
-      sig.focus(); document.execCommand("unlink",false,null); item.html=sig.innerHTML;
-    };
-    toolbar.querySelector('input[type="color"]').oninput=(e)=>{
-      sig.focus(); document.execCommand("foreColor",false,e.target.value); item.html=sig.innerHTML;
-    };
+    const sig=document.createElement("div");sig.className="sig"+(editing?" editing":"");sig.innerHTML=item.html;sig.contentEditable=editing?"true":"false";
+    sig.oninput=()=>item.html=sig.innerHTML;sig.onblur=()=>item.html=sig.innerHTML;
 
-    card.append(head,toolbar,sig);
+    toolbar.querySelectorAll("[data-cmd]").forEach(b=>b.onclick=()=>{sig.focus();document.execCommand(b.dataset.cmd,false,null);item.html=sig.innerHTML});
+    toolbar.querySelector('[data-action="link"]').onclick=()=>openLinkDialog(sig,item);
+    toolbar.querySelector('[data-action="unlink"]').onclick=()=>{sig.focus();document.execCommand("unlink",false,null);item.html=sig.innerHTML};
+    toolbar.querySelector('input[type="color"]').oninput=e=>{sig.focus();document.execCommand("foreColor",false,e.target.value);item.html=sig.innerHTML};
+
+    settings.querySelector(".ca-enable").onchange=e=>{c.enabled=e.target.checked;render()};
+    settings.querySelector(".ca-phone").oninput=e=>c.phone=e.target.value;
+    settings.querySelector(".ca-wa").onchange=e=>{c.whatsapp=e.target.checked;render()};
+    settings.querySelector(".ca-tg").onchange=e=>{c.telegram=e.target.checked;render()};
+
+    card.append(head,toolbar,settings,sig);
+    if(!editing && c.enabled){
+      const holder=document.createElement("div");holder.style.background="#fff";holder.style.padding="0 18px 15px";holder.innerHTML=contactHtml(c);card.appendChild(holder);
+    }
     grid.appendChild(card);
   });
 
-  if(editing){
-    const add=document.createElement("div");
-    add.className="addcard";
-    const b=document.createElement("button");
-    b.textContent="+ Neue Signatur";
-    b.onclick=addSignature;
-    add.appendChild(b);
-    grid.appendChild(add);
-  }
+  if(editing){const add=document.createElement("div");add.className="addcard";const b=document.createElement("button");b.textContent="+ Neue Signatur";b.onclick=addSignature;add.appendChild(b);grid.appendChild(add)}
 }
 
 async function copySignature(index,button){
-  const tmp=document.createElement("div");
-  tmp.innerHTML=data.signatures[index].html;
-  tmp.style.position="fixed"; tmp.style.left="-9999px"; tmp.style.background="#fff";
-  document.body.appendChild(tmp);
-  const html=tmp.innerHTML;
-  const plain=tmp.innerText;
-
+  const item=data.signatures[index],tmp=document.createElement("div");
+  tmp.innerHTML=item.html+contactHtml(item.contactActions);tmp.style.position="fixed";tmp.style.left="-9999px";tmp.style.background="#fff";document.body.appendChild(tmp);
+  const html=tmp.innerHTML,plain=tmp.innerText;
   try{
-    if(navigator.clipboard && window.ClipboardItem){
-      const item=new ClipboardItem({
-        "text/html":new Blob([html],{type:"text/html"}),
-        "text/plain":new Blob([plain],{type:"text/plain"})
-      });
-      await navigator.clipboard.write([item]);
-    }else{
-      const range=document.createRange();
-      range.selectNodeContents(tmp);
-      const sel=getSelection();
-      sel.removeAllRanges(); sel.addRange(range);
-      document.execCommand("copy");
-      sel.removeAllRanges();
-    }
-    flash(button,"✓ Kopiert");
+    if(navigator.clipboard&&window.ClipboardItem){const clip=new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([plain],{type:"text/plain"})});await navigator.clipboard.write([clip])}
+    else{const r=document.createRange();r.selectNodeContents(tmp);const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand("copy");s.removeAllRanges()}
+    flash(button)
   }catch(e){
-    try{
-      const range=document.createRange();
-      range.selectNodeContents(tmp);
-      const sel=getSelection();
-      sel.removeAllRanges(); sel.addRange(range);
-      document.execCommand("copy");
-      sel.removeAllRanges();
-      flash(button,"✓ Kopiert");
-    }catch(_){
-      alert("Kopieren wurde vom Browser blockiert.");
-    }
-  }finally{
-    tmp.remove();
-  }
+    const r=document.createRange();r.selectNodeContents(tmp);const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand("copy");s.removeAllRanges();flash(button)
+  }finally{tmp.remove()}
 }
+function flash(button){const old=button.textContent;button.textContent="✓ Kopiert";showToast("Signatur kopiert ✓");setTimeout(()=>button.textContent=old,1200)}
+function showToast(text){const t=$("#toast");t.textContent=text;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)}
 
-function flash(button,text){
-  const old=button.textContent;
-  button.textContent=text;
-  showToast("Signatur kopiert ✓");
-  setTimeout(()=>button.textContent=old,1200);
-}
-function showToast(text){
-  const t=document.getElementById("toast");
-  t.textContent=text; t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),1500);
-}
+$("#editToggle").onclick=()=>{editing=!editing;$("#editToggle").textContent=editing?"✓ Bearbeiten fertig":"✏️ Bearbeiten";render()};
+function addSignature(){data.signatures.push({id:"sig-"+Date.now(),title:"Neue Signatur",html:"<div><strong>Neue Signatur</strong></div><div>Text hier bearbeiten …</div>",contactActions:{enabled:false,phone:"",whatsapp:false,telegram:false}});render()}
+function duplicateSig(index){const src=data.signatures[index];data.signatures.splice(index+1,0,{id:src.id+"-"+Date.now(),title:src.title+" – Kopie",html:src.html,contactActions:{...src.contactActions}});render()}
+function deleteSig(index){if(confirm(`„${data.signatures[index].title}“ wirklich löschen?`)){data.signatures.splice(index,1);render()}}
 
-document.getElementById("editToggle").onclick=()=>{
-  editing=!editing;
-  document.getElementById("editToggle").textContent=editing?"✓ Bearbeiten fertig":"✏️ Bearbeiten";
-  render();
-};
-function addSignature(){
-  data.signatures.push({
-    id:"sig-"+Date.now(),
-    title:"Neue Signatur",
-    html:"<div><strong>Neue Signatur</strong></div><div>Text hier bearbeiten …</div>"
-  });
-  render();
-}
-function duplicateSig(index){
-  const src=data.signatures[index];
-  data.signatures.splice(index+1,0,{
-    id:src.id+"-"+Date.now(),
-    title:src.title+" – Kopie",
-    html:src.html
-  });
-  render();
-}
-function deleteSig(index){
-  if(confirm(`„${data.signatures[index].title}“ wirklich löschen?`)){
-    data.signatures.splice(index,1);
-    render();
-  }
-}
-
-document.getElementById("saveLocal").onclick=async()=>{
-  data.updated=new Date().toISOString().slice(0,10);
-  const wrapper=await encryptData(data,currentPin);
-  localStorage.setItem(LOCAL_KEY,JSON.stringify(wrapper));
-  document.getElementById("status").innerHTML="Änderungen wurden <strong>verschlüsselt auf diesem Gerät</strong> gespeichert.";
-  showToast("Auf Gerät gespeichert ✓");
-};
-
-document.getElementById("exportJson").onclick=async()=>{
-  data.updated=new Date().toISOString().slice(0,10);
-  const wrapper=await encryptData(data,currentPin);
-  const blob=new Blob([JSON.stringify(wrapper,null,2)],{type:"application/json"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="signatures.json";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  showToast("JSON exportiert ✓");
-};
-
-document.getElementById("lockBtn").onclick=()=>{
-  currentPin=""; data=null; editing=false;
-  document.getElementById("pin").value="";
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("lockScreen").classList.remove("hidden");
-  document.getElementById("pin").focus();
-};
+$("#saveLocal").onclick=async()=>{data.updated=new Date().toISOString().slice(0,10);const w=await encryptData(data,currentPin);localStorage.setItem(LOCAL_KEY,JSON.stringify(w));$("#status").innerHTML="Änderungen wurden <strong>verschlüsselt auf diesem Gerät</strong> gespeichert.";showToast("Auf Gerät gespeichert ✓")};
+$("#exportJson").onclick=async()=>{data.updated=new Date().toISOString().slice(0,10);const w=await encryptData(data,currentPin);const blob=new Blob([JSON.stringify(w,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="signatures.json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);showToast("JSON exportiert ✓")};
+$("#lockBtn").onclick=()=>{currentPin="";data=null;editing=false;$("#pin").value="";$("#app").classList.add("hidden");$("#lockScreen").classList.remove("hidden");$("#pin").focus()};
 </script>
 </body>
 </html>
