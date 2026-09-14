@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<title>Signature Library</title>
+<style>
+:root{
+  --bg:#0f1115;--panel:#171a20;--panel2:#1e222a;--text:#eef2f7;--muted:#aeb7c4;
+  --line:#303744;--accent:#4f8df7;--accent2:#6ea8fe;--ok:#42c875;--warn:#efb34d;--danger:#e95c63;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 14px 48px}
+.hidden{display:none!important}
+
+/* Lock screen */
+.lock{min-height:92vh;display:grid;place-items:center}
+.lockbox{
+  width:min(420px,100%);background:var(--panel);border:1px solid var(--line);
+  border-radius:22px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.35)
+}
+.lockbox h1{margin:0 0 8px;font-size:1.65rem}
+.lockbox p{margin:0 0 18px;color:var(--muted)}
+.pinrow{display:flex;gap:9px}
+.pinrow input{
+  flex:1;min-width:0;background:#0e1116;color:var(--text);border:1px solid var(--line);
+  border-radius:12px;padding:12px 14px;letter-spacing:.18em
+}
+.btn{
+  border:0;border-radius:11px;padding:10px 13px;background:var(--accent);color:white;font-weight:650
+}
+.btn.secondary{background:#2b313b;color:var(--text);border:1px solid #3b4451}
+.btn.danger{background:#5a2529;color:#ffdfe1;border:1px solid #7a3439}
+.btn.small{padding:7px 9px;font-size:.9rem}
+#error{min-height:20px;margin-top:10px;color:#ff858b;font-size:.92rem}
+
+/* App */
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.topbar h1{margin:0;font-size:1.8rem}
+.sub{margin:4px 0 0;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:15px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:0 9px 26px rgba(0,0,0,.18)
+}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.titlewrap{min-width:0;flex:1}
+.cardtitle{margin:0;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cardtitle.editable{
+  width:100%;background:#11151b;color:var(--text);border:1px solid #46505e;border-radius:8px;padding:7px 9px
+}
+.cardbuttons{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.sig{
+  padding:17px 18px;background:#fff;color:#222;font-family:Arial,sans-serif;font-size:14px;line-height:1.45;
+  min-height:90px;overflow-wrap:anywhere
+}
+.sig a{color:#2f5fc7;text-decoration:underline}
+.sig.editing{outline:3px solid rgba(79,141,247,.35);outline-offset:-3px;min-height:150px}
+.toolbar{
+  display:none;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#11151b;border-bottom:1px solid var(--line)
+}
+.card.editmode .toolbar{display:flex}
+.tool{
+  min-width:34px;border:1px solid #3a4350;background:#252b34;color:var(--text);
+  border-radius:8px;padding:6px 8px;font-weight:600
+}
+.tool.color input{width:22px;height:22px;padding:0;border:0;background:none;vertical-align:middle}
+.footer{margin-top:20px;color:var(--muted);font-size:.9rem}
+.status{margin-top:10px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted)}
+.addcard{
+  border:1px dashed #46505e;border-radius:18px;min-height:150px;display:grid;place-items:center;color:var(--muted)
+}
+.addcard button{background:transparent;border:0;color:var(--accent2);font-weight:700;font-size:1rem}
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);
+  background:#242a33;color:white;padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;
+  transition:.18s;box-shadow:0 8px 24px rgba(0,0,0,.35);z-index:50
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:680px){
+  .topbar{display:block}
+  .actions{justify-content:flex-start;margin-top:12px}
+  .grid{grid-template-columns:1fr}
+  .wrap{padding:14px 9px 36px}
+  .sig{font-size:13.5px}
+}
+</style>
+</head>
+<body>
+
+<div id="lockScreen" class="lock">
+  <div class="lockbox">
+    <h1>Signature Library</h1>
+    <p>PIN eingeben, um die Signaturen zu laden.</p>
+    <form id="unlockForm">
+      <div class="pinrow">
+        <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="PIN" autofocus>
+        <button class="btn" type="submit">Öffnen</button>
+      </div>
+      <div id="error"></div>
+    </form>
+  </div>
+</div>
+
+<main id="app" class="wrap hidden">
+  <div class="topbar">
+    <div>
+      <h1>Meine Signaturen</h1>
+      <p class="sub">Kopieren, bearbeiten oder als verschlüsselte JSON sichern.</p>
+    </div>
+    <div class="actions">
+      <button id="editToggle" class="btn secondary">✏️ Bearbeiten</button>
+      <button id="saveLocal" class="btn secondary">💾 Auf Gerät speichern</button>
+      <button id="exportJson" class="btn secondary">⬇️ JSON exportieren</button>
+      <button id="lockBtn" class="btn secondary">🔒 Sperren</button>
+    </div>
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <div class="status" id="status">
+    Änderungen werden erst dauerhaft, wenn du sie auf dem Gerät speicherst oder die exportierte <strong>signatures.json</strong> auf GitHub ersetzt.
+  </div>
+  <p class="footer">Die Signaturdaten stehen nicht im HTML. Sie werden erst nach erfolgreicher Entschlüsselung von <strong>signatures.json</strong> angezeigt.</p>
+</main>
+
+<div id="toast" class="toast">Kopiert ✓</div>
+
+<script>
+const DATA_FILE = "signatures.json";
+const LOCAL_KEY = "signatureLibraryEncryptedV1";
+let currentPin = "";
+let data = null;
+let editing = false;
+
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+function b64ToBytes(s){
+  const bin = atob(s); const out = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i]=bin.charCodeAt(i);
+  return out;
+}
+function bytesToB64(bytes){
+  let s=""; const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk) s+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+  return btoa(s);
+}
+async function deriveKey(pin,salt,iterations){
+  const material = await crypto.subtle.importKey("raw",enc.encode(pin),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    {name:"PBKDF2",salt,iterations,hash:"SHA-256"},
+    material,
+    {name:"AES-GCM",length:256},
+    false,
+    ["encrypt","decrypt"]
+  );
+}
+async function decryptWrapper(wrapper,pin){
+  const salt=b64ToBytes(wrapper.salt), iv=b64ToBytes(wrapper.iv), ct=b64ToBytes(wrapper.ciphertext);
+  const key=await deriveKey(pin,salt,wrapper.iterations);
+  const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv},key,ct);
+  return JSON.parse(dec.decode(plain));
+}
+async function encryptData(obj,pin){
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const iterations=200000;
+  const key=await deriveKey(pin,salt,iterations);
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(JSON.stringify(obj)));
+  return {
+    version:1,cipher:"AES-GCM",kdf:"PBKDF2-SHA256",iterations,
+    salt:bytesToB64(salt),iv:bytesToB64(iv),ciphertext:bytesToB64(new Uint8Array(ct))
+  };
+}
+async function loadWrapper(){
+  const local=localStorage.getItem(LOCAL_KEY);
+  if(local){
+    try { return {wrapper:JSON.parse(local),source:"local"}; } catch(e){}
+  }
+  const res=await fetch(DATA_FILE,{cache:"no-store"});
+  if(!res.ok) throw new Error("signatures.json konnte nicht geladen werden.");
+  return {wrapper:await res.json(),source:"github"};
+}
+
+document.getElementById("unlockForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const pin=document.getElementById("pin").value.trim();
+  const error=document.getElementById("error");
+  error.textContent="Öffne …";
+  try{
+    const loaded=await loadWrapper();
+    const decoded=await decryptWrapper(loaded.wrapper,pin);
+    currentPin=pin; data=decoded;
+    error.textContent="";
+    document.getElementById("lockScreen").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("status").innerHTML =
+      loaded.source==="local"
+      ? "Geladen wurde die <strong>lokal gespeicherte</strong> Version dieses Geräts."
+      : "Geladen wurde <strong>signatures.json</strong> vom Server.";
+    render();
+  }catch(err){
+    error.textContent="PIN falsch oder signatures.json konnte nicht geladen werden.";
+  }
+});
+
+function render(){
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+  data.signatures.forEach((item,index)=>{
+    const card=document.createElement("section");
+    card.className="card"+(editing?" editmode":"");
+    card.dataset.index=index;
+
+    const head=document.createElement("div");
+    head.className="cardhead";
+
+    const titleWrap=document.createElement("div");
+    titleWrap.className="titlewrap";
+    if(editing){
+      const inp=document.createElement("input");
+      inp.className="cardtitle editable";
+      inp.value=item.title;
+      inp.addEventListener("input",()=>item.title=inp.value);
+      titleWrap.appendChild(inp);
+    }else{
+      const h=document.createElement("h2");
+      h.className="cardtitle";
+      h.textContent=item.title;
+      titleWrap.appendChild(h);
+    }
+
+    const buttons=document.createElement("div");
+    buttons.className="cardbuttons";
+
+    const copy=document.createElement("button");
+    copy.className="btn small";
+    copy.textContent="📋 Kopieren";
+    copy.onclick=()=>copySignature(index,copy);
+    buttons.appendChild(copy);
+
+    if(editing){
+      const dup=document.createElement("button");
+      dup.className="btn small secondary";
+      dup.textContent="⧉";
+      dup.title="Duplizieren";
+      dup.onclick=()=>duplicateSig(index);
+      buttons.appendChild(dup);
+
+      const del=document.createElement("button");
+      del.className="btn small danger";
+      del.textContent="🗑";
+      del.title="Löschen";
+      del.onclick=()=>deleteSig(index);
+      buttons.appendChild(del);
+    }
+
+    head.append(titleWrap,buttons);
+
+    const toolbar=document.createElement("div");
+    toolbar.className="toolbar";
+    toolbar.innerHTML = `
+      <button class="tool" data-cmd="bold"><b>B</b></button>
+      <button class="tool" data-cmd="italic"><i>I</i></button>
+      <button class="tool" data-cmd="underline"><u>U</u></button>
+      <button class="tool" data-action="link">🔗</button>
+      <button class="tool" data-action="unlink">⛓️‍💥</button>
+      <button class="tool color" title="Textfarbe"><input type="color" value="#2f5fc7"></button>
+      <button class="tool" data-cmd="removeFormat">Tx</button>
+    `;
+
+    const sig=document.createElement("div");
+    sig.className="sig"+(editing?" editing":"");
+    sig.innerHTML=item.html;
+    sig.contentEditable=editing ? "true":"false";
+    sig.addEventListener("input",()=>item.html=sig.innerHTML);
+    sig.addEventListener("blur",()=>item.html=sig.innerHTML);
+
+    toolbar.querySelectorAll("[data-cmd]").forEach(b=>{
+      b.onclick=()=>{
+        sig.focus();
+        document.execCommand(b.dataset.cmd,false,null);
+        item.html=sig.innerHTML;
+      };
+    });
+    toolbar.querySelector('[data-action="link"]').onclick=()=>{
+      sig.focus();
+      const url=prompt("Link / URL eingeben:");
+      if(url) document.execCommand("createLink",false,url);
+      item.html=sig.innerHTML;
+    };
+    toolbar.querySelector('[data-action="unlink"]').onclick=()=>{
+      sig.focus(); document.execCommand("unlink",false,null); item.html=sig.innerHTML;
+    };
+    toolbar.querySelector('input[type="color"]').oninput=(e)=>{
+      sig.focus(); document.execCommand("foreColor",false,e.target.value); item.html=sig.innerHTML;
+    };
+
+    card.append(head,toolbar,sig);
+    grid.appendChild(card);
+  });
+
+  if(editing){
+    const add=document.createElement("div");
+    add.className="addcard";
+    const b=document.createElement("button");
+    b.textContent="+ Neue Signatur";
+    b.onclick=addSignature;
+    add.appendChild(b);
+    grid.appendChild(add);
+  }
+}
+
+async function copySignature(index,button){
+  const tmp=document.createElement("div");
+  tmp.innerHTML=data.signatures[index].html;
+  tmp.style.position="fixed"; tmp.style.left="-9999px"; tmp.style.background="#fff";
+  document.body.appendChild(tmp);
+  const html=tmp.innerHTML;
+  const plain=tmp.innerText;
+
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      const item=new ClipboardItem({
+        "text/html":new Blob([html],{type:"text/html"}),
+        "text/plain":new Blob([plain],{type:"text/plain"})
+      });
+      await navigator.clipboard.write([item]);
+    }else{
+      const range=document.createRange();
+      range.selectNodeContents(tmp);
+      const sel=getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      document.execCommand("copy");
+      sel.removeAllRanges();
+    }
+    flash(button,"✓ Kopiert");
+  }catch(e){
+    try{
+      const range=document.createRange();
+      range.selectNodeContents(tmp);
+      const sel=getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      document.execCommand("copy");
+      sel.removeAllRanges();
+      flash(button,"✓ Kopiert");
+    }catch(_){
+      alert("Kopieren wurde vom Browser blockiert.");
+    }
+  }finally{
+    tmp.remove();
+  }
+}
+
+function flash(button,text){
+  const old=button.textContent;
+  button.textContent=text;
+  showToast("Signatur kopiert ✓");
+  setTimeout(()=>button.textContent=old,1200);
+}
+function showToast(text){
+  const t=document.getElementById("toast");
+  t.textContent=text; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1500);
+}
+
+document.getElementById("editToggle").onclick=()=>{
+  editing=!editing;
+  document.getElementById("editToggle").textContent=editing?"✓ Bearbeiten fertig":"✏️ Bearbeiten";
+  render();
+};
+function addSignature(){
+  data.signatures.push({
+    id:"sig-"+Date.now(),
+    title:"Neue Signatur",
+    html:"<div><strong>Neue Signatur</strong></div><div>Text hier bearbeiten …</div>"
+  });
+  render();
+}
+function duplicateSig(index){
+  const src=data.signatures[index];
+  data.signatures.splice(index+1,0,{
+    id:src.id+"-"+Date.now(),
+    title:src.title+" – Kopie",
+    html:src.html
+  });
+  render();
+}
+function deleteSig(index){
+  if(confirm(`„${data.signatures[index].title}“ wirklich löschen?`)){
+    data.signatures.splice(index,1);
+    render();
+  }
+}
+
+document.getElementById("saveLocal").onclick=async()=>{
+  data.updated=new Date().toISOString().slice(0,10);
+  const wrapper=await encryptData(data,currentPin);
+  localStorage.setItem(LOCAL_KEY,JSON.stringify(wrapper));
+  document.getElementById("status").innerHTML="Änderungen wurden <strong>verschlüsselt auf diesem Gerät</strong> gespeichert.";
+  showToast("Auf Gerät gespeichert ✓");
+};
+
+document.getElementById("exportJson").onclick=async()=>{
+  data.updated=new Date().toISOString().slice(0,10);
+  const wrapper=await encryptData(data,currentPin);
+  const blob=new Blob([JSON.stringify(wrapper,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="signatures.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  showToast("JSON exportiert ✓");
+};
+
+document.getElementById("lockBtn").onclick=()=>{
+  currentPin=""; data=null; editing=false;
+  document.getElementById("pin").value="";
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("lockScreen").classList.remove("hidden");
+  document.getElementById("pin").focus();
+};
+</script>
+</body>
+</html>
