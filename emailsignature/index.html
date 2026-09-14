@@ -51,11 +51,6 @@ svg{display:block}
 .ib .lbl{font-size:.85rem;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
 .ib svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .ib.sm svg{width:17px;height:17px}
-.ib[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:50%;
-  transform:translateX(-50%) translateY(4px);background:#0f1118;color:#f2f4f8;font-size:.74rem;font-weight:500;
-  white-space:nowrap;padding:5px 10px;border-radius:8px;border:1px solid var(--line2);opacity:0;pointer-events:none;
-  transition:.14s;z-index:40;box-shadow:0 8px 22px rgba(0,0,0,.5)}
-@media (hover:hover) and (pointer:fine){.ib[data-tip]:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 /* ---------- Lockscreen ---------- */
 .lock{min-height:100dvh;display:grid;place-items:center;padding:20px}
@@ -125,15 +120,12 @@ svg{display:block}
 .tool:hover{background:rgba(255,255,255,.14)}
 .tool:active{transform:scale(.92)}
 .tool svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
-.tool[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 7px);left:50%;
-  transform:translateX(-50%) translateY(4px);background:#0f1118;color:#f2f4f8;font-size:.72rem;white-space:nowrap;
-  padding:4px 9px;border-radius:7px;border:1px solid var(--line2);opacity:0;pointer-events:none;transition:.14s;z-index:20}
-@media (hover:hover) and (pointer:fine){.tool[data-tip]:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}}
 .tool.color{overflow:hidden;padding:0}
 .tool.color input{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:none;opacity:0;cursor:pointer}
 .tool.color .swatch{width:17px;height:17px;border-radius:6px;border:1px solid rgba(255,255,255,.45);pointer-events:none}
 
-.settings{display:none;gap:8px;flex-wrap:wrap;align-items:center;padding:11px;background:rgba(0,0,0,.14);
+.srow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;width:100%}
+.settings{display:none;flex-direction:column;gap:8px;align-items:stretch;padding:11px;background:rgba(0,0,0,.14);
   border-bottom:1px solid var(--line);font-size:.86rem;color:var(--muted)}
 .settings label{display:flex;align-items:center;gap:7px;cursor:pointer;border:1px solid var(--line2);
   border-radius:11px;padding:8px 12px;min-height:40px;background:rgba(255,255,255,.05);transition:.15s}
@@ -159,6 +151,11 @@ svg{display:block}
 .status strong{color:var(--text);font-weight:600}
 .footer{margin-top:14px;color:var(--faint);font-size:.78rem;line-height:1.5}
 
+#tip{position:fixed;z-index:300;background:#0f1118;color:#f2f4f8;font-size:.76rem;font-weight:500;
+  white-space:nowrap;padding:6px 10px;border-radius:8px;border:1px solid var(--line2);
+  box-shadow:0 8px 22px rgba(0,0,0,.5);opacity:0;pointer-events:none;transform:translateY(4px);
+  transition:opacity .13s,transform .13s;left:0;top:0}
+#tip.show{opacity:1;transform:translateY(0)}
 .toast{position:fixed;left:50%;bottom:calc(26px + var(--safe-b));transform:translateX(-50%) translateY(12px);
   background:#0f1118;color:#fff;padding:12px 20px;border-radius:999px;border:1px solid var(--line2);font-size:.88rem;
   font-weight:600;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 14px 36px rgba(0,0,0,.55);z-index:200}
@@ -260,6 +257,7 @@ svg{display:block}
   <p class="footer">Die Signaturdaten stehen nicht im HTML. Sie werden erst nach erfolgreicher Entschlüsselung von <strong>signatures.json</strong> angezeigt.</p>
 </main>
 
+<div id="tip"></div>
 <div id="toast" class="toast">Kopiert</div>
 <div id="modalRoot"></div>
 
@@ -309,7 +307,13 @@ $("#unlockForm").addEventListener("submit",async e=>{
     const loaded=await loadWrapper();
     data=await decryptWrapper(loaded.wrapper,pin);
     currentPin=pin;
-    data.signatures.forEach(s=>s.contactActions??={enabled:false,phone:"",whatsapp:false});
+    data.signatures.forEach(s=>{
+      s.contactActions??={};
+      const c=s.contactActions;
+      if(c.waEnabled===undefined)c.waEnabled=!!(c.enabled&&c.whatsapp);
+      c.phone??="";c.tgEnabled??=false;c.tgUser??="";
+      delete c.enabled;delete c.whatsapp;delete c.telegram;
+    });
     error.textContent="";
     $("#lockScreen").classList.add("hidden");
     $("#app").classList.remove("hidden");
@@ -359,21 +363,33 @@ function openLinkDialog(sig,item){
   };
 }
 
-const WA_SYMBOLS={
+const SYMBOLS={
   "bubble":"\uD83D\uDDE8\uFE0E",  // Sprechblase, einfarbig (Segoe UI Symbol / Apple: ok)
   "bubble2":"\uD83D\uDCAC",        // Sprechblase als Emoji – immer da, aber farbig
   "phone":"\u2706\uFE0E",          // Telefonhörer
   "classic":"\u260E\uFE0E",        // klassisches Telefon
   "none":""
 };
-function contactHtml(c){
-  if(!c?.enabled||!c.phone||!c.whatsapp)return "";
-  const p=c.phone.replace(/[^\d+]/g,"").replace(/^\+/,"");
-  const sym=WA_SYMBOLS[c.symbol??"bubble"]||"";
-  const label=(c.label??"WhatsApp").trim();
-  const inner=(sym?`<span style="font-size:15px">${sym}</span>${label?"&nbsp;":""}`:"")+label;
+function contactLine(href,symKey,label){
+  const sym=SYMBOLS[symKey??"bubble"]||"";
+  const text=(label||"").trim();
+  const inner=(sym?`<span style="font-size:15px">${sym}</span>${text?"&nbsp;":""}`:"")+text;
   if(!inner)return "";
-  return `<div style="margin-top:10px"><a href="https://wa.me/${p}" style="color:#5b6470;text-decoration:none;font-family:Arial,sans-serif;font-size:13px">${inner}</a></div>`;
+  return `<div style="margin-top:4px"><a href="${href}" style="color:#5b6470;text-decoration:none;font-family:Arial,sans-serif;font-size:13px">${inner}</a></div>`;
+}
+function contactHtml(c){
+  if(!c)return "";
+  const lines=[];
+  if(c.waEnabled&&c.phone){
+    const p=c.phone.replace(/[^\d+]/g,"").replace(/^\+/,"");
+    lines.push(contactLine(`https://wa.me/${p}`,c.symbol,c.label??"WhatsApp"));
+  }
+  if(c.tgEnabled&&c.tgUser){
+    const u=c.tgUser.trim().replace(/^@/,"").replace(/^https?:\/\/t\.me\//i,"");
+    if(u)lines.push(contactLine(`https://t.me/${u}`,c.tgSymbol,c.tgLabel??"Telegram"));
+  }
+  const body=lines.filter(Boolean).join("");
+  return body?`<div style="margin-top:10px">${body}</div>`:"";
 }
 
 /* ---------- Render ---------- */
@@ -435,18 +451,24 @@ function render(){
 
     const settings=document.createElement("div");settings.className="settings";
     const c=item.contactActions;
-    const symVal=c.symbol??"bubble",labelVal=c.label??"WhatsApp";
-    settings.innerHTML=`<label><input type="checkbox" class="ca-enable" ${c.enabled?"checked":""}> WhatsApp-Zeile</label>
-      <input class="ca-phone" type="text" inputmode="tel" value="${(c.phone||"").replace(/"/g,"&quot;")}" placeholder="Nummer, z. B. +49 …">
-      <label><input type="checkbox" class="ca-wa" ${c.whatsapp?"checked":""}> anzeigen</label>
-      <select class="ca-sym">
-        <option value="bubble" ${symVal==="bubble"?"selected":""}>\uD83D\uDDE8\uFE0E Sprechblase</option>
-        <option value="bubble2" ${symVal==="bubble2"?"selected":""}>\uD83D\uDCAC Sprechblase farbig</option>
-        <option value="phone" ${symVal==="phone"?"selected":""}>\u2706\uFE0E Hörer</option>
-        <option value="classic" ${symVal==="classic"?"selected":""}>\u260E\uFE0E Telefon</option>
-        <option value="none" ${symVal==="none"?"selected":""}>ohne Symbol</option>
-      </select>
-      <input class="ca-label" type="text" value="${labelVal.replace(/"/g,"&quot;")}" placeholder="Beschriftung" style="min-width:120px;flex:0 1 150px">`;
+    const symOpts=v=>`<option value="bubble" ${v==="bubble"?"selected":""}>\uD83D\uDDE8\uFE0E Sprechblase</option>
+      <option value="bubble2" ${v==="bubble2"?"selected":""}>\uD83D\uDCAC Sprechblase farbig</option>
+      <option value="phone" ${v==="phone"?"selected":""}>\u2706\uFE0E Hörer</option>
+      <option value="classic" ${v==="classic"?"selected":""}>\u260E\uFE0E Telefon</option>
+      <option value="none" ${v==="none"?"selected":""}>ohne Symbol</option>`;
+    settings.innerHTML=`
+      <div class="srow">
+        <label data-tip="Zeile in der Signatur anzeigen"><input type="checkbox" class="wa-on" ${c.waEnabled?"checked":""}> WhatsApp</label>
+        <input class="wa-phone" type="text" inputmode="tel" value="${(c.phone||"").replace(/"/g,"&quot;")}" placeholder="Nummer, z. B. +49 …">
+        <select class="wa-sym" data-tip="Symbol vor dem Text">${symOpts(c.symbol??"bubble")}</select>
+        <input class="wa-label" type="text" value="${(c.label??"WhatsApp").replace(/"/g,"&quot;")}" placeholder="Beschriftung" style="flex:0 1 150px;min-width:110px">
+      </div>
+      <div class="srow">
+        <label data-tip="Zeile in der Signatur anzeigen"><input type="checkbox" class="tg-on" ${c.tgEnabled?"checked":""}> Telegram</label>
+        <input class="tg-user" type="text" value="${(c.tgUser||"").replace(/"/g,"&quot;")}" placeholder="@nutzername">
+        <select class="tg-sym" data-tip="Symbol vor dem Text">${symOpts(c.tgSymbol??"bubble")}</select>
+        <input class="tg-label" type="text" value="${(c.tgLabel??"Telegram").replace(/"/g,"&quot;")}" placeholder="Beschriftung" style="flex:0 1 150px;min-width:110px">
+      </div>`;
 
     const sig=document.createElement("div");sig.className="sig"+(editing?" editing":"");
     sig.innerHTML=item.html;sig.contentEditable=editing?"true":"false";
@@ -461,15 +483,21 @@ function render(){
       sig.focus();document.execCommand("foreColor",false,e.target.value);item.html=sig.innerHTML;
     };
 
-    settings.querySelector(".ca-enable").onchange=e=>{c.enabled=e.target.checked;render()};
-    settings.querySelector(".ca-phone").oninput=e=>c.phone=e.target.value;
-    settings.querySelector(".ca-wa").onchange=e=>{c.whatsapp=e.target.checked;render()};
-    settings.querySelector(".ca-sym").onchange=e=>{c.symbol=e.target.value;render()};
-    settings.querySelector(".ca-label").oninput=e=>{c.label=e.target.value};
-    settings.querySelector(".ca-label").onblur=()=>render();
+    settings.querySelector(".wa-on").onchange=e=>{c.waEnabled=e.target.checked;render()};
+    settings.querySelector(".wa-phone").oninput=e=>c.phone=e.target.value;
+    settings.querySelector(".wa-phone").onblur=()=>render();
+    settings.querySelector(".wa-sym").onchange=e=>{c.symbol=e.target.value;render()};
+    settings.querySelector(".wa-label").oninput=e=>c.label=e.target.value;
+    settings.querySelector(".wa-label").onblur=()=>render();
+    settings.querySelector(".tg-on").onchange=e=>{c.tgEnabled=e.target.checked;render()};
+    settings.querySelector(".tg-user").oninput=e=>c.tgUser=e.target.value;
+    settings.querySelector(".tg-user").onblur=()=>render();
+    settings.querySelector(".tg-sym").onchange=e=>{c.tgSymbol=e.target.value;render()};
+    settings.querySelector(".tg-label").oninput=e=>c.tgLabel=e.target.value;
+    settings.querySelector(".tg-label").onblur=()=>render();
 
     card.append(head,toolbar,settings,sig);
-    if(!editing && c.enabled){
+    if(!editing && contactHtml(c)){
       const holder=document.createElement("div");
       holder.style.background="#fff";holder.style.padding="0 20px 18px";
       holder.innerHTML=contactHtml(c);card.appendChild(holder);
@@ -527,6 +555,32 @@ function flash(button,msg){
     if(wasPrimary)button.classList.add("primary");
   },1300);
 }
+/* Globaler Tooltip – funktioniert auch in scrollbaren Leisten und bei Touch */
+(function(){
+  const tip=$("#tip");let hideTimer=null;
+  function show(el){
+    const txt=el.getAttribute("data-tip");if(!txt)return;
+    clearTimeout(hideTimer);
+    tip.textContent=txt;tip.classList.add("show");
+    const r=el.getBoundingClientRect(),t=tip.getBoundingClientRect();
+    let left=r.left+r.width/2-t.width/2;
+    left=Math.max(8,Math.min(left,innerWidth-t.width-8));
+    let top=r.bottom+8;
+    if(top+t.height>innerHeight-8)top=r.top-t.height-8;
+    tip.style.left=left+"px";tip.style.top=top+"px";
+  }
+  function hide(){tip.classList.remove("show")}
+  document.addEventListener("pointerover",e=>{const el=e.target.closest("[data-tip]");el?show(el):hide()});
+  document.addEventListener("pointerdown",e=>{
+    const el=e.target.closest("[data-tip]");
+    if(el&&e.pointerType!=="mouse"){show(el);hideTimer=setTimeout(hide,1400)}else hide();
+  });
+  document.addEventListener("focusin",e=>{const el=e.target.closest("[data-tip]");el?show(el):hide()});
+  document.addEventListener("focusout",hide);
+  addEventListener("scroll",hide,true);
+  addEventListener("blur",hide);
+})();
+
 function showToast(text){const t=$("#toast");t.textContent=text;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1700)}
 
 /* ---------- Aktionen ---------- */
@@ -540,7 +594,7 @@ function setEditButton(){
 $("#editToggle").onclick=()=>{editing=!editing;setEditButton();render()};
 
 function addSignature(){
-  data.signatures.push({id:"sig-"+Date.now(),title:"Neue Signatur",html:"<div><strong>Neue Signatur</strong></div><div>Text hier bearbeiten …</div>",contactActions:{enabled:false,phone:"",whatsapp:false}});
+  data.signatures.push({id:"sig-"+Date.now(),title:"Neue Signatur",html:"<div><strong>Neue Signatur</strong></div><div>Text hier bearbeiten …</div>",contactActions:{waEnabled:false,phone:"",tgEnabled:false,tgUser:""}});
   render();
 }
 function duplicateSig(index){
