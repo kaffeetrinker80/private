@@ -412,6 +412,22 @@
     }
     .stage-controls .btn { padding: 9px 12px; }
     .speed-chip { min-width: 68px; text-align: center; color: #c9e4ff; font-weight: 700; font-size: .86rem; }
+    /* Speed −/+ group: large touch targets, clearly separated from the other controls. */
+    .speed-group { display: flex; align-items: center; gap: 8px; }
+    .stage-controls .btn.speed-btn {
+      width: 48px; height: 48px; min-width: 48px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; line-height: 1; font-weight: 800;
+      border-radius: 12px;
+      touch-action: manipulation;
+      -webkit-user-select: none; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .stage-controls .btn.speed-btn:active { transform: scale(.94); }
+    .stage-controls .btn.speed-btn:disabled { opacity: .4; cursor: default; }
+    .speed-group .speed-chip { min-width: 72px; }
+    .controls-divider { width: 1px; align-self: stretch; margin: 4px 8px; background: rgba(255,255,255,.18); }
+    .light-mode .controls-divider { background: #afc1d2; }
 
     .toolbar .full { grid-column: 1 / -1; }
 
@@ -587,6 +603,8 @@
       .language-switch button { min-width: 34px; padding-inline: 7px; }
       .theme-switch button { min-width: 30px; padding-inline: 6px; }
       .stage-controls { max-width: calc(100% - 20px); flex-wrap: wrap; justify-content: center; }
+      .speed-group { flex: 1 1 100%; justify-content: center; }
+      .controls-divider { display: none; }
     }
   </style>
 </head>
@@ -596,7 +614,7 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.6</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.7</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="brand-switches">
@@ -721,8 +739,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.6</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.6">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.7</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.7">✉ Feedback</a>
       </div>
     </aside>
 
@@ -742,9 +760,14 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
         <div class="script" id="script"></div>
       </div>
       <div class="stage-controls">
+        <div class="speed-group" role="group" id="speedGroup" aria-label="Scrolltempo">
+          <button class="btn speed-btn" id="speedDownBtn" type="button" title="Langsamer" aria-label="Langsamer">−</button>
+          <span class="speed-chip" id="speedChip" aria-live="polite">28 px/s</span>
+          <button class="btn speed-btn" id="speedUpBtn" type="button" title="Schneller" aria-label="Schneller">+</button>
+        </div>
+        <span class="controls-divider" aria-hidden="true"></span>
         <button class="btn" id="restartBtn" title="Zurück zum Anfang">↺</button>
         <button class="btn primary" id="playBtn">▶ Start</button>
-        <span class="speed-chip" id="speedChip">28 px/s</span>
         <button class="btn" id="stageThemeBtn" title="Heller Modus">☀</button>
         <button class="btn" id="fullscreenBtn" title="Vollbild">⛶</button>
       </div>
@@ -803,6 +826,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     const fontSizeValue = document.getElementById('fontSizeValue');
     const lineHeightValue = document.getElementById('lineHeightValue');
     const speedChip = document.getElementById('speedChip');
+    const speedDownBtn = document.getElementById('speedDownBtn');
+    const speedUpBtn = document.getElementById('speedUpBtn');
     const fileInput = document.getElementById('fileInput');
     const cursorJumpBtn = document.getElementById('cursorJumpBtn');
     const topRestartBtn = document.getElementById('topRestartBtn');
@@ -874,6 +899,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         timerLabel: 'Talkzeit',
         timerTitle: 'Läuft ab dem ersten Start weiter, auch wenn du den Text pausierst.',
         restartTitle: 'Zurück zum Anfang',
+        speedDown: 'Langsamer',
+        speedUp: 'Schneller',
         fullscreenTitle: 'Vollbild',
         start: '▶ Start',
         pause: '❚❚ Pause',
@@ -990,6 +1017,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         timerLabel: 'Talk Time',
         timerTitle: 'Starts with the first press of Start and keeps running when you pause the text.',
         restartTitle: 'Back to start',
+        speedDown: 'Slower',
+        speedUp: 'Faster',
         fullscreenTitle: 'Fullscreen',
         start: '▶ Start',
         pause: '❚❚ Pause',
@@ -1160,6 +1189,11 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       timerLabel.textContent = tr('timerLabel');
       document.getElementById('timer').title = tr('timerTitle');
       restartBtn.title = tr('restartTitle');
+      speedDownBtn.title = tr('speedDown');
+      speedDownBtn.setAttribute('aria-label', tr('speedDown'));
+      speedUpBtn.title = tr('speedUp');
+      speedUpBtn.setAttribute('aria-label', tr('speedUp'));
+      document.getElementById('speedGroup').setAttribute('aria-label', tr('scrollSpeed'));
       fullscreenBtn.title = tr('fullscreenTitle');
       renderPlayButton();
       setStatus(statusKey, statusParams);
@@ -1791,6 +1825,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const speedLabel = speed.value + ' px/s';
       speedValue.textContent = speedLabel;
       speedChip.textContent = speedLabel;
+      speedDownBtn.disabled = Number(speed.value) <= Number(speed.min);
+      speedUpBtn.disabled = Number(speed.value) >= Number(speed.max);
       fontSizeValue.textContent = fontSize.value + ' px';
       lineHeightValue.textContent = Number(lineHeight.value).toFixed(2);
       document.documentElement.classList.toggle('light-mode', lightToggle.checked);
@@ -2409,6 +2445,48 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     playBtn.addEventListener('click', togglePlay);
     restartBtn.addEventListener('click', restart);
 
+    // Speed −/+ in the stage bar (also visible in fullscreen). Same steps as the arrow keys:
+    // 1 px/s below 10 px/s, 3 px/s above. Press and hold to keep adjusting.
+    function stepSpeed(direction) {
+      const current = Number(speed.value);
+      const min = Number(speed.min) || 1;
+      const max = Number(speed.max) || 160;
+      const next = direction > 0
+        ? Math.min(max, current + (current < 10 ? 1 : 3))
+        : Math.max(min, current - (current <= 10 ? 1 : 3));
+      if (next === current) return;
+      speed.value = next;
+      updateControls();
+    }
+
+    function bindSpeedButton(button, direction) {
+      let holdDelay = null;
+      let holdRepeat = null;
+      const stopHold = () => {
+        clearTimeout(holdDelay);
+        clearInterval(holdRepeat);
+        holdDelay = holdRepeat = null;
+      };
+      button.addEventListener('pointerdown', event => {
+        if (event.button !== undefined && event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        stopHold();
+        stepSpeed(direction);
+        holdDelay = setTimeout(() => {
+          holdRepeat = setInterval(() => stepSpeed(direction), 110);
+        }, 450);
+      });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(type => button.addEventListener(type, stopHold));
+      button.addEventListener('contextmenu', event => event.preventDefault());
+      // Keyboard activation (Enter/Space on a focused button) — pointer clicks are handled above.
+      button.addEventListener('click', event => {
+        if (event.detail === 0) stepSpeed(direction);
+      });
+    }
+    bindSpeedButton(speedDownBtn, -1);
+    bindSpeedButton(speedUpBtn, 1);
+
     // Touch/pen equivalent of the spacebar shortcut: tapping the reading area toggles
     // Start/Pause. Only for touch/pen pointers, so mouse users on desktop keep their
     // usual click-to-focus behaviour unchanged. A genuine tap (little movement, quick)
@@ -2482,8 +2560,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       }
       if (typing && event.code !== 'Escape') return;
       if (event.code === 'Space') { event.preventDefault(); togglePlay(); }
-      if (event.key === 'ArrowUp') { event.preventDefault(); speed.value = Math.min(160, Number(speed.value) + (Number(speed.value) < 10 ? 1 : 3)); updateControls(); }
-      if (event.key === 'ArrowDown') { event.preventDefault(); speed.value = Math.max(1, Number(speed.value) - (Number(speed.value) <= 10 ? 1 : 3)); updateControls(); }
+      if (event.key === 'ArrowUp') { event.preventDefault(); stepSpeed(1); }
+      if (event.key === 'ArrowDown') { event.preventDefault(); stepSpeed(-1); }
       if (event.key.toLowerCase() === 'r') restart();
       if (event.key.toLowerCase() === 'f') fullscreenBtn.click();
       if (event.key.toLowerCase() === 'c') { cameraToggle.checked = !cameraToggle.checked; cameraToggle.dispatchEvent(new Event('change')); }
