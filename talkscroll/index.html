@@ -331,9 +331,13 @@
       pointer-events: auto;
     }
     .stage-header-left { display: flex; align-items: center; gap: 10px; }
-    .timer { font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 7px; }
-    .timer-label { color: inherit; opacity: .78; font-size: .75rem; font-weight: 750; letter-spacing: .03em; text-transform: uppercase; }
-    .timer-value { font-weight: 800; }
+    .timer { font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 10px; padding: 7px 18px; }
+    .timer-label { color: inherit; opacity: .78; font-size: .8rem; font-weight: 750; letter-spacing: .03em; text-transform: uppercase; }
+    .timer-value { font-weight: 800; font-size: 1.75rem; line-height: 1.1; letter-spacing: .02em; }
+    @media (max-width: 560px) {
+      .timer { padding: 6px 14px; gap: 8px; }
+      .timer-value { font-size: 1.4rem; }
+    }
 
     .reading-mask {
       position: absolute;
@@ -612,7 +616,7 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.8</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.9</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="brand-switches">
@@ -737,8 +741,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.8</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.8">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.9</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.9">✉ Feedback</a>
       </div>
     </aside>
 
