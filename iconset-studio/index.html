@@ -315,7 +315,7 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
 <header>
   <div class="mark" aria-hidden="true"><span class="m-ring"></span><span class="m-ring r2"></span><span class="m-core"></span></div>
   <div>
-    <div class="htitle">Icon Set Studio <span class="pill">v1.3</span></div>
+    <div class="htitle">Icon Set Studio <span class="pill">v1.4</span></div>
     <div class="hsub" data-i18n="app.sub">Favicons, Manifest und Head-Snippet aus einem Symbol</div>
   </div>
   <div class="hspace"></div>
@@ -384,8 +384,8 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
       </label>
       <label class="field">
         <div class="field-head"><span data-i18n="f.url">Adresse der Seite</span></div>
-        <input type="text" id="siteUrl" value="https://example.com/" spellcheck="false">
-        <p class="hint" data-i18n="hint.url">Wird nur für die Link-Vorschau gebraucht — die muss absolut sein.</p>
+        <input type="text" id="siteUrl" value="https://kaffeetrinker80.github.io/" spellcheck="false">
+        <p class="hint" data-i18n="hint.url">Bestimmt automatisch die App-ID, Start-URL und den Scope. HTTPS-Adresse des Tools eintragen.</p><div class="hint" id="derivedPaths" style="overflow-wrap:anywhere"></div>
       </label>
     </div>
     </div>
@@ -537,7 +537,7 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
       <label class="field" id="scopeField">
         <div class="field-head"><span data-i18n="f.scope">Unterordner</span></div>
         <input type="text" id="scopePath" value="/" spellcheck="false" placeholder="/mein-tool/">
-        <p class="hint" data-i18n="hint.scope">Nur bei Wurzelpfaden nötig: der Ordner, in dem das Tool liegt.</p>
+        <p class="hint" data-i18n="hint.scope">Nur für Icon-Pfade im Root relevant. Die App-ID kommt immer aus der Seitenadresse.</p>
       </label>
     </div>
     <div class="card sect">
@@ -600,7 +600,7 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
     <div class="card">
       <div class="code-head">
         <h3 class="eyebrow"><span>site.webmanifest</span></h3>
-        <button class="btn sm" data-copy="manifestOut" data-i18n="btn.copy">Kopieren</button>
+        <div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn sm" data-copy="manifestOut" data-i18n="btn.copy">Kopieren</button><button class="btn sm primary" id="manifestDownload">↓ Manifest laden</button></div>
       </div>
       <pre id="manifestOut"></pre>
     </div>
@@ -678,7 +678,7 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>Made with Love © – Icon Set Studio V 1.3</footer>
+<footer>Made with Love © – Icon Set Studio V 1.4</footer>
 
 <script>
 (()=>{
@@ -697,7 +697,7 @@ de:{
  'src.none':'Am besten mindestens 512×512 px. SVG wird verlustfrei hochskaliert.',
  'h.project':'Projekt','f.name':'Name','f.short':'Kurzname','f.desc':'Beschreibung',
  'ph.desc':'Kurz, ein Satz — landet im Manifest und in der Link-Vorschau',
- 'f.url':'Adresse der Seite','hint.url':'Wird nur für die Link-Vorschau gebraucht — die muss absolut sein.',
+ 'f.url':'Adresse der Seite','hint.url':'Bestimmt automatisch die eindeutige App-ID, Start-URL und den Scope im Manifest. Vollständige HTTPS-Adresse des Tools eintragen.',
  'h.colors':'Farben','f.theme':'theme_color — Farbe deines Headers',
  'h.where':'Wo landen die Farben?',
  'schema.1':'deine Kopfzeile','schema.2':'deine Seitenfläche',
@@ -734,7 +734,7 @@ de:{
  'f.paths':'Pfade','path.rel':'relativ — Icons liegen neben der index.html','path.root':'ab Domain-Wurzel — Icons liegen im Root',
  'hint.pathRel':'Empfohlen. Der Ordner bleibt in sich geschlossen und lässt sich kopieren.',
  'hint.pathRoot':'Nur sinnvoll, wenn alle Tools sich ein Icon-Set im Root teilen.',
- 'f.scope':'Unterordner','hint.scope':'Nur bei Wurzelpfaden nötig: der Ordner, in dem das Tool liegt.',
+ 'f.scope':'Unterordner','hint.scope':'Nur für Icon-Pfade im Root relevant. Die App-ID kommt immer aus der Seitenadresse.',
  'h.extras':'Zusätzliche Dateien',
  'opt.svg':'favicon.svg','opt.svg.s':'Scharf in jeder Größe — nur möglich, wenn du ein SVG hochlädst',
  'opt.og':'og-image.png (1200×630)','opt.og.s':'Vorschaubild beim Teilen per WhatsApp, Telegram, Signal',
@@ -766,7 +766,7 @@ en:{
  'src.none':'At least 512×512 px is ideal. SVG scales without loss.',
  'h.project':'Project','f.name':'Name','f.short':'Short name','f.desc':'Description',
  'ph.desc':'One short sentence — used in the manifest and link preview',
- 'f.url':'Site address','hint.url':'Only needed for the link preview, which requires an absolute URL.',
+ 'f.url':'Site address','hint.url':'The tool URL sets the unique app ID, start URL and scope automatically. Enter its full HTTPS URL.',
  'h.colors':'Colours','f.theme':'theme_color — your header colour',
  'h.where':'Where do the colours land?',
  'schema.1':'your header bar','schema.2':'your page surface',
@@ -1081,7 +1081,7 @@ async function build(){
   lastDefs=defs;
   renderPreviews(defs,ogCanvas);
   renderFileList();
-  $('#zipBtn').disabled=false;
+  $('#zipBtn').disabled=!appPaths().valid;
 }
 
 function renderPreviews(defs,og){
@@ -1121,17 +1121,33 @@ function renderFileList(){
   $('#zipCount').textContent=n?T('zip.count',{n}):'0';
 }
 
+function appPaths(){
+  const raw=$('#siteUrl').value.trim();
+  try{
+    const url=new URL(raw);
+    if(url.protocol!=='https:' && !(url.hostname==='localhost' && url.protocol==='http:')) throw new Error('HTTPS required');
+    if(url.username||url.password) throw new Error('Credentials are not supported');
+    let path=url.pathname;
+    // index.html ist die Datei im App-Verzeichnis und keine eigene App-Route.
+    path=path.replace(/\/(?:index\.html?)$/i,'/');
+    if(!path.endsWith('/')) path+='/';
+    return {valid:true,path,full:url.origin+path};
+  }catch{
+    return {valid:false,path:'',full:''};
+  }
+}
 function manifestText(){
-  const root=isRoot(), sp=scopePath();
+  const paths=appPaths();
+  const sp=paths.valid?paths.path:'/';
   const m={
     name:$('#appName').value||'Tool',
     short_name:$('#shortName').value||'Tool'
   };
   const desc=$('#appDesc').value.trim();
   if(desc) m.description=desc;
-  m.id=root?sp:'./';
-  m.start_url=root?sp:'./';
-  m.scope=root?sp:'./';
+  m.id=sp;
+  m.start_url=sp;
+  m.scope=sp;
   m.display=$('#displayMode').value;
   m.orientation=$('#orientMode').value;
   m.background_color=state.bg;
@@ -1179,8 +1195,7 @@ function headText(){
   if($('#optTile').checked) L.push(`<meta name="msapplication-config" content="${iconHref('browserconfig.xml')}">`);
 
   if($('#optOg').checked){
-    let base=$('#siteUrl').value.trim();
-    if(base&&!base.endsWith('/')) base+='/';
+    let base=appPaths().full;
     const desc=$('#appDesc').value.trim();
     L.push('');
     L.push('<!-- Link-Vorschau -->');
@@ -1196,7 +1211,7 @@ function headText(){
 function readmeText(){
   const names=Object.keys(files).filter(n=>!/\.txt$/.test(n));
   const de=`ICON-SET — ${$('#appName').value}
-Erzeugt mit Icon Set Studio v1.3
+Erzeugt mit Icon Set Studio v1.4
 
 EINBAU
 1. Alle Dateien aus diesem Archiv in den Ordner legen, in dem deine index.html liegt.
@@ -1218,7 +1233,7 @@ HEAD-SNIPPET
 ${headText()}
 `;
   const en=`ICON SET — ${$('#appName').value}
-Generated with Icon Set Studio v1.3
+Generated with Icon Set Studio v1.4
 
 SETUP
 1. Put every file from this archive into the folder holding your index.html.
@@ -1271,7 +1286,15 @@ function paintPreviews(){
   try{ $('#urlText').textContent=new URL($('#siteUrl').value).host }catch{}
 }
 function refreshText(){
-  $('#manifestOut').textContent=manifestText();
+  const paths=appPaths();
+  const status=$('#derivedPaths');
+  status.style.color=paths.valid?'var(--ok)':'var(--warn)';
+  status.textContent=paths.valid
+    ? `✓ id / start_url / scope → ${paths.path}`
+    : (lang==='de'?'⚠ Gültige HTTPS-Adresse des Tools erforderlich.':'⚠ Enter a valid HTTPS URL for the app.');
+  $('#manifestDownload').disabled=!paths.valid;
+  $('#zipBtn').disabled=!paths.valid||!src;
+  $('#manifestOut').textContent=paths.valid?manifestText(): (lang==='de'?'Bitte zuerst eine gültige Tool-Adresse eintragen.':'Please enter a valid app URL first.');
   $('#headOut').textContent=headText();
   const sn=$('#shortName').value;
   $('#shortLen').textContent=`${sn.length} / 12`;
@@ -1654,7 +1677,19 @@ function zipFileName(){
   const base=slug($('#shortName').value)||slug($('#appName').value)||'icons';
   return base+'-iconset.zip';
 }
+$('#manifestDownload').onclick=()=>{
+  if(!appPaths().valid) return;
+  const blob=new Blob([manifestText()],{type:'application/manifest+json;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='site.webmanifest';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
 $('#zipBtn').onclick=()=>{
+  if(!appPaths().valid) return;
+  // Auch nach einer reinen URL-Änderung muss das ZIP die aktuelle Manifest-ID enthalten.
+  files['site.webmanifest']=new TextEncoder().encode(manifestText());
   const zip=buildZip(Object.entries(files).map(([name,bytes])=>({name,bytes})));
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([zip],{type:'application/zip'}));
