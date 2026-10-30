@@ -348,6 +348,7 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
         <input type="text" id="zipName" spellcheck="false" data-i18n-ph="ph.zipName" placeholder="wird aus dem Kurznamen gebildet">
       </label>
       <div class="filelist" id="fileList"></div>
+      <button type="button" class="btn wide" id="newProjectBtn" style="margin-top:12px" data-i18n="btn.newProject">↺ Neues Projekt / Alles zurücksetzen</button>
     </div>
     <div class="tabbar" id="tabbar">
       <button class="tab active" data-tab="symbol" data-i18n="tab.symbol">Symbol</button>
@@ -699,7 +700,7 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const I18N={
 de:{
  'app.sub':'Favicons, Manifest und Head-Snippet aus einem Symbol',
- 'import.title':'Vorhandenes Manifest korrigieren','import.drop':'site.webmanifest hierher ziehen oder auswählen','import.sub':'Name, Beschreibung, Farben und vorhandene Icons übernehmen','import.hint':'Danach die richtige Tool-Adresse eintragen und das Manifest einzeln herunterladen. Andere Felder bleiben erhalten.','import.reset':'Import zurücksetzen',
+ 'import.title':'Vorhandenes Manifest korrigieren','import.drop':'site.webmanifest hierher ziehen oder auswählen','import.sub':'Name, Beschreibung, Farben und vorhandene Icons übernehmen','import.hint':'Danach die richtige Tool-Adresse eintragen und das Manifest einzeln herunterladen. Andere Felder bleiben erhalten.','import.reset':'Import zurücksetzen','btn.newProject':'↺ Neues Projekt / Alles zurücksetzen',
   'tab.symbol':'Symbol','tab.colors':'Farben','tab.shape':'Form','tab.out':'Ausgabe',
  'f.zipName':'Dateiname','ph.zipName':'wird aus dem Kurznamen gebildet',
  'zip.count':'{n} Dateien','t.zipNamed':'{f} erstellt',
@@ -769,7 +770,7 @@ de:{
 },
 en:{
  'app.sub':'Favicons, manifest and head snippet from one symbol',
- 'import.title':'Fix existing manifest','import.drop':'Drop or select site.webmanifest','import.sub':'Import name, description, colors and existing icons','import.hint':'Enter the correct app URL below, then download the corrected manifest. Other fields are preserved.','import.reset':'Clear import',
+ 'import.title':'Fix existing manifest','import.drop':'Drop or select site.webmanifest','import.sub':'Import name, description, colors and existing icons','import.hint':'Enter the correct app URL below, then download the corrected manifest. Other fields are preserved.','import.reset':'Clear import','btn.newProject':'↺ New project / Reset all',
   'tab.symbol':'Symbol','tab.colors':'Colours','tab.shape':'Shape','tab.out':'Output',
  'f.zipName':'File name','ph.zipName':'derived from the short name',
  'zip.count':'{n} files','t.zipNamed':'{f} created',
@@ -1332,6 +1333,11 @@ function loadFile(file){
     img.onload=async()=>{
       if(!img.naturalWidth||!img.naturalHeight){toast(T('t.readFail'));return}
       src=img;
+      // A new image starts a new icon-set: never silently reuse an imported manifest.
+      if(importedManifest){
+        importedManifest=null; $('#manifestFile').value=''; $('#manifestReset').hidden=true;
+        $('#manifestImportInfo').textContent=lang==='de'?'Altes Manifest beim Bildwechsel entfernt.':'Previous manifest cleared when image changed.';
+      }
       let info=T('src.info',{name:file.name,w:img.naturalWidth,h:img.naturalHeight});
       if(Math.abs(img.naturalWidth-img.naturalHeight)>2) info+=T('src.nonsquare');
       if(srcIsSvg) info+=T('src.svg');
@@ -1642,7 +1648,7 @@ $('#file').onchange=e=>{if(e.target.files[0])loadFile(e.target.files[0])};
 ['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.add('drag')}));
 ['dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{
   e.preventDefault();
-  if(ev==='drop'&&e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  if(ev==='drop'&&e.dataTransfer.files[0]&&e.dataTransfer.files[0].type.startsWith('image/')) loadFile(e.dataTransfer.files[0]);
   $('#drop').classList.remove('drag');
 }));
 
@@ -1729,6 +1735,26 @@ $('#manifestReset').onclick=()=>{
   importedManifest=null;$('#manifestFile').value='';$('#manifestReset').hidden=true;
   $('#manifestImportInfo').textContent=lang==='de'?'Import zurückgesetzt.':'Import cleared.';
   refreshText();
+};
+$('#newProjectBtn').onclick=()=>{
+  if(!confirm(lang==='de'?'Neues Projekt starten? Bild, importiertes Manifest und alle Projekteinstellungen werden zurückgesetzt.':'Start a new project? This clears the image, imported manifest and all project settings.')) return;
+  importedManifest=null;
+  src=null;srcIsSvg=false;srcSvgText=null;srcName='';files={};lastDefs=[];
+  $('#file').value='';$('#manifestFile').value='';$('#manifestReset').hidden=true;
+  $('#manifestImportInfo').textContent=T('import.hint');
+  $('#appName').value='Mein Tool';$('#shortName').value='Tool';$('#appDesc').value='';
+  $('#siteUrl').value='https://kaffeetrinker80.github.io/';$('#zipName').value='';
+  $('#displayMode').value='standalone';$('#orientMode').value='any';
+  $('#pathMode').value='rel';$('#scopePath').value='/';
+  $('#optSvg').checked=true;$('#optOg').checked=true;$('#optApple').checked=false;
+  $('#optTile').checked=false;$('#optReadme').checked=true;
+  $('#optOpaque').checked=false;$('#optDarkTheme').checked=false;
+  [['theme','#172f4d'],['themeDark','#12151a'],['bg','#f3f6fa'],['pad','#172f4d']].forEach(([k,v])=>setColor(k,v));
+  [['padPct','#padRange','#padVal',8],['maskPct','#maskRange','#maskVal',22],['radPct','#radRange','#radVal',0]].forEach(([k,r,o,v])=>{state[k]=v;$(r).value=v;$(o).textContent=v+' %'});
+  $('#srcInfo').textContent=T('src.none');$('#themeSw').innerHTML='';$('#bgSw').innerHTML='';
+  $('#previews').innerHTML='';$('#previews').hidden=true;$('#pvEmpty').hidden=false;
+  renderFileList();showTab('symbol');refreshText();
+  toast(lang==='de'?'Neues Projekt bereit.':'New project ready.');
 };
 $('#manifestDownload').onclick=()=>{
   if(!appPaths().valid) return;
