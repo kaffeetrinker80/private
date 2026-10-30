@@ -1,7 +1,7 @@
 {
   "name": "TalkScroll Teleprompter",
   "short_name": "TalkScroll",
-  "start_url": "./index.html",
+  "start_url": "/private/talkscroll/",
   "display": "standalone",
   "background_color": "#f3f6fa",
   "theme_color": "#172f4d",
@@ -22,5 +22,9 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "description": "Telepromter for smart devices.",
+  "id": "/private/talkscroll/",
+  "scope": "/private/talkscroll/",
+  "orientation": "any"
 }
