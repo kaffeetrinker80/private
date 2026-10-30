@@ -315,7 +315,7 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
 <header>
   <div class="mark" aria-hidden="true"><span class="m-ring"></span><span class="m-ring r2"></span><span class="m-core"></span></div>
   <div>
-    <div class="htitle">Icon Set Studio <span class="pill">v1.4</span></div>
+    <div class="htitle">Icon Set Studio <span class="pill">v1.5</span></div>
     <div class="hsub" data-i18n="app.sub">Favicons, Manifest und Head-Snippet aus einem Symbol</div>
   </div>
   <div class="hspace"></div>
@@ -367,6 +367,16 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
       </button>
       <input type="file" id="file" accept="image/*" hidden>
       <p class="hint" id="srcInfo" data-i18n="src.none">Am besten mindestens 512×512 px. SVG wird verlustfrei hochskaliert.</p>
+    </div>
+    <div class="card sect" id="manifestImportCard">
+      <h3 class="eyebrow" style="cursor:default"><span data-i18n="import.title">Vorhandenes Manifest korrigieren</span></h3>
+      <button class="drop" id="manifestDrop" type="button">
+        <b data-i18n="import.drop">site.webmanifest hierher ziehen oder auswählen</b>
+        <span data-i18n="import.sub">Name, Beschreibung, Farben und vorhandene Icons übernehmen</span>
+      </button>
+      <input type="file" id="manifestFile" accept=".webmanifest,.json,application/manifest+json,application/json" hidden>
+      <p class="hint" id="manifestImportInfo" data-i18n="import.hint">Danach unten die richtige Tool-Adresse eintragen und nur das korrigierte Manifest herunterladen. Andere Felder bleiben erhalten.</p>
+      <button type="button" class="btn sm" id="manifestReset" hidden style="margin-top:9px" data-i18n="import.reset">Import zurücksetzen</button>
     </div>
     <div class="card sect">
       <h3 class="eyebrow"><span data-i18n="h.project">Projekt</span></h3>
@@ -678,7 +688,7 @@ textarea.css-in{width:100%;min-height:110px;border:1px solid var(--line);border-
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>Made with Love © – Icon Set Studio V 1.4</footer>
+<footer>Made with Love © – Icon Set Studio V 1.5</footer>
 
 <script>
 (()=>{
@@ -689,7 +699,8 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const I18N={
 de:{
  'app.sub':'Favicons, Manifest und Head-Snippet aus einem Symbol',
- 'tab.symbol':'Symbol','tab.colors':'Farben','tab.shape':'Form','tab.out':'Ausgabe',
+ 'import.title':'Vorhandenes Manifest korrigieren','import.drop':'site.webmanifest hierher ziehen oder auswählen','import.sub':'Name, Beschreibung, Farben und vorhandene Icons übernehmen','import.hint':'Danach die richtige Tool-Adresse eintragen und das Manifest einzeln herunterladen. Andere Felder bleiben erhalten.','import.reset':'Import zurücksetzen',
+  'tab.symbol':'Symbol','tab.colors':'Farben','tab.shape':'Form','tab.out':'Ausgabe',
  'f.zipName':'Dateiname','ph.zipName':'wird aus dem Kurznamen gebildet',
  'zip.count':'{n} Dateien','t.zipNamed':'{f} erstellt',
  'btn.theme':'Hell / Dunkel','btn.help':'Hilfe','btn.copy':'Kopieren','btn.zip':'Icon-Set als ZIP laden',
@@ -758,7 +769,8 @@ de:{
 },
 en:{
  'app.sub':'Favicons, manifest and head snippet from one symbol',
- 'tab.symbol':'Symbol','tab.colors':'Colours','tab.shape':'Shape','tab.out':'Output',
+ 'import.title':'Fix existing manifest','import.drop':'Drop or select site.webmanifest','import.sub':'Import name, description, colors and existing icons','import.hint':'Enter the correct app URL below, then download the corrected manifest. Other fields are preserved.','import.reset':'Clear import',
+  'tab.symbol':'Symbol','tab.colors':'Colours','tab.shape':'Shape','tab.out':'Output',
  'f.zipName':'File name','ph.zipName':'derived from the short name',
  'zip.count':'{n} files','t.zipNamed':'{f} created',
  'btn.theme':'Light / dark','btn.help':'Help','btn.copy':'Copy','btn.zip':'Download icon set as ZIP',
@@ -1136,15 +1148,17 @@ function appPaths(){
     return {valid:false,path:'',full:''};
   }
 }
+let importedManifest=null;
 function manifestText(){
   const paths=appPaths();
   const sp=paths.valid?paths.path:'/';
   const m={
+    ...(importedManifest ? structuredClone(importedManifest) : {}),
     name:$('#appName').value||'Tool',
     short_name:$('#shortName').value||'Tool'
   };
   const desc=$('#appDesc').value.trim();
-  if(desc) m.description=desc;
+  if(desc) m.description=desc; else delete m.description;
   m.id=sp;
   m.start_url=sp;
   m.scope=sp;
@@ -1152,11 +1166,13 @@ function manifestText(){
   m.orientation=$('#orientMode').value;
   m.background_color=state.bg;
   m.theme_color=state.theme;
-  m.icons=[
-    {src:iconHref('android-chrome-192x192.png'),sizes:'192x192',type:'image/png',purpose:'any'},
-    {src:iconHref('android-chrome-512x512.png'),sizes:'512x512',type:'image/png',purpose:'any'},
-    {src:iconHref('android-chrome-512x512-maskable.png'),sizes:'512x512',type:'image/png',purpose:'maskable'}
-  ];
+  if(!importedManifest || !Array.isArray(importedManifest.icons) || !importedManifest.icons.length){
+    m.icons=[
+      {src:iconHref('android-chrome-192x192.png'),sizes:'192x192',type:'image/png',purpose:'any'},
+      {src:iconHref('android-chrome-512x512.png'),sizes:'512x512',type:'image/png',purpose:'any'},
+      {src:iconHref('android-chrome-512x512-maskable.png'),sizes:'512x512',type:'image/png',purpose:'maskable'}
+    ];
+  }
   return JSON.stringify(m,null,2);
 }
 function browserConfigText(){
@@ -1677,6 +1693,43 @@ function zipFileName(){
   const base=slug($('#shortName').value)||slug($('#appName').value)||'icons';
   return base+'-iconset.zip';
 }
+// Import: bestehendes Manifest bleibt die Vorlage, nur die App-Pfade werden korrigiert.
+function importManifest(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const m=JSON.parse(String(reader.result).replace(/^\uFEFF/,''));
+      if(!m || Array.isArray(m) || typeof m!=='object') throw Error('Not an object');
+      importedManifest=m;
+      // Keine voreingestellte Root-URL versehentlich in importierte Manifeste schreiben.
+      $('#siteUrl').value='';
+      $('#appName').value=m.name||'Mein Tool';
+      $('#shortName').value=m.short_name||m.name||'Tool';
+      $('#appDesc').value=m.description||'';
+      if(['standalone','minimal-ui','fullscreen','browser'].includes(m.display)) $('#displayMode').value=m.display;
+      if(['any','portrait','landscape'].includes(m.orientation)) $('#orientMode').value=m.orientation;
+      if(m.theme_color && clean(m.theme_color)) setColor('theme',m.theme_color);
+      if(m.background_color && clean(m.background_color)) setColor('bg',m.background_color);
+      $('#manifestImportInfo').textContent=(lang==='de'?'✓ Geladen: ':'✓ Loaded: ')+file.name+' · '+(lang==='de'?'Tool-Adresse unten prüfen.':'Check app URL below.');
+      $('#manifestReset').hidden=false;
+      refreshText();
+    }catch(e){
+      $('#manifestImportInfo').textContent=lang==='de'?'⚠ Ungültige Manifest-Datei (JSON).':'⚠ Invalid manifest JSON.';
+    }
+  };
+  reader.readAsText(file);
+}
+$('#manifestDrop').onclick=()=>$('#manifestFile').click();
+$('#manifestFile').onchange=e=>importManifest(e.target.files[0]);
+$('#manifestDrop').ondragover=e=>{e.preventDefault();$('#manifestDrop').classList.add('drag')};
+$('#manifestDrop').ondragleave=()=>$('#manifestDrop').classList.remove('drag');
+$('#manifestDrop').ondrop=e=>{e.preventDefault();$('#manifestDrop').classList.remove('drag');importManifest(e.dataTransfer.files[0])};
+$('#manifestReset').onclick=()=>{
+  importedManifest=null;$('#manifestFile').value='';$('#manifestReset').hidden=true;
+  $('#manifestImportInfo').textContent=lang==='de'?'Import zurückgesetzt.':'Import cleared.';
+  refreshText();
+};
 $('#manifestDownload').onclick=()=>{
   if(!appPaths().valid) return;
   const blob=new Blob([manifestText()],{type:'application/manifest+json;charset=utf-8'});
