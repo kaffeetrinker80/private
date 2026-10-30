@@ -1,9 +1,9 @@
 {
   "name": "Icon Set Studio",
-  "short_name": "Icon-Set",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
+  "short_name": "Icon-Set Studio",
+  "id": "/private/iconset-studio/",
+  "start_url": "/private/iconset-studio/",
+  "scope": "/private/iconset-studio/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f3f6fa",
@@ -27,5 +27,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "description": "Create Fav-Icons, Head-Snippet and Manifest files for websites."
 }
