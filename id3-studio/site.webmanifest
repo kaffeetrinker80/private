@@ -1,13 +1,13 @@
 {
   "name": "ID3 Studio",
-  "short_name": "ID3 Tag",
-  "description": "Edit your mp3 tags on the fly",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
+  "short_name": "ID3 Studio",
+  "description": "ID3-Tags und Metadaten von Audiodateien direkt im Browser bearbeiten — inklusive Cover und wichtiger Tag-Informationen.",
+  "id": "/private/id3-studio/",
+  "start_url": "/private/id3-studio/",
+  "scope": "/private/id3-studio/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#191331",
+  "background_color": "#f3f6fa",
   "theme_color": "#172f4d",
   "icons": [
     {
