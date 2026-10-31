@@ -1,7 +1,7 @@
 {
   "name": "Contact Hub pro",
   "short_name": "Contact Hub",
-  "start_url": "./index.html",
+  "start_url": "/private/contact-hub-pro/",
   "display": "standalone",
   "background_color": "#f3f6fa",
   "theme_color": "#172f4d",
@@ -22,5 +22,9 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "description": "Personal contact manager with message composer, templates, and WhatsApp integration — built for quick, personalized outreach.",
+  "id": "/private/contact-hub-pro/",
+  "scope": "/private/contact-hub-pro/",
+  "orientation": "any"
 }
