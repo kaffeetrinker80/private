@@ -1,7 +1,7 @@
 {
   "name": "Audio Patchbay",
-  "short_name": "Patchbay",
-  "start_url": "./index.html",
+  "short_name": "Audio Patchbay",
+  "start_url": "/private/patchbay/",
   "display": "standalone",
   "background_color": "#f3f6fa",
   "theme_color": "#172f4d",
@@ -22,5 +22,9 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "description": "Lokaler Audio-Konverter mit Transkript-Funktion — Audiodateien schnell umwandeln, bearbeiten und Text daraus extrahieren.",
+  "id": "/private/patchbay/",
+  "scope": "/private/patchbay/",
+  "orientation": "any"
 }
