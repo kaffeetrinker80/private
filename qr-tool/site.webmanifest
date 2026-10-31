@@ -1,7 +1,7 @@
 {
   "name": "QR-Code Tool",
   "short_name": "QR Tool",
-  "start_url": "./index.html",
+  "start_url": "/private/qr-tool/",
   "display": "standalone",
   "background_color": "#f3f6fa",
   "theme_color": "#172f4d",
@@ -22,5 +22,9 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "description": "QR-Codes für den Alltag erstellen, anpassen und exportieren — zum Beispiel für WLAN, vCards, IBAN und mehr.",
+  "id": "/private/qr-tool/",
+  "scope": "/private/qr-tool/",
+  "orientation": "any"
 }
