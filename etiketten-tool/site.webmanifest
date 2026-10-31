@@ -1,7 +1,7 @@
 {
   "name": "Etiketten-Tool",
-  "short_name": "Etiketten easy",
-  "start_url": "./index.html",
+  "short_name": "Etiketten-Tool",
+  "start_url": "/private/etiketten-tool/",
   "display": "standalone",
   "background_color": "#f3f6fa",
   "theme_color": "#172f4d",
@@ -22,5 +22,9 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "description": "Schneller, druckfertiger Etiketten-Generator für Haushalt, Organisation und alles, was eine klare Beschriftung braucht.",
+  "id": "/private/etiketten-tool/",
+  "scope": "/private/etiketten-tool/",
+  "orientation": "any"
 }
