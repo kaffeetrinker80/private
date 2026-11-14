@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!-- Icons + Manifest -->
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
@@ -12,8 +14,6 @@
 
 <meta name="theme-color" content="#172f4d">
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Etiketten & Badgecard Tool</title>
   <style>
     :root{
@@ -257,6 +257,24 @@
     .item-row input,.item-row textarea{padding:7px 8px;border-radius:9px}
     .item-row textarea{min-height:44px}
 
+    .rich-edit-btn{width:100%;margin:9px 0;background:#dff0fa;color:#14324d;border:1px solid #b9d5e6;text-align:left}
+    .rich-modal[hidden],.selection-toolbar[hidden]{display:none!important}
+    .rich-modal{position:fixed;inset:0;background:rgba(10,24,42,.68);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+    .rich-dialog{width:min(900px,100%);max-height:94vh;display:flex;flex-direction:column;background:white;border-radius:18px;box-shadow:0 28px 85px rgba(0,0,0,.35);overflow:hidden}
+    .rich-header{display:flex;justify-content:space-between;align-items:center;padding:16px 19px;border-bottom:1px solid var(--line);gap:12px}
+    .rich-header h2{margin:0;font-size:1.1rem}
+    .rich-actions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;background:#f5f8fc;border-bottom:1px solid var(--line);align-items:center}
+    .rich-actions button,.selection-toolbar button{padding:7px 10px;border-radius:8px;min-width:34px}
+    .rich-actions select{width:auto;padding:7px}
+    .rich-body{padding:16px 20px;overflow:auto;min-height:180px}
+    .rich-editor{min-height:240px;border:1px solid #b6c7d8;border-radius:12px;padding:18px;outline:none;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.35;background:#fff}
+    .rich-editor:focus{box-shadow:0 0 0 3px rgba(31,95,139,.13);border-color:#1f5f8b}
+    .rich-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+    .selection-toolbar{position:fixed;z-index:1010;background:#172f4d;padding:5px;border-radius:10px;display:flex;gap:4px;box-shadow:0 9px 20px #0004}
+    .selection-toolbar button{color:white;background:transparent}
+    .selection-toolbar button:hover{background:#355877}
+    .rich-editor .badge-headline{display:block}
+    .rich-editor .badge-subline{display:block;margin-top:8px}
     .advanced-box{display:none}
     .advanced-box.show{display:block}
 
@@ -570,6 +588,7 @@
         <input id="headline" type="text">
         <label>Text darunter</label>
         <textarea id="subline"></textarea>
+        <button id="editSameRich" class="rich-edit-btn" type="button">✎ Text frei gestalten · Fett, Kursiv, Unterstrichen …</button>
         <label>Anzahl</label>
         <input id="mainQty" type="number" min="1" step="1">
       </div>
@@ -654,6 +673,7 @@
       <input id="backHeadline" type="text">
       <label>Rückseite Text</label>
       <textarea id="backSubline"></textarea>
+      <button id="editBackRich" class="rich-edit-btn" type="button">✎ Rückseite frei gestalten</button>
       <div class="grid2">
         <div><label>Rückseite Überschrift Größe</label><input id="backHeadlineSize" type="number" min="6" max="72" step="1"></div>
         <div><label>Rückseite Text Größe</label><input id="backSublineSize" type="number" min="6" max="72" step="1"></div>
@@ -692,12 +712,40 @@
   </section>
 </main>
 
+<div id="richModal" class="rich-modal" hidden>
+  <div class="rich-dialog" role="dialog" aria-modal="true" aria-labelledby="richTitle">
+    <div class="rich-header"><h2 id="richTitle">Text gestalten</h2><button id="richClose" type="button" title="Schließen">✕</button></div>
+    <div class="rich-actions" id="richActions">
+      <button type="button" data-command="bold" title="Fett (Strg+B)"><b>F</b></button>
+      <button type="button" data-command="italic" title="Kursiv (Strg+I)"><i>K</i></button>
+      <button type="button" data-command="underline" title="Unterstrichen (Strg+U)"><u>U</u></button>
+      <button type="button" data-command="strikeThrough" title="Durchgestrichen"><s>S</s></button>
+      <button type="button" data-command="removeFormat" title="Formatierung entfernen">Tx</button>
+      <span style="border-left:1px solid #cbd5e1;height:24px;margin:0 5px"></span>
+      <select id="richSize" aria-label="Schriftgröße"><option value="">Schriftgröße</option><option value="1">Sehr klein</option><option value="2">Klein</option><option value="3">Normal</option><option value="4">Mittel</option><option value="5">Groß</option><option value="6">Sehr groß</option><option value="7">Extra groß</option></select>
+      <input id="richColor" type="color" title="Textfarbe" aria-label="Textfarbe" value="#172033" style="width:42px;height:35px;padding:3px">
+      <button type="button" data-command="justifyLeft" title="Linksbündig">☷</button>
+      <button type="button" data-command="justifyCenter" title="Zentriert">≡</button>
+      <button type="button" data-command="justifyRight" title="Rechtsbündig">☰</button>
+      <button type="button" data-command="undo" title="Rückgängig">↶</button>
+      <button type="button" data-command="redo" title="Wiederholen">↷</button>
+    </div>
+    <div class="rich-body"><div id="richEditor" class="rich-editor" contenteditable="true" role="textbox" aria-label="Badge-Text bearbeiten" aria-multiline="true"></div>
+      <div class="help">Text markieren und die schwebende Leiste oder die obere Werkzeugleiste verwenden. Strg+B / Strg+I / Strg+U funktionieren ebenfalls. Änderungen werden erst mit „Übernehmen“ gespeichert.</div>
+    </div>
+    <div class="rich-footer"><button id="richReset" class="ghost" type="button">Standardtext wiederherstellen</button><div class="btn-row" style="margin:0"><button id="richCancel" class="ghost" type="button">Abbrechen</button><button id="richSave" class="primary" type="button">Übernehmen</button></div></div>
+  </div>
+</div>
+<div id="selectionToolbar" class="selection-toolbar" hidden>
+  <button type="button" data-command="bold" title="Fett"><b>F</b></button><button type="button" data-command="italic" title="Kursiv"><i>K</i></button><button type="button" data-command="underline" title="Unterstrichen"><u>U</u></button><button type="button" data-command="removeFormat" title="Format entfernen">Tx</button>
+</div>
+
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <span class="site-footer-version">Etiketten & Badgecard Tool · V1.5.0</span>
+    <span class="site-footer-version">Etiketten & Badgecard Tool · V1.6.0</span>
     <span class="site-footer-sep">·</span>
     <span>Made with Love ©</span>
-    <a class="site-footer-feedback" href="mailto:cryptopower@outlook.de?subject=Feedback%3A%20Etiketten%20%26%20Badgecard%20Tool%20V1.5.0">✉ Feedback</a>
+    <a class="site-footer-feedback" href="mailto:cryptopower@outlook.de?subject=Feedback%3A%20Etiketten%20%26%20Badgecard%20Tool%20V1.6.0">✉ Feedback</a>
   </div>
 </footer>
 
@@ -705,7 +753,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '1.5.0';
+  const VERSION = '1.6.0';
 
   const PRESETS = {
     half:{name:'A4 halbseitig – 2 Etiketten, 210 × 148,5 mm',cols:1,rows:2,labelW:210,labelH:148.5,gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},
@@ -730,6 +778,7 @@
     editMode:'same',
     headline:'BEISPIELTITEL',
     subline:'Untertitel',
+    richHtml:'',
     mainQty:8,
     items:[
       {headline:'ATTENDANT',subline:'Entrance A',qty:2,html:''},
@@ -743,6 +792,7 @@
     duplexMode:'interleaved',
     backHeadline:'Bitte sichtbar tragen',
     backSubline:'Thank you for serving',
+    backHtml:'',
     backStyle:{headlineSize:16,sublineSize:11},
     advanced:false,
     advancedHtml:'',
@@ -849,6 +899,8 @@
         html:item.html || ''
       };
     }) : copy(DEFAULT_STATE.items);
+    fresh.richHtml = typeof imported.richHtml === 'string' ? imported.richHtml : '';
+    fresh.backHtml = typeof imported.backHtml === 'string' ? imported.backHtml : '';
     fresh.mainQty = Math.max(1, Number(fresh.mainQty) || 1);
     if(!PRESETS[fresh.preset]) fresh.preset = 'custom';
     return fresh;
@@ -958,7 +1010,7 @@
       headline.placeholder = 'Überschrift';
       headline.value = item.headline || '';
       headline.addEventListener('input', function(){
-        state.items[index].headline = headline.value;
+        state.items[index].headline = headline.value; state.items[index].html = '';
         renderPreview();
       });
 
@@ -992,13 +1044,18 @@
       subline.placeholder = 'Details';
       subline.value = item.subline || '';
       subline.addEventListener('input', function(){
-        state.items[index].subline = subline.value;
+        state.items[index].subline = subline.value; state.items[index].html = '';
         renderPreview();
       });
 
       box.appendChild(top);
       box.appendChild(label);
       box.appendChild(subline);
+      const richBtn = document.createElement('button');
+      richBtn.type = 'button'; richBtn.className = 'mini rich-edit-btn';
+      richBtn.textContent = item.html ? '✎ Formatierung bearbeiten ✓' : '✎ Text frei gestalten';
+      richBtn.addEventListener('click', function(){ openRich('item',index); });
+      box.appendChild(richBtn);
       el.itemsList.appendChild(box);
     });
   }
@@ -1006,7 +1063,7 @@
   function collectEntries(front){
     if(front === false && state.enableBack){
       return collectEntries(true).map(function(){
-        return {headline:state.backHeadline, subline:state.backSubline, html:'', back:true};
+        return {headline:state.backHeadline, subline:state.backSubline, html:state.backHtml || '', back:true};
       });
     }
 
@@ -1014,7 +1071,7 @@
       const qty = Math.max(1, Number(state.mainQty) || 1);
       const arr = [];
       for(let i=0;i<qty;i++){
-        arr.push({headline:state.headline, subline:state.subline, html:state.advanced ? state.advancedHtml : ''});
+        arr.push({headline:state.headline, subline:state.subline, html:state.advanced ? state.advancedHtml : (state.richHtml || '')});
       }
       return arr;
     }
@@ -1188,7 +1245,7 @@
   function safeHtml(input){
     const template = document.createElement('template');
     template.innerHTML = String(input || '').replace(/\n/g,'<br>');
-    const allowedTags = new Set(['B','STRONG','I','EM','U','BR','SPAN','DIV','SMALL']);
+    const allowedTags = new Set(['B','STRONG','I','EM','U','S','STRIKE','BR','SPAN','DIV','P','SMALL','FONT']);
     const allowedStyles = new Set(['font-size','font-weight','font-style','text-decoration','color','line-height','letter-spacing','text-align']);
 
     function clean(node){
@@ -1199,7 +1256,7 @@
             return;
           }
           Array.from(child.attributes).forEach(function(attr){
-            if(attr.name.toLowerCase() !== 'style') child.removeAttribute(attr.name);
+            if(attr.name.toLowerCase() !== 'style' && !(attr.name.toLowerCase() === 'class' && ['badge-headline','badge-subline'].includes(attr.value)) && !(child.tagName === 'FONT' && ['color','size'].includes(attr.name.toLowerCase()) && /^(#[0-9a-f]{3,8}|[a-z]+|[1-7])$/i.test(attr.value))) child.removeAttribute(attr.name);
           });
           if(child.hasAttribute('style')){
             const cleanRules = [];
@@ -1232,6 +1289,7 @@
     }else{
       state.items.push({headline:split.headline, subline:split.subline, qty:1, html:''});
     }
+    if(state.editMode === 'same') state.richHtml = '';
     el.smartPaste.value = '';
     syncForm();
   }
@@ -1246,6 +1304,123 @@
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  }
+
+  let richTarget = null;
+  let richLastSelection = null;
+
+  function sourceHtml(headline, subline){
+    return '<span class="badge-headline">' + escapeHtml(headline || '') + '</span>' +
+      (subline ? '<span class="badge-subline">' + escapeHtml(subline).replace(/\n/g,'<br>') + '</span>' : '');
+  }
+
+  function richInfo(){
+    if(!richTarget) return null;
+    if(richTarget.kind === 'item') return state.items[richTarget.index];
+    if(richTarget.kind === 'back') return {headline:state.backHeadline,subline:state.backSubline,html:state.backHtml};
+    return {headline:state.headline,subline:state.subline,html:state.richHtml || (state.advanced ? state.advancedHtml : '')};
+  }
+
+  function openRich(kind,index){
+    richTarget = {kind:kind,index:index};
+    const info = richInfo();
+    if(!info) return;
+    byId('richTitle').textContent = kind === 'back' ? 'Rückseite gestalten' : kind === 'item' ? 'Eintrag ' + (index + 1) + ' gestalten' : 'Badge-Text gestalten';
+    byId('richEditor').innerHTML = safeHtml(info.html || sourceHtml(info.headline, info.subline));
+    byId('richModal').hidden = false;
+    byId('selectionToolbar').hidden = true;
+    byId('richEditor').focus();
+  }
+
+  function closeRich(){
+    byId('richModal').hidden = true;
+    byId('selectionToolbar').hidden = true;
+    richLastSelection = null;
+    richTarget = null;
+  }
+
+  function saveRich(){
+    if(!richTarget) return;
+    const html = safeHtml(byId('richEditor').innerHTML);
+    if(richTarget.kind === 'item') state.items[richTarget.index].html = html;
+    else if(richTarget.kind === 'back') state.backHtml = html;
+    else {
+      state.richHtml = html;
+      state.advanced = false;
+    }
+    closeRich();
+    syncForm();
+  }
+
+  function selectionInsideRich(){
+    const sel = window.getSelection();
+    if(!sel || !sel.rangeCount) return false;
+    return byId('richEditor').contains(sel.getRangeAt(0).commonAncestorContainer);
+  }
+
+  function updateSelectionToolbar(){
+    const bar = byId('selectionToolbar');
+    const sel = window.getSelection();
+    if(byId('richModal').hidden || !selectionInsideRich() || !sel || sel.isCollapsed || !sel.toString().trim()){
+      bar.hidden = true;
+      return;
+    }
+    richLastSelection = sel.getRangeAt(0).cloneRange();
+    const rect = richLastSelection.getBoundingClientRect();
+    if(rect.width === 0 && rect.height === 0){bar.hidden=true;return;}
+    bar.hidden = false;
+    const top = Math.max(7,rect.top - bar.offsetHeight - 9);
+    const left = Math.max(7,Math.min(window.innerWidth - bar.offsetWidth - 7,rect.left + rect.width/2 - bar.offsetWidth/2));
+    bar.style.top = top + 'px';bar.style.left = left + 'px';
+  }
+
+  function richCommand(command,value){
+    const editor = byId('richEditor');
+    editor.focus();
+    if(richLastSelection){
+      const sel = window.getSelection();
+      sel.removeAllRanges();sel.addRange(richLastSelection);
+    }
+    document.execCommand(command,false,value || null);
+    richLastSelection = null;
+    updateSelectionToolbar();
+  }
+
+  function initRichEditor(){
+    byId('editSameRich').addEventListener('click',function(){openRich('same');});
+    byId('editBackRich').addEventListener('click',function(){openRich('back');});
+    byId('richClose').addEventListener('click',closeRich);
+    byId('richCancel').addEventListener('click',closeRich);
+    byId('richSave').addEventListener('click',saveRich);
+    byId('richReset').addEventListener('click',function(){
+      const info=richInfo(); if(!info)return;
+      byId('richEditor').innerHTML=sourceHtml(info.headline,info.subline);
+      byId('selectionToolbar').hidden=true;
+      byId('richEditor').focus();
+    });
+    byId('richModal').addEventListener('mousedown',function(event){
+      if(event.target === this) closeRich();
+    });
+    document.addEventListener('keydown',function(event){
+      if(event.key === 'Escape' && !byId('richModal').hidden){closeRich();event.preventDefault();}
+    });
+    document.querySelectorAll('#richActions [data-command],#selectionToolbar [data-command]').forEach(function(button){
+      button.addEventListener('mousedown',function(event){event.preventDefault();});
+      button.addEventListener('click',function(){richCommand(button.dataset.command);});
+    });
+    byId('richSize').addEventListener('change',function(){if(this.value)richCommand('fontSize',this.value);this.value='';});
+    byId('richColor').addEventListener('input',function(){richCommand('foreColor',this.value);});
+    byId('richEditor').addEventListener('mouseup',function(){requestAnimationFrame(updateSelectionToolbar);});
+    byId('richEditor').addEventListener('keyup',function(){requestAnimationFrame(updateSelectionToolbar);});
+    byId('richEditor').addEventListener('input',function(){byId('selectionToolbar').hidden=true;});
+    byId('richEditor').addEventListener('paste',function(event){
+      event.preventDefault();
+      const text = event.clipboardData.getData('text/plain');
+      document.execCommand('insertText',false,text);
+    });
+    document.addEventListener('selectionchange',function(){
+      if(!byId('richModal').hidden) requestAnimationFrame(updateSelectionToolbar);
+    });
   }
 
   function wireEvents(){
@@ -1288,8 +1463,8 @@
     el.zoomFit.addEventListener('click', fitZoom);
 
     el.editMode.addEventListener('change', function(){ state.editMode = el.editMode.value; syncForm(); });
-    el.headline.addEventListener('input', function(){ state.headline = el.headline.value; renderPreview(); });
-    el.subline.addEventListener('input', function(){ state.subline = el.subline.value; renderPreview(); });
+    el.headline.addEventListener('input', function(){ state.headline = el.headline.value; state.richHtml = ''; renderPreview(); });
+    el.subline.addEventListener('input', function(){ state.subline = el.subline.value; state.richHtml = ''; renderPreview(); });
     el.mainQty.addEventListener('input', function(){ state.mainQty = Math.max(1, Number(el.mainQty.value) || 1); renderPreview(); });
 
     el.fontFamily.addEventListener('change', function(){ state.style.fontFamily = el.fontFamily.value; renderPreview(); });
@@ -1327,8 +1502,8 @@
 
     el.enableBack.addEventListener('change', function(){ state.enableBack = el.enableBack.checked; syncForm(); });
     el.duplexMode.addEventListener('change', function(){ state.duplexMode = el.duplexMode.value; renderPreview(); });
-    el.backHeadline.addEventListener('input', function(){ state.backHeadline = el.backHeadline.value; renderPreview(); });
-    el.backSubline.addEventListener('input', function(){ state.backSubline = el.backSubline.value; renderPreview(); });
+    el.backHeadline.addEventListener('input', function(){ state.backHeadline = el.backHeadline.value; state.backHtml = ''; renderPreview(); });
+    el.backSubline.addEventListener('input', function(){ state.backSubline = el.backSubline.value; state.backHtml = ''; renderPreview(); });
     el.backHeadlineSize.addEventListener('input', function(){ state.backStyle.headlineSize = Math.max(6, Number(el.backHeadlineSize.value) || 16); renderPreview(); });
     el.backSublineSize.addEventListener('input', function(){ state.backStyle.sublineSize = Math.max(6, Number(el.backSublineSize.value) || 11); renderPreview(); });
 
@@ -1353,7 +1528,7 @@
     byId('exportBtn').addEventListener('click', function(){
       state.version = VERSION;
       const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-      downloadJson('etiketten_tool_backup_v1-5-0_' + stamp + '.json', state);
+      downloadJson('etiketten_tool_backup_v1-6-0_' + stamp + '.json', state);
     });
 
     byId('importBtn').addEventListener('click', function(){ el.importFile.click(); });
@@ -1385,6 +1560,7 @@
       initPresets();
       state = copy(DEFAULT_STATE);
       wireEvents();
+      initRichEditor();
       syncForm();
     }catch(error){
       console.error(error);
