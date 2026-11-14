@@ -22,7 +22,9 @@
       --line:#d7dee8;
       --accent:#1f5f8b;
       --accent-dark:#14324d;
+      --navy:#0f2338;
       --green:#0f766e;
+      --mint:#5eead4;
       --danger:#b91c1c;
       --danger-bg:#fee2e2;
       --shadow:0 12px 34px rgba(15,23,42,.12);
@@ -30,6 +32,7 @@
       --page-w:210mm;
       --page-h:297mm;
       --zoom:1;
+      --header-h:84px;
     }
 
     *{box-sizing:border-box}
@@ -39,53 +42,116 @@
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
       color:var(--ink);
       background:radial-gradient(circle at top left,rgba(31,95,139,.18),transparent 32%),linear-gradient(135deg,#eef4fa,#f8fafc 45%,#e8f3f0);
+      min-height:100vh;
     }
+    body.modal-open{overflow:hidden}
 
-    header{
-      max-width:1480px;
-      margin:0 auto;
-      padding:18px 18px 10px;
+    /* ---------- Header ---------- */
+    .app-header{
+      position:sticky;
+      top:0;
+      z-index:60;
+      padding:12px 18px 0;
+      background:linear-gradient(to bottom,rgba(238,244,250,.96) 70%,rgba(238,244,250,0));
     }
 
     .hero{
-      background:linear-gradient(135deg,var(--accent-dark),var(--accent) 55%,var(--green));
-      color:#fff;
-      border-radius:24px;
-      padding:20px 22px;
-      box-shadow:var(--shadow);
+      max-width:1480px;
+      margin:0 auto;
+      position:relative;
+      overflow:hidden;
       display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:18px;
+      align-items:center;
+      gap:14px;
+      padding:11px 14px 11px 12px;
+      border-radius:20px;
+      color:#fff;
+      background:linear-gradient(115deg,var(--navy) 0%,var(--accent-dark) 38%,var(--accent) 74%,var(--green) 100%);
+      box-shadow:0 14px 36px rgba(15,35,56,.26), inset 0 1px 0 rgba(255,255,255,.12);
     }
-
-    .hero h1{
-      margin:0 0 5px;
-      font-size:clamp(1.45rem,2vw,2.15rem);
-      letter-spacing:-.035em;
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 88% -60%,rgba(94,234,212,.42),transparent 48%),
+        radial-gradient(circle at 8% 160%,rgba(255,255,255,.12),transparent 40%),
+        repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 15px);
     }
+    .hero > *{position:relative}
 
-    .hero p{
-      margin:0;
-      color:rgba(255,255,255,.84);
-      font-size:.96rem;
-    }
-
-    .version-badge{
-      background:rgba(255,255,255,.14);
+    .brand-mark{
+      flex:0 0 auto;
+      width:48px;height:48px;
+      border-radius:14px;
+      display:grid;place-items:center;
+      background:linear-gradient(145deg,rgba(255,255,255,.2),rgba(255,255,255,.06));
       border:1px solid rgba(255,255,255,.25);
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:.84rem;
+      box-shadow:0 6px 16px rgba(0,0,0,.18);
+    }
+
+    .hero-title{min-width:0}
+    .hero-title h1{
+      margin:0;
+      font-size:1.28rem;
+      line-height:1.15;
+      letter-spacing:-.025em;
+      font-weight:800;
       white-space:nowrap;
     }
+    .hero-title h1 span{color:var(--mint)}
+    .hero-title p{
+      margin:3px 0 0;
+      font-size:.8rem;
+      color:rgba(255,255,255,.74);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
+    .hero-actions{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .save-pill,.version-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 11px;
+      border-radius:999px;
+      font-size:.76rem;
+      font-weight:700;
+      white-space:nowrap;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.22);
+      color:#fff;
+    }
+    .save-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 3px rgba(94,234,212,.22)}
+    .save-pill.pending .dot{background:#fde68a;box-shadow:0 0 0 3px rgba(253,230,138,.25)}
+    .save-pill.warn .dot{background:#fca5a5;box-shadow:0 0 0 3px rgba(252,165,165,.25)}
+    .version-badge{font-variant-numeric:tabular-nums;background:rgba(15,35,56,.35)}
+
+    .hero-print{
+      background:#fff;
+      color:var(--accent-dark);
+      box-shadow:0 6px 16px rgba(0,0,0,.2);
+      display:inline-flex;align-items:center;gap:7px;
+    }
+    .hero-print:hover{filter:none;background:#f0fdfa}
+
+    /* ---------- Layout ---------- */
     main{
       max-width:1480px;
       margin:0 auto;
-      padding:10px 18px 34px;
+      padding:12px 18px 34px;
       display:grid;
-      grid-template-columns:430px 1fr;
+      grid-template-columns:410px minmax(0,1fr);
       gap:18px;
       align-items:start;
     }
@@ -101,8 +167,8 @@
     .panel{
       padding:16px;
       position:sticky;
-      top:12px;
-      max-height:calc(100vh - 24px);
+      top:calc(var(--header-h) + 8px);
+      max-height:calc(100vh - var(--header-h) - 20px);
       overflow:auto;
     }
 
@@ -111,10 +177,15 @@
       padding-top:14px;
       margin-top:14px;
     }
-
     .section:first-child{border-top:0;margin-top:0;padding-top:0}
 
-    h2{font-size:1rem;margin:0 0 10px;letter-spacing:-.015em}
+    h2{font-size:1rem;margin:0 0 10px;letter-spacing:-.015em;display:flex;align-items:center;gap:8px}
+    .step{
+      width:22px;height:22px;border-radius:7px;
+      display:inline-grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent-dark),var(--accent));
+      color:#fff;font-size:.72rem;font-weight:800;
+    }
 
     label{
       display:block;
@@ -135,12 +206,7 @@
       padding:9px 10px;
       outline:none;
     }
-
-    textarea{
-      min-height:74px;
-      resize:vertical;
-      line-height:1.35;
-    }
+    textarea{min-height:74px;resize:vertical;line-height:1.35}
 
     input:focus,select:focus,textarea:focus{
       border-color:#4f91bd;
@@ -148,6 +214,7 @@
     }
 
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 
     .btn-row,.format-buttons{
       display:flex;
@@ -166,9 +233,8 @@
       font-weight:750;
       transition:.15s ease;
     }
-
     button:hover{transform:translateY(-1px);filter:brightness(.985)}
-    button.active{background:var(--accent);color:#fff}
+    button:disabled{opacity:.4;cursor:default;transform:none}
     .primary{background:var(--accent);color:#fff}
     .green{background:var(--green);color:#fff}
     .danger{background:var(--danger-bg);color:var(--danger)}
@@ -183,11 +249,48 @@
       font-weight:650;
     }
     .format-buttons button.active,
-     button.active{
-     background:linear-gradient(135deg,#14324d,#1f5f8b);
-     color:#fff;
-     box-shadow:0 2px 8px rgba(31,95,139,.25);
+    button.active{
+      background:linear-gradient(135deg,#14324d,#1f5f8b);
+      color:#fff;
+      box-shadow:0 2px 8px rgba(31,95,139,.25);
     }
+
+    /* Segmented control */
+    .segmented{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:4px;
+      padding:4px;
+      background:#eef3f8;
+      border-radius:13px;
+    }
+    .segmented button{padding:7px 8px;font-size:.8rem;border-radius:10px;background:transparent;font-weight:700;color:#475569}
+    .segmented button.active{background:#fff;color:var(--accent-dark);box-shadow:0 2px 8px rgba(15,23,42,.1)}
+
+    /* Quick presets */
+    .quick-presets{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:6px;
+      margin-bottom:4px;
+    }
+    .quick-presets button{
+      padding:8px 4px 7px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid var(--line);
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+      font-weight:800;font-size:.86rem;color:var(--accent-dark);
+    }
+    .quick-presets button small{font-size:.62rem;font-weight:650;color:var(--muted);white-space:nowrap}
+    .quick-presets button.active{border-color:transparent;background:linear-gradient(135deg,#14324d,#1f5f8b);color:#fff;box-shadow:0 4px 12px rgba(31,95,139,.3)}
+    .quick-presets button.active small{color:rgba(255,255,255,.8)}
+    .qp-icon{display:grid;gap:1.5px;width:22px;height:30px;padding:1.5px;border:1.5px solid currentColor;border-radius:3px;opacity:.85}
+    .qp-icon i{background:currentColor;opacity:.35;border-radius:1px}
+    .quick-presets button.active .qp-icon{border-color:#fff}
+    .quick-presets button.active .qp-icon i{background:#fff;opacity:.55}
+    .landscape .qp-icon{width:30px;height:22px}
+
     .toggle-row{
       display:flex;
       align-items:center;
@@ -195,7 +298,6 @@
       margin:8px 0;
       font-size:.9rem;
     }
-
     .toggle-row input{width:auto}
 
     .help{
@@ -204,6 +306,30 @@
       line-height:1.42;
       margin-top:8px;
     }
+
+    details.fold{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#f8fafc;
+      margin-top:10px;
+    }
+    details.fold > summary{
+      cursor:pointer;
+      list-style:none;
+      padding:10px 12px;
+      font-size:.82rem;
+      font-weight:750;
+      color:#334155;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      user-select:none;
+    }
+    details.fold > summary::-webkit-details-marker{display:none}
+    details.fold > summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+    details.fold[open] > summary::after{transform:rotate(180deg)}
+    details.fold .fold-body{padding:0 12px 12px}
+    details.fold .fold-body > label:first-child{margin-top:0}
 
     .duplex-status{
       background:#f8fafc;
@@ -215,7 +341,6 @@
       font-size:.82rem;
       line-height:1.35;
     }
-
     .duplex-status.active{
       border-color:rgba(15,118,110,.28);
       background:#ecfdf5;
@@ -223,65 +348,90 @@
       font-weight:650;
     }
 
-    .smart-box{
-      background:#f8fafc;
-      border:1px solid #dbe4ee;
-      border-radius:14px;
-      padding:10px;
-      margin:10px 0 12px;
+    /* Content card in sidebar */
+    .content-card{
+      position:relative;
+      border:1px solid #c9d8e6;
+      border-radius:16px;
+      background:repeating-conic-gradient(#f1f5f9 0% 25%,#f8fafc 0% 50%) 0 0/16px 16px;
+      padding:12px;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .content-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,95,139,.1)}
+    .content-card .mini-stage{display:flex;justify-content:center}
+    .content-card .edit-hint{
+      position:absolute;right:10px;bottom:10px;
+      background:var(--accent-dark);color:#fff;
+      font-size:.74rem;font-weight:750;
+      padding:5px 10px;border-radius:999px;
+      box-shadow:0 4px 12px rgba(15,23,42,.25);
+    }
+    .content-card .warn-badge{
+      display:none;position:absolute;left:10px;top:10px;
+      background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;
+      font-size:.72rem;font-weight:750;padding:3px 8px;border-radius:999px;
+    }
+    .content-card.warn .warn-badge{display:block}
+
+    .edit-main-btn{
+      width:100%;
+      margin-top:9px;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      background:linear-gradient(135deg,var(--accent-dark),var(--accent));
+      color:#fff;
+      padding:11px 12px;
+    }
+    .qty-row{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:end}
+
+    .mini-frame{position:relative;flex:0 0 auto}
+    .mini-frame .label-card{
+      position:absolute;left:0;top:0;
+      transform-origin:top left;
+      border:1px solid rgba(15,23,42,.25)!important;
+      box-shadow:0 6px 18px rgba(15,23,42,.14);
     }
 
+    /* List editor */
     .items-list{
       display:flex;
       flex-direction:column;
-      gap:9px;
-      max-height:280px;
+      gap:7px;
+      max-height:330px;
       overflow:auto;
       padding-right:3px;
     }
-
     .item-row{
+      display:grid;
+      grid-template-columns:24px 1fr 58px auto;
+      gap:8px;
+      align-items:center;
       background:#f8fafc;
       border:1px solid var(--line);
-      border-radius:14px;
-      padding:9px;
+      border-radius:13px;
+      padding:7px 8px;
+      transition:.15s ease;
     }
-
-    .item-top{
-      display:grid;
-      grid-template-columns:1fr 70px auto;
-      gap:7px;
-      align-items:center;
+    .item-row:hover{border-color:#9ec0d8;background:#fff}
+    .item-num{
+      width:24px;height:24px;border-radius:8px;
+      display:grid;place-items:center;
+      background:#e2ebf4;color:var(--accent-dark);
+      font-size:.74rem;font-weight:800;
     }
+    .item-text{min-width:0;cursor:pointer;line-height:1.25}
+    .item-text strong{display:block;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .item-text span{display:block;font-size:.76rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .item-text em{font-style:normal;color:#94a3b8}
+    .item-row input{padding:6px 6px;border-radius:9px;text-align:center}
+    .item-actions{display:flex;gap:4px}
+    .item-actions button{padding:5px 8px;font-size:.8rem;border-radius:9px}
 
-    .item-row input,.item-row textarea{padding:7px 8px;border-radius:9px}
-    .item-row textarea{min-height:44px}
-
-    .rich-edit-btn{width:100%;margin:9px 0;background:#dff0fa;color:#14324d;border:1px solid #b9d5e6;text-align:left}
-    .rich-modal[hidden],.selection-toolbar[hidden]{display:none!important}
-    .rich-modal{position:fixed;inset:0;background:rgba(10,24,42,.68);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
-    .rich-dialog{width:min(900px,100%);max-height:94vh;display:flex;flex-direction:column;background:white;border-radius:18px;box-shadow:0 28px 85px rgba(0,0,0,.35);overflow:hidden}
-    .rich-header{display:flex;justify-content:space-between;align-items:center;padding:16px 19px;border-bottom:1px solid var(--line);gap:12px}
-    .rich-header h2{margin:0;font-size:1.1rem}
-    .rich-actions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;background:#f5f8fc;border-bottom:1px solid var(--line);align-items:center}
-    .rich-actions button,.selection-toolbar button{padding:7px 10px;border-radius:8px;min-width:34px}
-    .rich-actions select{width:auto;padding:7px}
-    .rich-body{padding:16px 20px;overflow:auto;min-height:180px}
-    .rich-editor{min-height:240px;border:1px solid #b6c7d8;border-radius:12px;padding:18px;outline:none;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.35;background:#fff}
-    .rich-editor:focus{box-shadow:0 0 0 3px rgba(31,95,139,.13);border-color:#1f5f8b}
-    .rich-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
-    .selection-toolbar{position:fixed;z-index:1010;background:#172f4d;padding:5px;border-radius:10px;display:flex;gap:4px;box-shadow:0 9px 20px #0004}
-    .selection-toolbar button{color:white;background:transparent}
-    .selection-toolbar button:hover{background:#355877}
-    .rich-editor .badge-headline{display:block}
-    .rich-editor .badge-subline{display:block;margin-top:8px}
-    .advanced-box{display:none}
-    .advanced-box.show{display:block}
-
+    /* ---------- Preview ---------- */
     .preview-wrap{
-      padding:16px;
-      overflow:auto;
+      padding:0 16px 16px;
       min-height:70vh;
+      min-width:0;
     }
 
     .preview-toolbar{
@@ -289,23 +439,20 @@
       justify-content:space-between;
       align-items:center;
       gap:10px;
-      margin-bottom:14px;
       position:sticky;
-      top:0;
-      z-index:2;
-      background:rgba(255,255,255,.92);
+      top:var(--header-h);
+      z-index:5;
+      margin:0 -16px 14px;
+      padding:14px 16px 10px;
+      background:rgba(255,255,255,.94);
       backdrop-filter:blur(8px);
-      padding-bottom:8px;
+      border-radius:var(--radius) var(--radius) 0 0;
+      border-bottom:1px solid #eef2f7;
     }
-
     .preview-toolbar h2{margin:0}
-
-    .preview-toolbar-actions{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      flex-wrap:wrap;
-    }
+    .preview-toolbar-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    #countInfo{margin:0}
+    #countInfo .warn{color:#b91c1c;font-weight:750}
 
     .zoom-controls{
       display:flex;
@@ -315,50 +462,29 @@
       border-radius:999px;
       padding:3px;
     }
-
     .zoom-controls button{
-      width:26px;
-      height:26px;
-      padding:0;
-      border-radius:999px;
-      background:transparent;
-      font-size:1rem;
-      line-height:1;
-      font-weight:800;
+      width:26px;height:26px;padding:0;
+      border-radius:999px;background:transparent;
+      font-size:1rem;line-height:1;font-weight:800;
     }
-
     .zoom-controls button:hover{background:#fff}
-
     .zoom-controls .zoom-value{
-      min-width:42px;
-      text-align:center;
-      font-size:.78rem;
-      font-weight:750;
-      color:#334155;
-      cursor:pointer;
-      user-select:none;
+      min-width:42px;text-align:center;
+      font-size:.78rem;font-weight:750;color:#334155;
+      cursor:pointer;user-select:none;
     }
-
-    .zoom-controls .zoom-fit{
-      width:auto;
-      padding:0 10px;
-      font-size:.74rem;
-      border-radius:999px;
-    }
+    .zoom-controls .zoom-fit{width:auto;padding:0 10px;font-size:.74rem;border-radius:999px}
 
     .page-stage{
       display:flex;
       flex-wrap:wrap;
       align-items:flex-start;
       gap:24px;
+      overflow-x:auto;
+      padding-bottom:6px;
     }
 
-    .page-title{
-      font-size:.86rem;
-      font-weight:850;
-      color:var(--muted);
-      margin:0 0 8px;
-    }
+    .page-title{font-size:.86rem;font-weight:850;color:var(--muted);margin:0 0 8px}
 
     .page-holder{
       width:calc(var(--page-w) * var(--zoom));
@@ -389,9 +515,9 @@
       border:1px dashed rgba(15,23,42,.36);
       background:#fff;
       color:#111827;
-      padding:4mm;
+      padding:var(--card-padding,4mm);
       display:flex;
-      align-items:center;
+      align-items:var(--v-align,center);
       justify-content:center;
       text-align:var(--text-align);
       font-family:var(--font-family);
@@ -401,12 +527,13 @@
       text-decoration:var(--text-decoration);
       line-height:1.16;
     }
-
     .label-card.no-border{border-color:transparent}
+    .label-card.overflowing{outline:2px solid rgba(220,38,38,.6);outline-offset:-2px}
 
     .label-content{
       width:100%;
-      white-space:normal;
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
       position:relative;
       z-index:2;
     }
@@ -418,16 +545,14 @@
       line-height:1.04;
       overflow-wrap:anywhere;
     }
-
     .badge-subline{
       display:block;
-      margin-top:1.9mm;
       font-size:var(--subline-size);
       font-weight:var(--subline-weight);
       line-height:1.16;
-      white-space:pre-line;
       overflow-wrap:anywhere;
     }
+    .badge-headline + .badge-subline{margin-top:1.9mm}
 
     .label-image{
       position:absolute;
@@ -442,248 +567,398 @@
     }
 
     .cutmarks .label-card::before,
+    .cutmarks .label-card::after{content:"";position:absolute;pointer-events:none;opacity:.7}
+    .cutmarks .label-card::before{inset:1.7mm;border:.25mm solid rgba(15,23,42,.18)}
     .cutmarks .label-card::after{
-      content:"";
-      position:absolute;
-      pointer-events:none;
-      opacity:.7;
-    }
-
-    .cutmarks .label-card::before{
-      inset:1.7mm;
-      border:.25mm solid rgba(15,23,42,.18);
-    }
-
-    .cutmarks .label-card::after{
-      left:50%;top:50%;
-      width:8mm;height:8mm;
+      left:50%;top:50%;width:8mm;height:8mm;
       transform:translate(-50%,-50%);
       border-left:.2mm solid rgba(15,23,42,.13);
       border-top:.2mm solid rgba(15,23,42,.13);
     }
 
-    .site-footer{
-      max-width:1480px;
-      margin:6px auto 28px;
-      padding:0 18px;
-      text-align:center;
+    /* ---------- Rich editor modal ---------- */
+    .rich-modal[hidden],.selection-toolbar[hidden],.rich-warn[hidden],[hidden]{display:none!important}
+    .rich-modal{
+      position:fixed;inset:0;z-index:1000;
+      background:rgba(10,24,42,.62);
+      backdrop-filter:blur(3px);
+      display:flex;align-items:center;justify-content:center;
+      padding:18px;
+    }
+    .rich-dialog{
+      width:min(1180px,100%);
+      height:min(820px,100%);
+      display:flex;flex-direction:column;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 28px 85px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .rich-header{
+      display:flex;align-items:center;gap:14px;
+      padding:13px 16px 13px 20px;
+      background:linear-gradient(115deg,var(--navy),var(--accent-dark) 45%,var(--accent));
+      color:#fff;
+    }
+    .rich-kicker{font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mint)}
+    .rich-header h2{margin:2px 0 0;font-size:1.12rem}
+    .rich-nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+    .rich-nav button,.icon-btn{
+      background:rgba(255,255,255,.14);color:#fff;
+      border:1px solid rgba(255,255,255,.22);
+      padding:6px 11px;border-radius:10px;
+    }
+    .rich-nav span{font-size:.8rem;font-weight:750;min-width:46px;text-align:center;font-variant-numeric:tabular-nums}
+    .icon-btn{margin-left:6px;font-size:1rem;padding:6px 12px}
+    .rich-nav[hidden] + .icon-btn{margin-left:auto}
+
+    .rich-toolbar{
+      display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+      padding:9px 14px;
+      background:#f5f8fc;
+      border-bottom:1px solid var(--line);
+    }
+    .tb-group{display:flex;align-items:center;gap:3px;padding:3px;background:#fff;border:1px solid #dfe7f0;border-radius:11px}
+    .rich-toolbar button{
+      min-width:32px;height:32px;padding:0 8px;
+      border-radius:8px;background:transparent;font-weight:700;
+      display:inline-flex;align-items:center;justify-content:center;
+    }
+    .rich-toolbar button:hover{background:#eef3f8;transform:none}
+    .rich-toolbar button.active{background:linear-gradient(135deg,#14324d,#1f5f8b);color:#fff}
+    .rich-toolbar select{width:auto;height:32px;padding:0 8px;border:0;border-radius:8px;font-size:.82rem;font-weight:650;background:transparent;cursor:pointer}
+    .rich-toolbar select:hover{background:#eef3f8}
+    .rich-toolbar select:focus{box-shadow:none}
+    .color-pick{display:inline-flex;margin:0;width:32px;height:32px;border-radius:8px;align-items:center;justify-content:center;cursor:pointer}
+    .color-pick:hover{background:#eef3f8}
+    .color-pick input{width:22px;height:22px;padding:0;border:0;border-radius:6px;background:none;cursor:pointer}
+    .rich-toolbar.source-mode .tb-group:not(.tb-keep){opacity:.35;pointer-events:none}
+
+    .rich-main{
+      flex:1;min-height:0;
+      display:grid;
+      grid-template-columns:1fr 360px;
+    }
+    .rich-edit-col{padding:16px 18px;overflow:auto;display:flex;flex-direction:column;gap:10px;background:#fbfcfe}
+    .rich-canvas{flex:1;display:flex;flex-direction:column}
+    .rich-editor{
+      flex:1;
+      min-height:260px;
+      border:1px solid #c6d4e2;
+      border-radius:14px;
+      padding:22px 24px;
+      outline:none;
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
+      line-height:1.16;
+      background:#fff;
+      color:#111827;
+      font-family:var(--font-family);
+      font-size:var(--font-size);
+      font-weight:var(--font-weight);
+      font-style:var(--font-style);
+      text-decoration:var(--text-decoration);
+      text-align:var(--text-align);
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+    }
+    .rich-editor:focus{box-shadow:0 0 0 3px rgba(31,95,139,.13);border-color:#1f5f8b}
+    .rich-editor.is-empty::before{
+      content:attr(data-placeholder);
+      color:#94a3b8;font-size:13pt;font-weight:500;font-style:normal;
+      pointer-events:none;white-space:pre-line;display:block;text-align:left;
+    }
+    .rich-editor > div,.rich-editor > p{margin-left:0;margin-right:0}
+    .rich-editor p{margin-top:0;margin-bottom:0}
+    .rich-source{
+      flex:1;min-height:260px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:.85rem;line-height:1.5;
+      border-radius:14px;padding:16px;
+      background:#0f172a;color:#e2e8f0;border-color:#0f172a;
     }
 
-    .site-footer-inner{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      align-items:center;
-      gap:9px;
-      color:var(--muted);
-      font-size:.8rem;
+    .rich-side{
+      border-left:1px solid var(--line);
+      background:#f5f8fc;
+      padding:16px;
+      overflow:auto;
+      display:flex;flex-direction:column;gap:10px;
     }
+    .rich-side-title{display:flex;justify-content:space-between;align-items:baseline;font-size:.82rem;font-weight:800;color:#334155}
+    .rich-side-title span{font-weight:600;color:var(--muted);font-size:.74rem}
+    .rich-preview{
+      border-radius:14px;
+      padding:14px;
+      background:repeating-conic-gradient(#e9eff6 0% 25%,#f3f6fa 0% 50%) 0 0/16px 16px;
+      border:1px solid #d6e1ec;
+      display:flex;justify-content:center;
+    }
+    .rich-preview .mini-stage{display:flex;justify-content:center}
+    .rich-warn{
+      background:#fef2f2;border:1px solid #fecaca;color:#991b1b;
+      border-radius:12px;padding:8px 10px;font-size:.8rem;line-height:1.35;font-weight:600;
+    }
+    .rich-tips{font-size:.78rem;color:var(--muted);line-height:1.5;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px}
+    .rich-tips b{color:#334155}
+    .rich-tips kbd{font-family:inherit;font-size:.72rem;background:#eef3f8;border:1px solid #d6e1ec;border-bottom-width:2px;border-radius:5px;padding:0 5px}
 
+    .rich-footer{
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+      padding:11px 16px;border-top:1px solid var(--line);background:#fff;
+    }
+    .rich-footer .help{margin:0}
+
+    .selection-toolbar{
+      position:fixed;z-index:1010;
+      background:#172f4d;padding:5px;border-radius:10px;
+      display:flex;gap:3px;box-shadow:0 9px 20px #0004;
+    }
+    .selection-toolbar button{color:#fff;background:transparent;padding:6px 9px;border-radius:7px;min-width:30px}
+    .selection-toolbar button:hover{background:#355877;transform:none}
+
+    /* ---------- Footer ---------- */
+    .site-footer{max-width:1480px;margin:6px auto 28px;padding:0 18px;text-align:center}
+    .site-footer-inner{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:9px;color:var(--muted);font-size:.8rem}
     .site-footer-sep{opacity:.6}
-
     .site-footer-feedback{
-      color:var(--accent-dark);
-      text-decoration:none;
-      font-weight:750;
-      padding:4px 12px;
-      border-radius:999px;
-      background:rgba(31,95,139,.1);
-      transition:.15s ease;
+      color:var(--accent-dark);text-decoration:none;font-weight:750;
+      padding:4px 12px;border-radius:999px;background:rgba(31,95,139,.1);transition:.15s ease;
     }
-
     .site-footer-feedback:hover{background:rgba(31,95,139,.18)}
 
     @media(max-width:1050px){
       main{grid-template-columns:1fr}
       .panel{position:relative;top:0;max-height:none}
+      .preview-toolbar{top:var(--header-h)}
       :root{--zoom:.55}
     }
+    @media(max-width:860px){
+      .rich-main{grid-template-columns:1fr;overflow:auto}
+      .rich-side{border-left:0;border-top:1px solid var(--line)}
+      .rich-edit-col{overflow:visible}
+      .rich-modal{padding:0}
+      .rich-dialog{height:100%;border-radius:0}
+    }
+    @media(max-width:700px){
+      .hero-title p,.version-badge{display:none}
+      .hero-title h1{font-size:1.05rem}
+      .brand-mark{width:40px;height:40px}
+      .save-pill .txt{display:none}
+    }
 
-    /* @page Größe/Ausrichtung wird dynamisch über #pageSizeStyle gesetzt (siehe Script) */
-
+    /* @page Größe/Ausrichtung wird dynamisch über #pageSizeStyle gesetzt */
     @media print{
       body{background:#fff}
-      header,.panel,.preview-toolbar,.page-title,.site-footer{display:none!important}
+      .app-header,.panel,.preview-toolbar,.page-title,.site-footer,.rich-modal,.selection-toolbar{display:none!important}
       main{display:block;max-width:none;margin:0;padding:0}
-      .preview-wrap{border:0;box-shadow:none;padding:0;background:#fff;overflow:visible;min-height:0}
-      .page-stage{display:block}
+      .preview-wrap{border:0;box-shadow:none;padding:0;background:#fff;overflow:visible;min-height:0;backdrop-filter:none}
+      .page-stage{display:block;overflow:visible;padding:0}
       .page-holder{page-break-after:always;width:auto!important;height:auto!important}
       .page-holder:last-child{page-break-after:auto}
       .sheet{width:var(--page-w);height:var(--page-h);min-height:var(--page-h);box-shadow:none;transform:none!important;overflow:hidden}
+      .label-card.overflowing{outline:none}
     }
   </style>
   <style id="pageSizeStyle">@page{size:A4 portrait;margin:0}</style>
 </head>
 <body>
-<header>
+<header class="app-header" id="appHeader">
   <div class="hero">
-    <div>
-      <h1>Etiketten & Badgecard Tool</h1>
-      <p>A4-Etiketten, Kongress-Badges, Smart Paste, Duplex, Bild, Hoch-/Querformat, JSON & Druckansicht.</p>
+    <div class="brand-mark" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="3" y="5" width="22" height="18" rx="3.5" stroke="#fff" stroke-width="1.8"/>
+        <path d="M3 11h22" stroke="#5eead4" stroke-width="1.8"/>
+        <rect x="7" y="14.5" width="9" height="2.2" rx="1.1" fill="#fff"/>
+        <rect x="7" y="18.3" width="13" height="1.6" rx=".8" fill="#fff" opacity=".6"/>
+        <circle cx="21.2" cy="8" r="1.3" fill="#fff"/>
+      </svg>
     </div>
-    <div class="version-badge">Badge & Label Studio</div>
+    <div class="hero-title">
+      <h1>Etiketten <span>&amp;</span> Badgecards</h1>
+      <p>A4-Etiketten, Kongress-Badges, Duplex, Bild &amp; Druckansicht – alles lokal im Browser.</p>
+    </div>
+    <div class="hero-actions">
+      <span class="save-pill" id="saveStatus" title="Wird automatisch im Browser gespeichert"><span class="dot"></span><span class="txt">Bereit</span></span>
+      <span class="version-badge">v1.7.0</span>
+      <button class="hero-print" id="printBtnTop" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>
+        Drucken
+      </button>
+    </div>
   </div>
 </header>
 
 <main>
   <aside class="panel">
     <div class="section">
-      <h2>1. Format wählen</h2>
-      <label>Standardformat</label>
+      <h2><span class="step">1</span>Format</h2>
+      <div class="quick-presets" id="quickPresets"></div>
+      <label>Alle Formate</label>
       <select id="presetSelect"></select>
-      <div class="help">Alle Maße sind in mm. Beim Drucken bitte <b>100 % / tatsächliche Größe</b> einstellen.</div>
 
-      <label>Seitenausrichtung beim Drucken</label>
-      <div class="format-buttons">
-        <button id="orientationPortrait" type="button">Hochformat (A4 Hoch)</button>
-        <button id="orientationLandscape" type="button">Querformat (A4 Quer)</button>
+      <label>Seitenausrichtung</label>
+      <div class="segmented">
+        <button id="orientationPortrait" type="button"><svg width="10" height="13" viewBox="0 0 10 13" style="vertical-align:-1px;margin-right:5px"><rect x="1" y="1" width="8" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Hochformat</button>
+        <button id="orientationLandscape" type="button"><svg width="13" height="10" viewBox="0 0 13 10" style="vertical-align:0;margin-right:5px"><rect x="1" y="1" width="11" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Querformat</button>
       </div>
-      <div class="help">Bestimmt die Ausrichtung des gedruckten Blatts. Beim Umschalten werden Spalten/Zeilen automatisch so neu berechnet, dass die Etiketten ins gewählte Format passen (Etikettengröße, Abstände und Ränder bleiben gleich). Bei Bedarf danach Spalten/Zeilen/Ränder unten von Hand feinjustieren.</div>
+      <div class="help">Beim Drucken bitte <b>100 % / tatsächliche Größe</b> wählen.</div>
 
-      <div class="grid2">
-        <div><label>Spalten</label><input id="cols" type="number" min="1" max="10" step="1"></div>
-        <div><label>Zeilen</label><input id="rows" type="number" min="1" max="20" step="1"></div>
-      </div>
-      <div class="grid2">
-        <div><label>Etikett Breite</label><input id="labelW" type="number" min="10" step="0.1"></div>
-        <div><label>Etikett Höhe</label><input id="labelH" type="number" min="10" step="0.1"></div>
-      </div>
-      <div class="grid2">
-        <div><label>Horizontaler Abstand zwischen Etiketten (mm)</label><input id="gapX" type="number" min="0" step="0.1"></div>
-        <div><label>Vertikaler Abstand zwischen Etiketten (mm)</label><input id="gapY" type="number" min="0" step="0.1"></div>
-      </div>
-      <div class="grid2">
-        <div><label>Seitenrand oben (mm)</label><input id="marginTop" type="number" min="0" step="0.1"></div>
-        <div><label>Seitenrand links (mm)</label><input id="marginLeft" type="number" min="0" step="0.1"></div>
-      </div>
-      <div class="grid2">
-        <div><label>Seitenrand rechts (mm)</label><input id="marginRight" type="number" min="0" step="0.1"></div>
-        <div><label>Seitenrand unten (mm)</label><input id="marginBottom" type="number" min="0" step="0.1"></div>
-      </div>
+      <details class="fold">
+        <summary>Maße &amp; Ränder feinjustieren (mm)</summary>
+        <div class="fold-body">
+          <div class="grid2">
+            <div><label>Spalten</label><input id="cols" type="number" min="1" max="10" step="1"></div>
+            <div><label>Zeilen</label><input id="rows" type="number" min="1" max="20" step="1"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Etikett Breite</label><input id="labelW" type="number" min="10" step="0.1"></div>
+            <div><label>Etikett Höhe</label><input id="labelH" type="number" min="10" step="0.1"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Abstand horizontal</label><input id="gapX" type="number" min="0" step="0.1"></div>
+            <div><label>Abstand vertikal</label><input id="gapY" type="number" min="0" step="0.1"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Rand oben</label><input id="marginTop" type="number" min="0" step="0.1"></div>
+            <div><label>Rand unten</label><input id="marginBottom" type="number" min="0" step="0.1"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Rand links</label><input id="marginLeft" type="number" min="0" step="0.1"></div>
+            <div><label>Rand rechts</label><input id="marginRight" type="number" min="0" step="0.1"></div>
+          </div>
+        </div>
+      </details>
 
       <div class="toggle-row"><input id="showCutmarks" type="checkbox"><span>Schneide-/Hilfslinien anzeigen</span></div>
       <div class="toggle-row"><input id="showBorders" type="checkbox"><span>Etikettenrahmen drucken</span></div>
     </div>
 
     <div class="section">
-      <h2>2. Text & Stil</h2>
-      <label>Bearbeitungsmodus</label>
-      <select id="editMode">
-        <option value="same">Ein Badge mehrfach</option>
-        <option value="list">Mehrere Badges mit Anzahl</option>
-      </select>
+      <h2><span class="step">2</span>Inhalt</h2>
+      <div class="segmented">
+        <button id="modeSame" type="button">Ein Badge mehrfach</button>
+        <button id="modeList" type="button">Mehrere Badges</button>
+      </div>
 
-      <div class="smart-box">
-        <label>Smart Paste / Schnelleingabe</label>
-        <textarea id="smartPaste" placeholder="Einfach einfügen, z.B.&#10;BEISPIELTITEL&#10;Untertitel"></textarea>
-        <div class="btn-row">
-          <button class="mini primary" id="applySmartBtn" type="button">In Badge übernehmen</button>
-          <button class="mini ghost" id="clearSmartBtn" type="button">Feld leeren</button>
+      <div id="sameEditor" style="margin-top:12px">
+        <div class="content-card" id="frontMini" title="Klicken zum Bearbeiten">
+          <div class="mini-box"></div>
+          <span class="warn-badge">⚠ Text zu groß</span>
+          <span class="edit-hint">✎ Bearbeiten</span>
         </div>
-        <div class="help">Erste Zeile = Überschrift. Weitere Zeilen = kleiner Text. Im Listenmodus wird daraus ein neuer Eintrag.</div>
+        <div class="qty-row">
+          <button id="editSameRich" class="edit-main-btn" type="button">✎ Text bearbeiten &amp; gestalten</button>
+          <div><label>Anzahl</label><input id="mainQty" type="number" min="1" step="1"></div>
+        </div>
       </div>
 
-      <div id="sameEditor">
-        <label>Überschrift</label>
-        <input id="headline" type="text">
-        <label>Text darunter</label>
-        <textarea id="subline"></textarea>
-        <button id="editSameRich" class="rich-edit-btn" type="button">✎ Text frei gestalten · Fett, Kursiv, Unterstrichen …</button>
-        <label>Anzahl</label>
-        <input id="mainQty" type="number" min="1" step="1">
-      </div>
-
-      <div id="listEditor" style="display:none">
-        <label>Einträge</label>
+      <div id="listEditor" style="display:none;margin-top:12px">
         <div class="items-list" id="itemsList"></div>
         <div class="btn-row">
-          <button class="mini ghost" id="addItemBtn" type="button">+ Eintrag</button>
+          <button class="mini primary" id="addItemBtn" type="button">＋ Eintrag</button>
           <button class="mini danger" id="clearItemsBtn" type="button">Liste leeren</button>
         </div>
+        <div class="help">Auf einen Eintrag klicken, um ihn im Editor zu öffnen. Zahl = Anzahl Etiketten.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="step">3</span>Schrift &amp; Layout</h2>
+      <label>Schriftart</label>
+      <select id="fontFamily">
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="system-ui, sans-serif">System UI</option>
+        <option value="Verdana, sans-serif">Verdana</option>
+        <option value="Tahoma, sans-serif">Tahoma</option>
+        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+        <option value="'Courier New', monospace">Courier New</option>
+      </select>
+
+      <div class="grid3">
+        <div><label>Überschrift pt</label><input id="headlineSize" type="number" min="6" max="96" step="1"></div>
+        <div><label>Untertext pt</label><input id="sublineSize" type="number" min="6" max="96" step="1"></div>
+        <div><label>Normaltext pt</label><input id="fontSize" type="number" min="6" max="96" step="1"></div>
       </div>
 
       <div class="grid2">
         <div>
-          <label>Schriftart</label>
-          <select id="fontFamily">
-            <option value="Arial, sans-serif">Arial</option>
-            <option value="system-ui, sans-serif">System UI</option>
-            <option value="Verdana, sans-serif">Verdana</option>
-            <option value="Tahoma, sans-serif">Tahoma</option>
-            <option value="Georgia, serif">Georgia</option>
-            <option value="'Times New Roman', serif">Times New Roman</option>
-            <option value="'Courier New', monospace">Courier New</option>
-          </select>
+          <label>Ausrichtung</label>
+          <div class="format-buttons" style="margin-top:0">
+            <button id="alignLeft" type="button" title="Links">⇤</button>
+            <button id="alignCenter" type="button" title="Zentriert">↔</button>
+            <button id="alignRight" type="button" title="Rechts">⇥</button>
+          </div>
         </div>
-        <div><label>Basisgröße</label><input id="fontSize" type="number" min="6" max="72" step="1"></div>
+        <div>
+          <label>Vertikal</label>
+          <div class="format-buttons" style="margin-top:0">
+            <button id="vTop" type="button" title="Oben">⤒</button>
+            <button id="vCenter" type="button" title="Mitte">↕</button>
+            <button id="vBottom" type="button" title="Unten">⤓</button>
+          </div>
+        </div>
       </div>
 
-      <div class="grid2">
-        <div><label>Überschrift Größe</label><input id="headlineSize" type="number" min="6" max="72" step="1"></div>
-        <div><label>Text Größe</label><input id="sublineSize" type="number" min="6" max="72" step="1"></div>
-      </div>
-
-      <label>Ausrichtung</label>
-      <div class="format-buttons">
-        <button id="alignLeft" type="button">Links</button>
-        <button id="alignCenter" type="button">Zentriert</button>
-        <button id="alignRight" type="button">Rechts</button>
-      </div>
-
-      <label>Format</label>
-      <div class="format-buttons">
+      <label>Grundformat</label>
+      <div class="format-buttons" style="margin-top:0">
+        <button id="headlineBoldBtn" type="button">Überschrift fett</button>
         <button id="boldBtn" type="button">Alles fett</button>
         <button id="italicBtn" type="button">Kursiv</button>
         <button id="underlineBtn" type="button">Unterstrichen</button>
-        <button id="headlineBoldBtn" type="button">Überschrift fett</button>
       </div>
 
-      <div class="toggle-row"><input id="advancedToggle" type="checkbox"><span>Erweiterten HTML-Modus anzeigen</span></div>
-      <div id="advancedBox" class="advanced-box">
-        <label>HTML / Sonderformatierung</label>
-        <textarea id="advancedHtml"></textarea>
-        <div class="help">Nur bei Bedarf. Normalerweise reichen Überschrift und Text darunter.</div>
-      </div>
+      <label>Innenabstand im Etikett (mm)</label>
+      <input id="cardPadding" type="number" min="0" max="30" step="0.5">
+      <div class="help">Das sind die Grundwerte für alle Etiketten. Einzelne Wörter oder Zeilen gestaltest du im Editor.</div>
     </div>
 
     <div class="section">
-      <h2>3. Bild / Logo</h2>
+      <h2><span class="step">4</span>Bild / Logo</h2>
       <div class="toggle-row"><input id="imageEnabled" type="checkbox"><span>Bild auf Etiketten anzeigen</span></div>
       <input id="imageFile" type="file" accept="image/*">
-      <div class="grid2">
-        <div><label>Bildbreite (mm)</label><input id="imageW" type="number" min="5" max="200" step="1"></div>
-        <div><label>Bild-Deckkraft (%)</label><input id="imageOpacity" type="number" min="5" max="100" step="5"></div>
-      </div>
-      <div class="grid2">
-        <div><label>Bild-Abstand vom linken Etikettenrand (mm)</label><input id="imageX" type="number" min="-100" max="200" step="1"></div>
-        <div><label>Bild-Abstand vom oberen Etikettenrand (mm)</label><input id="imageY" type="number" min="-100" max="200" step="1"></div>
-      </div>
-      <div class="help">Bild wird auf jedem Label gleich platziert. Für Logos am besten PNG verwenden.</div>
+      <details class="fold">
+        <summary>Position &amp; Größe</summary>
+        <div class="fold-body">
+          <div class="grid2">
+            <div><label>Bildbreite (mm)</label><input id="imageW" type="number" min="5" max="200" step="1"></div>
+            <div><label>Deckkraft (%)</label><input id="imageOpacity" type="number" min="5" max="100" step="5"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Abstand links (mm)</label><input id="imageX" type="number" min="-100" max="200" step="1"></div>
+            <div><label>Abstand oben (mm)</label><input id="imageY" type="number" min="-100" max="200" step="1"></div>
+          </div>
+        </div>
+      </details>
+      <div class="help">Bild wird auf jedem Etikett gleich platziert. Für Logos am besten PNG verwenden.</div>
     </div>
 
     <div class="section">
-      <h2>4. Rückseite / Duplex</h2>
+      <h2><span class="step">5</span>Rückseite / Duplex</h2>
       <div class="toggle-row"><input id="enableBack" type="checkbox"><span>Rückseite zusätzlich erstellen</span></div>
-      <label>Druckreihenfolge</label>
-      <select id="duplexMode">
-        <option value="interleaved">Duplex: Vorderseite 1, Rückseite 1, Vorderseite 2, Rückseite 2</option>
-        <option value="frontsThenBacks">Erst alle Vorderseiten, dann alle Rückseiten</option>
-      </select>
-      <label>Rückseite Überschrift</label>
-      <input id="backHeadline" type="text">
-      <label>Rückseite Text</label>
-      <textarea id="backSubline"></textarea>
-      <button id="editBackRich" class="rich-edit-btn" type="button">✎ Rückseite frei gestalten</button>
-      <div class="grid2">
-        <div><label>Rückseite Überschrift Größe</label><input id="backHeadlineSize" type="number" min="6" max="72" step="1"></div>
-        <div><label>Rückseite Text Größe</label><input id="backSublineSize" type="number" min="6" max="72" step="1"></div>
+      <div id="backBox">
+        <div class="content-card" id="backMini" title="Klicken zum Bearbeiten">
+          <div class="mini-box"></div>
+          <span class="warn-badge">⚠ Text zu groß</span>
+          <span class="edit-hint">✎ Bearbeiten</span>
+        </div>
+        <button id="editBackRich" class="edit-main-btn" type="button">✎ Rückseite bearbeiten</button>
+        <div class="grid2">
+          <div><label>Überschrift pt</label><input id="backHeadlineSize" type="number" min="6" max="96" step="1"></div>
+          <div><label>Untertext pt</label><input id="backSublineSize" type="number" min="6" max="96" step="1"></div>
+        </div>
+        <label>Druckreihenfolge</label>
+        <select id="duplexMode">
+          <option value="interleaved">Duplex: V1, R1, V2, R2 …</option>
+          <option value="frontsThenBacks">Erst alle Vorderseiten, dann alle Rückseiten</option>
+        </select>
       </div>
-      <div class="duplex-status" id="duplexHint">Rückseite ist aus. Aktiviere die Checkbox, um Rückseiten in die Druckvorschau einzufügen.</div>
-      <div class="help">Für normalen Duplexdruck ist die erste Option richtig. Wichtig: Die sichtbare Reihenfolge unterscheidet sich erst, sobald mehr als eine Vorderseite entsteht.</div>
+      <div class="duplex-status" id="duplexHint"></div>
     </div>
 
     <div class="section">
-      <h2>5. Daten & Druck</h2>
+      <h2><span class="step">6</span>Daten</h2>
       <div class="btn-row">
         <button class="primary" id="printBtn" type="button">Drucken</button>
         <button class="green" id="exportBtn" type="button">JSON exportieren</button>
@@ -691,7 +966,7 @@
         <button class="danger" id="resetBtn" type="button">Reset</button>
         <input id="importFile" type="file" accept="application/json,.json" style="display:none">
       </div>
-      <div class="help">Alles bleibt lokal im Browser. Bilder im JSON können die Datei größer machen.</div>
+      <div class="help">Alles wird automatisch lokal in diesem Browser gespeichert und ist nach dem Schließen wieder da. JSON-Export = Sicherung zum Weitergeben.</div>
     </div>
   </aside>
 
@@ -712,40 +987,116 @@
   </section>
 </main>
 
+<!-- Editor-Modal -->
 <div id="richModal" class="rich-modal" hidden>
   <div class="rich-dialog" role="dialog" aria-modal="true" aria-labelledby="richTitle">
-    <div class="rich-header"><h2 id="richTitle">Text gestalten</h2><button id="richClose" type="button" title="Schließen">✕</button></div>
-    <div class="rich-actions" id="richActions">
-      <button type="button" data-command="bold" title="Fett (Strg+B)"><b>F</b></button>
-      <button type="button" data-command="italic" title="Kursiv (Strg+I)"><i>K</i></button>
-      <button type="button" data-command="underline" title="Unterstrichen (Strg+U)"><u>U</u></button>
-      <button type="button" data-command="strikeThrough" title="Durchgestrichen"><s>S</s></button>
-      <button type="button" data-command="removeFormat" title="Formatierung entfernen">Tx</button>
-      <span style="border-left:1px solid #cbd5e1;height:24px;margin:0 5px"></span>
-      <select id="richSize" aria-label="Schriftgröße"><option value="">Schriftgröße</option><option value="1">Sehr klein</option><option value="2">Klein</option><option value="3">Normal</option><option value="4">Mittel</option><option value="5">Groß</option><option value="6">Sehr groß</option><option value="7">Extra groß</option></select>
-      <input id="richColor" type="color" title="Textfarbe" aria-label="Textfarbe" value="#172033" style="width:42px;height:35px;padding:3px">
-      <button type="button" data-command="justifyLeft" title="Linksbündig">☷</button>
-      <button type="button" data-command="justifyCenter" title="Zentriert">≡</button>
-      <button type="button" data-command="justifyRight" title="Rechtsbündig">☰</button>
-      <button type="button" data-command="undo" title="Rückgängig">↶</button>
-      <button type="button" data-command="redo" title="Wiederholen">↷</button>
+    <div class="rich-header">
+      <div>
+        <div class="rich-kicker" id="richKicker">Vorderseite</div>
+        <h2 id="richTitle">Text bearbeiten</h2>
+      </div>
+      <div class="rich-nav" id="richNav" hidden>
+        <button id="richPrev" type="button" title="Vorheriger Eintrag">‹</button>
+        <span id="richNavInfo">1 / 1</span>
+        <button id="richNext" type="button" title="Nächster Eintrag">›</button>
+        <button id="richAdd" type="button" title="Neuen Eintrag anlegen">＋ Eintrag</button>
+      </div>
+      <button id="richClose" class="icon-btn" type="button" title="Schließen – Änderungen bleiben erhalten">✕</button>
     </div>
-    <div class="rich-body"><div id="richEditor" class="rich-editor" contenteditable="true" role="textbox" aria-label="Badge-Text bearbeiten" aria-multiline="true"></div>
-      <div class="help">Text markieren und die schwebende Leiste oder die obere Werkzeugleiste verwenden. Strg+B / Strg+I / Strg+U funktionieren ebenfalls. Änderungen werden erst mit „Übernehmen“ gespeichert.</div>
+
+    <div class="rich-toolbar" id="richActions">
+      <div class="tb-group">
+        <select id="richBlock" title="Absatzformat der aktuellen Zeile(n)">
+          <option value="headline">Überschrift</option>
+          <option value="subline">Untertext</option>
+          <option value="normal">Normaltext</option>
+        </select>
+      </div>
+      <div class="tb-group">
+        <button type="button" data-command="bold" title="Fett (Strg+B)"><b>F</b></button>
+        <button type="button" data-command="italic" title="Kursiv (Strg+I)"><i>K</i></button>
+        <button type="button" data-command="underline" title="Unterstrichen (Strg+U)"><u>U</u></button>
+        <button type="button" data-command="strikeThrough" title="Durchgestrichen"><s>S</s></button>
+      </div>
+      <div class="tb-group">
+        <select id="richSize" title="Schriftgröße (Markierung oder ganze Zeile)">
+          <option value="">Größe</option>
+          <option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>16</option><option>18</option><option>20</option><option>22</option><option>24</option><option>28</option><option>32</option><option>36</option><option>42</option><option>48</option><option>56</option><option>64</option><option>72</option>
+          <option value="reset">Standard</option>
+        </select>
+        <label class="color-pick" title="Textfarbe"><input id="richColor" type="color" value="#172033"></label>
+      </div>
+      <div class="tb-group">
+        <button type="button" data-align="left" title="Linksbündig">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 3h12M2 6.5h8M2 10h12M2 13.5h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <button type="button" data-align="center" title="Zentriert">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 3h12M4 6.5h8M2 10h12M4 13.5h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <button type="button" data-align="right" title="Rechtsbündig">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 3h12M6 6.5h8M2 10h12M6 13.5h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="tb-group">
+        <select id="richLine" title="Zeilenabstand der aktuellen Zeile(n)">
+          <option value="">Zeilenabstand</option>
+          <option value="1">1,0</option><option value="1.15">1,15</option><option value="1.3">1,3</option><option value="1.5">1,5</option><option value="1.75">1,75</option><option value="2">2,0</option>
+          <option value="reset">Standard</option>
+        </select>
+        <select id="richSpace" title="Abstand vor der aktuellen Zeile">
+          <option value="">Abstand davor</option>
+          <option value="0">0 mm</option><option value="1">1 mm</option><option value="2">2 mm</option><option value="3">3 mm</option><option value="4">4 mm</option><option value="6">6 mm</option><option value="8">8 mm</option><option value="10">10 mm</option><option value="15">15 mm</option>
+          <option value="reset">Standard</option>
+        </select>
+      </div>
+      <div class="tb-group">
+        <button type="button" data-command="removeFormat" title="Formatierung der Markierung entfernen">T<sub style="font-size:.6em">x</sub></button>
+        <button type="button" data-command="undo" title="Rückgängig (Strg+Z)">↶</button>
+        <button type="button" data-command="redo" title="Wiederholen (Strg+Y)">↷</button>
+      </div>
+      <div class="tb-group tb-keep">
+        <button type="button" id="richSourceBtn" title="HTML-Quelltext anzeigen/bearbeiten">&lt;/&gt;</button>
+      </div>
     </div>
-    <div class="rich-footer"><button id="richReset" class="ghost" type="button">Standardtext wiederherstellen</button><div class="btn-row" style="margin:0"><button id="richCancel" class="ghost" type="button">Abbrechen</button><button id="richSave" class="primary" type="button">Übernehmen</button></div></div>
+
+    <div class="rich-main">
+      <div class="rich-edit-col">
+        <div class="rich-canvas" id="richCanvas">
+          <div id="richEditor" class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Etikett-Text" spellcheck="true"
+               data-placeholder="Text hier einfügen oder tippen …&#10;Erste Zeile wird Überschrift, alles darunter Untertext."></div>
+          <textarea id="richSource" class="rich-source" spellcheck="false" hidden></textarea>
+        </div>
+      </div>
+      <aside class="rich-side">
+        <div class="rich-side-title">Live-Vorschau <span id="richDims"></span></div>
+        <div id="richPreview" class="rich-preview"></div>
+        <div id="richWarn" class="rich-warn" hidden>⚠ Der Text passt nicht ganz aufs Etikett. Schrift verkleinern, Abstände reduzieren oder Text kürzen.</div>
+        <div id="richQtyWrap"><label style="margin-top:0">Anzahl dieses Etiketts</label><input id="richQty" type="number" min="0" step="1"></div>
+        <div class="rich-tips">
+          <b>So geht's:</b> Zeile anklicken und oben das <b>Absatzformat</b> wählen (Überschrift / Untertext / Normal). Für einzelne Wörter Text markieren – dann <b>Fett, Größe, Farbe</b>.<br>
+          <b>Abstände:</b> Zeilenabstand &amp; „Abstand davor“ gelten für die Zeile(n) mit dem Cursor.<br>
+          <kbd>Strg</kbd>+<kbd>B</kbd>/<kbd>I</kbd>/<kbd>U</kbd> · <kbd>Strg</kbd>+<kbd>Enter</kbd> oder <kbd>Esc</kbd> = fertig
+        </div>
+      </aside>
+    </div>
+
+    <div class="rich-footer">
+      <button id="richDiscard" class="ghost" type="button">Änderungen verwerfen</button>
+      <span class="help">✓ Änderungen werden sofort übernommen und gespeichert</span>
+      <button id="richDone" class="primary" type="button">Fertig</button>
+    </div>
   </div>
 </div>
 <div id="selectionToolbar" class="selection-toolbar" hidden>
-  <button type="button" data-command="bold" title="Fett"><b>F</b></button><button type="button" data-command="italic" title="Kursiv"><i>K</i></button><button type="button" data-command="underline" title="Unterstrichen"><u>U</u></button><button type="button" data-command="removeFormat" title="Format entfernen">Tx</button>
+  <button type="button" data-command="bold" title="Fett"><b>F</b></button><button type="button" data-command="italic" title="Kursiv"><i>K</i></button><button type="button" data-command="underline" title="Unterstrichen"><u>U</u></button><button type="button" data-size-step="2" title="Größer">A+</button><button type="button" data-size-step="-2" title="Kleiner">A−</button><button type="button" data-command="removeFormat" title="Format entfernen">T<sub style="font-size:.6em">x</sub></button>
 </div>
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <span class="site-footer-version">Etiketten & Badgecard Tool · V1.6.0</span>
+    <span class="site-footer-version">Etiketten & Badgecard Tool · V1.7.0</span>
     <span class="site-footer-sep">·</span>
     <span>Made with Love ©</span>
-    <a class="site-footer-feedback" href="mailto:cryptopower@outlook.de?subject=Feedback%3A%20Etiketten%20%26%20Badgecard%20Tool%20V1.6.0">✉ Feedback</a>
+    <a class="site-footer-feedback" href="mailto:cryptopower@outlook.de?subject=Feedback%3A%20Etiketten%20%26%20Badgecard%20Tool%20V1.7.0">✉ Feedback</a>
   </div>
 </footer>
 
@@ -753,13 +1104,20 @@
 (function(){
   'use strict';
 
-  const VERSION = '1.6.0';
+  const VERSION = '1.7.0';
+  // Versionsunabhängiger, tool-eindeutiger Speicher-Schlüssel:
+  // Daten bleiben bei Updates erhalten und kollidieren nicht mit anderen lokalen Tools.
+  const STORAGE_KEY = 'kt80.etikettenBadgeTool.state';
+  const ZOOM_KEY = 'kt80.etikettenBadgeTool.zoom';
+  const MM_PX = 96 / 25.4;
 
+  const Z = {gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0};
   const PRESETS = {
-    half:{name:'A4 halbseitig – 2 Etiketten, 210 × 148,5 mm',cols:1,rows:2,labelW:210,labelH:148.5,gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},
-    quarter:{name:'A4 Viertelseite – 4 Etiketten, 105 × 148,5 mm',cols:2,rows:2,labelW:105,labelH:148.5,gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},
-    eighth:{name:'A4 Achtelseite – 8 Etiketten, 105 × 74,25 mm',cols:2,rows:4,labelW:105,labelH:74.25,gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},
-    sixteenth:{name:'A4 Sechzehntel – 16 Etiketten, 52,5 × 74,25 mm',cols:4,rows:4,labelW:52.5,labelH:74.25,gapX:0,gapY:0,marginTop:0,marginRight:0,marginBottom:0,marginLeft:0},
+    half:{name:'A4 Hälfte – 2 Etiketten, 210 × 148,5 mm',short:'2er',tile:true,cols:1,rows:2,labelW:210,labelH:148.5,...Z},
+    quarter:{name:'A4 Viertel – 4 Etiketten, 105 × 148,5 mm',short:'4er',tile:true,cols:2,rows:2,labelW:105,labelH:148.5,...Z},
+    sixth:{name:'A4 Sechstel – 6 Etiketten, 105 × 99 mm',short:'6er',tile:true,cols:2,rows:3,labelW:105,labelH:99,...Z},
+    eighth:{name:'A4 Achtel – 8 Etiketten, 105 × 74,25 mm',short:'8er',tile:true,cols:2,rows:4,labelW:105,labelH:74.25,...Z},
+    sixteenth:{name:'A4 Sechzehntel – 16 Etiketten, 52,5 × 74,25 mm',short:'16er',tile:true,cols:4,rows:4,labelW:52.5,labelH:74.25,...Z},
     business:{name:'Visitenkarte – 10 Karten, 85 × 55 mm',cols:2,rows:5,labelW:85,labelH:55,gapX:5,gapY:0,marginTop:11,marginRight:17.5,marginBottom:11,marginLeft:17.5},
     badge:{name:'Kongress Badgecards – 8 Karten, 80 × 52 mm',cols:2,rows:4,labelW:80,labelH:52,gapX:10,gapY:10,marginTop:19.5,marginRight:20,marginBottom:19.5,marginLeft:20},
     address24:{name:'Adressetiketten ähnlich 70 × 37 mm – 24 Stück',cols:3,rows:8,labelW:70,labelH:37,gapX:0,gapY:0,marginTop:0.5,marginRight:0,marginBottom:0.5,marginLeft:0},
@@ -769,33 +1127,55 @@
     namecards:{name:'Namenskarten groß – 4 Karten, 95 × 60 mm',cols:2,rows:2,labelW:95,labelH:60,gapX:10,gapY:25,marginTop:76,marginRight:5,marginBottom:76,marginLeft:5},
     custom:{name:'Eigenes Format',cols:2,rows:4,labelW:80,labelH:52,gapX:5,gapY:5,marginTop:10,marginRight:10,marginBottom:10,marginLeft:10}
   };
+  const LAYOUT_KEYS = ['cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft'];
+
+  function copy(obj){ return JSON.parse(JSON.stringify(obj)); }
+  function byId(id){ return document.getElementById(id); }
+  function escapeHtml(value){
+    return String(value ?? '').replace(/[&<>"']/g, function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+  function mm(value){ return String(Number(value || 0)) + 'mm'; }
+  function fmtNum(n){ return String(Math.round(Number(n) * 100) / 100).replace('.', ','); }
+
+  // Baut aus Überschrift + Text die Block-Struktur des Editors
+  function sourceHtml(headline, subline){
+    let html = '<div class="badge-headline">' + (escapeHtml(headline || '') || '<br>') + '</div>';
+    const lines = String(subline || '').replace(/\r/g,'').split('\n');
+    while(lines.length && !lines[lines.length - 1].trim()) lines.pop();
+    lines.forEach(function(line){
+      html += '<div class="badge-subline">' + (escapeHtml(line.replace(/\s+$/,'')) || '<br>') + '</div>';
+    });
+    return html;
+  }
+
+  function layoutOf(p){
+    const l = {};
+    LAYOUT_KEYS.forEach(function(k){ l[k] = p[k]; });
+    return l;
+  }
 
   const DEFAULT_STATE = {
     version:VERSION,
     preset:'badge',
-    layout:copy(PRESETS.badge),
+    layout:layoutOf(PRESETS.badge),
     orientation:'portrait',
     editMode:'same',
-    headline:'BEISPIELTITEL',
-    subline:'Untertitel',
-    richHtml:'',
+    frontHtml:sourceHtml('BEISPIELTITEL','Untertitel'),
     mainQty:8,
     items:[
-      {headline:'ATTENDANT',subline:'Entrance A',qty:2,html:''},
-      {headline:'CLEANING',subline:'Team 1',qty:2,html:''},
-      {headline:'FIRST AID',subline:'Support',qty:1,html:''}
+      {html:sourceHtml('ATTENDANT','Entrance A'),qty:2},
+      {html:sourceHtml('CLEANING','Team 1'),qty:2},
+      {html:sourceHtml('FIRST AID','Support'),qty:1}
     ],
-    style:{fontFamily:'Arial, sans-serif',fontSize:16,headlineSize:22,sublineSize:13,bold:false,italic:false,underline:false,headlineBold:true,textAlign:'center'},
+    style:{fontFamily:'Arial, sans-serif',fontSize:14,headlineSize:22,sublineSize:13,bold:false,italic:false,underline:false,headlineBold:true,textAlign:'center',vAlign:'center',padding:4},
     showCutmarks:true,
     showBorders:true,
     enableBack:false,
     duplexMode:'interleaved',
-    backHeadline:'Bitte sichtbar tragen',
-    backSubline:'Thank you for serving',
-    backHtml:'',
+    backHtml:sourceHtml('Bitte sichtbar tragen','Thank you for serving'),
     backStyle:{headlineSize:16,sublineSize:11},
-    advanced:false,
-    advancedHtml:'',
     image:{enabled:false,src:'',w:24,x:4,y:4,opacity:20}
   };
 
@@ -803,22 +1183,106 @@
   let zoom = 1;
   const el = {};
 
-  function copy(obj){
-    return JSON.parse(JSON.stringify(obj));
+  /* ---------------- Speichern ---------------- */
+  let saveTimer = null;
+  let savePending = false;
+
+  function setSaveStatus(kind){
+    const pill = byId('saveStatus');
+    if(!pill) return;
+    const txt = pill.querySelector('.txt');
+    pill.classList.remove('pending','warn');
+    const time = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    if(kind === 'pending'){ pill.classList.add('pending'); txt.textContent = 'Speichert …'; }
+    else if(kind === 'noimage'){ pill.classList.add('warn'); txt.textContent = 'Gespeichert ohne Bild'; pill.title = 'Das Bild ist zu groß für den Browser-Speicher. Text und Einstellungen sind gesichert – Bild per JSON-Export sichern.'; }
+    else if(kind === 'error'){ pill.classList.add('warn'); txt.textContent = 'Nicht gespeichert'; pill.title = 'Browser-Speicher nicht verfügbar (z. B. privater Modus). Bitte JSON exportieren.'; }
+    else { txt.textContent = 'Gespeichert ' + time; pill.title = 'Automatisch im Browser gespeichert'; }
   }
 
-  function byId(id){
-    return document.getElementById(id);
+  function saveNow(){
+    clearTimeout(saveTimer);
+    savePending = false;
+    state.version = VERSION;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setSaveStatus('ok');
+    }catch(err){
+      try{
+        const lite = copy(state);
+        lite.image.src = '';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(lite));
+        setSaveStatus('noimage');
+      }catch(err2){
+        setSaveStatus('error');
+      }
+    }
   }
 
-  function escapeHtml(value){
-    return String(value ?? '').replace(/[&<>"']/g, function(ch){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+  function scheduleSave(){
+    savePending = true;
+    setSaveStatus('pending');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 350);
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return normalize(JSON.parse(raw));
+    }catch(err){ console.warn('Gespeicherter Stand nicht lesbar:', err); }
+    return copy(DEFAULT_STATE);
+  }
+
+  /* ---------------- Migration / Import ---------------- */
+  function normalize(obj){
+    const fresh = copy(DEFAULT_STATE);
+    if(!obj || typeof obj !== 'object') return fresh;
+
+    ['preset','editMode','mainQty','showCutmarks','showBorders','enableBack','duplexMode'].forEach(function(k){
+      if(k in obj) fresh[k] = obj[k];
     });
+    fresh.orientation = obj.orientation === 'landscape' ? 'landscape' : 'portrait';
+    fresh.editMode = obj.editMode === 'list' ? 'list' : 'same';
+    fresh.duplexMode = obj.duplexMode === 'frontsThenBacks' ? 'frontsThenBacks' : 'interleaved';
+    fresh.layout = Object.assign({}, DEFAULT_STATE.layout, obj.layout || {});
+    fresh.style = Object.assign({}, DEFAULT_STATE.style, obj.style || {});
+    fresh.backStyle = Object.assign({}, DEFAULT_STATE.backStyle, obj.backStyle || {});
+    fresh.image = Object.assign({}, DEFAULT_STATE.image, obj.image || {});
+
+    // Vorderseite: neues Feld frontHtml, sonst aus v1.6 übernehmen
+    if(typeof obj.frontHtml === 'string') fresh.frontHtml = obj.frontHtml;
+    else if(obj.advanced && obj.advancedHtml) fresh.frontHtml = String(obj.advancedHtml).replace(/\n/g,'<br>');
+    else if(obj.richHtml) fresh.frontHtml = obj.richHtml;
+    else if('headline' in obj || 'subline' in obj) fresh.frontHtml = sourceHtml(obj.headline, obj.subline);
+
+    if(typeof obj.backHtml === 'string' && obj.backHtml) fresh.backHtml = obj.backHtml;
+    else if('backHeadline' in obj || 'backSubline' in obj) fresh.backHtml = sourceHtml(obj.backHeadline, obj.backSubline);
+
+    if(Array.isArray(obj.items)){
+      fresh.items = obj.items.map(function(item){
+        item = item || {};
+        return {
+          html: typeof item.html === 'string' && item.html ? item.html : sourceHtml(item.headline, item.subline),
+          qty: Math.max(0, Number(item.qty) || 0)
+        };
+      });
+    }
+
+    fresh.mainQty = Math.max(1, Number(fresh.mainQty) || 1);
+    fresh.version = VERSION;
+    if(!PRESETS[fresh.preset]) fresh.preset = 'custom';
+    return fresh;
   }
 
-  function mm(value){
-    return String(Number(value || 0)) + 'mm';
+  /* ---------------- Layout ---------------- */
+  function presetLayout(key){
+    const p = PRESETS[key] || PRESETS.custom;
+    const l = layoutOf(p);
+    if(p.tile && state.orientation === 'landscape'){
+      const c = l.cols; l.cols = l.rows; l.rows = c;
+      const w = l.labelW; l.labelW = l.labelH; l.labelH = w;
+    }
+    return l;
   }
 
   function applyOrientation(){
@@ -834,13 +1298,10 @@
     const pageW = landscape ? 297 : 210;
     const pageH = landscape ? 210 : 297;
     const l = state.layout;
-
     const availW = Math.max(l.labelW, pageW - l.marginLeft - l.marginRight);
     const availH = Math.max(l.labelH, pageH - l.marginTop - l.marginBottom);
-
     const fitCols = Math.max(1, Math.floor((availW + l.gapX) / (l.labelW + l.gapX)));
     const fitRows = Math.max(1, Math.floor((availH + l.gapY) / (l.labelH + l.gapY)));
-
     if(fitCols !== l.cols || fitRows !== l.rows){
       l.cols = fitCols;
       l.rows = fitRows;
@@ -848,15 +1309,26 @@
     }
   }
 
-  function plainLines(value){
-    const lines = String(value || '').replace(/\r/g,'').split('\n').map(function(line){return line.trim();}).filter(Boolean);
-    return {headline:lines[0] || '', subline:lines.slice(1).join('\n')};
+  function setOrientation(o){
+    if(state.orientation === o) return;
+    state.orientation = o;
+    if(PRESETS[state.preset] && PRESETS[state.preset].tile) state.layout = presetLayout(state.preset);
+    else fitLayoutToOrientation();
+    syncForm();
   }
 
+  function setPreset(key){
+    state.preset = key;
+    state.layout = presetLayout(key);
+    syncForm();
+  }
+
+  /* ---------------- Zoom ---------------- */
   function applyZoom(){
     zoom = Math.max(0.2, Math.min(2, zoom));
     document.documentElement.style.setProperty('--zoom', zoom);
     if(el.zoomValue) el.zoomValue.textContent = Math.round(zoom * 100) + '%';
+    try{ localStorage.setItem(ZOOM_KEY, String(zoom)); }catch(e){}
   }
 
   function fitZoom(){
@@ -865,45 +1337,28 @@
     const landscape = state.orientation === 'landscape';
     const pageWmm = landscape ? 297 : 210;
     const pageHmm = landscape ? 210 : 297;
-    const mmToPx = 96 / 25.4;
     const availW = wrap.clientWidth - 32;
-    const availH = window.innerHeight - wrap.getBoundingClientRect().top - 40;
-    const fitW = availW / (pageWmm * mmToPx);
-    const fitH = availH / (pageHmm * mmToPx);
+    const availH = window.innerHeight - headerHeight() - 90;
+    const fitW = availW / (pageWmm * MM_PX);
+    const fitH = availH / (pageHmm * MM_PX);
     zoom = Math.max(0.2, Math.min(1, Math.min(fitW, fitH)));
     zoom = Math.round(zoom * 100) / 100;
     applyZoom();
   }
 
-  function cacheElements(){
-    ['presetSelect','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','orientationPortrait','orientationLandscape','editMode','smartPaste','headline','subline','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','advancedToggle','advancedBox','advancedHtml','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','duplexMode','duplexHint','backHeadline','backSubline','backHeadlineSize','backSublineSize','pageStage','countInfo','zoomOut','zoomIn','zoomFit','zoomValue','importFile'].forEach(function(id){
-      el[id] = byId(id);
-    });
+  function headerHeight(){
+    const h = byId('appHeader');
+    return h ? h.offsetHeight : 84;
+  }
+  function updateHeaderVar(){
+    document.documentElement.style.setProperty('--header-h', headerHeight() + 'px');
   }
 
-  function normalize(imported){
-    const fresh = copy(DEFAULT_STATE);
-    if(!imported || typeof imported !== 'object') return fresh;
-    Object.assign(fresh, imported);
-    fresh.version = VERSION;
-    fresh.layout = Object.assign({}, DEFAULT_STATE.layout, imported.layout || {});
-    fresh.orientation = imported.orientation === 'landscape' ? 'landscape' : 'portrait';
-    fresh.style = Object.assign({}, DEFAULT_STATE.style, imported.style || {});
-    fresh.backStyle = Object.assign({}, DEFAULT_STATE.backStyle, imported.backStyle || {});
-    fresh.image = Object.assign({}, DEFAULT_STATE.image, imported.image || {});
-    fresh.items = Array.isArray(imported.items) ? imported.items.map(function(item){
-      return {
-        headline:item.headline || '',
-        subline:item.subline || '',
-        qty:Number(item.qty) || 0,
-        html:item.html || ''
-      };
-    }) : copy(DEFAULT_STATE.items);
-    fresh.richHtml = typeof imported.richHtml === 'string' ? imported.richHtml : '';
-    fresh.backHtml = typeof imported.backHtml === 'string' ? imported.backHtml : '';
-    fresh.mainQty = Math.max(1, Number(fresh.mainQty) || 1);
-    if(!PRESETS[fresh.preset]) fresh.preset = 'custom';
-    return fresh;
+  /* ---------------- Form ---------------- */
+  function cacheElements(){
+    ['presetSelect','quickPresets','cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft','showCutmarks','showBorders','orientationPortrait','orientationLandscape','modeSame','modeList','mainQty','itemsList','fontFamily','fontSize','headlineSize','sublineSize','alignLeft','alignCenter','alignRight','vTop','vCenter','vBottom','boldBtn','italicBtn','underlineBtn','headlineBoldBtn','cardPadding','imageEnabled','imageFile','imageW','imageOpacity','imageX','imageY','enableBack','backBox','duplexMode','duplexHint','backHeadlineSize','backSublineSize','pageStage','countInfo','zoomOut','zoomIn','zoomFit','zoomValue','importFile','frontMini','backMini'].forEach(function(id){
+      el[id] = byId(id);
+    });
   }
 
   function initPresets(){
@@ -913,6 +1368,32 @@
       option.value = key;
       option.textContent = PRESETS[key].name;
       el.presetSelect.appendChild(option);
+    });
+  }
+
+  function renderQuickPresets(){
+    const landscape = state.orientation === 'landscape';
+    el.quickPresets.classList.toggle('landscape', landscape);
+    el.quickPresets.innerHTML = '';
+    Object.keys(PRESETS).filter(function(k){ return PRESETS[k].tile; }).forEach(function(key){
+      const p = PRESETS[key];
+      const l = presetLayout(key);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.title = p.name + (landscape ? ' (quer)' : '');
+      b.classList.toggle('active', state.preset === key);
+      const icon = document.createElement('span');
+      icon.className = 'qp-icon';
+      icon.style.gridTemplateColumns = 'repeat(' + l.cols + ',1fr)';
+      icon.style.gridTemplateRows = 'repeat(' + l.rows + ',1fr)';
+      for(let i = 0; i < l.cols * l.rows; i++) icon.appendChild(document.createElement('i'));
+      const name = document.createElement('span');
+      name.textContent = p.short;
+      const size = document.createElement('small');
+      size.textContent = fmtNum(l.labelW) + '×' + fmtNum(l.labelH);
+      b.appendChild(icon); b.appendChild(name); b.appendChild(size);
+      b.addEventListener('click', function(){ setPreset(key); });
+      el.quickPresets.appendChild(b);
     });
   }
 
@@ -929,19 +1410,13 @@
     state.layout.marginLeft = Math.max(0, Number(el.marginLeft.value) || 0);
   }
 
+  function setActive(node, isActive){ if(node) node.classList.toggle('active', !!isActive); }
+
   function syncForm(){
     const l = state.layout;
     el.presetSelect.value = state.preset;
-    el.cols.value = l.cols;
-    el.rows.value = l.rows;
-    el.labelW.value = l.labelW;
-    el.labelH.value = l.labelH;
-    el.gapX.value = l.gapX;
-    el.gapY.value = l.gapY;
-    el.marginTop.value = l.marginTop;
-    el.marginRight.value = l.marginRight;
-    el.marginBottom.value = l.marginBottom;
-    el.marginLeft.value = l.marginLeft;
+    LAYOUT_KEYS.forEach(function(k){ el[k].value = l[k]; });
+    renderQuickPresets();
 
     el.showCutmarks.checked = !!state.showCutmarks;
     el.showBorders.checked = !!state.showBorders;
@@ -950,30 +1425,28 @@
     setActive(el.orientationLandscape, state.orientation === 'landscape');
     applyOrientation();
 
-    el.editMode.value = state.editMode;
+    setActive(el.modeSame, state.editMode === 'same');
+    setActive(el.modeList, state.editMode === 'list');
     byId('sameEditor').style.display = state.editMode === 'same' ? 'block' : 'none';
     byId('listEditor').style.display = state.editMode === 'list' ? 'block' : 'none';
-
-    el.headline.value = state.headline;
-    el.subline.value = state.subline;
     el.mainQty.value = state.mainQty;
 
     el.fontFamily.value = state.style.fontFamily;
     el.fontSize.value = state.style.fontSize;
     el.headlineSize.value = state.style.headlineSize;
     el.sublineSize.value = state.style.sublineSize;
+    el.cardPadding.value = state.style.padding;
 
     setActive(el.alignLeft, state.style.textAlign === 'left');
     setActive(el.alignCenter, state.style.textAlign === 'center');
     setActive(el.alignRight, state.style.textAlign === 'right');
-    setActive(el.boldBtn, !!state.style.bold);
-    setActive(el.italicBtn, !!state.style.italic);
-    setActive(el.underlineBtn, !!state.style.underline);
-    setActive(el.headlineBoldBtn, !!state.style.headlineBold);
-
-    el.advancedToggle.checked = !!state.advanced;
-    el.advancedBox.classList.toggle('show', !!state.advanced);
-    el.advancedHtml.value = state.advancedHtml || '';
+    setActive(el.vTop, state.style.vAlign === 'top');
+    setActive(el.vCenter, state.style.vAlign === 'center');
+    setActive(el.vBottom, state.style.vAlign === 'bottom');
+    setActive(el.boldBtn, state.style.bold);
+    setActive(el.italicBtn, state.style.italic);
+    setActive(el.underlineBtn, state.style.underline);
+    setActive(el.headlineBoldBtn, state.style.headlineBold);
 
     el.imageEnabled.checked = !!state.image.enabled;
     el.imageW.value = state.image.w;
@@ -982,10 +1455,8 @@
     el.imageY.value = state.image.y;
 
     el.enableBack.checked = !!state.enableBack;
+    el.backBox.style.display = state.enableBack ? 'block' : 'none';
     el.duplexMode.value = state.duplexMode;
-    updateDuplexHint();
-    el.backHeadline.value = state.backHeadline;
-    el.backSubline.value = state.backSubline;
     el.backHeadlineSize.value = state.backStyle.headlineSize;
     el.backSublineSize.value = state.backStyle.sublineSize;
 
@@ -993,206 +1464,211 @@
     renderPreview();
   }
 
-  function setActive(node, isActive){
-    node.classList.toggle('active', isActive);
+  /* ---------------- Inhalte ---------------- */
+  function htmlSummary(html){
+    const t = document.createElement('template');
+    t.innerHTML = safeHtml(html);
+    const lines = [];
+    const kids = Array.from(t.content.childNodes);
+    if(kids.some(function(n){ return n.nodeType === 1 && /^(DIV|P)$/.test(n.tagName); })){
+      kids.forEach(function(n){ const s = (n.textContent || '').trim(); if(s) lines.push(s); });
+    }else{
+      (t.content.textContent || '').split('\n').forEach(function(s){ s = s.trim(); if(s) lines.push(s); });
+    }
+    return {title:lines[0] || '', rest:lines.slice(1).join(' · ')};
   }
 
   function renderItemsEditor(){
     el.itemsList.innerHTML = '';
-    state.items.forEach(function(item,index){
-      const box = document.createElement('div');
-      box.className = 'item-row';
+    if(!state.items.length){
+      const empty = document.createElement('div');
+      empty.className = 'help';
+      empty.textContent = 'Noch keine Einträge – mit „＋ Eintrag“ anlegen.';
+      el.itemsList.appendChild(empty);
+    }
+    state.items.forEach(function(item, index){
+      const row = document.createElement('div');
+      row.className = 'item-row';
 
-      const top = document.createElement('div');
-      top.className = 'item-top';
+      const num = document.createElement('span');
+      num.className = 'item-num';
+      num.textContent = index + 1;
 
-      const headline = document.createElement('input');
-      headline.placeholder = 'Überschrift';
-      headline.value = item.headline || '';
-      headline.addEventListener('input', function(){
-        state.items[index].headline = headline.value; state.items[index].html = '';
-        renderPreview();
-      });
+      const text = document.createElement('div');
+      text.className = 'item-text';
+      text.title = 'Klicken zum Bearbeiten';
+      const sum = htmlSummary(item.html);
+      const strong = document.createElement('strong');
+      if(sum.title) strong.textContent = sum.title;
+      else { const em = document.createElement('em'); em.textContent = '(leer – klicken zum Füllen)'; strong.appendChild(em); }
+      const span = document.createElement('span');
+      span.textContent = sum.rest || ' ';
+      text.appendChild(strong); text.appendChild(span);
+      text.addEventListener('click', function(){ openRich('item', index); });
 
       const qty = document.createElement('input');
-      qty.type = 'number';
-      qty.min = '0';
-      qty.step = '1';
+      qty.type = 'number'; qty.min = '0'; qty.step = '1';
+      qty.title = 'Anzahl';
       qty.value = Number(item.qty) || 0;
       qty.addEventListener('input', function(){
         state.items[index].qty = Math.max(0, Number(qty.value) || 0);
         renderPreview();
       });
 
-      const remove = document.createElement('button');
-      remove.className = 'mini danger';
-      remove.type = 'button';
-      remove.textContent = '×';
-      remove.addEventListener('click', function(){
-        state.items.splice(index,1);
+      const actions = document.createElement('div');
+      actions.className = 'item-actions';
+      const edit = mkBtn('✎', 'Bearbeiten', 'ghost', function(){ openRich('item', index); });
+      const dup = mkBtn('⧉', 'Duplizieren', 'ghost', function(){
+        state.items.splice(index + 1, 0, copy(state.items[index]));
         syncForm();
       });
-
-      top.appendChild(headline);
-      top.appendChild(qty);
-      top.appendChild(remove);
-
-      const label = document.createElement('label');
-      label.textContent = 'Text darunter';
-
-      const subline = document.createElement('textarea');
-      subline.placeholder = 'Details';
-      subline.value = item.subline || '';
-      subline.addEventListener('input', function(){
-        state.items[index].subline = subline.value; state.items[index].html = '';
-        renderPreview();
+      const del = mkBtn('×', 'Löschen', 'danger', function(){
+        state.items.splice(index, 1);
+        syncForm();
       });
+      actions.appendChild(edit); actions.appendChild(dup); actions.appendChild(del);
 
-      box.appendChild(top);
-      box.appendChild(label);
-      box.appendChild(subline);
-      const richBtn = document.createElement('button');
-      richBtn.type = 'button'; richBtn.className = 'mini rich-edit-btn';
-      richBtn.textContent = item.html ? '✎ Formatierung bearbeiten ✓' : '✎ Text frei gestalten';
-      richBtn.addEventListener('click', function(){ openRich('item',index); });
-      box.appendChild(richBtn);
-      el.itemsList.appendChild(box);
+      row.appendChild(num); row.appendChild(text); row.appendChild(qty); row.appendChild(actions);
+      el.itemsList.appendChild(row);
     });
   }
 
-  function collectEntries(front){
-    if(front === false && state.enableBack){
-      return collectEntries(true).map(function(){
-        return {headline:state.backHeadline, subline:state.backSubline, html:state.backHtml || '', back:true};
-      });
-    }
+  function mkBtn(label, title, cls, fn){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = cls; b.textContent = label; b.title = title;
+    b.addEventListener('click', fn);
+    return b;
+  }
 
+  function collectEntries(front){
+    if(front === false){
+      return collectEntries(true).map(function(){ return {html:state.backHtml || '', back:true}; });
+    }
     if(state.editMode === 'same'){
       const qty = Math.max(1, Number(state.mainQty) || 1);
       const arr = [];
-      for(let i=0;i<qty;i++){
-        arr.push({headline:state.headline, subline:state.subline, html:state.advanced ? state.advancedHtml : (state.richHtml || '')});
-      }
+      for(let i = 0; i < qty; i++) arr.push({html:state.frontHtml || ''});
       return arr;
     }
-
     const result = [];
     state.items.forEach(function(item){
       const qty = Math.max(0, Number(item.qty) || 0);
-      for(let i=0;i<qty;i++){
-        result.push({headline:item.headline || '', subline:item.subline || '', html:item.html || ''});
-      }
+      for(let i = 0; i < qty; i++) result.push({html:item.html || ''});
     });
-    return result.length ? result : [{headline:'',subline:'',html:''}];
+    return result.length ? result : [{html:'', blank:true}];
   }
 
   function splitIntoPages(title, entries){
     const perPage = Math.max(1, state.layout.cols * state.layout.rows);
     const pages = [];
-    for(let start=0; start<entries.length; start += perPage){
+    for(let start = 0; start < entries.length; start += perPage){
       const chunk = entries.slice(start, start + perPage);
-      while(chunk.length < perPage) chunk.push({headline:'',subline:'',html:''});
+      while(chunk.length < perPage) chunk.push({html:'', blank:true, back:entries[0] && entries[0].back});
       pages.push({title:title + (entries.length > perPage ? ' ' + (pages.length + 1) : ''), entries:chunk});
     }
     return pages;
   }
 
-  function getFrontPageCount(){
-    const perPage = Math.max(1, state.layout.cols * state.layout.rows);
-    const count = collectEntries(true).length;
-    return Math.ceil(count / perPage);
-  }
-
-  function updateDuplexHint(){
-    if(!el.duplexHint) return;
-    const pages = getFrontPageCount();
+  function updateDuplexHint(frontPageCount){
     el.duplexHint.classList.toggle('active', !!state.enableBack);
-
     if(!state.enableBack){
-      el.duplexHint.textContent = 'Rückseite ist aus. Aktiviere die Checkbox, um Rückseiten in die Druckvorschau einzufügen.';
+      el.duplexHint.textContent = 'Rückseite ist aus. Checkbox aktivieren, um Rückseiten in die Druckvorschau einzufügen.';
       return;
     }
+    let txt = state.duplexMode === 'interleaved'
+      ? 'Aktiv · Reihenfolge Vorderseite 1 → Rückseite 1 → Vorderseite 2 … (normaler Duplexdruck).'
+      : 'Aktiv · erst alle Vorderseiten, danach alle Rückseiten (praktisch fürs manuelle Wiedereinlegen).';
+    if(frontPageCount <= 1) txt += ' Bei nur einer Vorderseite ist die Reihenfolge identisch.';
+    el.duplexHint.textContent = txt;
+  }
 
-    if(state.duplexMode === 'interleaved'){
-      el.duplexHint.textContent = 'Rückseite ist aktiv. Druckreihenfolge: Vorderseite 1 → Rückseite 1 → Vorderseite 2 → Rückseite 2. Bei nur einer Vorderseite sieht die Auswahl natürlich fast gleich aus.';
-    }else{
-      el.duplexHint.textContent = 'Rückseite ist aktiv. Druckreihenfolge: erst alle Vorderseiten, danach alle Rückseiten. Das ist praktisch fürs manuelle Wiedereinlegen.';
-    }
+  /* ---------------- Rendering ---------------- */
+  function applySheetVars(node, back){
+    const l = state.layout, s = state.style;
+    const set = function(k, v){ node.style.setProperty(k, v); };
+    set('--cols', l.cols);
+    set('--label-w', mm(l.labelW));
+    set('--label-h', mm(l.labelH));
+    set('--gap-x', mm(l.gapX));
+    set('--gap-y', mm(l.gapY));
+    set('--page-margin-top', mm(l.marginTop));
+    set('--page-margin-right', mm(l.marginRight));
+    set('--page-margin-bottom', mm(l.marginBottom));
+    set('--page-margin-left', mm(l.marginLeft));
+    set('--font-family', s.fontFamily);
+    set('--font-size', (Number(s.fontSize) || 14) + 'pt');
+    set('--font-weight', s.bold ? '800' : '400');
+    set('--font-style', s.italic ? 'italic' : 'normal');
+    set('--text-decoration', s.underline ? 'underline' : 'none');
+    set('--text-align', s.textAlign || 'center');
+    set('--v-align', {top:'flex-start',center:'center',bottom:'flex-end'}[s.vAlign] || 'center');
+    set('--card-padding', mm(s.padding == null ? 4 : s.padding));
+    set('--headline-size', (Number(back ? state.backStyle.headlineSize : s.headlineSize) || 22) + 'pt');
+    set('--subline-size', (Number(back ? state.backStyle.sublineSize : s.sublineSize) || 13) + 'pt');
+    set('--headline-weight', s.headlineBold || s.bold ? '800' : '400');
+    set('--subline-weight', s.bold ? '800' : '400');
+  }
 
-    if(pages <= 1){
-      el.duplexHint.textContent += ' Hinweis: Aktuell gibt es nur eine Vorderseite; der Unterschied der beiden Duplex-Optionen wird erst ab Seite 2 sichtbar.';
-    }
+  let previewTimer = null;
+  function schedulePreview(){
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(renderPreview, 140);
   }
 
   function renderPreview(){
+    clearTimeout(previewTimer);
     try{
       el.pageStage.innerHTML = '';
       const frontEntries = collectEntries(true);
       const frontPages = splitIntoPages('Vorderseite', frontEntries);
-      let allPages = [];
+      let allPages = frontPages;
 
       if(state.enableBack){
         const backPages = splitIntoPages('Rückseite', collectEntries(false));
         if(state.duplexMode === 'interleaved'){
-          for(let i=0;i<frontPages.length;i++){
+          allPages = [];
+          for(let i = 0; i < frontPages.length; i++){
             allPages.push(frontPages[i]);
             if(backPages[i]) allPages.push(backPages[i]);
           }
         }else{
           allPages = frontPages.concat(backPages);
         }
-      }else{
-        allPages = frontPages;
       }
 
       allPages.forEach(function(page){
         el.pageStage.appendChild(createPage(page.title, page.entries));
       });
 
-      el.countInfo.textContent = frontEntries.length + ' Etikett(en) · ' + state.layout.cols + ' × ' + state.layout.rows + ' pro Seite · ' + frontPages.length + ' Vorderseite(n)' + (state.enableBack ? ' + Rückseite' : '');
-      updateDuplexHint();
+      // Überlauf-Prüfung (Text größer als Etikett)
+      let overflow = 0;
+      el.pageStage.querySelectorAll('.label-card:not(.blank)').forEach(function(card){
+        if(isOverflowing(card)){ card.classList.add('overflowing'); overflow++; }
+      });
+
+      const real = frontEntries.filter(function(e){ return !e.blank; }).length;
+      el.countInfo.innerHTML = escapeHtml(real + ' Etikett(en) · ' + state.layout.cols + ' × ' + state.layout.rows + ' pro Seite · ' + frontPages.length + ' Seite(n)' + (state.enableBack ? ' + Rückseiten' : '')) +
+        (overflow ? ' · <span class="warn" title="Rot markierte Etiketten: Text ist abgeschnitten">⚠ ' + overflow + '× Text zu groß</span>' : '');
+      updateDuplexHint(frontPages.length);
+      renderSideMinis();
     }catch(error){
       console.error(error);
       el.pageStage.innerHTML = '<div class="help">Vorschaufehler: ' + escapeHtml(error.message) + '</div>';
     }
+    scheduleSave();
   }
 
   function createPage(title, entries){
     const holder = document.createElement('div');
     holder.className = 'page-holder';
-
     const pageTitle = document.createElement('div');
     pageTitle.className = 'page-title';
     pageTitle.textContent = title;
-
     const sheet = document.createElement('div');
     sheet.className = 'sheet';
     if(state.showCutmarks) sheet.classList.add('cutmarks');
-
-    sheet.style.setProperty('--cols', state.layout.cols);
-    sheet.style.setProperty('--label-w', mm(state.layout.labelW));
-    sheet.style.setProperty('--label-h', mm(state.layout.labelH));
-    sheet.style.setProperty('--gap-x', mm(state.layout.gapX));
-    sheet.style.setProperty('--gap-y', mm(state.layout.gapY));
-    sheet.style.setProperty('--page-margin-top', mm(state.layout.marginTop));
-    sheet.style.setProperty('--page-margin-right', mm(state.layout.marginRight));
-    sheet.style.setProperty('--page-margin-bottom', mm(state.layout.marginBottom));
-    sheet.style.setProperty('--page-margin-left', mm(state.layout.marginLeft));
-    sheet.style.setProperty('--font-family', state.style.fontFamily);
-    sheet.style.setProperty('--font-size', (Number(state.style.fontSize) || 16) + 'pt');
-    sheet.style.setProperty('--font-weight', state.style.bold ? '800' : '400');
-    sheet.style.setProperty('--font-style', state.style.italic ? 'italic' : 'normal');
-    sheet.style.setProperty('--text-decoration', state.style.underline ? 'underline' : 'none');
-    sheet.style.setProperty('--text-align', state.style.textAlign || 'center');
-    sheet.style.setProperty('--headline-size', (Number(state.style.headlineSize) || 22) + 'pt');
-    sheet.style.setProperty('--subline-size', (Number(state.style.sublineSize) || 13) + 'pt');
-    sheet.style.setProperty('--headline-weight', state.style.headlineBold ? '800' : '400');
-    sheet.style.setProperty('--subline-weight', state.style.bold ? '800' : '400');
-
-    entries.forEach(function(entry){
-      sheet.appendChild(createCard(entry));
-    });
-
+    applySheetVars(sheet, false);
+    entries.forEach(function(entry){ sheet.appendChild(createCard(entry)); });
     holder.appendChild(pageTitle);
     holder.appendChild(sheet);
     return holder;
@@ -1201,13 +1677,13 @@
   function createCard(entry){
     const card = document.createElement('div');
     card.className = 'label-card';
+    if(entry.blank) card.classList.add('blank');
     if(!state.showBorders) card.classList.add('no-border');
     if(entry.back){
       card.style.setProperty('--headline-size', (Number(state.backStyle.headlineSize) || 16) + 'pt');
       card.style.setProperty('--subline-size', (Number(state.backStyle.sublineSize) || 11) + 'pt');
     }
-
-    if(state.image.enabled && state.image.src){
+    if(state.image.enabled && state.image.src && !entry.blank){
       const img = document.createElement('img');
       img.className = 'label-image';
       img.src = state.image.src;
@@ -1215,273 +1691,659 @@
       img.style.setProperty('--img-x', mm(state.image.x));
       img.style.setProperty('--img-y', mm(state.image.y));
       img.style.setProperty('--img-w', mm(state.image.w));
-      img.style.setProperty('--img-opacity', Math.max(0,Math.min(100,Number(state.image.opacity)||20)) / 100);
+      img.style.setProperty('--img-opacity', Math.max(0, Math.min(100, Number(state.image.opacity) || 20)) / 100);
       card.appendChild(img);
     }
-
     const content = document.createElement('div');
     content.className = 'label-content';
-
-    if(entry.html){
-      content.innerHTML = safeHtml(entry.html);
-    }else{
-      const headline = document.createElement('span');
-      headline.className = 'badge-headline';
-      headline.textContent = entry.headline || '';
-      content.appendChild(headline);
-
-      if(entry.subline){
-        const subline = document.createElement('span');
-        subline.className = 'badge-subline';
-        subline.textContent = entry.subline;
-        content.appendChild(subline);
-      }
-    }
-
+    content.innerHTML = safeHtml(entry.html);
     card.appendChild(content);
     return card;
   }
 
+  function isOverflowing(card){
+    const c = card.querySelector('.label-content');
+    if(!c || !card.clientHeight) return false;
+    const cs = getComputedStyle(card);
+    const innerH = card.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    return c.scrollHeight > innerH + 1.5 || c.scrollWidth > c.clientWidth + 1.5;
+  }
+
+  // Einzelnes Etikett maßstabsgetreu verkleinert darstellen
+  function renderMiniCard(box, html, back, maxW, maxH){
+    box.innerHTML = '';
+    const stage = document.createElement('div');
+    stage.className = 'mini-stage';
+    applySheetVars(stage, back);
+    const card = createCard({html:html, back:back});
+    const wPx = state.layout.labelW * MM_PX;
+    const hPx = state.layout.labelH * MM_PX;
+    const sc = Math.max(0.05, Math.min(maxW / wPx, (maxH || Infinity) / hPx, 1.6));
+    const frame = document.createElement('div');
+    frame.className = 'mini-frame';
+    frame.style.width = (wPx * sc) + 'px';
+    frame.style.height = (hPx * sc) + 'px';
+    card.style.transform = 'scale(' + sc + ')';
+    frame.appendChild(card);
+    stage.appendChild(frame);
+    box.appendChild(stage);
+    return {scale:sc, overflow:isOverflowing(card)};
+  }
+
+  function renderSideMinis(){
+    if(state.editMode === 'same' && el.frontMini.offsetParent){
+      const box = el.frontMini.querySelector('.mini-box');
+      const res = renderMiniCard(box, state.frontHtml, false, Math.max(160, el.frontMini.clientWidth - 26), 190);
+      el.frontMini.classList.toggle('warn', res.overflow);
+    }
+    if(state.enableBack && el.backMini.offsetParent){
+      const box = el.backMini.querySelector('.mini-box');
+      const res = renderMiniCard(box, state.backHtml, true, Math.max(160, el.backMini.clientWidth - 26), 160);
+      el.backMini.classList.toggle('warn', res.overflow);
+    }
+  }
+
+  /* ---------------- HTML-Bereinigung ---------------- */
   function safeHtml(input){
     const template = document.createElement('template');
-    template.innerHTML = String(input || '').replace(/\n/g,'<br>');
-    const allowedTags = new Set(['B','STRONG','I','EM','U','S','STRIKE','BR','SPAN','DIV','P','SMALL','FONT']);
-    const allowedStyles = new Set(['font-size','font-weight','font-style','text-decoration','color','line-height','letter-spacing','text-align']);
+    template.innerHTML = String(input || '');
+    const allowedTags = new Set(['B','STRONG','I','EM','U','S','STRIKE','BR','SPAN','DIV','P','SMALL','FONT','SUB','SUP']);
+    const allowedStyles = new Set(['font-size','font-weight','font-style','text-decoration','text-decoration-line','color','line-height','letter-spacing','text-align','margin-top','margin-bottom']);
+    const allowedClasses = ['badge-headline','badge-subline'];
 
     function clean(node){
       Array.from(node.childNodes).forEach(function(child){
-        if(child.nodeType === Node.ELEMENT_NODE){
-          if(!allowedTags.has(child.tagName)){
-            child.replaceWith(document.createTextNode(child.textContent));
+        if(child.nodeType === Node.COMMENT_NODE){ child.remove(); return; }
+        if(child.nodeType !== Node.ELEMENT_NODE) return;
+        if(!allowedTags.has(child.tagName)){
+          child.replaceWith(document.createTextNode(child.textContent));
+          return;
+        }
+        Array.from(child.attributes).forEach(function(attr){
+          const name = attr.name.toLowerCase();
+          if(name === 'style') return;
+          if(name === 'class'){
+            const keep = attr.value.split(/\s+/).filter(function(c){ return allowedClasses.includes(c); });
+            if(keep.length) child.setAttribute('class', keep.join(' ')); else child.removeAttribute('class');
             return;
           }
-          Array.from(child.attributes).forEach(function(attr){
-            if(attr.name.toLowerCase() !== 'style' && !(attr.name.toLowerCase() === 'class' && ['badge-headline','badge-subline'].includes(attr.value)) && !(child.tagName === 'FONT' && ['color','size'].includes(attr.name.toLowerCase()) && /^(#[0-9a-f]{3,8}|[a-z]+|[1-7])$/i.test(attr.value))) child.removeAttribute(attr.name);
+          if(child.tagName === 'FONT' && (name === 'color' || name === 'size') && /^(#[0-9a-f]{3,8}|[a-z]+|[1-7])$/i.test(attr.value)) return;
+          child.removeAttribute(attr.name);
+        });
+        if(child.hasAttribute('style')){
+          const rules = [];
+          child.getAttribute('style').split(';').forEach(function(rule){
+            const parts = rule.split(':');
+            if(parts.length < 2) return;
+            const prop = parts[0].trim().toLowerCase();
+            const val = parts.slice(1).join(':').trim().replace(/[<>"]/g,'');
+            if(allowedStyles.has(prop) && val && !/url\(|expression|javascript/i.test(val)) rules.push(prop + ':' + val);
           });
-          if(child.hasAttribute('style')){
-            const cleanRules = [];
-            child.getAttribute('style').split(';').forEach(function(rule){
-              const parts = rule.split(':');
-              if(parts.length < 2) return;
-              const prop = parts[0].trim().toLowerCase();
-              const val = parts.slice(1).join(':').trim().replace(/[<>]/g,'');
-              if(allowedStyles.has(prop)) cleanRules.push(prop + ':' + val);
-            });
-            if(cleanRules.length) child.setAttribute('style', cleanRules.join(';'));
-            else child.removeAttribute('style');
-          }
-          clean(child);
+          if(rules.length) child.setAttribute('style', rules.join(';'));
+          else child.removeAttribute('style');
         }
+        clean(child);
       });
     }
 
     clean(template.content);
+    Array.from(template.content.childNodes).forEach(function(n){
+      if(n.nodeType === Node.TEXT_NODE && /^\s*$/.test(n.textContent) && /\n/.test(n.textContent)) n.remove();
+    });
     return template.innerHTML;
   }
 
-  function applySmartPaste(){
-    const raw = el.smartPaste.value.trim();
-    if(!raw) return;
-    const split = plainLines(raw);
-    if(state.editMode === 'same'){
-      state.headline = split.headline;
-      state.subline = split.subline;
+  /* ---------------- Editor-Modal ---------------- */
+  const rich = {target:null, snapshot:'', sourceMode:false, lastRange:null, downOnBackdrop:false};
+  let editor, source, modal, toolbar;
+
+  function getTargetHtml(t){
+    if(!t) return '';
+    if(t.kind === 'item') return (state.items[t.index] || {}).html || '';
+    if(t.kind === 'back') return state.backHtml || '';
+    return state.frontHtml || '';
+  }
+  function setTargetHtml(t, html){
+    if(!t) return;
+    if(t.kind === 'item'){ if(state.items[t.index]) state.items[t.index].html = html; }
+    else if(t.kind === 'back') state.backHtml = html;
+    else state.frontHtml = html;
+  }
+
+  function compactHtml(v){
+    return String(v || '').replace(/>\s*\n\s*</g,'><').replace(/\n/g,'<br>');
+  }
+  function prettyHtml(h){
+    return String(h || '').replace(/(<\/(div|p)>)(?!$)/gi,'$1\n');
+  }
+  function getEditorHtml(){
+    return rich.sourceMode ? safeHtml(compactHtml(source.value)) : safeHtml(editor.innerHTML);
+  }
+
+  function isBlock(n){ return n && n.nodeType === 1 && /^(DIV|P)$/.test(n.tagName); }
+
+  // Sorgt dafür, dass jede Zeile ein eigener Block (div) ist
+  function normalizeBlocks(){
+    const sel = window.getSelection();
+    let saved = null;
+    if(sel && sel.rangeCount && editor.contains(sel.anchorNode)){
+      const r = sel.getRangeAt(0);
+      saved = {sc:r.startContainer, so:r.startOffset, ec:r.endContainer, eo:r.endOffset};
+    }
+    let changed = false;
+    let run = null;
+    Array.from(editor.childNodes).forEach(function(n){
+      if(n.nodeType === 1 && n.tagName === 'SPAN' && /badge-(headline|subline)/.test(n.className)){
+        const d = document.createElement('div');
+        d.className = n.className;
+        if(n.getAttribute('style')) d.setAttribute('style', n.getAttribute('style'));
+        while(n.firstChild) d.appendChild(n.firstChild);
+        n.replaceWith(d);
+        run = null; changed = true;
+        return;
+      }
+      if(isBlock(n)){ run = null; return; }
+      if(n.nodeType === 3 && !run && /^\s*$/.test(n.textContent) && /\n/.test(n.textContent)){ n.remove(); changed = true; return; }
+      if(n.nodeType === 1 && n.tagName === 'BR'){
+        if(run){ run.appendChild(n); run = null; }
+        else{
+          const d = document.createElement('div');
+          editor.insertBefore(d, n);
+          d.appendChild(n);
+        }
+        changed = true;
+        return;
+      }
+      if(!run){
+        run = document.createElement('div');
+        editor.insertBefore(run, n);
+      }
+      run.appendChild(n);
+      changed = true;
+    });
+    if(changed && saved){
+      try{
+        if(editor.contains(saved.sc) && editor.contains(saved.ec)) sel.setBaseAndExtent(saved.sc, saved.so, saved.ec, saved.eo);
+      }catch(e){}
+    }
+    return changed;
+  }
+
+  function currentRange(){
+    const sel = window.getSelection();
+    if(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).commonAncestorContainer)) return sel.getRangeAt(0);
+    return rich.lastRange;
+  }
+
+  function restoreRange(){
+    editor.focus({preventScroll:true});
+    if(rich.lastRange){
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(rich.lastRange);
+    }
+  }
+
+  function selectedBlocks(doNormalize){
+    if(doNormalize) normalizeBlocks();
+    const range = currentRange();
+    const blocks = Array.from(editor.children).filter(isBlock);
+    if(!blocks.length){
+      if(!doNormalize) return [];
+      const d = document.createElement('div');
+      d.innerHTML = '<br>';
+      editor.appendChild(d);
+      return [d];
+    }
+    if(!range) return [blocks[blocks.length - 1]];
+    const hit = blocks.filter(function(b){ try{ return range.intersectsNode(b); }catch(e){ return false; } });
+    return hit.length ? hit : [blocks[blocks.length - 1]];
+  }
+
+  function applyBlockStyle(prop, value){
+    if(rich.sourceMode) return;
+    restoreRange();
+    selectedBlocks(true).forEach(function(b){
+      if(value === '' || value == null) b.style.removeProperty(prop);
+      else b.style.setProperty(prop, value);
+      if(!b.getAttribute('style')) b.removeAttribute('style');
+    });
+    commitRich();
+    updateToolbarState();
+  }
+
+  function setBlockType(type){
+    if(rich.sourceMode) return;
+    restoreRange();
+    selectedBlocks(true).forEach(function(b){
+      b.classList.remove('badge-headline','badge-subline');
+      if(type === 'headline') b.classList.add('badge-headline');
+      if(type === 'subline') b.classList.add('badge-subline');
+      if(!b.className) b.removeAttribute('class');
+      b.style.removeProperty('font-size');
+      if(!b.getAttribute('style')) b.removeAttribute('style');
+    });
+    commitRich();
+  }
+
+  function applyInlineSize(pt){
+    if(rich.sourceMode) return;
+    restoreRange();
+    const sel = window.getSelection();
+    if(!sel.rangeCount || sel.isCollapsed){
+      applyBlockStyle('font-size', pt ? pt + 'pt' : '');
+      if(!pt) selectedBlocks(false).forEach(function(b){
+        b.querySelectorAll('[style*="font-size"]').forEach(function(x){ x.style.removeProperty('font-size'); if(!x.getAttribute('style')) x.removeAttribute('style'); });
+        b.querySelectorAll('font[size]').forEach(function(f){ f.removeAttribute('size'); });
+      });
+      commitRich();
+      return;
+    }
+    document.execCommand('styleWithCSS', false, false);
+    document.execCommand('fontSize', false, '7');
+    const created = [];
+    editor.querySelectorAll('font[size="7"]').forEach(function(f){
+      const s = document.createElement('span');
+      if(pt) s.style.fontSize = pt + 'pt';
+      while(f.firstChild) s.appendChild(f.firstChild);
+      s.querySelectorAll('[style*="font-size"]').forEach(function(x){ x.style.removeProperty('font-size'); if(!x.getAttribute('style')) x.removeAttribute('style'); });
+      s.querySelectorAll('font[size]').forEach(function(x){ x.removeAttribute('size'); });
+      f.replaceWith(s);
+      created.push(s);
+    });
+    // Markierung wiederherstellen
+    if(created.length){
+      const r = document.createRange();
+      r.setStartBefore(created[0]);
+      r.setEndAfter(created[created.length - 1]);
+      sel.removeAllRanges(); sel.addRange(r);
+      rich.lastRange = r.cloneRange();
+    }
+    commitRich();
+  }
+
+  function stepSelectionSize(step){
+    const range = currentRange();
+    let node = range ? range.startContainer : null;
+    if(node && node.nodeType === 3) node = node.parentNode;
+    const basePx = node && editor.contains(node) ? parseFloat(getComputedStyle(node).fontSize) : 16;
+    const pt = Math.max(6, Math.round(basePx * 0.75) + step);
+    applyInlineSize(pt);
+  }
+
+  function richCommand(command){
+    if(rich.sourceMode) return;
+    restoreRange();
+    document.execCommand('styleWithCSS', false, false);
+    document.execCommand(command, false, null);
+    normalizeBlocks();
+    commitRich();
+    updateToolbarState();
+    updateSelectionToolbar();
+  }
+
+  function commitRich(){
+    if(!rich.target) return;
+    const html = getEditorHtml();
+    setTargetHtml(rich.target, html);
+    editor.classList.toggle('is-empty', !rich.sourceMode && !editor.textContent.trim() && !editor.querySelector('br + br'));
+    renderRichPreview();
+    schedulePreview();
+  }
+
+  function renderRichPreview(){
+    if(!rich.target || modal.hidden) return;
+    const box = byId('richPreview');
+    const w = Math.max(160, box.clientWidth - 30);
+    const res = renderMiniCard(box, getTargetHtml(rich.target), rich.target.kind === 'back', w, 380);
+    byId('richDims').textContent = fmtNum(state.layout.labelW) + ' × ' + fmtNum(state.layout.labelH) + ' mm · ' + Math.round(res.scale * 100) + ' %';
+    byId('richWarn').hidden = !res.overflow;
+  }
+
+  function placeCaretAtEnd(node){
+    const r = document.createRange();
+    r.selectNodeContents(node);
+    r.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(r);
+    rich.lastRange = r.cloneRange();
+  }
+
+  function openRich(kind, index){
+    if(rich.target && !modal.hidden) commitRich();
+    rich.target = {kind:kind, index:index};
+    rich.snapshot = getTargetHtml(rich.target);
+    rich.lastRange = null;
+    setSourceMode(false, true);
+
+    applySheetVars(byId('richCanvas'), kind === 'back');
+    editor.innerHTML = safeHtml(rich.snapshot);
+    normalizeBlocks();
+    editor.classList.toggle('is-empty', !editor.textContent.trim());
+
+    const kicker = byId('richKicker'), title = byId('richTitle');
+    const nav = byId('richNav'), qtyWrap = byId('richQtyWrap'), qty = byId('richQty');
+    if(kind === 'item'){
+      kicker.textContent = 'Vorderseite · Liste';
+      title.textContent = 'Eintrag ' + (index + 1) + ' bearbeiten';
+      nav.hidden = false;
+      byId('richNavInfo').textContent = (index + 1) + ' / ' + state.items.length;
+      byId('richPrev').disabled = index <= 0;
+      byId('richNext').disabled = index >= state.items.length - 1;
+      qtyWrap.hidden = false;
+      qty.value = state.items[index].qty;
+    }else if(kind === 'back'){
+      kicker.textContent = 'Rückseite';
+      title.textContent = 'Rückseite bearbeiten';
+      nav.hidden = true;
+      qtyWrap.hidden = true;
     }else{
-      state.items.push({headline:split.headline, subline:split.subline, qty:1, html:''});
+      kicker.textContent = 'Vorderseite · Ein Badge mehrfach';
+      title.textContent = 'Badge-Text bearbeiten';
+      nav.hidden = true;
+      qtyWrap.hidden = false;
+      qty.value = state.mainQty;
     }
-    if(state.editMode === 'same') state.richHtml = '';
-    el.smartPaste.value = '';
-    syncForm();
-  }
 
-  function downloadJson(filename, data){
-    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  let richTarget = null;
-  let richLastSelection = null;
-
-  function sourceHtml(headline, subline){
-    return '<span class="badge-headline">' + escapeHtml(headline || '') + '</span>' +
-      (subline ? '<span class="badge-subline">' + escapeHtml(subline).replace(/\n/g,'<br>') + '</span>' : '');
-  }
-
-  function richInfo(){
-    if(!richTarget) return null;
-    if(richTarget.kind === 'item') return state.items[richTarget.index];
-    if(richTarget.kind === 'back') return {headline:state.backHeadline,subline:state.backSubline,html:state.backHtml};
-    return {headline:state.headline,subline:state.subline,html:state.richHtml || (state.advanced ? state.advancedHtml : '')};
-  }
-
-  function openRich(kind,index){
-    richTarget = {kind:kind,index:index};
-    const info = richInfo();
-    if(!info) return;
-    byId('richTitle').textContent = kind === 'back' ? 'Rückseite gestalten' : kind === 'item' ? 'Eintrag ' + (index + 1) + ' gestalten' : 'Badge-Text gestalten';
-    byId('richEditor').innerHTML = safeHtml(info.html || sourceHtml(info.headline, info.subline));
-    byId('richModal').hidden = false;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
     byId('selectionToolbar').hidden = true;
-    byId('richEditor').focus();
+    requestAnimationFrame(function(){
+      renderRichPreview();
+      editor.focus({preventScroll:true});
+      placeCaretAtEnd(editor);
+      updateToolbarState();
+    });
   }
 
-  function closeRich(){
-    byId('richModal').hidden = true;
-    byId('selectionToolbar').hidden = true;
-    richLastSelection = null;
-    richTarget = null;
-  }
-
-  function saveRich(){
-    if(!richTarget) return;
-    const html = safeHtml(byId('richEditor').innerHTML);
-    if(richTarget.kind === 'item') state.items[richTarget.index].html = html;
-    else if(richTarget.kind === 'back') state.backHtml = html;
-    else {
-      state.richHtml = html;
-      state.advanced = false;
+  function closeRich(discard){
+    if(!rich.target) return;
+    if(discard){
+      setTargetHtml(rich.target, rich.snapshot);
+    }else{
+      commitRich();
     }
-    closeRich();
-    syncForm();
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+    byId('selectionToolbar').hidden = true;
+    rich.target = null;
+    rich.lastRange = null;
+    renderItemsEditor();
+    renderPreview();
+  }
+
+  function discardRich(){
+    if(!rich.target) return;
+    const changed = getEditorHtml() !== safeHtml(rich.snapshot);
+    if(changed && !confirm('Änderungen in diesem Fenster verwerfen und den vorherigen Text wiederherstellen?')) return;
+    closeRich(true);
+  }
+
+  function setSourceMode(on, silent){
+    if(!silent && rich.sourceMode === on) return;
+    if(on){
+      source.value = prettyHtml(safeHtml(editor.innerHTML));
+      source.hidden = false;
+      editor.hidden = true;
+      rich.sourceMode = true;
+      source.focus();
+    }else{
+      if(rich.sourceMode && !silent) editor.innerHTML = safeHtml(compactHtml(source.value));
+      source.hidden = true;
+      editor.hidden = false;
+      rich.sourceMode = false;
+      if(!silent){ normalizeBlocks(); editor.focus(); placeCaretAtEnd(editor); }
+    }
+    toolbar.classList.toggle('source-mode', rich.sourceMode);
+    setActive(byId('richSourceBtn'), rich.sourceMode);
+    byId('selectionToolbar').hidden = true;
+    if(!silent) commitRich();
+  }
+
+  function blockOfNode(n){
+    while(n && n.parentNode !== editor) n = n.parentNode;
+    return n && n.parentNode === editor ? n : null;
+  }
+
+  function fixNewParagraph(){
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return;
+    const b = blockOfNode(sel.anchorNode);
+    if(!b || b.nodeType !== 1) return;
+    const prev = b.previousElementSibling;
+    if(prev && prev.classList.contains('badge-headline') && b.classList.contains('badge-headline') && !b.textContent.trim()){
+      b.classList.remove('badge-headline');
+      b.classList.add('badge-subline');
+      b.style.removeProperty('margin-top');
+      b.style.removeProperty('font-size');
+      if(!b.getAttribute('style')) b.removeAttribute('style');
+    }
+  }
+
+  function updateToolbarState(){
+    if(!rich.target || rich.sourceMode) return;
+    ['bold','italic','underline','strikeThrough'].forEach(function(c){
+      const b = toolbar.querySelector('[data-command="' + c + '"]');
+      try{ setActive(b, document.queryCommandState(c)); }catch(e){}
+    });
+    const blocks = selectedBlocks(false);
+    const first = blocks[0];
+    const sel = byId('richBlock');
+    if(first){
+      sel.value = first.classList.contains('badge-headline') ? 'headline' : first.classList.contains('badge-subline') ? 'subline' : 'normal';
+      const align = first.style.textAlign || '';
+      toolbar.querySelectorAll('[data-align]').forEach(function(b){ setActive(b, align === b.dataset.align); });
+    }
   }
 
   function selectionInsideRich(){
     const sel = window.getSelection();
     if(!sel || !sel.rangeCount) return false;
-    return byId('richEditor').contains(sel.getRangeAt(0).commonAncestorContainer);
+    return editor.contains(sel.getRangeAt(0).commonAncestorContainer);
   }
 
   function updateSelectionToolbar(){
     const bar = byId('selectionToolbar');
     const sel = window.getSelection();
-    if(byId('richModal').hidden || !selectionInsideRich() || !sel || sel.isCollapsed || !sel.toString().trim()){
+    if(modal.hidden || rich.sourceMode || !selectionInsideRich() || !sel || sel.isCollapsed || !sel.toString().trim()){
       bar.hidden = true;
       return;
     }
-    richLastSelection = sel.getRangeAt(0).cloneRange();
-    const rect = richLastSelection.getBoundingClientRect();
-    if(rect.width === 0 && rect.height === 0){bar.hidden=true;return;}
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    if(rect.width === 0 && rect.height === 0){ bar.hidden = true; return; }
     bar.hidden = false;
-    const top = Math.max(7,rect.top - bar.offsetHeight - 9);
-    const left = Math.max(7,Math.min(window.innerWidth - bar.offsetWidth - 7,rect.left + rect.width/2 - bar.offsetWidth/2));
-    bar.style.top = top + 'px';bar.style.left = left + 'px';
+    const top = Math.max(7, rect.top - bar.offsetHeight - 9);
+    const left = Math.max(7, Math.min(window.innerWidth - bar.offsetWidth - 7, rect.left + rect.width / 2 - bar.offsetWidth / 2));
+    bar.style.top = top + 'px';
+    bar.style.left = left + 'px';
   }
 
-  function richCommand(command,value){
-    const editor = byId('richEditor');
-    editor.focus();
-    if(richLastSelection){
-      const sel = window.getSelection();
-      sel.removeAllRanges();sel.addRange(richLastSelection);
+  function handlePaste(event){
+    event.preventDefault();
+    const text = (event.clipboardData.getData('text/plain') || '').replace(/\r/g,'');
+    if(!text) return;
+    const lines = text.split('\n');
+    while(lines.length && !lines[0].trim()) lines.shift();
+    while(lines.length && !lines[lines.length - 1].trim()) lines.pop();
+    if(!lines.length) return;
+
+    // Leerer Editor: Smart Paste – 1. Zeile Überschrift, Rest Untertext
+    if(!editor.textContent.trim()){
+      editor.innerHTML = sourceHtml(lines[0].trim(), lines.slice(1).join('\n'));
+      placeCaretAtEnd(editor);
+      commitRich();
+      updateToolbarState();
+      return;
     }
-    document.execCommand(command,false,value || null);
-    richLastSelection = null;
-    updateSelectionToolbar();
+    if(lines.length === 1){
+      document.execCommand('insertText', false, lines[0]);
+      return;
+    }
+    document.execCommand('insertHTML', false, lines.map(escapeHtml).join('<br>'));
   }
 
   function initRichEditor(){
-    byId('editSameRich').addEventListener('click',function(){openRich('same');});
-    byId('editBackRich').addEventListener('click',function(){openRich('back');});
-    byId('richClose').addEventListener('click',closeRich);
-    byId('richCancel').addEventListener('click',closeRich);
-    byId('richSave').addEventListener('click',saveRich);
-    byId('richReset').addEventListener('click',function(){
-      const info=richInfo(); if(!info)return;
-      byId('richEditor').innerHTML=sourceHtml(info.headline,info.subline);
-      byId('selectionToolbar').hidden=true;
-      byId('richEditor').focus();
+    editor = byId('richEditor');
+    source = byId('richSource');
+    modal = byId('richModal');
+    toolbar = byId('richActions');
+    try{ document.execCommand('defaultParagraphSeparator', false, 'div'); }catch(e){}
+
+    byId('editSameRich').addEventListener('click', function(){ openRich('same'); });
+    el.frontMini.addEventListener('click', function(){ openRich('same'); });
+    byId('editBackRich').addEventListener('click', function(){ openRich('back'); });
+    el.backMini.addEventListener('click', function(){ openRich('back'); });
+
+    byId('richClose').addEventListener('click', function(){ closeRich(false); });
+    byId('richDone').addEventListener('click', function(){ closeRich(false); });
+    byId('richDiscard').addEventListener('click', discardRich);
+
+    byId('richPrev').addEventListener('click', function(){ if(rich.target && rich.target.index > 0) openRich('item', rich.target.index - 1); });
+    byId('richNext').addEventListener('click', function(){ if(rich.target && rich.target.index < state.items.length - 1) openRich('item', rich.target.index + 1); });
+    byId('richAdd').addEventListener('click', function(){
+      commitRich();
+      state.items.push({html:'', qty:1});
+      openRich('item', state.items.length - 1);
     });
-    byId('richModal').addEventListener('mousedown',function(event){
-      if(event.target === this) closeRich();
+
+    byId('richQty').addEventListener('input', function(){
+      const v = Number(this.value);
+      if(!rich.target) return;
+      if(rich.target.kind === 'item') state.items[rich.target.index].qty = Math.max(0, v || 0);
+      else if(rich.target.kind === 'same'){ state.mainQty = Math.max(1, v || 1); el.mainQty.value = state.mainQty; }
+      schedulePreview();
     });
-    document.addEventListener('keydown',function(event){
-      if(event.key === 'Escape' && !byId('richModal').hidden){closeRich();event.preventDefault();}
+
+    // Klick neben das Fenster schließt (Änderungen bleiben) – nur wenn Klick dort begann
+    modal.addEventListener('mousedown', function(e){ rich.downOnBackdrop = e.target === modal; });
+    modal.addEventListener('mouseup', function(e){
+      if(rich.downOnBackdrop && e.target === modal) closeRich(false);
+      rich.downOnBackdrop = false;
     });
-    document.querySelectorAll('#richActions [data-command],#selectionToolbar [data-command]').forEach(function(button){
-      button.addEventListener('mousedown',function(event){event.preventDefault();});
-      button.addEventListener('click',function(){richCommand(button.dataset.command);});
+
+    document.addEventListener('keydown', function(e){
+      if(modal.hidden) return;
+      if(e.key === 'Escape'){ e.preventDefault(); closeRich(false); }
+      else if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); closeRich(false); }
     });
-    byId('richSize').addEventListener('change',function(){if(this.value)richCommand('fontSize',this.value);this.value='';});
-    byId('richColor').addEventListener('input',function(){richCommand('foreColor',this.value);});
-    byId('richEditor').addEventListener('mouseup',function(){requestAnimationFrame(updateSelectionToolbar);});
-    byId('richEditor').addEventListener('keyup',function(){requestAnimationFrame(updateSelectionToolbar);});
-    byId('richEditor').addEventListener('input',function(){byId('selectionToolbar').hidden=true;});
-    byId('richEditor').addEventListener('paste',function(event){
-      event.preventDefault();
-      const text = event.clipboardData.getData('text/plain');
-      document.execCommand('insertText',false,text);
+
+    toolbar.querySelectorAll('button[data-command]').forEach(function(button){
+      button.addEventListener('mousedown', function(e){ e.preventDefault(); });
+      button.addEventListener('click', function(){ richCommand(button.dataset.command); });
     });
-    document.addEventListener('selectionchange',function(){
-      if(!byId('richModal').hidden) requestAnimationFrame(updateSelectionToolbar);
+    byId('selectionToolbar').querySelectorAll('button').forEach(function(button){
+      button.addEventListener('mousedown', function(e){ e.preventDefault(); });
+      button.addEventListener('click', function(){
+        if(button.dataset.sizeStep) stepSelectionSize(Number(button.dataset.sizeStep));
+        else richCommand(button.dataset.command);
+      });
     });
+    toolbar.querySelectorAll('button[data-align]').forEach(function(button){
+      button.addEventListener('mousedown', function(e){ e.preventDefault(); });
+      button.addEventListener('click', function(){
+        const first = selectedBlocks(false)[0];
+        const same = first && first.style.textAlign === button.dataset.align;
+        applyBlockStyle('text-align', same ? '' : button.dataset.align);
+      });
+    });
+    byId('richSourceBtn').addEventListener('mousedown', function(e){ e.preventDefault(); });
+    byId('richSourceBtn').addEventListener('click', function(){ setSourceMode(!rich.sourceMode); });
+
+    byId('richBlock').addEventListener('change', function(){ setBlockType(this.value); });
+    byId('richSize').addEventListener('change', function(){
+      const v = this.value; this.value = '';
+      if(!v) return;
+      applyInlineSize(v === 'reset' ? 0 : Number(v));
+    });
+    byId('richLine').addEventListener('change', function(){
+      const v = this.value; this.value = '';
+      if(!v) return;
+      applyBlockStyle('line-height', v === 'reset' ? '' : v);
+    });
+    byId('richSpace').addEventListener('change', function(){
+      const v = this.value; this.value = '';
+      if(!v) return;
+      applyBlockStyle('margin-top', v === 'reset' ? '' : v + 'mm');
+    });
+    byId('richColor').addEventListener('input', function(){
+      if(rich.sourceMode) return;
+      restoreRange();
+      document.execCommand('styleWithCSS', false, false);
+      document.execCommand('foreColor', false, this.value);
+      commitRich();
+    });
+
+    editor.addEventListener('input', function(e){
+      if(e.inputType === 'insertParagraph') fixNewParagraph();
+      normalizeBlocks();
+      commitRich();
+    });
+    editor.addEventListener('paste', handlePaste);
+    editor.addEventListener('mouseup', function(){ requestAnimationFrame(updateSelectionToolbar); });
+    editor.addEventListener('keyup', function(){ requestAnimationFrame(updateSelectionToolbar); });
+    source.addEventListener('input', commitRich);
+
+    document.addEventListener('selectionchange', function(){
+      if(modal.hidden || rich.sourceMode) return;
+      if(selectionInsideRich()){
+        rich.lastRange = window.getSelection().getRangeAt(0).cloneRange();
+        updateToolbarState();
+      }
+      requestAnimationFrame(updateSelectionToolbar);
+    });
+
+    window.addEventListener('resize', function(){ if(!modal.hidden) renderRichPreview(); });
+  }
+
+  /* ---------------- Events ---------------- */
+  function downloadJson(filename, data){
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
   }
 
   function wireEvents(){
-    el.presetSelect.addEventListener('change', function(){
-      state.preset = el.presetSelect.value;
-      state.layout = copy(PRESETS[state.preset]);
-      syncForm();
-    });
+    el.presetSelect.addEventListener('change', function(){ setPreset(el.presetSelect.value); });
 
-    ['cols','rows','labelW','labelH','gapX','gapY','marginTop','marginRight','marginBottom','marginLeft'].forEach(function(id){
+    LAYOUT_KEYS.forEach(function(id){
       el[id].addEventListener('input', function(){
         state.preset = 'custom';
         readLayout();
         el.presetSelect.value = 'custom';
+        renderQuickPresets();
         renderPreview();
       });
     });
 
     el.showCutmarks.addEventListener('change', function(){ state.showCutmarks = el.showCutmarks.checked; renderPreview(); });
     el.showBorders.addEventListener('change', function(){ state.showBorders = el.showBorders.checked; renderPreview(); });
-
-    el.orientationPortrait.addEventListener('click', function(){
-      if(state.orientation !== 'portrait'){
-        state.orientation = 'portrait';
-        fitLayoutToOrientation();
-      }
-      syncForm();
-    });
-    el.orientationLandscape.addEventListener('click', function(){
-      if(state.orientation !== 'landscape'){
-        state.orientation = 'landscape';
-        fitLayoutToOrientation();
-      }
-      syncForm();
-    });
+    el.orientationPortrait.addEventListener('click', function(){ setOrientation('portrait'); });
+    el.orientationLandscape.addEventListener('click', function(){ setOrientation('landscape'); });
 
     el.zoomOut.addEventListener('click', function(){ zoom = Math.round((zoom - 0.1) * 100) / 100; applyZoom(); });
     el.zoomIn.addEventListener('click', function(){ zoom = Math.round((zoom + 0.1) * 100) / 100; applyZoom(); });
     el.zoomValue.addEventListener('click', function(){ zoom = 1; applyZoom(); });
     el.zoomFit.addEventListener('click', fitZoom);
 
-    el.editMode.addEventListener('change', function(){ state.editMode = el.editMode.value; syncForm(); });
-    el.headline.addEventListener('input', function(){ state.headline = el.headline.value; state.richHtml = ''; renderPreview(); });
-    el.subline.addEventListener('input', function(){ state.subline = el.subline.value; state.richHtml = ''; renderPreview(); });
+    el.modeSame.addEventListener('click', function(){ state.editMode = 'same'; syncForm(); });
+    el.modeList.addEventListener('click', function(){ state.editMode = 'list'; syncForm(); });
     el.mainQty.addEventListener('input', function(){ state.mainQty = Math.max(1, Number(el.mainQty.value) || 1); renderPreview(); });
 
     el.fontFamily.addEventListener('change', function(){ state.style.fontFamily = el.fontFamily.value; renderPreview(); });
-    el.fontSize.addEventListener('input', function(){ state.style.fontSize = Math.max(6, Number(el.fontSize.value) || 16); renderPreview(); });
+    el.fontSize.addEventListener('input', function(){ state.style.fontSize = Math.max(6, Number(el.fontSize.value) || 14); renderPreview(); });
     el.headlineSize.addEventListener('input', function(){ state.style.headlineSize = Math.max(6, Number(el.headlineSize.value) || 22); renderPreview(); });
     el.sublineSize.addEventListener('input', function(){ state.style.sublineSize = Math.max(6, Number(el.sublineSize.value) || 13); renderPreview(); });
+    el.cardPadding.addEventListener('input', function(){ state.style.padding = Math.max(0, Number(el.cardPadding.value) || 0); renderPreview(); });
 
-    el.alignLeft.addEventListener('click', function(){ state.style.textAlign = 'left'; syncForm(); });
-    el.alignCenter.addEventListener('click', function(){ state.style.textAlign = 'center'; syncForm(); });
-    el.alignRight.addEventListener('click', function(){ state.style.textAlign = 'right'; syncForm(); });
-    el.boldBtn.addEventListener('click', function(){ state.style.bold = !state.style.bold; syncForm(); });
-    el.italicBtn.addEventListener('click', function(){ state.style.italic = !state.style.italic; syncForm(); });
-    el.underlineBtn.addEventListener('click', function(){ state.style.underline = !state.style.underline; syncForm(); });
-    el.headlineBoldBtn.addEventListener('click', function(){ state.style.headlineBold = !state.style.headlineBold; syncForm(); });
-
-    el.advancedToggle.addEventListener('change', function(){ state.advanced = el.advancedToggle.checked; syncForm(); });
-    el.advancedHtml.addEventListener('input', function(){ state.advancedHtml = el.advancedHtml.value; renderPreview(); });
+    [['alignLeft','textAlign','left'],['alignCenter','textAlign','center'],['alignRight','textAlign','right'],['vTop','vAlign','top'],['vCenter','vAlign','center'],['vBottom','vAlign','bottom']].forEach(function(a){
+      el[a[0]].addEventListener('click', function(){ state.style[a[1]] = a[2]; syncForm(); });
+    });
+    [['boldBtn','bold'],['italicBtn','italic'],['underlineBtn','underline'],['headlineBoldBtn','headlineBold']].forEach(function(a){
+      el[a[0]].addEventListener('click', function(){ state.style[a[1]] = !state.style[a[1]]; syncForm(); });
+    });
 
     el.imageEnabled.addEventListener('change', function(){ state.image.enabled = el.imageEnabled.checked; renderPreview(); });
     el.imageW.addEventListener('input', function(){ state.image.w = Number(el.imageW.value) || 24; renderPreview(); });
@@ -1502,33 +2364,25 @@
 
     el.enableBack.addEventListener('change', function(){ state.enableBack = el.enableBack.checked; syncForm(); });
     el.duplexMode.addEventListener('change', function(){ state.duplexMode = el.duplexMode.value; renderPreview(); });
-    el.backHeadline.addEventListener('input', function(){ state.backHeadline = el.backHeadline.value; state.backHtml = ''; renderPreview(); });
-    el.backSubline.addEventListener('input', function(){ state.backSubline = el.backSubline.value; state.backHtml = ''; renderPreview(); });
     el.backHeadlineSize.addEventListener('input', function(){ state.backStyle.headlineSize = Math.max(6, Number(el.backHeadlineSize.value) || 16); renderPreview(); });
     el.backSublineSize.addEventListener('input', function(){ state.backStyle.sublineSize = Math.max(6, Number(el.backSublineSize.value) || 11); renderPreview(); });
 
-    byId('applySmartBtn').addEventListener('click', applySmartPaste);
-    el.smartPaste.addEventListener('paste', function(){ setTimeout(applySmartPaste, 0); });
-    byId('clearSmartBtn').addEventListener('click', function(){ el.smartPaste.value = ''; });
-
     byId('addItemBtn').addEventListener('click', function(){
-      state.items.push({headline:'Neuer Eintrag',subline:'Details',qty:1,html:''});
-      syncForm();
+      state.items.push({html:'', qty:1});
+      renderItemsEditor();
+      openRich('item', state.items.length - 1);
     });
-
     byId('clearItemsBtn').addEventListener('click', function(){
-      if(confirm('Liste wirklich leeren?')){
-        state.items = [];
-        syncForm();
-      }
+      if(confirm('Liste wirklich leeren?')){ state.items = []; syncForm(); }
     });
 
     byId('printBtn').addEventListener('click', function(){ window.print(); });
+    byId('printBtnTop').addEventListener('click', function(){ window.print(); });
 
     byId('exportBtn').addEventListener('click', function(){
       state.version = VERSION;
       const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-      downloadJson('etiketten_tool_backup_v1-6-0_' + stamp + '.json', state);
+      downloadJson('etiketten_tool_backup_v1-7-0_' + stamp + '.json', state);
     });
 
     byId('importBtn').addEventListener('click', function(){ el.importFile.click(); });
@@ -1536,8 +2390,7 @@
       const file = el.importFile.files && el.importFile.files[0];
       if(!file) return;
       try{
-        const imported = JSON.parse(await file.text());
-        state = normalize(imported);
+        state = normalize(JSON.parse(await file.text()));
         syncForm();
       }catch(err){
         alert('JSON konnte nicht importiert werden: ' + err.message);
@@ -1547,20 +2400,28 @@
     });
 
     byId('resetBtn').addEventListener('click', function(){
-      if(confirm('Tool auf Beispielwerte zurücksetzen?')){
+      if(confirm('Alles auf Beispielwerte zurücksetzen? Der automatisch gespeicherte Stand wird dabei überschrieben.')){
         state = copy(DEFAULT_STATE);
         syncForm();
       }
     });
+
+    // Vor dem Schließen/Wechseln sicher speichern
+    window.addEventListener('beforeunload', function(){ if(rich.target) commitRich(); if(savePending) saveNow(); });
+    document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden'){ if(rich.target) commitRich(); if(savePending) saveNow(); } });
+    window.addEventListener('resize', function(){ updateHeaderVar(); renderSideMinis(); });
   }
 
   function boot(){
     try{
       cacheElements();
       initPresets();
-      state = copy(DEFAULT_STATE);
+      state = loadState();
+      try{ const z = parseFloat(localStorage.getItem(ZOOM_KEY)); if(z) zoom = z; }catch(e){}
       wireEvents();
       initRichEditor();
+      updateHeaderVar();
+      applyZoom();
       syncForm();
     }catch(error){
       console.error(error);
