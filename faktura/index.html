@@ -1269,6 +1269,24 @@ tr[data-kind="info"]{background:linear-gradient(90deg,var(--offwh) 0%,transparen
   tr[data-kind="info"]{background:none}
   .move-group{display:none!important}
 }
+
+/* ─── v1.8.0: E-Rechnung, Ordner freigeben, Willkommen */
+.only-rechnung{display:none}
+body.doc-rechnung .only-rechnung{display:inline-flex;align-items:center}
+#reconnect-btn{display:none;background:var(--amber);border-color:var(--amber2);color:#2A2117;
+  animation:reconPulse 1.4s infinite alternate}
+@keyframes reconPulse{from{box-shadow:0 0 0 0 rgba(224,175,107,.0)}to{box-shadow:0 0 0 5px rgba(224,175,107,.45)}}
+#reconnect-btn:hover{filter:brightness(.95)}
+.er-checks{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;font-size:12.5px;line-height:1.45}
+.er-check{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;border-radius:7px;background:var(--offwh)}
+.er-check.ok{background:#EAF5EE;color:#24613A}
+.er-check.warn{background:#FBF3E5;color:#7A5418}
+.er-check.err{background:#FBEAE7;color:#9C3324}
+.er-check b{flex:none;width:16px;text-align:center}
+#modal-erechnung .modal-box{max-width:620px;width:min(96vw,620px)}
+#modal-welcome .modal-box{max-width:500px;width:min(96vw,500px)}
+.welcome-text{font-size:13px;line-height:1.6;color:var(--text);margin-bottom:16px}
+.welcome-text code{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--offwh2);padding:1px 5px;border-radius:4px}
 </style>
 </head>
 <body data-theme="anthrazit" data-print-mode="eco" class="tax-klein">
@@ -1287,6 +1305,7 @@ tr[data-kind="info"]{background:linear-gradient(90deg,var(--offwh) 0%,transparen
         </button>
         <div class="drop-menu account-menu" id="account-menu"></div>
       </div>
+      <button class="tbtn" id="reconnect-btn" onclick="Sync.verify()" title="Gespeicherten Arbeitsordner wieder freigeben">🔓 Ordner freigeben</button>
       <button class="tbtn tbtn-ghost" onclick="openAdmin('dokumente')" title="Dokumente und Kunden verwalten">🗂 Verwaltung</button>
     </div>
 
@@ -1294,6 +1313,7 @@ tr[data-kind="info"]{background:linear-gradient(90deg,var(--offwh) 0%,transparen
 
     <div class="tb-group">
       <button class="tbtn tbtn-ghost" onclick="openSettings()" title="Profil, Bank, Steuer, Nummernkreis, Farbschema">⚙ Einstellungen</button>
+      <button class="tbtn tbtn-ghost only-rechnung" onclick="openERechnung()" title="E-Rechnung als XML (ZUGFeRD/Factur-X CII, EN 16931) erzeugen">🧾 E-Rechnung</button>
       <button class="tbtn tbtn-navy" onclick="printDocument()">⎙ Drucken / PDF</button>
     </div>
   </div>
@@ -1709,6 +1729,75 @@ tr[data-kind="info"]{background:linear-gradient(90deg,var(--offwh) 0%,transparen
     </label>
     <div class="modal-actions">
       <button class="mbtn mbtn-ghost" onclick="closeModal('modal-print')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MODAL: E-Rechnung -->
+<div class="modal-overlay" id="modal-erechnung">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>E-Rechnung erstellen
+        <span class="modal-sub">XML nach EN 16931 (ZUGFeRD / Factur-X, Syntax CII)</span></span>
+      <button class="modal-close" onclick="closeModal('modal-erechnung')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="er-checks" id="er-checks"></div>
+      <div class="set-title">Rechnungsempfänger (strukturiert)</div>
+      <div class="set-grid">
+        <div class="form-group"><label>Name / Firma</label><input type="text" id="er-name" oninput="erInput()"></div>
+        <div class="form-group"><label>Straße &amp; Hausnummer</label><input type="text" id="er-street" oninput="erInput()"></div>
+        <div class="form-group"><label>PLZ</label><input type="text" id="er-zip" oninput="erInput()"></div>
+        <div class="form-group"><label>Ort</label><input type="text" id="er-city" oninput="erInput()"></div>
+        <div class="form-group"><label>Land (ISO, z.B. DE)</label><input type="text" id="er-country" maxlength="2" oninput="erInput()"></div>
+        <div class="form-group"><label>E-Mail Empfänger (optional)</label><input type="text" id="er-mail" oninput="erInput()"></div>
+      </div>
+      <div class="set-section">
+        <div class="set-title">Leistung &amp; Zuordnung</div>
+        <div class="set-grid">
+          <div class="form-group"><label>Leistungsdatum / von</label><input type="date" id="er-from" oninput="erInput()"></div>
+          <div class="form-group"><label>Leistungszeitraum bis (optional)</label><input type="date" id="er-to" oninput="erInput()"></div>
+          <div class="form-group"><label>Käuferreferenz / Leitweg-ID (optional)</label><input type="text" id="er-ref" placeholder="nur wenn vom Kunden verlangt" oninput="erInput()"></div>
+        </div>
+        <div class="hint">Die Angaben werden mit dem Dokument gesichert. Das Dokument wird vor dem Erzeugen automatisch gespeichert,
+          damit Nummer und Beträge in PDF und XML übereinstimmen.</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-ghost" onclick="closeModal('modal-erechnung')">Abbrechen</button>
+      <button class="mbtn mbtn-primary" id="er-create" onclick="createERechnung()">⬇ XML erzeugen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ MODAL: Willkommen (neues Gerät) -->
+<div class="modal-overlay" id="modal-welcome">
+  <div class="modal-box">
+    <div class="modal-title">
+      Willkommen bei Faktura
+      <button class="modal-close" onclick="closeModal('modal-welcome')">×</button>
+    </div>
+    <div class="welcome-text" id="welcome-text"></div>
+    <div class="form-group welcome-folder-only">
+      <label>Name des Projektordners</label>
+      <input type="text" id="welcome-folder" placeholder="Rechnungstool">
+    </div>
+    <div class="print-choice">
+      <button class="choice-card welcome-folder-only" onclick="welcomeConnect()">
+        <span class="choice-icon">📁</span>
+        <span class="choice-txt"><b>Projektordner verbinden</b>
+          <span>Wähle den Projektordner selbst – oder den Ordner darüber (z.B. OneDrive). Ein vorhandener Projektordner wird erkannt, sonst wird er angelegt.</span></span>
+      </button>
+      <button class="choice-card" onclick="welcomeImport()">
+        <span class="choice-icon">⬆</span>
+        <span class="choice-txt"><b>Profil-Datei importieren</b>
+          <span>Eine gesicherte <code>profil.json</code> einspielen – ohne Ordner-Anbindung.</span></span>
+      </button>
+      <button class="choice-card" onclick="welcomeNew()">
+        <span class="choice-icon">✏</span>
+        <span class="choice-txt"><b>Neu einrichten</b>
+          <span>Absenderdaten jetzt eintragen. Den Ordner kannst du später jederzeit verbinden.</span></span>
+      </button>
     </div>
   </div>
 </div>
@@ -3016,7 +3105,8 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.8.0';
+const FOLDER_DEFAULT = 'Rechnungstool';
 
 const LS = {
   profiles: 'inv_profiles_v1',
@@ -3083,6 +3173,8 @@ let askBeforePrint = true;
 let syncLabel = 'Lokal';
 let store = { updatedAt: null, activeId: null, profiles: [] };
 let indexData = [];
+let folderName = FOLDER_DEFAULT;   // Name des Projektordners (für neue Geräte)
+let currentErech = null;           // E-Rechnungs-Zusatzangaben des offenen Dokuments
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ PROFILE
 function blankProfile(label) {
@@ -3108,23 +3200,39 @@ function loadStore() {
     const raw = JSON.parse(localStorage.getItem(LS.profiles) || 'null');
     if (raw && Array.isArray(raw.profiles) && raw.profiles.length) {
       store = raw;
-      store.profiles = store.profiles.map(p => Object.assign(blankProfile(), p, {
-        sender: Object.assign(blankProfile().sender, p.sender || {}),
-        legal:  Object.assign(blankProfile().legal,  p.legal  || {}),
-        tax:    Object.assign(blankProfile().tax,    p.tax    || {}),
-        terms:  Object.assign(blankProfile().terms,  p.terms  || {}),
-        numbering: Object.assign(blankProfile().numbering, p.numbering || {}),
-        banks: (p.banks && p.banks.length) ? p.banks : [{ name: '', iban: '' }],
-        customers: p.customers || []
-      }));
+      store.profiles = store.profiles.map(normalizeProfile);
       if (!store.profiles.some(p => p.id === store.activeId)) store.activeId = store.profiles[0].id;
       return false;
     }
   } catch (e) { console.warn('Profil konnte nicht gelesen werden', e); }
   const p = blankProfile('Mein Profil');
-  store = { updatedAt: new Date().toISOString(), activeId: p.id, profiles: [p] };
+  // updatedAt bleibt leer: ein frisches Leerprofil darf nie einen vorhandenen Stand überschreiben
+  store = { updatedAt: null, activeId: p.id, profiles: [p] };
   return true; // Erststart
 }
+
+function normalizeProfile(p) {
+  const b = blankProfile();
+  return Object.assign(b, p, {
+    id: p.id || b.id,
+    sender: Object.assign(b.sender, p.sender || {}),
+    legal:  Object.assign(b.legal,  p.legal  || {}),
+    tax:    Object.assign(b.tax,    p.tax    || {}),
+    terms:  Object.assign(b.terms,  p.terms  || {}),
+    numbering: Object.assign(b.numbering, p.numbering || {}),
+    banks: (p.banks && p.banks.length) ? p.banks : [{ name: '', iban: '' }],
+    customers: p.customers || []
+  });
+}
+
+// Leeres, nie ausgefülltes Profil (z.B. automatisch beim Erststart angelegt)
+function isBlankProfile(p) {
+  if (!p) return true;
+  const s = p.sender || {};
+  return !s.name && !s.street && !s.city && !(p.legal && p.legal.taxNo)
+      && !(p.banks || []).some(b => b.iban || b.name) && !(p.customers || []).length;
+}
+function storePristine() { return store.profiles.every(isBlankProfile); }
 
 function saveStore(push = true) {
   store.updatedAt = new Date().toISOString();
@@ -3162,7 +3270,8 @@ function renderProfileMenu() {
      <div class="drop-head">Arbeitsordner · ${escHtml(syncLabel)}</div>` +
     (needsPerm ? '<button class="drop-item" onclick="Sync.reconnect();closeDrop()">🔓 Ordner freigeben</button>' : '') +
     `<button class="drop-item" onclick="Sync.chooseFolder();closeDrop()">📁 ${Sync.connected ? 'Anderen Ordner wählen …' : 'Arbeitsordner wählen …'}</button>` +
-    (Sync.connected ? `<button class="drop-item" onclick="Sync.syncNow();closeDrop()">🔄 Jetzt abgleichen</button>
+    (Sync.connected ? `<button class="drop-item" onclick="Sync.verify();closeDrop()">✓ Verbindung prüfen</button>
+       <button class="drop-item" onclick="Sync.syncNow();closeDrop()">🔄 Jetzt abgleichen</button>
        <button class="drop-item" onclick="Sync.rebuildIndex();closeDrop()">🧮 Ordner neu einlesen</button>
        <button class="drop-item" onclick="Sync.disconnect();closeDrop()">✕ Ordner trennen</button>` : '') +
     `<div class="drop-sep"></div>
@@ -3482,7 +3591,7 @@ function setPaymentQr(on, persist = true) {
 }
 
 function saveUi() {
-  localStorage.setItem(LS.ui, JSON.stringify({ outputMode, paymentQr, askBeforePrint }));
+  localStorage.setItem(LS.ui, JSON.stringify({ outputMode, paymentQr, askBeforePrint, folderName }));
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ZAHLUNGS-QR (SEPA/EPC)
@@ -4091,6 +4200,7 @@ function getState() {
     kunde:   document.getElementById('kunde').innerText,
     betreff: document.getElementById('betreff').innerText,
     rows,
+    erech: currentErech,
     totals: { net: t.net, vat: t.vat, gross: t.gross, rate: t.rate }
   };
 }
@@ -4102,6 +4212,7 @@ function applyState(s) {
     applyProfileToDocument();
   }
   currentDocId = s.id || null;
+  currentErech = s.erech || null;
   currentM = s.milestones ? Object.assign({}, s.milestones) : milestonesFromStatus(s.status, s.docType || 'rechnung');
   if (s.docType) setDocType(s.docType);
   if (s.stunden) setStunden(s.stunden);
@@ -4146,6 +4257,7 @@ function newDocument() {
   autosavePaused = true;
   currentDocId = null;
   currentM = {};
+  currentErech = null;
   renderStatusUI();
   localStorage.removeItem(LS.autosave);
   collapseToFirstPage();
@@ -4469,6 +4581,7 @@ async function deleteDocument(id) {
     try {
       const yearDir = await Sync.dirs.rechnungen.getDirectoryHandle(String(e.year));
       await yearDir.removeEntry(e.file);
+      try { await yearDir.removeEntry(e.file.replace(/\.json$/, '.xml')); } catch {}
     } catch (err) { console.warn('Datei nicht gefunden', err); }
   }
   if (id === currentDocId) { currentDocId = null; currentM = {}; renderStatusUI(); }
@@ -4615,6 +4728,8 @@ const Sync = {
     if (lbl) lbl.textContent = label;
     const btn = document.getElementById('account-btn');
     if (btn) btn.title = `Profil: ${P()?.label || ''} · Arbeitsordner: ${label}`;
+    const rb = document.getElementById('reconnect-btn');
+    if (rb) rb.style.display = (Sync.supported && Sync.root && !Sync.connected) ? 'inline-flex' : 'none';
     renderProfileMenu();
     const info = document.getElementById('set-sync-info');
     if (info) {
@@ -4635,21 +4750,75 @@ const Sync = {
     else { Sync.root = handle; Sync.setStatus('warn', 'Freigeben'); }
   },
 
-  async chooseFolder() {
-    if (!Sync.supported) { toast('Ordner-Anbindung braucht Chrome oder Edge am Desktop.'); return; }
+  async chooseFolder(wanted) {
+    if (!Sync.supported) { toast('Ordner-Anbindung braucht Chrome oder Edge am Desktop.'); return false; }
+    wanted = (wanted || folderName || FOLDER_DEFAULT).trim() || FOLDER_DEFAULT;
     try {
-      const handle = await window.showDirectoryPicker({ mode: 'readwrite', id: 'rechnungstool' });
+      const picked = await window.showDirectoryPicker({ mode: 'readwrite', id: 'rechnungstool' });
+      const handle = await Sync.resolveProjectFolder(picked, wanted);
       await idb.set('rootHandle', handle);
       await Sync.connect(handle);
       logEvent('ordner', 'Arbeitsordner verbunden: ' + handle.name);
-    } catch (e) { if (e.name !== 'AbortError') console.warn(e); }
+      return Sync.connected;
+    } catch (e) { if (e.name !== 'AbortError') console.warn(e); return false; }
   },
 
-  async reconnect() {
-    if (!Sync.root) return Sync.chooseFolder();
-    const perm = await Sync.root.requestPermission({ mode: 'readwrite' });
-    if (perm === 'granted') await Sync.connect(Sync.root);
-    else toast('Zugriff auf den Ordner wurde nicht erteilt.');
+  // Gibt es hier schon eine Faktura-Ablage?
+  async hasEntry(dir, name) {
+    try { await dir.getDirectoryHandle(name); return true; } catch { return false; }
+  },
+  async looksLikeProject(dir) {
+    for (const n of ['Profil', 'System', 'Dokumente', 'Rechnungen']) if (await Sync.hasEntry(dir, n)) return true;
+    return false;
+  },
+
+  // Aus dem gewählten Ordner den eigentlichen Projektordner ableiten:
+  // 1. Ordner ist schon ein Projektordner → nehmen
+  // 2. darin liegt ein (Projekt-)Unterordner mit dem gewünschten Namen → den nehmen
+  // 3. Ordner heißt wie gewünscht oder ist leer → direkt verwenden
+  // 4. sonst nachfragen, ob ein Unterordner angelegt werden soll
+  async resolveProjectFolder(handle, wanted) {
+    if (await Sync.looksLikeProject(handle)) return handle;
+    for (const n of [...new Set([wanted, FOLDER_DEFAULT, 'Faktura'])]) {
+      if (await Sync.hasEntry(handle, n)) {
+        const sub = await handle.getDirectoryHandle(n);
+        toast(`Projektordner „${n}" gefunden.`);
+        return sub;
+      }
+    }
+    if (handle.name.toLowerCase() === wanted.toLowerCase()) return handle;
+    let empty = true;
+    for await (const _ of handle.keys()) { empty = false; break; }
+    if (empty) return handle;
+    if (confirm(`Im Ordner „${handle.name}" liegt noch keine Faktura-Ablage.\n\n` +
+                `OK: Unterordner „${wanted}" darin anlegen und verwenden\n` +
+                `Abbrechen: „${handle.name}" selbst als Projektordner verwenden`)) {
+      return handle.getDirectoryHandle(wanted, { create: true });
+    }
+    return handle;
+  },
+
+  async reconnect() { return Sync.verify(); },
+
+  // Gespeicherten Ordner wieder freigeben bzw. bestehende Verbindung prüfen.
+  // Muss direkt aus einem Klick heraus aufgerufen werden (Browser-Vorgabe).
+  async verify() {
+    if (!Sync.supported) { toast('Ordner-Anbindung braucht Chrome oder Edge am Desktop.'); return; }
+    if (!Sync.root) { await Sync.chooseFolder(); return; }
+    let perm = 'denied';
+    try { perm = await Sync.root.requestPermission({ mode: 'readwrite' }); } catch (e) { console.warn(e); }
+    if (perm !== 'granted') {
+      Sync.setStatus('warn', 'Freigeben');
+      toast('Zugriff nicht erteilt. Tipp: „Bei jedem Besuch zulassen" wählen, dann bleibt der Punkt grün.');
+      return;
+    }
+    const wasProject = await Sync.looksLikeProject(Sync.root);
+    await Sync.connect(Sync.root);
+    if (!Sync.connected) return;
+    const docs = indexData.filter(e => e.profileId === store.activeId).length;
+    toast(`✓ ${Sync.root.name}: ${store.profiles.length} Profil(e), ${docs} Dokument(e)` +
+          (wasProject ? '' : ' – Ablage neu angelegt'));
+    logEvent('ordner', 'Verbindung bestätigt: ' + Sync.root.name);
   },
 
   async connect(handle) {
@@ -4686,6 +4855,13 @@ const Sync = {
     await w.close();
   },
 
+  async writeText(dir, name, text) {
+    const fh = await dir.getFileHandle(name, { create: true });
+    const w = await fh.createWritable();
+    await w.write(text);
+    await w.close();
+  },
+
   async readJson(dir, name) {
     try {
       const fh = await dir.getFileHandle(name);
@@ -4695,15 +4871,21 @@ const Sync = {
 
   async pullAll() {
     // Profile: neuerer Stand gewinnt
+    // Ein leeres Erststart-Profil verliert immer gegen einen vorhandenen Stand im Ordner.
+    const wasPristine = storePristine();
     const remote = await Sync.readJson(Sync.dirs.profil, 'profil.json');
     if (remote && Array.isArray(remote.profiles) && remote.profiles.length) {
-      const rt = Date.parse(remote.updatedAt || 0), lt = Date.parse(store.updatedAt || 0);
-      if (rt > lt) {
+      const rt = Date.parse(remote.updatedAt || 0), lt = Date.parse(store.updatedAt || 0) || 0;
+      if (wasPristine || rt > lt) {
         store = remote;
+        store.profiles = store.profiles.map(normalizeProfile);
+        if (!store.profiles.some(p => p.id === store.activeId)) store.activeId = store.profiles[0].id;
         localStorage.setItem(LS.profiles, JSON.stringify(store));
+        bankIdx = 0;
         applyProfileToDocument();
+        if (wasPristine) toast('Profil aus dem Projektordner übernommen.');
       } else { await Sync.pushProfiles(); }
-    } else { await Sync.pushProfiles(); }
+    } else if (!wasPristine) { await Sync.pushProfiles(); }
 
     // Index: pro Eintrag der neuere Stand
     const rIdx = await Sync.readJson(Sync.dirs.system, 'index.json');
@@ -4717,6 +4899,8 @@ const Sync = {
       saveIndex(false);
     }
     await Sync.pushIndex();
+    // Neues Gerät: Nummer des noch ungesicherten Entwurfs an den Bestand anpassen
+    if (wasPristine && !currentDocId) document.getElementById('inv-nr').value = nextNumber();
 
     // Entwurf von einem anderen Gerät?
     const rAuto = await Sync.readJson(Sync.dirs.system, 'autosave.json');
@@ -4973,12 +5157,17 @@ function readProfileFile(e) {
     try {
       const data = JSON.parse(ev.target.result);
       const incoming = Array.isArray(data.profiles) ? data.profiles : (data.id ? [data] : null);
-      if (!incoming) throw 0;
-      incoming.forEach(p => { p.id = p.id || blankProfile().id; });
+      if (!incoming || !incoming.length) throw 0;
+      const list = incoming.map(normalizeProfile);
+      // Leere Platzhalter-Profile (z.B. vom Erststart) fliegen raus – es gibt ja jetzt echte
+      store.profiles = store.profiles.filter(p => !isBlankProfile(p));
       const ids = new Set(store.profiles.map(p => p.id));
-      incoming.forEach(p => { if (ids.has(p.id)) p.id = blankProfile().id; store.profiles.push(p); });
-      saveStore(); fillSettings(); renderProfileMenu();
-      toast(incoming.length + ' Profil(e) importiert.');
+      list.forEach(p => { if (ids.has(p.id)) p.id = blankProfile().id; store.profiles.push(p); });
+      store.activeId = list[0].id;
+      bankIdx = 0;
+      saveStore(); applyProfileToDocument(); fillSettings(); renderProfileMenu();
+      if (!currentDocId) document.getElementById('inv-nr').value = nextNumber();
+      toast(list.length + ' Profil(e) importiert.');
     } catch { alert('Ungültige Profil-Datei.'); }
   };
   r.readAsText(file); e.target.value = '';
@@ -5093,6 +5282,316 @@ function preparePrintLayout() {
   });
 }
 
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ WILLKOMMEN (neues Gerät)
+function openWelcome() {
+  const sup = Sync.supported;
+  document.getElementById('welcome-text').innerHTML = sup
+    ? 'Auf diesem Gerät gibt es noch keine Faktura-Daten. Verbinde deinen <b>Projektordner</b> – dann kommen Profil, ' +
+      'Kunden und alle Dokumente automatisch mit. Gibt es ihn noch nicht, legt Faktura darin ' +
+      '<code>Dokumente</code>, <code>Profil</code> und <code>System</code> an.'
+    : 'Auf diesem Gerät gibt es noch keine Faktura-Daten. Die Ordner-Anbindung braucht Chrome oder Edge am Desktop – ' +
+      'hier kannst du dein Profil per Datei einspielen oder neu einrichten.';
+  document.querySelectorAll('.welcome-folder-only').forEach(el => el.style.display = sup ? '' : 'none');
+  document.getElementById('welcome-folder').value = folderName || FOLDER_DEFAULT;
+  openModal('modal-welcome');
+}
+
+async function welcomeConnect() {
+  folderName = (document.getElementById('welcome-folder').value || '').trim() || FOLDER_DEFAULT;
+  saveUi();
+  const ok = await Sync.chooseFolder(folderName);   // erster await = Ordnerdialog (Klick-Geste bleibt erhalten)
+  if (!ok) return;                                  // abgebrochen → Willkommen bleibt offen
+  closeModal('modal-welcome');
+  if (!P().sender.name) setTimeout(openSettings, 250);
+}
+
+function welcomeImport() { closeModal('modal-welcome'); importProfiles(); }
+function welcomeNew() { closeModal('modal-welcome'); openSettings(); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ E-RECHNUNG (CII / EN 16931)
+// Erzeugt die XML einer ZUGFeRD-/Factur-X-Rechnung im Profil EN 16931 (Comfort).
+// Für Rechnungsempfänger in Deutschland ist diese XML allein bereits eine gültige E-Rechnung.
+
+// Freitext-Empfänger in Name / Straße / PLZ / Ort zerlegen
+function parseRecipient(text) {
+  const lines = String(text || '').split('\n').map(l => l.trim()).filter(Boolean);
+  const r = { name: lines[0] || '', street: '', zip: '', city: '', country: 'DE' };
+  let rest = lines.slice(1);
+  const ci = rest.findIndex(l => /^(?:[A-Z]{1,2}[-\s])?\d{4,5}\s+\S/.test(l));
+  if (ci >= 0) {
+    const m = rest[ci].match(/^(?:([A-Z]{1,2})[-\s])?(\d{4,5})\s+(.+)$/);
+    if (m) {
+      r.zip = m[2]; r.city = m[3];
+      if (m[1]) r.country = ({ D: 'DE', A: 'AT', CH: 'CH', L: 'LU', NL: 'NL', B: 'BE', F: 'FR' })[m[1]] || m[1];
+    }
+    if (rest[ci + 1] && /^(österreich|austria)$/i.test(rest[ci + 1])) r.country = 'AT';
+    if (rest[ci + 1] && /^(schweiz|switzerland)$/i.test(rest[ci + 1])) r.country = 'CH';
+    rest = rest.slice(0, ci);
+  }
+  // Straße = letzte Zeile vor PLZ/Ort, die nach Straße aussieht; davor liegende Zeilen (z.B. "z. Hd.") ignorieren
+  r.street = rest.length ? rest[rest.length - 1] : '';
+  return r;
+}
+
+function erDefaults() {
+  const st = getState();
+  const r = parseRecipient(st.kunde);
+  return { name: r.name, street: r.street, zip: r.zip, city: r.city, country: r.country,
+           mail: '', from: st.date || today(), to: '', ref: '' };
+}
+
+function openERechnung() {
+  if (docType !== 'rechnung') { toast('E-Rechnungen gibt es nur für Rechnungen.'); return; }
+  const d = Object.assign(erDefaults(), currentErech || {});
+  // Wurde der Empfänger im Dokument geändert, die Felder neu aus dem Text vorschlagen
+  const fresh = erDefaults();
+  if (currentErech && currentErech._src !== (document.getElementById('kunde').innerText || '').trim()) {
+    Object.assign(d, { name: fresh.name, street: fresh.street, zip: fresh.zip, city: fresh.city, country: fresh.country });
+  }
+  const v = (id, val) => document.getElementById(id).value = val || '';
+  v('er-name', d.name); v('er-street', d.street); v('er-zip', d.zip); v('er-city', d.city);
+  v('er-country', d.country || 'DE'); v('er-mail', d.mail); v('er-from', d.from); v('er-to', d.to); v('er-ref', d.ref);
+  erInput(true);
+  openModal('modal-erechnung');
+}
+
+function erRead() {
+  const g = id => (document.getElementById(id).value || '').trim();
+  return { name: g('er-name'), street: g('er-street'), zip: g('er-zip'), city: g('er-city'),
+           country: (g('er-country') || 'DE').toUpperCase(), mail: g('er-mail'),
+           from: g('er-from'), to: g('er-to'), ref: g('er-ref'),
+           _src: (document.getElementById('kunde').innerText || '').trim() };
+}
+
+function erInput(noSave) {
+  currentErech = erRead();
+  const data = collectErechData(currentErech);
+  const res = checkErech(data);
+  document.getElementById('er-checks').innerHTML = res.items.map(c =>
+    `<div class="er-check ${c.t}"><b>${c.t === 'ok' ? '✓' : c.t === 'warn' ? '!' : '✕'}</b><span>${c.m}</span></div>`).join('');
+  document.getElementById('er-create').disabled = res.errors > 0;
+  document.getElementById('er-create').style.opacity = res.errors ? .45 : 1;
+  if (!noSave) scheduleAutosave();
+}
+
+const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+
+// Alle Daten für die XML aus Profil + Dokument zusammentragen (reine Daten, kein DOM in buildCiiXml)
+function collectErechData(er) {
+  const p = P(), s = p.sender, st = getState();
+  const klein = p.tax.mode !== 'ust';
+  const rate = klein ? 0 : (parseFloat(p.tax.rate) || 0);
+  const unit = stunden === 'mit' ? 'HUR' : 'C62';
+  const lines = [];
+  allRows().forEach(tr => {
+    if (tr.dataset.kind === 'info') return;
+    const text = (tr.querySelector('.desc-edit')?.innerText || '').replace(/ /g, ' ').trim();
+    const betrag = parseFloat(tr.querySelector('.betrag-inp')?.value) || 0;
+    let qty = 1, price = betrag;
+    if (stunden !== 'ohne') {
+      qty = parseFloat(tr.querySelector('.stunden-inp')?.value) || 0;
+      price = parseFloat(tr.querySelector('.satz-inp')?.value) || 0;
+    }
+    if (!text && !betrag) return;
+    lines.push({ text, qty, price, unit, total: round2(stunden === 'ohne' ? betrag : qty * price), rawBetrag: betrag });
+  });
+  const b = activeBank();
+  return {
+    nr: (st.nr || '').trim(), date: st.date, betreff: (st.betreff || '').trim(),
+    seller: { name: s.name, street: s.street, zip: s.zip, city: s.city, country: 'DE',
+              phone: s.phone, mail: s.mail, taxNo: (p.legal.taxNo || '').trim() },
+    buyer: { name: er.name, street: er.street, zip: er.zip, city: er.city, country: er.country || 'DE', mail: er.mail },
+    ref: er.ref, from: er.from, to: er.to,
+    klein, rate, payDays: parseInt(p.terms.payDays, 10) || 0,
+    iban: b ? String(b.iban || '').replace(/\s+/g, '').toUpperCase() : '', bankName: b ? b.name : '',
+    lines, pdfGross: round2(getTotals().gross)
+  };
+}
+
+function erTotals(d) {
+  const net = round2(d.lines.reduce((a, l) => a + l.total, 0));
+  const vat = d.klein ? 0 : round2(net * d.rate / 100);
+  return { net, vat, gross: round2(net + vat) };
+}
+
+function checkErech(d) {
+  const items = [];
+  const add = (t, m) => items.push({ t, m });
+  if (!d.nr) add('err', 'Rechnungsnummer fehlt.');
+  if (!d.date) add('err', 'Rechnungsdatum fehlt.');
+  if (!d.seller.name || !d.seller.zip || !d.seller.city) add('err', 'Absender unvollständig (Name, PLZ, Ort) – ⚙ Einstellungen.');
+  if (!d.seller.taxNo) add('err', 'Steuernummer bzw. USt-IdNr. fehlt – ist in der E-Rechnung Pflicht (⚙ Einstellungen).');
+  if (!d.buyer.name) add('err', 'Name des Empfängers fehlt.');
+  if (!d.buyer.zip || !d.buyer.city) add('err', 'PLZ und Ort des Empfängers fehlen.');
+  if (!/^[A-Z]{2}$/.test(d.buyer.country)) add('err', 'Land bitte als 2-Buchstaben-Code angeben (z.B. DE).');
+  if (!d.lines.length) add('err', 'Keine Positionen mit Betrag.');
+  if (d.lines.some(l => l.total < 0)) add('err', 'Negative Positionen werden hier nicht unterstützt.');
+  if (!d.from) add('err', 'Leistungsdatum fehlt.');
+  if (d.to && d.from && d.to < d.from) add('err', 'Leistungszeitraum: „bis" liegt vor „von".');
+  const t = erTotals(d);
+  if (Math.abs(t.gross - d.pdfGross) > 0.004)
+    add('warn', `Gerundet ergibt die XML ${fmtEur(t.gross)}, das Dokument zeigt ${fmtEur(d.pdfGross)} – bitte Beträge mit max. 2 Nachkommastellen eintragen.`);
+  if (d.lines.some(l => !l.text)) add('warn', 'Eine Position hat keine Beschreibung – sie erscheint als „Position n".');
+  if (!d.iban) add('warn', 'Keine IBAN hinterlegt – die Zahlungsangaben fehlen dann in der XML.');
+  if (!d.seller.mail) add('warn', 'Keine Absender-E-Mail – manche Empfänger (XRechnung/Behörden) verlangen sie.');
+  if (!items.some(i => i.t === 'err')) {
+    add('ok', `${d.lines.length} Position(en) · Summe ${fmtEur(t.gross)}` +
+              (d.klein ? ' · Kleinunternehmer (§ 19 UStG, Steuerkategorie E)' : ` · ${String(d.rate).replace('.', ',')} % USt.`));
+  }
+  return { items, errors: items.filter(i => i.t === 'err').length };
+}
+
+function xmlEsc(v) {
+  return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+const d102 = iso => String(iso || '').replace(/-/g, '');
+const amt = n => round2(n).toFixed(2);
+function decStr(n, max = 4) {           // 2–4 Nachkommastellen, ohne überflüssige Nullen
+  let s = Number(n || 0).toFixed(max).replace(/0+$/, '');
+  const dec = (s.split('.')[1] || '').length;
+  return dec < 2 ? Number(n || 0).toFixed(2) : s;
+}
+function qtyStr(n) { return String(Number(Number(n || 0).toFixed(4))); }
+function addDaysIso(iso, days) {
+  const d = new Date(iso + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function buildCiiXml(d) {
+  const t = erTotals(d);
+  const cat = d.klein ? 'E' : 'S';
+  const rate = d.klein ? 0 : d.rate;
+  const exempt = 'Kein Ausweis von Umsatzsteuer, da Kleinunternehmer gemäß § 19 UStG';
+  const taxId = d.seller.taxNo.replace(/\s+/g, '');
+  const scheme = /^[A-Z]{2}[0-9A-Z]{8,12}$/.test(taxId) ? 'VA' : 'FC';
+  const tag = (name, val) => (val || val === 0) && String(val).trim() !== '' ? `<ram:${name}>${xmlEsc(val)}</ram:${name}>` : '';
+  const addr = a => `<ram:PostalTradeAddress>${tag('PostcodeCode', a.zip)}${tag('LineOne', a.street)}${tag('CityName', a.city)}<ram:CountryID>${xmlEsc(a.country || 'DE')}</ram:CountryID></ram:PostalTradeAddress>`;
+  const dt = iso => `<udt:DateTimeString format="102">${d102(iso)}</udt:DateTimeString>`;
+
+  const lineXml = d.lines.map((l, i) => {
+    const textLines = l.text ? l.text.split('\n').map(x => x.trim()).filter(Boolean) : [];
+    const name = (textLines[0] || `Position ${i + 1}`).slice(0, 250);
+    const desc = textLines.length > 1 ? textLines.join('\n') : '';
+    return `
+    <ram:IncludedSupplyChainTradeLineItem>
+      <ram:AssociatedDocumentLineDocument><ram:LineID>${i + 1}</ram:LineID></ram:AssociatedDocumentLineDocument>
+      <ram:SpecifiedTradeProduct>${tag('Name', name)}${tag('Description', desc)}</ram:SpecifiedTradeProduct>
+      <ram:SpecifiedLineTradeAgreement>
+        <ram:NetPriceProductTradePrice><ram:ChargeAmount>${decStr(l.price)}</ram:ChargeAmount></ram:NetPriceProductTradePrice>
+      </ram:SpecifiedLineTradeAgreement>
+      <ram:SpecifiedLineTradeDelivery><ram:BilledQuantity unitCode="${l.unit}">${qtyStr(l.qty)}</ram:BilledQuantity></ram:SpecifiedLineTradeDelivery>
+      <ram:SpecifiedLineTradeSettlement>
+        <ram:ApplicableTradeTax><ram:TypeCode>VAT</ram:TypeCode><ram:CategoryCode>${cat}</ram:CategoryCode><ram:RateApplicablePercent>${decStr(rate, 2)}</ram:RateApplicablePercent></ram:ApplicableTradeTax>
+        <ram:SpecifiedTradeSettlementLineMonetarySummation><ram:LineTotalAmount>${amt(l.total)}</ram:LineTotalAmount></ram:SpecifiedTradeSettlementLineMonetarySummation>
+      </ram:SpecifiedLineTradeSettlement>
+    </ram:IncludedSupplyChainTradeLineItem>`;
+  }).join('');
+
+  const contact = (d.seller.phone || d.seller.mail)
+    ? `<ram:DefinedTradeContact>${tag('PersonName', d.seller.name)}` +
+      (d.seller.phone ? `<ram:TelephoneUniversalCommunication>${tag('CompleteNumber', d.seller.phone)}</ram:TelephoneUniversalCommunication>` : '') +
+      (d.seller.mail ? `<ram:EmailURIUniversalCommunication>${tag('URIID', d.seller.mail)}</ram:EmailURIUniversalCommunication>` : '') +
+      `</ram:DefinedTradeContact>` : '';
+  const uri = m => m ? `<ram:URIUniversalCommunication><ram:URIID schemeID="EM">${xmlEsc(m)}</ram:URIID></ram:URIUniversalCommunication>` : '';
+
+  const delivery = d.to
+    ? '' : `<ram:ActualDeliverySupplyChainEvent><ram:OccurrenceDateTime>${dt(d.from)}</ram:OccurrenceDateTime></ram:ActualDeliverySupplyChainEvent>`;
+  const period = d.to
+    ? `<ram:BillingSpecifiedPeriod><ram:StartDateTime>${dt(d.from)}</ram:StartDateTime><ram:EndDateTime>${dt(d.to)}</ram:EndDateTime></ram:BillingSpecifiedPeriod>` : '';
+  const payMeans = d.iban
+    ? `<ram:SpecifiedTradeSettlementPaymentMeans><ram:TypeCode>58</ram:TypeCode><ram:PayeePartyCreditorFinancialAccount>${tag('IBANID', d.iban)}${tag('AccountName', d.seller.name)}</ram:PayeePartyCreditorFinancialAccount></ram:SpecifiedTradeSettlementPaymentMeans>` : '';
+  const due = d.payDays > 0 ? addDaysIso(d.date, d.payDays) : d.date;
+  const termsTxt = d.payDays > 0 ? `Zahlbar innerhalb ${d.payDays} Tagen ${d.klein ? 'rein netto' : 'ohne Abzug'}` : 'Zahlbar sofort ohne Abzug';
+  const notes = [d.betreff, d.klein ? exempt : ''].filter(Boolean)
+    .map(n => `<ram:IncludedNote><ram:Content>${xmlEsc(n)}</ram:Content></ram:IncludedNote>`).join('');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
+  <rsm:ExchangedDocumentContext>
+    <ram:GuidelineSpecifiedDocumentContextParameter><ram:ID>urn:cen.eu:en16931:2017</ram:ID></ram:GuidelineSpecifiedDocumentContextParameter>
+  </rsm:ExchangedDocumentContext>
+  <rsm:ExchangedDocument>
+    <ram:ID>${xmlEsc(d.nr)}</ram:ID>
+    <ram:TypeCode>380</ram:TypeCode>
+    <ram:IssueDateTime>${dt(d.date)}</ram:IssueDateTime>
+    ${notes}
+  </rsm:ExchangedDocument>
+  <rsm:SupplyChainTradeTransaction>${lineXml}
+    <ram:ApplicableHeaderTradeAgreement>
+      ${tag('BuyerReference', d.ref)}
+      <ram:SellerTradeParty>
+        ${scheme === 'FC' ? tag('ID', taxId) /* BT-29: ohne USt-IdNr. braucht der Empfänger eine Verkäuferkennung */ : ''}
+        ${tag('Name', d.seller.name)}
+        ${contact}
+        ${addr(d.seller)}
+        ${uri(d.seller.mail)}
+        <ram:SpecifiedTaxRegistration><ram:ID schemeID="${scheme}">${xmlEsc(taxId)}</ram:ID></ram:SpecifiedTaxRegistration>
+      </ram:SellerTradeParty>
+      <ram:BuyerTradeParty>
+        ${tag('Name', d.buyer.name)}
+        ${addr(d.buyer)}
+        ${uri(d.buyer.mail)}
+      </ram:BuyerTradeParty>
+    </ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeDelivery>${delivery}</ram:ApplicableHeaderTradeDelivery>
+    <ram:ApplicableHeaderTradeSettlement>
+      ${tag('PaymentReference', d.nr)}
+      <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+      ${payMeans}
+      <ram:ApplicableTradeTax>
+        <ram:CalculatedAmount>${amt(t.vat)}</ram:CalculatedAmount>
+        <ram:TypeCode>VAT</ram:TypeCode>
+        ${d.klein ? tag('ExemptionReason', exempt) : ''}
+        <ram:BasisAmount>${amt(t.net)}</ram:BasisAmount>
+        <ram:CategoryCode>${cat}</ram:CategoryCode>
+        <ram:RateApplicablePercent>${decStr(rate, 2)}</ram:RateApplicablePercent>
+      </ram:ApplicableTradeTax>
+      ${period}
+      <ram:SpecifiedTradePaymentTerms>
+        ${tag('Description', termsTxt)}
+        <ram:DueDateDateTime>${dt(due)}</ram:DueDateDateTime>
+      </ram:SpecifiedTradePaymentTerms>
+      <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        <ram:LineTotalAmount>${amt(t.net)}</ram:LineTotalAmount>
+        <ram:TaxBasisTotalAmount>${amt(t.net)}</ram:TaxBasisTotalAmount>
+        <ram:TaxTotalAmount currencyID="EUR">${amt(t.vat)}</ram:TaxTotalAmount>
+        <ram:GrandTotalAmount>${amt(t.gross)}</ram:GrandTotalAmount>
+        <ram:DuePayableAmount>${amt(t.gross)}</ram:DuePayableAmount>
+      </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+    </ram:ApplicableHeaderTradeSettlement>
+  </rsm:SupplyChainTradeTransaction>
+</rsm:CrossIndustryInvoice>
+`.replace(/\n\s*\n/g, '\n');
+}
+
+async function createERechnung() {
+  currentErech = erRead();
+  const d = collectErechData(currentErech);
+  if (checkErech(d).errors) { erInput(true); return; }
+  await saveDocument();                         // Nummer sichern, Stand festhalten
+  if (!currentDocId) return;                    // leer → nichts gesichert
+  const xml = buildCiiXml(d);
+  const entry = indexData.find(e => e.id === currentDocId);
+  const name = (entry?.file || docFileName(getState())).replace(/\.json$/, '.xml');
+  const blob = new Blob([xml], { type: 'application/xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  if (Sync.connected && entry) {
+    try {
+      const yearDir = await Sync.dirs.rechnungen.getDirectoryHandle(String(entry.year), { create: true });
+      await Sync.writeText(yearDir, name, xml);
+    } catch (e) { console.warn('XML nicht im Ordner gespeichert', e); }
+  }
+  closeModal('modal-erechnung');
+  logEvent('e-rechnung', `${d.nr} · ${fmtEur(erTotals(d).gross)} · ${name}`);
+  toast(Sync.connected ? 'E-Rechnung erzeugt und im Arbeitsordner abgelegt.' : 'E-Rechnung (XML) heruntergeladen.');
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HELFER
 function fmtEur(v) {
   const n = parseFloat(v) || 0;
@@ -5166,6 +5665,7 @@ function markEmptyRowsForPrint() {
   setDocType('rechnung');
   applyDocTheme();
   askBeforePrint = ui.askBeforePrint !== false;
+  folderName = (ui.folderName || FOLDER_DEFAULT);
   setOutputMode(ui.outputMode || 'eco', false);
   setPaymentQr(!!ui.paymentQr, false);
   applyProfileToDocument();
@@ -5203,8 +5703,10 @@ function markEmptyRowsForPrint() {
   document.getElementById('invoice').addEventListener('input', scheduleLayout);
   window.addEventListener('resize', scheduleLayout);
   setTimeout(paginate, 60);
-  Sync.init();
-  if (firstRun) setTimeout(openSettings, 400);
+  Sync.init().then(() => {
+    // Neues Gerät: noch kein Profil, kein gemerkter Ordner → einmal nach dem Projektordner fragen
+    if (firstRun && storePristine() && !Sync.connected && !Sync.root) setTimeout(openWelcome, 300);
+  });
 })();
 
 </script>
