@@ -3105,7 +3105,7 @@ module.exports = QRCode;
 // Alle personenbezogenen Daten liegen ausschließlich im Profil (localStorage bzw.
 // Arbeitsordner) – im Quelltext steht nichts Privates.
 
-const APP_VERSION = '1.8.0';
+const APP_VERSION = '1.8.1';
 const FOLDER_DEFAULT = 'Rechnungstool';
 
 const LS = {
@@ -4630,7 +4630,20 @@ function doPrint(mode) {
   saveUi();
   closeModal('modal-print');
   logEvent('gedruckt', `${document.getElementById('inv-nr').value || ''} · ${fmtEur(getTotals().gross)} · ${mode === 'vivid' ? 'kräftig' : 'druckfreundlich'}`);
+  setPrintTitle();
   setTimeout(() => window.print(), 120);
+}
+
+// Chrome/Edge schlagen beim „Als PDF speichern" den Seitentitel als Dateinamen vor.
+// Für die Dauer des Drucks heißt die Seite deshalb wie die gesicherte JSON-Datei:
+// Re_R2026-003_2026-09-25_Friseur-am-Kuhsee
+let originalTitle = null;
+function setPrintTitle() {
+  if (originalTitle === null) originalTitle = document.title;
+  document.title = docFileName(getState()).replace(/\.json$/, '');
+}
+function restorePrintTitle() {
+  if (originalTitle !== null) { document.title = originalTitle; originalTitle = null; }
 }
 
 function setPrintPreference(v) {
@@ -5685,8 +5698,9 @@ function markEmptyRowsForPrint() {
   document.getElementById('inv-nr').addEventListener('input', renderPaymentQr);
   window.addEventListener('pagehide', saveDraftNow);
   window.addEventListener('beforeunload', saveDraftNow);
-  window.addEventListener('beforeprint', () => { markEmptyRowsForPrint(); preparePrintLayout(); });
+  window.addEventListener('beforeprint', () => { setPrintTitle(); markEmptyRowsForPrint(); preparePrintLayout(); });
   window.addEventListener('afterprint', () => {
+    restorePrintTitle();
       allRows().forEach(tr => tr.classList.remove('is-empty'));
     preparePrintLayout();
   });
