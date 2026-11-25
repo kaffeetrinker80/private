@@ -608,6 +608,83 @@
       .theme-switch button { min-width: 30px; padding-inline: 6px; }
       .stage-controls { max-width: calc(100% - 20px); flex-wrap: wrap; justify-content: center; }
     }
+    /* ---------- Large editor (modal) ---------- */
+    .format-bar .fmt-expand { flex: 0 0 auto; min-width: 40px; font-size: 1rem; }
+    .editor-modal {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 3vh 3vw;
+      background: rgba(6, 10, 16, .62);
+      backdrop-filter: blur(3px);
+    }
+    .editor-modal[hidden] { display: none; }
+    .editor-modal-dialog {
+      display: flex; flex-direction: column;
+      width: min(1100px, 100%); height: 100%;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .editor-modal-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .editor-modal-head h2 { margin: 0; font-size: 1.02rem; }
+    .editor-modal-tools {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+    }
+    .editor-modal-tools .tool-group { display: flex; align-items: center; gap: 5px; }
+    .editor-modal-tools .tool-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
+    .editor-modal-tools button {
+      min-width: 40px; min-height: 36px; padding: 6px 10px;
+      border: 1px solid var(--border); border-radius: 9px;
+      background: var(--panel-2); color: var(--text);
+      font: inherit; font-size: .9rem; line-height: 1; cursor: pointer;
+    }
+    .editor-modal-tools button:hover { border-color: var(--accent); }
+    .editor-modal-tools button.is-active { background: var(--accent-strong); color: #fff; border-color: transparent; }
+    .editor-modal-tools .em-mark { background: rgba(255, 196, 46, .22); }
+    .editor-modal-tools .em-bold { font-weight: 800; }
+    .editor-modal-tools .em-italic { font-style: italic; }
+    .editor-modal-tools .em-underline { text-decoration: underline; }
+    .editor-modal-tools .em-size-value { min-width: 46px; text-align: center; font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .editor-modal-body {
+      flex: 1 1 auto; overflow-y: auto;
+      margin: 12px 16px; padding: 16px 18px;
+      background: #111923; color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px;
+      outline: none;
+      white-space: pre-wrap; overflow-wrap: anywhere;
+      line-height: 1.5; font-size: 20px;
+      tab-size: 4;
+    }
+    .editor-modal-body:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(104,182,255,.14); }
+    .editor-modal-body:empty::before { content: attr(data-placeholder); color: var(--muted); }
+    .editor-modal-body b, .editor-modal-body strong { font-weight: 800; }
+    .editor-modal-body [style*="background"] { color: #1c1400; border-radius: .12em; }
+    .editor-modal-body [style*="transparent"] { color: inherit; }
+    .editor-modal-foot {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 16px 14px; border-top: 1px solid var(--border);
+    }
+    .editor-modal-foot .em-info { color: var(--muted); font-size: .76rem; }
+    .editor-modal-foot .em-actions { display: flex; gap: 8px; margin-left: auto; }
+    .editor-modal-foot .btn { min-height: 38px; padding: 8px 16px; }
+    .light-mode .editor-modal { background: rgba(30, 50, 75, .38); }
+    .light-mode .editor-modal-body { background: #ffffff; color: #10243a; border-color: #aebfd0; }
+    .light-mode .editor-modal-tools button { background: #e5edf5; color: #122c47; border-color: #a6bacd; }
+    .light-mode .editor-modal-tools button.is-active { background: #1e62a5; color: #fff; border-color: transparent; }
+    @media (max-width: 700px) {
+      .editor-modal { padding: 0; }
+      .editor-modal-dialog { border-radius: 0; }
+      .editor-modal-tools { padding: 8px 10px; }
+      .editor-modal-body { margin: 8px 10px; padding: 12px; }
+      .editor-modal-tools .tool-sep { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -616,7 +693,7 @@
       <div class="brand">
         <div class="brand-row">
           <div class="brand-copy">
-            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.4.9</span></h1>
+            <h1>TalkScroll <span class="version-badge" id="versionBadge">v1.5.0</span></h1>
             <p>Teleprompter &amp; Script Reader</p>
           </div>
           <div class="brand-switches">
@@ -644,6 +721,7 @@
         <button type="button" class="fmt-italic" data-marker="*" title="Kursiv">K</button>
         <button type="button" class="fmt-underline" data-marker="__" title="Unterstrichen">U</button>
         <button type="button" class="fmt-clear" id="formatClearBtn" title="Formatierung entfernen">✕</button>
+        <button type="button" class="fmt-expand" id="openEditorModalBtn" title="Großer Editor">⤢</button>
       </div>
       <textarea id="editor" spellcheck="true" placeholder="Hier dein Skript einfügen oder schreiben …">Willkommen bei TalkScroll.
 
@@ -741,8 +819,8 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </p>
 
       <div class="sidebar-footer">
-        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.4.9</span></span>
-        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.4.9">✉ Feedback</a>
+        <span>Made with Love © – TalkScroll <span id="sidebarVersion">v1.5.0</span></span>
+        <a href="mailto:cryptopower@outlook.de?subject=Feedback:%20TalkScroll%20V1.5.0">✉ Feedback</a>
       </div>
     </aside>
 
@@ -774,6 +852,43 @@ Kleiner Tipp: Mit den Pfeiltasten nach oben und unten passt du das Tempo auch w�
       </div>
     </section>
   </main>
+
+  <div class="editor-modal" id="editorModal" hidden>
+    <div class="editor-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="editorModalTitle">
+      <div class="editor-modal-head">
+        <h2 id="editorModalTitle">Skript bearbeiten</h2>
+        <button type="button" class="btn" id="editorModalCloseBtn" aria-label="Schließen">✕</button>
+      </div>
+      <div class="editor-modal-tools" id="editorModalTools">
+        <div class="tool-group">
+          <button type="button" class="em-mark" data-cmd="highlight">Markieren</button>
+          <button type="button" class="em-bold" data-cmd="bold">F</button>
+          <button type="button" class="em-italic" data-cmd="italic">K</button>
+          <button type="button" class="em-underline" data-cmd="underline">U</button>
+          <button type="button" class="em-clear" data-cmd="clear">✕</button>
+        </div>
+        <span class="tool-sep"></span>
+        <div class="tool-group">
+          <button type="button" data-cmd="undo">↶</button>
+          <button type="button" data-cmd="redo">↷</button>
+        </div>
+        <span class="tool-sep"></span>
+        <div class="tool-group">
+          <button type="button" data-cmd="smaller">A−</button>
+          <span class="em-size-value" id="editorModalSize">20 px</span>
+          <button type="button" data-cmd="larger">A+</button>
+        </div>
+      </div>
+      <div class="editor-modal-body" id="editorModalBody" contenteditable="true" spellcheck="true"></div>
+      <div class="editor-modal-foot">
+        <span class="em-info" id="editorModalInfo"></span>
+        <div class="em-actions">
+          <button type="button" class="btn" id="editorModalCancelBtn">Abbrechen</button>
+          <button type="button" class="btn primary" id="editorModalApplyBtn">✓ Übernehmen</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <script>
@@ -937,7 +1052,20 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           italicTitle: 'Kursiv (Strg+I)',
           underline: 'U',
           underlineTitle: 'Unterstrichen (Strg+U)',
-          clearTitle: 'Formatierung der Auswahl entfernen'
+          clearTitle: 'Formatierung der Auswahl entfernen',
+          expandTitle: 'Im großen Editor bearbeiten'
+        },
+        modal: {
+          title: 'Skript bearbeiten',
+          close: 'Schließen',
+          undo: 'Rückgängig (Strg+Z)',
+          redo: 'Wiederholen (Strg+Y)',
+          smaller: 'Editor-Schrift kleiner',
+          larger: 'Editor-Schrift größer',
+          cancel: 'Abbrechen',
+          apply: '✓ Übernehmen',
+          info: '{words} Wörter · Strg+Enter übernimmt · Esc schließt',
+          discardConfirm: 'Änderungen im Editor verwerfen?'
         },
         syncSection: 'Cloud-Sync',
         sync: {
@@ -1057,7 +1185,20 @@ https://github.com/nodeca/pako/blob/main/LICENSE
           italicTitle: 'Italic (Ctrl+I)',
           underline: 'U',
           underlineTitle: 'Underline (Ctrl+U)',
-          clearTitle: 'Remove formatting from the selection'
+          clearTitle: 'Remove formatting from the selection',
+          expandTitle: 'Edit in the large editor'
+        },
+        modal: {
+          title: 'Edit script',
+          close: 'Close',
+          undo: 'Undo (Ctrl+Z)',
+          redo: 'Redo (Ctrl+Y)',
+          smaller: 'Smaller editor text',
+          larger: 'Larger editor text',
+          cancel: 'Cancel',
+          apply: '✓ Apply',
+          info: '{words} words · Ctrl+Enter applies · Esc closes',
+          discardConfirm: 'Discard your changes in the editor?'
         },
         syncSection: 'Cloud Sync',
         sync: {
@@ -1190,6 +1331,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       formatBar.querySelector('.fmt-underline').textContent = tr('format.underline');
       formatBar.querySelector('.fmt-underline').title = tr('format.underlineTitle');
       formatClearBtn.title = tr('format.clearTitle');
+      localizeEditorModal();
       timerLabel.textContent = tr('timerLabel');
       document.getElementById('timer').title = tr('timerTitle');
       restartBtn.title = tr('restartTitle');
@@ -1679,6 +1821,61 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       if (syncDirHandle && syncAutoToggle.checked) writeSyncFile();
     });
 
+    // Inline markers understood in the script text. Longer markers must come
+    // first so "**bold**" is not read as an italic star. Markers may be nested,
+    // e.g. **==important==** works.
+    const INLINE_MARKERS = [
+      { marker: '***', tags: ['strong', 'em'] },
+      { marker: '==', tags: ['mark'] },
+      { marker: '**', tags: ['strong'] },
+      { marker: '__', tags: ['u'] },
+      { marker: '*', tags: ['em'] },
+      { marker: '_', tags: ['em'] }
+    ];
+
+    // Turns one line of raw text into formatted nodes while keeping every text
+    // node's original character offset intact (needed for "jump to cursor").
+    function appendInlineFormatted(parent, text, absoluteStart, onText, makeElement = tag => document.createElement(tag)) {
+      let cursor = 0;
+      while (cursor < text.length) {
+        let best = null;
+        for (const entry of INLINE_MARKERS) {
+          const open = text.indexOf(entry.marker, cursor);
+          if (open === -1) continue;
+          const close = text.indexOf(entry.marker, open + entry.marker.length);
+          if (close === -1 || close === open + entry.marker.length) continue;
+          // A marker only counts when it hugs its text ("*so*", not "3 * 4 * 5"),
+          // and underscores additionally have to sit outside words (snake_case).
+          const inner = text.slice(open + entry.marker.length, close);
+          if (inner !== inner.trim()) continue;
+          if (entry.marker[0] === '_') {
+            const before = text[open - 1] || ' ';
+            const after = text[close + entry.marker.length] || ' ';
+            if (/[\w]/.test(before) || /[\w]/.test(after)) continue;
+          }
+          const better = !best || open < best.open ||
+            (open === best.open && entry.marker.length > best.entry.marker.length);
+          if (better) best = { entry, open, close };
+        }
+        if (!best) break;
+
+        if (best.open > cursor) onText(parent, text.slice(cursor, best.open), absoluteStart + cursor);
+        // "***text***" nests two tags, every other marker exactly one.
+        const element = makeElement(best.entry.tags[0]);
+        let innermost = element;
+        best.entry.tags.slice(1).forEach(tag => {
+          const child = makeElement(tag);
+          innermost.appendChild(child);
+          innermost = child;
+        });
+        const innerStart = best.open + best.entry.marker.length;
+        appendInlineFormatted(innermost, text.slice(innerStart, best.close), absoluteStart + innerStart, onText, makeElement);
+        parent.appendChild(element);
+        cursor = best.close + best.entry.marker.length;
+      }
+      if (cursor < text.length) onText(parent, text.slice(cursor), absoluteStart + cursor);
+    }
+
     // Renders editor.value into #script as paragraphs (so the blank-line gap between
     // them can be controlled via CSS margin instead of a literal, line-height-sized
     // empty line) and turns ==marked text== into <mark> highlights. Keeps `scriptRuns`
@@ -1701,61 +1898,6 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         scriptRuns.push({ node, start: originalStart, end: originalStart + text.length });
       }
 
-      // Inline markers understood in the script text. Longer markers must come
-      // first so "**bold**" is not read as an italic star. Markers may be nested,
-      // e.g. **==important==** works.
-      const INLINE_MARKERS = [
-        { marker: '***', tags: ['strong', 'em'] },
-        { marker: '==', tags: ['mark'] },
-        { marker: '**', tags: ['strong'] },
-        { marker: '__', tags: ['u'] },
-        { marker: '*', tags: ['em'] },
-        { marker: '_', tags: ['em'] }
-      ];
-
-      // Turns one line of raw text into formatted nodes while keeping every text
-      // node's original character offset intact (needed for "jump to cursor").
-      function appendFormatted(parent, text, absoluteStart) {
-        let cursor = 0;
-        while (cursor < text.length) {
-          let best = null;
-          for (const entry of INLINE_MARKERS) {
-            const open = text.indexOf(entry.marker, cursor);
-            if (open === -1) continue;
-            const close = text.indexOf(entry.marker, open + entry.marker.length);
-            if (close === -1 || close === open + entry.marker.length) continue;
-            // A marker only counts when it hugs its text ("*so*", not "3 * 4 * 5"),
-            // and underscores additionally have to sit outside words (snake_case).
-            const inner = text.slice(open + entry.marker.length, close);
-            if (inner !== inner.trim()) continue;
-            if (entry.marker[0] === '_') {
-              const before = text[open - 1] || ' ';
-              const after = text[close + entry.marker.length] || ' ';
-              if (/[\w]/.test(before) || /[\w]/.test(after)) continue;
-            }
-            const better = !best || open < best.open ||
-              (open === best.open && entry.marker.length > best.entry.marker.length);
-            if (better) best = { entry, open, close };
-          }
-          if (!best) break;
-
-          if (best.open > cursor) appendRun(parent, text.slice(cursor, best.open), absoluteStart + cursor);
-          // "***text***" nests two tags, every other marker exactly one.
-          const element = document.createElement(best.entry.tags[0]);
-          let innermost = element;
-          best.entry.tags.slice(1).forEach(tag => {
-            const child = document.createElement(tag);
-            innermost.appendChild(child);
-            innermost = child;
-          });
-          const innerStart = best.open + best.entry.marker.length;
-          appendFormatted(innermost, text.slice(innerStart, best.close), absoluteStart + innerStart);
-          parent.appendChild(element);
-          cursor = best.close + best.entry.marker.length;
-        }
-        if (cursor < text.length) appendRun(parent, text.slice(cursor), absoluteStart + cursor);
-      }
-
       const paraRegex = /\n{2,}/g;
       const paragraphs = [];
       let paraStart = 0;
@@ -1773,7 +1915,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         let lineOffset = para.start;
 
         lines.forEach((line, lineIndex) => {
-          appendFormatted(p, line, lineOffset);
+          appendInlineFormatted(p, line, lineOffset, appendRun);
 
           lineOffset += line.length;
           if (lineIndex < lines.length - 1) {
@@ -2586,9 +2728,439 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       if (confirm(tr('clearConfirm'))) { editor.value = ''; isDemoText = false; updateText(); restart(); }
     });
 
+    // ---------- Large editor (modal) ----------
+    // A roomy WYSIWYG editor for pasting and reworking the script. The script itself
+    // keeps living in the textarea as plain text with markers (==, **, *, __), so
+    // profiles, sync, export and the reader are untouched: the modal converts the
+    // markers to visible formatting on open and back to markers on "Apply".
+    const editorModal = document.getElementById('editorModal');
+    const editorModalBody = document.getElementById('editorModalBody');
+    const editorModalTools = document.getElementById('editorModalTools');
+    const editorModalSize = document.getElementById('editorModalSize');
+    const editorModalInfo = document.getElementById('editorModalInfo');
+    const openEditorModalBtn = document.getElementById('openEditorModalBtn');
+    const EDITOR_MODAL_FONT_KEY = 'talkscroll-editor-modal-font';
+    const EDITOR_MODAL_HIGHLIGHT = '#ffd152';
+    const EDITOR_FONT_MIN = 14;
+    const EDITOR_FONT_MAX = 44;
+    let editorModalBaseline = '';
+    let editorModalRange = null;
+    let editorModalFont = 20;
+    try {
+      const storedFont = Number(localStorage.getItem(EDITOR_MODAL_FONT_KEY));
+      if (storedFont >= EDITOR_FONT_MIN && storedFont <= EDITOR_FONT_MAX) editorModalFont = storedFont;
+    } catch (error) { /* storage unavailable: keep default */ }
+
+    function isEditorModalOpen() {
+      return !editorModal.hidden;
+    }
+
+    // Is a CSS colour a real highlight? Transparent, white-ish and dark backgrounds
+    // (page or editor backgrounds that come along when copying) are not.
+    const colorProbe = document.createElement('canvas').getContext('2d');
+    function isHighlightColor(value) {
+      if (!value) return false;
+      const raw = value.trim().toLowerCase();
+      if (!raw || ['transparent', 'none', 'initial', 'inherit', 'unset', 'window', 'auto'].includes(raw)) return false;
+      if (!colorProbe) return true;
+      colorProbe.fillStyle = '#010203';
+      colorProbe.fillStyle = raw;
+      const normalized = colorProbe.fillStyle;
+      if (normalized === '#010203' && raw !== '#010203') return false; // not a colour
+      let r, g, b, a = 1;
+      if (normalized.startsWith('#')) {
+        r = parseInt(normalized.slice(1, 3), 16);
+        g = parseInt(normalized.slice(3, 5), 16);
+        b = parseInt(normalized.slice(5, 7), 16);
+      } else {
+        const parts = normalized.match(/[\d.]+/g)?.map(Number) || [];
+        [r, g, b] = parts;
+        if (parts.length > 3) a = parts[3];
+      }
+      if (a < 0.15) return false;
+      if (r > 238 && g > 238 && b > 238) return false;
+      const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      return luminance > 0.3;
+    }
+
+    // Formatting an element adds to (or switches off) what it inherits.
+    function formatOfElement(element, inherited) {
+      const format = { ...inherited };
+      const tag = element.tagName;
+      if (tag === 'B' || tag === 'STRONG') format.bold = true;
+      if (tag === 'I' || tag === 'EM') format.italic = true;
+      if (tag === 'U' || tag === 'INS') format.underline = true;
+      if (tag === 'MARK') format.highlight = true;
+      const style = element.style;
+      if (style) {
+        const weight = style.fontWeight;
+        if (weight) format.bold = weight === 'bold' || weight === 'bolder' || Number(weight) >= 600;
+        const fontStyle = style.fontStyle;
+        if (fontStyle) format.italic = fontStyle === 'italic' || fontStyle === 'oblique';
+        const decoration = style.textDecorationLine || style.textDecoration;
+        if (decoration && decoration.includes('underline')) format.underline = true;
+        const background = style.backgroundColor;
+        if (background) format.highlight = isHighlightColor(background);
+      }
+      const msoHighlight = (element.getAttribute('style') || '').match(/mso-highlight\s*:\s*([a-z]+)/i);
+      if (msoHighlight) format.highlight = msoHighlight[1].toLowerCase() !== 'none';
+      return format;
+    }
+
+    function wrapWithMarkers(text, format) {
+      return text.split('\n').map(part => {
+        const markers = [];
+        if (format.highlight) markers.push('==');
+        if (format.bold) markers.push('**');
+        if (format.italic) markers.push('*');
+        if (format.underline) markers.push('__');
+        const core = part.trim();
+        if (!markers.length || !core) return part;
+        const leading = part.slice(0, part.indexOf(core[0]));
+        const trailing = part.slice(leading.length + core.length);
+        return leading + markers.join('') + core + markers.slice().reverse().join('') + trailing;
+      }).join('\n');
+    }
+
+    // Turns editor (or pasted) HTML into script text with markers.
+    // pasted: collapse HTML source whitespace and treat <p> as a paragraph (blank line).
+    function domToMarkers(root, { pasted = false } = {}) {
+      const NONE = { bold: false, italic: false, underline: false, highlight: false };
+      const SKIP = /^(STYLE|SCRIPT|HEAD|TITLE|META|LINK|NOSCRIPT|TEMPLATE)$/;
+      const PARAGRAPH = /^(P|H[1-6]|LI|BLOCKQUOTE|PRE|UL|OL|TABLE)$/;
+      const LINE = /^(DIV|TR|SECTION|ARTICLE|HEADER|FOOTER|DT|DD)$/;
+      const segments = [];
+      let plain = '';
+
+      function push(text, format) {
+        if (!text) return;
+        segments.push({ text, format });
+        plain += text;
+      }
+      function ensureBreak(count) {
+        if (!plain) return;
+        const trailing = plain.match(/\n*$/)[0].length;
+        if (trailing < count) push('\n'.repeat(count - trailing), NONE);
+      }
+      function walk(node, format) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          let text = node.nodeValue.replace(/ /g, ' ');
+          if (pasted) {
+            text = text.replace(/\s+/g, ' ');
+            if (/\n$/.test(plain) || !plain) text = text.replace(/^ /, '');
+          }
+          push(text, format);
+          return;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        const tag = node.tagName;
+        if (SKIP.test(tag)) return;
+        if (tag === 'BR') { push('\n', NONE); return; }
+        const own = formatOfElement(node, format);
+        const breakCount = PARAGRAPH.test(tag) ? (pasted ? 2 : 1) : (LINE.test(tag) ? 1 : 0);
+        if (breakCount) ensureBreak(breakCount);
+        node.childNodes.forEach(child => walk(child, own));
+        if (breakCount) ensureBreak(breakCount);
+        if (tag === 'TD' || tag === 'TH') push(' ', NONE);
+      }
+      root.childNodes.forEach(child => walk(child, NONE));
+
+      // The browser keeps a placeholder <br> after a line break at the very end.
+      if (!pasted) {
+        let last = root.lastChild;
+        while (last && last.nodeType === Node.TEXT_NODE && !last.nodeValue) last = last.previousSibling;
+        if (last && last.nodeName === 'BR' && segments.length && segments[segments.length - 1].text === '\n') {
+          segments.pop();
+        }
+      }
+
+      // Merge neighbours with identical formatting, then write the markers.
+      const merged = [];
+      segments.forEach(segment => {
+        const previous = merged[merged.length - 1];
+        const same = previous && ['bold', 'italic', 'underline', 'highlight']
+          .every(key => !!previous.format[key] === !!segment.format[key]);
+        if (same) previous.text += segment.text;
+        else merged.push({ text: segment.text, format: segment.format });
+      });
+      let result = merged.map(segment => wrapWithMarkers(segment.text, segment.format)).join('');
+      if (pasted) {
+        result = result.replace(/[ \t]*\n[ \t]*/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+      }
+      return result;
+    }
+
+    // Script text with markers → editor DOM (b / i / u / highlighted span).
+    function markersToEditorFragment(text) {
+      const fragment = document.createDocumentFragment();
+      const makeElement = tag => {
+        if (tag === 'mark') {
+          const span = document.createElement('span');
+          span.style.backgroundColor = EDITOR_MODAL_HIGHLIGHT;
+          return span;
+        }
+        return document.createElement({ strong: 'b', em: 'i' }[tag] || tag);
+      };
+      const onText = (parent, value) => parent.appendChild(document.createTextNode(value));
+      const lines = text.replace(/\r\n?/g, '\n').split('\n');
+      lines.forEach((line, index) => {
+        appendInlineFormatted(fragment, line, 0, onText, makeElement);
+        if (index < lines.length - 1) fragment.appendChild(document.createElement('br'));
+      });
+      // A trailing line break needs a second <br> to be visible.
+      if (text.endsWith('\n')) fragment.appendChild(document.createElement('br'));
+      return fragment;
+    }
+
+    function fragmentToHtml(fragment) {
+      const holder = document.createElement('div');
+      holder.appendChild(fragment);
+      return holder.innerHTML;
+    }
+
+    function updateEditorModalFont() {
+      editorModalBody.style.fontSize = `${editorModalFont}px`;
+      editorModalSize.textContent = `${editorModalFont} px`;
+      editorModalTools.querySelector('[data-cmd="smaller"]').disabled = editorModalFont <= EDITOR_FONT_MIN;
+      editorModalTools.querySelector('[data-cmd="larger"]').disabled = editorModalFont >= EDITOR_FONT_MAX;
+    }
+
+    function updateEditorModalInfo() {
+      const words = (editorModalBody.innerText || '').trim().split(/\s+/).filter(Boolean).length;
+      editorModalInfo.textContent = tr('modal.info', { words });
+    }
+
+    function selectionInEditorModal() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return null;
+      const range = selection.getRangeAt(0);
+      return editorModalBody.contains(range.commonAncestorContainer) ? range : null;
+    }
+
+    function restoreEditorModalSelection() {
+      const hadFocus = document.activeElement === editorModalBody;
+      if (!hadFocus) editorModalBody.focus({ preventScroll: true });
+      if ((!hadFocus || !selectionInEditorModal()) && editorModalRange) {
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(editorModalRange);
+      }
+    }
+
+    function isSelectionHighlighted() {
+      const range = selectionInEditorModal();
+      if (!range) return false;
+      let node = range.startContainer;
+      if (node.nodeType === Node.TEXT_NODE && range.startOffset === node.length && node.nextSibling && !range.collapsed) {
+        node = node.nextSibling;
+      }
+      let element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+      while (element && element !== editorModalBody) {
+        if (element.tagName === 'MARK') return true;
+        if (element.style && element.style.backgroundColor) return isHighlightColor(element.style.backgroundColor);
+        element = element.parentElement;
+      }
+      return false;
+    }
+
+    function refreshEditorModalState() {
+      const inside = !!selectionInEditorModal();
+      const state = {
+        bold: inside && document.queryCommandState('bold'),
+        italic: inside && document.queryCommandState('italic'),
+        underline: inside && document.queryCommandState('underline'),
+        highlight: inside && isSelectionHighlighted()
+      };
+      Object.entries(state).forEach(([cmd, active]) => {
+        editorModalTools.querySelector(`[data-cmd="${cmd}"]`)?.classList.toggle('is-active', !!active);
+      });
+    }
+
+    function runEditorModalCommand(cmd) {
+      if (cmd === 'smaller' || cmd === 'larger') {
+        editorModalFont = Math.min(EDITOR_FONT_MAX, Math.max(EDITOR_FONT_MIN, editorModalFont + (cmd === 'larger' ? 2 : -2)));
+        try { localStorage.setItem(EDITOR_MODAL_FONT_KEY, String(editorModalFont)); } catch (error) { /* ignore */ }
+        updateEditorModalFont();
+        return;
+      }
+      restoreEditorModalSelection();
+      document.execCommand('styleWithCSS', false, false);
+      if (cmd === 'highlight') {
+        const on = isSelectionHighlighted();
+        document.execCommand('styleWithCSS', false, true);
+        document.execCommand('hiliteColor', false, on ? 'transparent' : EDITOR_MODAL_HIGHLIGHT);
+        document.execCommand('styleWithCSS', false, false);
+      } else if (cmd === 'clear') {
+        document.execCommand('removeFormat');
+        if (isSelectionHighlighted()) {
+          document.execCommand('styleWithCSS', false, true);
+          document.execCommand('hiliteColor', false, 'transparent');
+          document.execCommand('styleWithCSS', false, false);
+        }
+      } else {
+        document.execCommand(cmd);
+      }
+      refreshEditorModalState();
+      updateEditorModalInfo();
+    }
+
+    function openEditorModal() {
+      editorModalBody.innerHTML = '';
+      editorModalBody.appendChild(markersToEditorFragment(editor.value));
+      editorModalBaseline = domToMarkers(editorModalBody);
+      editorModalRange = null;
+      editorModal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      updateEditorModalFont();
+      updateEditorModalInfo();
+      editorModalBody.focus({ preventScroll: true });
+      // Caret to the start, view at the top.
+      const range = document.createRange();
+      range.setStart(editorModalBody, 0);
+      range.collapse(true);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      editorModalBody.scrollTop = 0;
+      refreshEditorModalState();
+    }
+
+    function closeEditorModal() {
+      editorModal.hidden = true;
+      document.body.style.overflow = '';
+      editorModalBody.innerHTML = '';
+      editorModalRange = null;
+      openEditorModalBtn.focus({ preventScroll: true });
+    }
+
+    function cancelEditorModal() {
+      const changed = domToMarkers(editorModalBody) !== editorModalBaseline;
+      if (changed && !confirm(tr('modal.discardConfirm'))) return;
+      closeEditorModal();
+    }
+
+    function applyEditorModal() {
+      const text = domToMarkers(editorModalBody);
+      if (text !== editorModalBaseline && text !== editor.value) {
+        editor.value = text;
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      closeEditorModal();
+    }
+
+    function localizeEditorModal() {
+      openEditorModalBtn.title = tr('format.expandTitle');
+      openEditorModalBtn.setAttribute('aria-label', tr('format.expandTitle'));
+      document.getElementById('editorModalTitle').textContent = tr('modal.title');
+      document.getElementById('editorModalCloseBtn').setAttribute('aria-label', tr('modal.close'));
+      document.getElementById('editorModalCloseBtn').title = tr('modal.close');
+      document.getElementById('editorModalCancelBtn').textContent = tr('modal.cancel');
+      document.getElementById('editorModalApplyBtn').textContent = tr('modal.apply');
+      const labels = {
+        highlight: ['format.mark', 'format.markTitle'],
+        bold: ['format.bold', 'format.boldTitle'],
+        italic: ['format.italic', 'format.italicTitle'],
+        underline: ['format.underline', 'format.underlineTitle'],
+        clear: [null, 'format.clearTitle'],
+        undo: [null, 'modal.undo'],
+        redo: [null, 'modal.redo'],
+        smaller: [null, 'modal.smaller'],
+        larger: [null, 'modal.larger']
+      };
+      Object.entries(labels).forEach(([cmd, [textKey, titleKey]]) => {
+        const button = editorModalTools.querySelector(`[data-cmd="${cmd}"]`);
+        if (!button) return;
+        if (textKey) button.textContent = tr(textKey);
+        button.title = tr(titleKey);
+        button.setAttribute('aria-label', tr(titleKey));
+      });
+      editorModalBody.dataset.placeholder = tr('scriptPlaceholder');
+      if (isEditorModalOpen()) updateEditorModalInfo();
+    }
+
+    openEditorModalBtn.addEventListener('click', openEditorModal);
+    document.getElementById('editorModalCloseBtn').addEventListener('click', cancelEditorModal);
+    document.getElementById('editorModalCancelBtn').addEventListener('click', cancelEditorModal);
+    document.getElementById('editorModalApplyBtn').addEventListener('click', applyEditorModal);
+
+    // Keep the text selection when a toolbar button is pressed.
+    editorModalTools.addEventListener('mousedown', event => {
+      if (event.target.closest('button')) event.preventDefault();
+    });
+    editorModalTools.addEventListener('click', event => {
+      const button = event.target.closest('button[data-cmd]');
+      if (button) runEditorModalCommand(button.dataset.cmd);
+    });
+
+    document.addEventListener('selectionchange', () => {
+      if (!isEditorModalOpen()) return;
+      const range = selectionInEditorModal();
+      if (range) editorModalRange = range.cloneRange();
+      refreshEditorModalState();
+    });
+
+    // Enter = line break (like the textarea), so blank lines keep meaning "new paragraph".
+    editorModalBody.addEventListener('beforeinput', event => {
+      if (event.inputType === 'insertParagraph') {
+        event.preventDefault();
+        if (!document.execCommand('insertLineBreak')) document.execCommand('insertHTML', false, '<br>');
+      }
+    });
+
+    editorModalBody.addEventListener('input', updateEditorModalInfo);
+
+    // Paste: keep bold / italic / underline / highlight, drop everything else.
+    editorModalBody.addEventListener('paste', event => {
+      const data = event.clipboardData;
+      if (!data) return;
+      event.preventDefault();
+      const html = data.getData('text/html');
+      let text = '';
+      if (html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        text = domToMarkers(doc.body, { pasted: true });
+      }
+      if (!text) text = data.getData('text/plain').replace(/\r\n?/g, '\n');
+      if (!text) return;
+      document.execCommand('insertHTML', false, fragmentToHtml(markersToEditorFragment(text)));
+      updateEditorModalInfo();
+    });
+
+    // Copy / cut: hand out clean HTML (no editor colours) plus plain text.
+    function writeEditorModalClipboard(event) {
+      const range = selectionInEditorModal();
+      if (!range || range.collapsed || !event.clipboardData) return false;
+      const holder = document.createElement('div');
+      holder.appendChild(range.cloneContents());
+      const markers = domToMarkers(holder);
+      const html = fragmentToHtml(markersToEditorFragment(markers));
+      const temp = document.createElement('div');
+      temp.innerHTML = html.replace(/<br>/g, '\n');
+      event.clipboardData.setData('text/plain', temp.textContent);
+      event.clipboardData.setData('text/html', html);
+      event.preventDefault();
+      return true;
+    }
+    editorModalBody.addEventListener('copy', writeEditorModalClipboard);
+    editorModalBody.addEventListener('cut', event => {
+      if (writeEditorModalClipboard(event)) document.execCommand('delete');
+    });
+
+    editorModal.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); cancelEditorModal(); return; }
+      const mod = (event.ctrlKey || event.metaKey) && !event.altKey;
+      if (mod && event.key === 'Enter') { event.preventDefault(); applyEditorModal(); return; }
+      if (!mod || event.target !== editorModalBody) return;
+      const key = event.key.toLowerCase();
+      const shortcuts = { b: 'bold', i: 'italic', u: 'underline', h: 'highlight' };
+      if (shortcuts[key]) { event.preventDefault(); runEditorModalCommand(shortcuts[key]); }
+    });
+
+
     document.addEventListener('keydown', event => {
+      if (isEditorModalOpen()) return;
       const tag = document.activeElement?.tagName;
-      const typing = tag === 'TEXTAREA' || tag === 'INPUT';
+      const typing = tag === 'TEXTAREA' || tag === 'INPUT' || document.activeElement?.isContentEditable;
       if (event.altKey && event.key.toLowerCase() === 'j') {
         event.preventDefault();
         rememberCursorPosition();
